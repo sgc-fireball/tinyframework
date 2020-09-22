@@ -3,18 +3,6 @@
   "license": "proprietary",
   "type": "composer-plugin",
   "autoload": {
-    "files": [
-      "src/Helpers/env.php",
-      "src/Helpers/toBool.php",
-      "src/Helpers/dic.php",
-      "src/Helpers/guid.php",
-      "src/Helpers/dump.php",
-      "src/Helpers/base64url.php",
-      "src/Helpers/exception2text.php",
-      "src/Helpers/route.php",
-      "src/Helpers/lang.php",
-      "src/Helpers/view.php"
-    ],
     "psr-4": {
       "TinyFramework\\": "src/"
     }
