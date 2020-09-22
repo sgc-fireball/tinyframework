@@ -1,0 +1,100 @@
+<?php declare(strict_types=1);
+
+namespace TinyFramework\Core;
+
+use RuntimeException;
+
+class Config implements ConfigInterface
+{
+
+    private array $config = [];
+
+    public function __construct(array $config)
+    {
+        $this->config = array_merge($this->config, $config);
+        $root = (defined('ROOT') ? ROOT : '.');
+        $this->loadFolder(__DIR__ . '/config');
+        $this->loadFolder($root . '/config');
+    }
+
+    private function loadFolder(string $path): ConfigInterface
+    {
+        if (is_dir($path)) {
+            foreach (glob($path . '/*.php') as $file) {
+                $this->load(str_replace('.php', '', basename($file)), $file);
+            }
+        }
+        return $this;
+    }
+
+    public function load(string $name, string $file): ConfigInterface
+    {
+        if (!file_exists($file) || !is_readable($file)) {
+            throw new RuntimeException('Could not load config.');
+        }
+        $this->config[$name] = $this->merge(
+            $this->config[$name] ?? [],
+            (array)require($file)
+        );
+        return $this;
+    }
+
+    private function merge(array $output = [], array $input = []): array
+    {
+        foreach ($input as $key => $value) {
+            if (is_numeric($key)) {
+                $output[] = $value;
+            } else if (array_key_exists($key, $output) && is_array($output[$key]) && is_array($input[$key])) {
+                $output[$key] = $this->merge($output[$key], $value);
+            } else {
+                $output[$key] = $value;
+            }
+        }
+        return $output;
+    }
+
+    /**
+     * @param string|null $key
+     * @param null $default
+     * @return array|mixed|null
+     */
+    public function get(string $key = null, $default = null)
+    {
+        if (is_null($key)) {
+            return $this->config;
+        }
+        if (strpos($key, '.') !== false) {
+            $keys = explode('.', $key);
+            $config = $this->config;
+            foreach ($keys as $key) {
+                if (!array_key_exists($key, $config)) {
+                    return $default;
+                }
+                $config = $config[$key];
+            }
+            return $config;
+        }
+        return array_key_exists($key, $this->config) ? $this->config[$key] : $default;
+    }
+
+    /**
+     * @param string $key
+     * @param mixed $value
+     * @return $this|ConfigInterface
+     */
+    public function set(string $key, $value): ConfigInterface
+    {
+        $keys = strpos($key, '.') === false ? [$key] : explode('.', $key);
+        $key = $keys[count($keys) - 1];
+        $config = &$this->config;
+        foreach ($keys as $key) {
+            if (!array_key_exists($key, $config) || !is_array($config[$key])) {
+                $config[$key] = [];
+            }
+            $config = &$config[$key];
+        }
+        $config[$key] = $value;
+        return $this;
+    }
+
+}

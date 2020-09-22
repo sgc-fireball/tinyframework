@@ -1,0 +1,117 @@
+<?php declare(strict_types=1);
+
+namespace TinyFramework\Cache;
+
+class FileCache extends CacheAwesome
+{
+
+    private string $path;
+
+    public function __construct(array $config = [])
+    {
+        parent::__construct($config);
+        $this->path = $this->config['path'] ?? sys_get_temp_dir();
+        if (!is_dir($this->path)) {
+            if (!mkdir($this->path, 0770, true)) {
+                throw new \RuntimeException('Could not create cache folder.');
+            }
+        }
+        if (!is_readable($this->path) || !is_writable($this->path)) {
+            throw new \RuntimeException('Invalid cache folder permission.');
+        }
+    }
+
+    private function key2file(string $key)
+    {
+        return sprintf('%s/%s.cache.tmp', $this->path, hash('sha3-256', $key));
+    }
+
+    public function clear(): CacheInterface
+    {
+        if (count($this->tags)) {
+            foreach ($this->tags as $tag) {
+                $keys = $this->get($tag, []);
+                foreach ($keys as $key => $item) {
+                    $this->forget($key);
+                }
+                $this->forget($tag);
+            }
+        } else {
+            foreach (glob($this->path . '/*.cache.tmp') as $item) {
+                unlink($item);
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * @param string $key
+     * @param mixed $default
+     * @return mixed
+     */
+    public function get(string $key, $default = null)
+    {
+        $value = $default;
+        if ($this->has($key)) {
+            $value = unserialize(file_get_contents($this->key2file($key))) ?: $default;
+        }
+        return $value ?: $default;
+    }
+
+    public function has(string $key): bool
+    {
+        $file = $this->key2file($key);
+        if (!file_exists($file)) {
+            return false;
+        }
+        if (filemtime($file) <= time()) {
+            @unlink($file);
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @param string $key
+     * @param mixed $value
+     * @param null|int|\DateTime|\DateTimeInterface $ttl
+     * @return CacheInterface
+     */
+    public function set(string $key, $value = null, $ttl = null): CacheInterface
+    {
+        $file = $this->key2file($key);
+        if (file_put_contents($file, serialize($value)) === false) {
+            throw new \RuntimeException('Could not write cache.');
+        }
+        if (!touch($file, $ttl ? $this->calculateExpiration($ttl) : time() + 60 * 60 * 24 * 7 * 52)) {
+            throw new \RuntimeException('Could set cache ttl.');
+        }
+        $this->addKeyToTags($key);
+        return $this;
+    }
+
+    public function forget(string $key): CacheInterface
+    {
+        $file = $this->key2file($key);
+        if (!file_exists($file)) {
+            return $this;
+        }
+        if (@unlink($key)) {
+            return $this;
+        }
+        throw new \RuntimeException('Could not clear cache key.');
+    }
+
+    private function addKeyToTags(string $key): FileCache
+    {
+        foreach ($this->tags as $tag) {
+            $keys = $this->get($tag, []);
+            if (!array_key_exists($key, $keys)) {
+                $keys[$key] = 1;
+                $this->set($tag, $keys);
+            }
+        }
+        return $this;
+    }
+
+}

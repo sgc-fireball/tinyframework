@@ -1,0 +1,57 @@
+{
+  "name": "sgc-fireball/tinyframework",
+  "license": "proprietary",
+  "type": "composer-plugin",
+  "autoload": {
+    "files": [
+      "TinyFramework/Helpers/env.php",
+      "TinyFramework/Helpers/toBool.php",
+      "TinyFramework/Helpers/dic.php",
+      "TinyFramework/Helpers/guid.php",
+      "TinyFramework/Helpers/dump.php",
+      "TinyFramework/Helpers/base64url.php",
+      "TinyFramework/Helpers/exception2text.php",
+      "TinyFramework/Helpers/route.php",
+      "TinyFramework/Helpers/lang.php",
+      "TinyFramework/Helpers/view.php"
+    ],
+    "psr-4": {
+      "TinyFramework\\": "src/"
+    }
+  },
+  "require": {
+    "php": ">=7.4",
+    "ext-json": "*",
+    "ext-mysqli": "*",
+    "ext-simplexml": "*",
+    "ext-readline": "*",
+    "composer-plugin-api": "^1.1",
+    "composer/composer": "@stable",
+    "psy/psysh": "@stable"
+  },
+  "require-dev": {
+    "phpstan/phpstan": "^0.12"
+  },
+  "suggest": {
+    "ext-redis": "*",
+    "predis/predis": "@stable"
+  },
+  "scripts": {
+    "post-install-cmd": [
+      "TinyFramework\\Composer\\Hook::postInstallCommand"
+    ],
+    "post-update-cmd": [
+      "TinyFramework\\Composer\\Hook::postUpdateCommand"
+    ],
+    "analyse": [
+      "@php $(which composer) dump-autoload",
+      "@php vendor/bin/phpstan analyse"
+    ]
+  },
+  "scripts-descriptions": {
+    "analyse": "Dump autoload and analyse the source with phpstan!"
+  },
+  "extra": {
+    "class": "TinyFramework\\Composer\\Plugin"
+  }
+}

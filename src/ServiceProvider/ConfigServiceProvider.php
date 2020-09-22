@@ -1,0 +1,22 @@
+<?php declare(strict_types=1);
+
+namespace TinyFramework\ServiceProvider;
+
+use TinyFramework\Core\Config;
+use TinyFramework\Core\ConfigInterface;
+use TinyFramework\Core\ContainerInterface;
+
+class ConfigServiceProvider extends ServiceProviderAwesome
+{
+
+    public function register()
+    {
+        $this->container
+            ->alias('config', Config::Class)
+            ->alias(ConfigInterface::class, Config::Class)
+            ->singleton(Config::class, function (ContainerInterface $container) {
+                return new Config(['base_path' => getcwd()]);
+            });
+    }
+
+}
