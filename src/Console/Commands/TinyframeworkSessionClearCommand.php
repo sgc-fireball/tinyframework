@@ -5,17 +5,17 @@ namespace TinyFramework\Console\Commands;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use TinyFramework\Console\CommandAwesome;
-use TinyFramework\Template\ViewInterface;
+use TinyFramework\Session\SessionInterface;
 
-class ViewClearCommand extends CommandAwesome
+class TinyframeworkSessionClearCommand extends CommandAwesome
 {
 
     public function run(InputInterface $input, OutputInterface $output)
     {
         parent::run($input, $output);
-        $this->output->write('[<info>....</info>] View clear');
-        /** @var ViewInterface $session */
-        $session = $this->container->get('view');
+        $this->output->write('[<info>....</info>] Session clear');
+        /** @var SessionInterface $session */
+        $session = $this->container->get('session');
         $session->clear();
         $this->output->write("\r[<info>DONE</info>]\n");
         return 0;

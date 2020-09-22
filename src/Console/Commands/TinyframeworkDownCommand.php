@@ -9,7 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use TinyFramework\Console\CommandAwesome;
 use TinyFramework\Template\ViewInterface;
 
-class DownCommand extends CommandAwesome
+class TinyframeworkDownCommand extends CommandAwesome
 {
 
     protected function configure()

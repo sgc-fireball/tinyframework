@@ -10,7 +10,7 @@ use TinyFramework\Console\CommandAwesome;
 use TinyFramework\Console\ConsoleKernel;
 use TinyFramework\Shell\TabCompletion\TinyFrameworkMatcher;
 
-class ShellCommand extends CommandAwesome
+class TinyframeworkShellCommand extends CommandAwesome
 {
 
     public function run(InputInterface $input, OutputInterface $output)

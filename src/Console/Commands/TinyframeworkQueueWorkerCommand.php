@@ -12,7 +12,7 @@ use TinyFramework\Queue\SyncQueue;
 use TinyFramework\Session\SessionInterface;
 use TinyFramework\Template\ViewInterface;
 
-class QueueWorkerCommand extends CommandAwesome
+class TinyframeworkQueueWorkerCommand extends CommandAwesome
 {
 
     public function run(InputInterface $input, OutputInterface $output)

@@ -17,6 +17,12 @@ abstract class CommandAwesome extends BaseCommand implements CommandInterface
 
     protected OutputInterface $output;
 
+    public function __construct(string $name = null)
+    {
+        $name = static::getDefaultName();
+        parent::__construct($name);
+    }
+
     public static function getDefaultName()
     {
         $command = str_replace('\\', '/', static::class);
@@ -34,6 +40,7 @@ abstract class CommandAwesome extends BaseCommand implements CommandInterface
     {
         $this->input = $input;
         $this->output = $output;
+        $this->container = Container::instance();
         // @TODO compile inputargs with definition
         return 0;
     }

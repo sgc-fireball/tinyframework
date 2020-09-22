@@ -5,19 +5,18 @@ namespace TinyFramework\Console\Commands;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use TinyFramework\Console\CommandAwesome;
-use TinyFramework\Session\SessionInterface;
+use TinyFramework\Template\ViewInterface;
 
-class SessionClearCommand extends CommandAwesome
+class TinyframeworkUpCommand extends CommandAwesome
 {
 
     public function run(InputInterface $input, OutputInterface $output)
     {
         parent::run($input, $output);
-        $this->output->write('[<info>....</info>] Session clear');
-        /** @var SessionInterface $session */
-        $session = $this->container->get('session');
-        $session->clear();
-        $this->output->write("\r[<info>DONE</info>]\n");
+        if (file_exists('storage/maintenance.json')) {
+            @unlink('storage/maintenance.json');
+        }
+        $this->output->writeln('<info>Application is now live.</info>');
         return 0;
     }
 
