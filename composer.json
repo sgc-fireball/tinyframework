@@ -4,16 +4,16 @@
   "type": "composer-plugin",
   "autoload": {
     "files": [
-      "TinyFramework/Helpers/env.php",
-      "TinyFramework/Helpers/toBool.php",
-      "TinyFramework/Helpers/dic.php",
-      "TinyFramework/Helpers/guid.php",
-      "TinyFramework/Helpers/dump.php",
-      "TinyFramework/Helpers/base64url.php",
-      "TinyFramework/Helpers/exception2text.php",
-      "TinyFramework/Helpers/route.php",
-      "TinyFramework/Helpers/lang.php",
-      "TinyFramework/Helpers/view.php"
+      "src/Helpers/env.php",
+      "src/Helpers/toBool.php",
+      "src/Helpers/dic.php",
+      "src/Helpers/guid.php",
+      "src/Helpers/dump.php",
+      "src/Helpers/base64url.php",
+      "src/Helpers/exception2text.php",
+      "src/Helpers/route.php",
+      "src/Helpers/lang.php",
+      "src/Helpers/view.php"
     ],
     "psr-4": {
       "TinyFramework\\": "src/"
