@@ -28,6 +28,8 @@ class Hook
     private static function installFolder()
     {
         $folders = [
+            'app/Commands',
+            'app/Providers',
             'public',
             'routes',
             'resources/views',

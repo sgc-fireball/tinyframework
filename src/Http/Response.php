@@ -157,22 +157,27 @@ class Response
 
     public function send()
     {
+        header(
+            sprintf('%s %d %s', $this->protocol, $this->code, static::$codes[$this->code]),
+            true,
+            $this->code
+        );
         foreach ($this->headers as $key => $value) {
             header($key . ': ' . $value, $key === 'content-type');
         }
-        header(
-            sprintf(
-                '%s %d %s',
-                $this->protocol,
-                $this->code,
-                static::$codes[$this->code]
-            ),
-            true,
-            $this->code()
-        );
         echo $this->content;
         flush();
         return $this;
+    }
+
+    public function __toString()
+    {
+        $response = sprintf("%s %d %s\n", $this->protocol, $this->code, static::$codes[$this->code]);
+        foreach ($this->headers as $key => $value) {
+            $response .= sprintf("%s: %s\n", $key, $value);
+        }
+        $response .= "\n" . $this->content;
+        return $response;
     }
 
 }

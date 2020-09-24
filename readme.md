@@ -1,5 +1,19 @@
 # TinyFramework
 
+## Folders
+- app
+    - Commands
+    - Providers
+- config
+- public
+- resources
+    - views
+- storage
+    - cache
+    - logs
+    - psych
+    - sessions 
+
 ## Composer
 ```bash
 php7.4 $(which composer) --help
@@ -13,20 +27,21 @@ php7.4 $(which composer) tinyframework:view:clear
 
 ## Container
 ```php
-$service = container();
-$service = container($service);
+$container = container();
 $service = container('config');
 $service = container(ConfigInterface::class);
 ```
 
 ## Config
 ```php
+$key = 'app.debug';
 config()->get($key);
 config()->set($key, $value);
 ```
 
 ## Cache
 ```php
+$key = 'my:cache:key';
 cache()->clear();
 cache()->get($key);
 cache()->set($key, $value);
@@ -68,15 +83,15 @@ logger()->log($level, $message, $context);
 ## Queue
 ```php
 queue()->count();
-queue()->push((new JobAwesome(['your-data']))->attempts(3)->delay(60)->queue('priority'));
+queue()->push((new JobAwesome($yourData))->attempts(3)->delay(60)->queue('priority'));
 queue()->name('priority')->pop(); // return null or and a JobInterface
 ```
 
 ## Template Engine
 ```php
 view(); // return ViewInterface
-view('path.to.file'); // return Response|ViewInterface
-echo view('path.to.file', ['key' => $value]);
+view('path.to.file'); // return Response
+view('path.to.file', ['key' => $value]);
 ```
 
 ## Console / PsySh

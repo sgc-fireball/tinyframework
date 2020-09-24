@@ -30,7 +30,7 @@ class Blade implements ViewInterface
     {
         $this->config = $config;
         $this->config['cache'] = $this->config['cache'] ?? true;
-        $this->config['source'] = $this->config['source'] ?? 'ressources/views';
+        $this->config['source'] = $this->config['source'] ?? 'resources/views';
         $this->cache = $cache->tag('template');
     }
 

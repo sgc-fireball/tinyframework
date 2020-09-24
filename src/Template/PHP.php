@@ -12,7 +12,7 @@ class PHP implements ViewInterface
     public function __construct(array $config)
     {
         $this->config = $config;
-        $this->config['source'] = $this->config['source'] ?? 'ressources/views';
+        $this->config['source'] = $this->config['source'] ?? 'resources/views';
     }
 
     private function view2file(string $view): string

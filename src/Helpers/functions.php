@@ -84,9 +84,10 @@ if (!function_exists('view')) {
     /**
      * @param string|null $file
      * @param array $data
+     * @param int $code
      * @return \TinyFramework\Http\Response|\TinyFramework\Template\ViewInterface
      */
-    function view(string $file = null, array $data = [])
+    function view(string $file = null, array $data = [], int $code = 200)
     {
         /** @var \TinyFramework\Template\ViewInterface $view */
         $view = container('view');
@@ -94,7 +95,7 @@ if (!function_exists('view')) {
             return $view;
         }
         $content = $view->render($file, $data);
-        return Response::new($content);
+        return Response::new($content, $code);
     }
 }
 
