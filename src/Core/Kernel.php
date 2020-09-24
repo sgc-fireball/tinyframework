@@ -61,8 +61,9 @@ abstract class Kernel
             }
         }
 
-        if (is_dir('src/ServiceProvider')) {
-            foreach (glob('src/ServiceProvider/*.php') as $file) {
+        $root = (defined('ROOT') ? ROOT : '.');
+        if (is_dir($root.'/app/ServiceProvider')) {
+            foreach (glob($root.'/app/ServiceProvider/*.php') as $file) {
                 $provider = 'App\\ServiceProvider\\' . str_replace('.php', '', basename($file));
                 if (class_exists($provider)) {
                     $this->serviceProviderNames[] = $provider;

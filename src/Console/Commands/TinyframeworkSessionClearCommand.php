@@ -10,6 +10,13 @@ use TinyFramework\Session\SessionInterface;
 class TinyframeworkSessionClearCommand extends CommandAwesome
 {
 
+    protected function configure()
+    {
+        parent::configure();
+        $this
+            ->setDescription('Flush the session cache');
+    }
+
     public function run(InputInterface $input, OutputInterface $output)
     {
         parent::run($input, $output);

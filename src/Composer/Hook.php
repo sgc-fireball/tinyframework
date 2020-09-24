@@ -21,23 +21,30 @@ class Hook
 
     private static function checkPublicIndex()
     {
-        self::installConsole();
+        self::installFolder();
         self::installIndex();
     }
 
-    private static function installConsole()
+    private static function installFolder()
     {
-        if (!file_exists('console')) {
-            copy(__DIR__ . '/../Files/console', 'console');
+        $folders = [
+            'public',
+            'routes',
+            'resources/views',
+            'storage/logs',
+            'storage/psych',
+            'storage/cache',
+            'storage/sessions',
+        ];
+        foreach ($folders as $folder) {
+            if (!is_dir('./' . $folder)) {
+                mkdir('./' . $folder, 0755, true);
+            }
         }
-        chmod('console', 0755);
     }
 
     private static function installIndex()
     {
-        if (!is_dir('./public')) {
-            mkdir('./public', 0755, true);
-        }
         if (!file_exists('public/index.php')) {
             copy(__DIR__ . '/../Files/index.php', 'public/index.php');
         }

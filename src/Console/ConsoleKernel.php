@@ -19,7 +19,7 @@ class ConsoleKernel extends Kernel
         foreach ($this->container->tagged('commands') as $command) {
             $this->commands[$command->getName()] = $command;
         }
-        $this->loadCommandsByPath((defined('ROOT') ? ROOT : '.') . '/src/Commands', 'App\\Commands\\');
+        $this->loadCommandsByPath((defined('ROOT') ? ROOT : '.') . '/app/Commands', 'App\\Commands\\');
         $this->loadCommandsByPath(__DIR__ . '/Commands', 'TinyFramework\\Console\\Commands\\');
     }
 

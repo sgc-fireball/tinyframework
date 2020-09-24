@@ -10,6 +10,13 @@ use TinyFramework\Console\CommandAwesome;
 class TinyframeworkCacheClearCommand extends CommandAwesome
 {
 
+    protected function configure()
+    {
+        parent::configure();
+        $this
+            ->setDescription('Flush the application cache');
+    }
+
     public function run(InputInterface $input, OutputInterface $output)
     {
         parent::run($input, $output);

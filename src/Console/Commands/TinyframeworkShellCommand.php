@@ -13,6 +13,13 @@ use TinyFramework\Shell\TabCompletion\TinyFrameworkMatcher;
 class TinyframeworkShellCommand extends CommandAwesome
 {
 
+    protected function configure()
+    {
+        parent::configure();
+        $this
+            ->setDescription('Start a psysh');
+    }
+
     public function run(InputInterface $input, OutputInterface $output)
     {
         parent::run($input, $output);

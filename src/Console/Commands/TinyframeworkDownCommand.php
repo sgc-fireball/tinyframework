@@ -16,7 +16,7 @@ class TinyframeworkDownCommand extends CommandAwesome
     {
         parent::configure();
         $this
-            ->setDescription('Describe args behaviors')
+            ->setDescription('Put the application into maintenance mode')
             ->setDefinition(
                 new InputDefinition([
                     new InputOption('ip', 'i', InputOption::VALUE_OPTIONAL, 'Allowed client', '127.0.0.1'),

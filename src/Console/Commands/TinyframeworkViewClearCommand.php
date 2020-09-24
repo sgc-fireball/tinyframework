@@ -10,6 +10,13 @@ use TinyFramework\Template\ViewInterface;
 class TinyframeworkViewClearCommand extends CommandAwesome
 {
 
+    protected function configure()
+    {
+        parent::configure();
+        $this
+            ->setDescription('Clear all compiled view files');
+    }
+
     public function run(InputInterface $input, OutputInterface $output)
     {
         parent::run($input, $output);
