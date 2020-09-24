@@ -93,8 +93,3 @@ view(); // return ViewInterface
 view('path.to.file'); // return Response
 view('path.to.file', ['key' => $value]);
 ```
-
-## Console / PsySh
-```bash
-php7.4 console
-```
