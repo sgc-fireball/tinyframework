@@ -19,7 +19,7 @@ abstract class CommandAwesome extends BaseCommand implements CommandInterface
 
     public function __construct(string $name = null)
     {
-        $name = static::getDefaultName();
+        $name = $name ?: static::getDefaultName();
         parent::__construct($name);
     }
 

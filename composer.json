@@ -3,6 +3,9 @@
   "license": "proprietary",
   "type": "composer-plugin",
   "autoload": {
+    "files": [
+      "src/Helpers/functions.php"
+    ],
     "psr-4": {
       "TinyFramework\\": "src/"
     }

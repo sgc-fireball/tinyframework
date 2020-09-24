@@ -8,16 +8,7 @@ use ReflectionClass;
 use ReflectionMethod;
 use ReflectionFunction;
 
-require_once(__DIR__ . "/../Helpers/env.php");
-require_once(__DIR__ . "/../Helpers/toBool.php");
-require_once(__DIR__ . "/../Helpers/dic.php");
-require_once(__DIR__ . "/../Helpers/guid.php");
-require_once(__DIR__ . "/../Helpers/dump.php");
-require_once(__DIR__ . "/../Helpers/base64url.php");
-require_once(__DIR__ . "/../Helpers/exception2text.php");
-require_once(__DIR__ . "/../Helpers/route.php");
-require_once(__DIR__ . "/../Helpers/lang.php");
-require_once(__DIR__ . "/../Helpers/view.php");
+require_once(__DIR__ . "/../Helpers/functions.php");
 
 class Container implements ContainerInterface
 {
