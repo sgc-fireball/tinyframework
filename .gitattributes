@@ -1,17 +1,24 @@
+# https://php.watch/articles/composer-gitattributes
+/.gitattributes export-ignore
+/.gitignore     export-ignore
+/phpstan.neon   export-ignore
+/readme.md      export-ignore
+
 * text eol=LF
 
-*.pdf binary
-*.zip binary
-*.rar binary
-*.7z binary
-*.gz binary
-*.jpg binary
-*.png binary
-*.gif binary
-*.ttf binary
-*.woff binary
-*.woff2 binary
-*.eot binary
+*.pdf binary -diff
+*.phar binary -diff
+*.zip binary -diff
+*.rar binary -diff
+*.7z binary -diff
+*.gz binary -diff
+*.jpg binary -diff
+*.png binary -diff
+*.gif binary -diff
+*.ttf binary -diff
+*.woff binary -diff
+*.woff2 binary -diff
+*.eot binary -diff
 
 *.php text eol=lf whitespace=blank-at-eol,-blank-at-eof,-space-before-tab,tab-in-indent,tabwidth=4 diff=php
 *.html text eol=lf whitespace=blank-at-eol,-blank-at-eof,-space-before-tab,tab-in-indent,tabwidth=4 diff=html
