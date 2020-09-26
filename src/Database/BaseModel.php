@@ -10,6 +10,8 @@ class BaseModel implements JsonSerializable, ArrayAccess
 
     protected string $table;
 
+    protected string $primaryType = 'uuid';
+
     protected array $fillable = [];
 
     protected array $attributes = [];
@@ -116,7 +118,9 @@ class BaseModel implements JsonSerializable, ArrayAccess
     public function save(): self
     {
         if (!array_key_exists('id', $this->attributes) || empty($this->attributes['id'])) {
-            $this->attributes['id'] = guid();
+            if ($this->primaryType === 'string') {
+                $this->attributes['id'] = guid();
+            }
         }
         if (!$this->isDirty()) {
             return $this;
