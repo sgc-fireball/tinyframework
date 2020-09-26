@@ -76,7 +76,7 @@ class Query extends AbstractQuery implements QueryInterface
         $self = $this;
         return trim(implode(', ', array_map(function ($value, $key) use ($self) {
             return sprintf('`%s` = %s', $key, $self->driver->escape($value));
-        }, $fields)), ' ,');
+        }, array_values($fields), array_keys($fields))), ' ,');
     }
 
     public function load(): array
