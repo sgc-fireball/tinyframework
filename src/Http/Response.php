@@ -39,6 +39,7 @@ class Response
         408 => 'Request Timeout',
         409 => 'Conflict',
         410 => 'Gone',
+        419 => 'Page Expired',
         411 => 'Length Required',
         412 => 'Precondition Failed',
         413 => 'Payload Too Large',

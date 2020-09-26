@@ -29,7 +29,7 @@ class Router
     public function load(): self
     {
         $router = $this;
-        $files = ['config', 'web', 'api'];
+        $files = ['config', 'api', 'web'];
         foreach ($files as $file) {
             $file = sprintf('routes/%s.php', $file);
             if (file_exists($file)) {
