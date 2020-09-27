@@ -141,7 +141,7 @@ if (!function_exists('env')) {
 
 
 if (!function_exists('exception2text')) {
-    function exception2text(\Throwable $e): string
+    function exception2text(\Throwable $e, bool $stacktrace = false): string
     {
         $result = sprintf(
             '%s[%d] %s in %s:%d',
@@ -151,8 +151,11 @@ if (!function_exists('exception2text')) {
             ltrim(str_replace([getcwd()], '', $e->getFile()), '/'),
             $e->getLine()
         );
+        if ($stacktrace) {
+            $result .= "\n".$e->getTraceAsString();
+        }
         if ($e = $e->getPrevious()) {
-            $result .= sprintf("\n - %s", exception2text($e));
+            $result .= sprintf("\n - %s", exception2text($e, $stacktrace));
         }
         return $result;
     }

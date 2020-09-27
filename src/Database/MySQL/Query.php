@@ -98,10 +98,10 @@ class Query extends AbstractQuery implements QueryInterface
         return $this->driver->execute(sprintf(
             'INSERT INTO `%s` SET %s ON DUPLICATE KEY UPDATE %s',
             $this->table,
+            $this->compileFieldSet($fields),
             $this->compileFieldSet(array_filter($fields, function ($value, $key) {
                 return $key !== 'id';
-            }, ARRAY_FILTER_USE_BOTH)),
-            $this->compileFieldSet($fields)
+            }, ARRAY_FILTER_USE_BOTH))
         ));
     }
 
