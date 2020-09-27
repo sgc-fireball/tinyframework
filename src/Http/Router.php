@@ -189,7 +189,7 @@ class Router
 
     public function resolve(Request $request): ?Route
     {
-        $url = $request->uri()->query([])->__toString();
+        $url = $request->uri()->query([])->fragment('')->__toString();
 
         /** @var Route $route */
         foreach ($this->routes as $route) {

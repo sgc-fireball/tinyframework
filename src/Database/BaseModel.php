@@ -108,11 +108,13 @@ class BaseModel implements JsonSerializable, ArrayAccess
         return false;
     }
 
-    public function query(): QueryInterface
+
+    public static function query(): QueryInterface
     {
+        $class = static::class;
         /** @var DatabaseInterface $database */
         $database = container('database');
-        return $database->query()->table($this->table)->class(get_class($this));
+        return $database->query()->table((new $class())->getTable())->class($class);
     }
 
     public function save(): self
@@ -125,7 +127,7 @@ class BaseModel implements JsonSerializable, ArrayAccess
         if (!$this->isDirty()) {
             return $this;
         }
-        $this->query()->put($this->attributes);
+        $this::query()->put($this->attributes);
         $this->originals = $this->attributes;
         return $this;
     }
@@ -133,7 +135,7 @@ class BaseModel implements JsonSerializable, ArrayAccess
     public function delete(): self
     {
         if (array_key_exists('id', $this->attributes) && !empty($this->attributes['id'])) {
-            $this->query()->where('id', '=', $this->attributes['id'])->delete();
+            $this::query()->where('id', '=', $this->attributes['id'])->delete();
         }
         $this->originals = [];
         return $this;
