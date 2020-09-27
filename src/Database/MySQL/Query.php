@@ -93,16 +93,28 @@ class Query extends AbstractQuery implements QueryInterface
         )));
     }
 
-    public function put(array $fields = [])
+    public function put(array &$fields = [])
     {
-        return $this->driver->execute(sprintf(
-            'INSERT INTO `%s` SET %s ON DUPLICATE KEY UPDATE %s',
-            $this->table,
-            $this->compileFieldSet($fields),
-            $this->compileFieldSet(array_filter($fields, function ($value, $key) {
-                return $key !== 'id';
-            }, ARRAY_FILTER_USE_BOTH))
-        ));
+        if (array_key_exists('id', $fields) && $fields['id']) {
+            return $this->driver->execute(sprintf(
+                'INSERT INTO `%s` SET %s ON DUPLICATE KEY UPDATE %s',
+                $this->table,
+                $this->compileFieldSet($fields),
+                $this->compileFieldSet(array_filter($fields, function ($value, $key) {
+                    return $key !== 'id';
+                }, ARRAY_FILTER_USE_BOTH))
+            ));
+        } else {
+            $result = $this->driver->execute(sprintf(
+                'INSERT INTO `%s` SET %s',
+                $this->table,
+                $this->compileFieldSet(array_filter($fields, function ($value, $key) {
+                    return $key !== 'id';
+                }, ARRAY_FILTER_USE_BOTH))
+            ));
+            $fields['id'] = $this->driver->getLastInsertId();
+            return $result;
+        }
     }
 
     public function delete()

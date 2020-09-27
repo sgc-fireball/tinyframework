@@ -43,7 +43,7 @@ interface QueryInterface
 
     public function load(): array;
 
-    public function put(array $fields = []);
+    public function put(array &$fields = []);
 
     public function delete();
 

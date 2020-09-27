@@ -97,6 +97,9 @@ class BaseModel implements JsonSerializable, ArrayAccess
 
     public function isDirty(): bool
     {
+        if (!array_key_exists('id', $this->attributes) || !$this->attributes['id']) {
+            return true;
+        }
         foreach ($this->attributes as $key => $value) {
             if (!array_key_exists($key, $this->originals)) {
                 return true;

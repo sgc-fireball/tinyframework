@@ -120,4 +120,12 @@ class Database implements DatabaseInterface
         return $result;
     }
 
+    /**
+     * @return int|string
+     */
+    public function getLastInsertId()
+    {
+        return mysqli_insert_id($this->connect()->connection);
+    }
+
 }
