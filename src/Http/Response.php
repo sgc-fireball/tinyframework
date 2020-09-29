@@ -2,6 +2,9 @@
 
 namespace TinyFramework\Http;
 
+use TinyFramework\Session\SessionInterface;
+use TinyFramework\Template\ViewInterface;
+
 class Response
 {
 
@@ -69,6 +72,7 @@ class Response
         508 => 'Loop Detected',
         510 => 'Not Extended',
         511 => 'Network Authentication Required',
+        599 => 'Maintenance Mode'
     ];
 
     private int $code = 200;
@@ -83,28 +87,93 @@ class Response
 
     private string $id;
 
-    public static function error(int $code = 200): self
+    private ?SessionInterface $session = null;
+
+    public static function new(?string $content = '', int $code = 200, array $headers = []): self
+    {
+        return (new static)->code($code)->content($content ?? '')->headers($headers);
+    }
+
+    public static function view(string $file, array $data = [], int $code = 200, array $headers = []): self
+    {
+        return self::new(container('view')->render($file, $data), $code, $headers);
+    }
+
+    public static function json(array $json = [], int $code = 200): self
+    {
+        return self::new(json_encode($json), $code)->type('application/json; charset=utf-8');
+    }
+
+    public static function error(int $code = 400, array $headers = []): self
     {
         $content = 'HTTP Status ' . $code;
         if (array_key_exists($code, self::$codes)) {
             $content = $code . ' ' . self::$codes[$code];
         }
-        return (new self())->content($content)->code($code);
+        return self::new($content, $code, $headers);
     }
 
-    public static function new(?string $content = '', int $code = 200): self
+    public static function redirect(string $to, int $code = 302, array $headers = []): self
     {
-        return (new self())->content($content ?? '')->code($code);
+        $code = in_array($code, [301, 302]) ? $code : 302;
+        return self::new('', $code, $headers)->header('location', $to);
     }
 
-    public static function redirect(string $to, int $code = 301): self
+    public static function back(string $fallback = null, array $headers = []): self
     {
-        return (new self())->code($code)->header('location', $to);
+        /** @var Request $request */
+        $request = container('request');
+        $back = $request->header('referer') ?? $fallback ?? $request->uri()->__toString();
+        return self::redirect($back, 302, $headers);
     }
 
     public function __construct()
     {
         $this->id = guid();
+    }
+
+    /**
+     * @param SessionInterface|null $session
+     * @return $this|SessionInterface|null
+     */
+    public function session(SessionInterface $session = null)
+    {
+        if (is_null($session)) {
+            return $this->session;
+        }
+        $this->session = $session;
+        return $this;
+    }
+
+    public function with(string $key, $value): self
+    {
+        if ($this->session) {
+            $flash = $this->session->get('flash') ?? [];
+            $flash[$key][] = $value;
+            $this->session->set('flash', $flash);
+        }
+        return $this;
+    }
+
+    public function withInput(array $input = null): self
+    {
+        if ($this->session) {
+            if (is_null($input)) {
+                /** @var Request $request */
+                $request = container('request');
+                $input = array_merge($request->get(), $request->post());
+            }
+            $this->session->set('flash_inputs', $input);
+        }
+        return $this;
+    }
+
+    public function withErrors(array $errors = []): self
+    {
+        if ($this->session) {
+            $this->session->set('flash_errors', $errors);
+        }
+        return $this;
     }
 
     public function id(): string
@@ -144,6 +213,17 @@ class Response
             return $this->headers[$key] ?? null;
         }
         $this->headers[strtolower($key)] = $value;
+        return $this;
+    }
+
+    public function headers(array $headers = null)
+    {
+        if (!is_array($headers)) {
+            return $this->headers;
+        }
+        foreach ($headers as $key => $value) {
+            $this->header($key, $value ?? '');
+        }
         return $this;
     }
 

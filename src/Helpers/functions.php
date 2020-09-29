@@ -19,11 +19,12 @@ if (!function_exists('base64url_decode')) {
 if (!function_exists('container')) {
     /**
      * @param string|null $key
+     * @param array $parameters
      * @return mixed|TinyFramework\Core\Container
      */
-    function container(string $key = null)
+    function container(string $key = null, array $parameters = [])
     {
-        return \TinyFramework\Core\Container::instance()->get($key);
+        return \TinyFramework\Core\Container::instance()->get($key, $parameters);
     }
 }
 
@@ -85,20 +86,23 @@ if (!function_exists('view')) {
      * @param string|null $file
      * @param array $data
      * @param int $code
+     * @param array $headers
      * @return \TinyFramework\Http\Response|\TinyFramework\Template\ViewInterface
      */
-    function view(string $file = null, array $data = [], int $code = 200)
+    function view(string $file = null, array $data = [], int $code = 200, array $headers = [])
     {
         /** @var \TinyFramework\Template\ViewInterface $view */
         $view = container('view');
         if (is_null($file)) {
             return $view;
         }
-        $content = $view->render($file, $data);
-        return Response::new($content, $code);
+        $response = $view->render($file, $data);
+        if (!($response instanceof Response)) {
+            $response = Response::new($response, $code);
+        }
+        return $response->headers($headers);
     }
 }
-
 
 if (!function_exists('dump')) {
     /**
@@ -135,10 +139,14 @@ if (!function_exists('env')) {
      */
     function env(string $key, $default = null)
     {
-        return $_ENV[$key] ?? $default;
+        $value = $_ENV[$key] ?? null;
+        $value = is_string($value) && empty($value) ? 'null' : $value;
+        $value = is_string($value) && strtolower($value) === 'null' ? null : $value;
+        $value = is_string($value) && strtolower($value) === 'true' ? true : $value;
+        $value = is_string($value) && strtolower($value) === 'false' ? false : $value;
+        return $value ?? $default;
     }
 }
-
 
 if (!function_exists('exception2text')) {
     function exception2text(\Throwable $e, bool $stacktrace = false): string
@@ -152,7 +160,7 @@ if (!function_exists('exception2text')) {
             $e->getLine()
         );
         if ($stacktrace) {
-            $result .= "\n".$e->getTraceAsString();
+            $result .= "\n" . $e->getTraceAsString();
         }
         if ($e = $e->getPrevious()) {
             $result .= sprintf("\n - %s", exception2text($e, $stacktrace));

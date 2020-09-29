@@ -69,19 +69,18 @@ class Container implements ContainerInterface
         return array_key_exists($key, $this->instances);
     }
 
-    public function get(string $key)
+    public function get(string $key, array $parameters = [])
     {
         $oKey = $key;
         $key = $this->resolveAlias($key);
-        if (array_key_exists($key, $this->instances)) {
+        if (empty($parameters) && array_key_exists($key, $this->instances)) {
             if (is_callable($this->instances[$key]) || is_string($this->instances[$key])) {
                 $this->instances[$key] = $this->call($this->instances[$key]);
             }
             return $this->instances[$key];
         }
         if (class_exists($key)) {
-            $this->instances[$key] = $this->call($key);
-            return $this->instances[$key];
+            return $this->call($key, $parameters);
         }
         throw new RuntimeException('Could not resolve ' . $oKey);
     }
@@ -109,6 +108,22 @@ class Container implements ContainerInterface
     public function alias(string $alias, string $key): ContainerInterface
     {
         $this->aliases[$alias] = $key;
+        return $this;
+    }
+
+    public function decorator(string $key, $object)
+    {
+        $self = $this;
+        $innerKey = uniqid('inner-' . $key . '-');
+        $this->instances[$innerKey] = $this->instances[$key];
+        $this->instances[$key] = function () use ($self, $object, $key, $innerKey) {
+            $inner = $self->get($innerKey);
+            $result = $self->get($object, ['inner' => $inner]);
+            if (method_exists($result, 'setInner')) {
+                $result->setInner($inner);
+            }
+            return $result;
+        };
         return $this;
     }
 
@@ -152,8 +167,24 @@ class Container implements ContainerInterface
     {
         $arguments = [];
         $reflection = new ReflectionClass($class);
+
+        /** if class supported singleton */
+        if ($reflection->hasMethod('instance')) {
+            $reflectionMethod = $reflection->getMethod('instance');
+            if ($reflectionMethod->isPublic() && $reflectionMethod->isStatic()) {
+                $arguments = $this->buildArgumentsByParameters($reflectionMethod, $parameters);
+                return call_user_func([$class, 'instance'], $arguments);
+            }
+        }
+
+        /** if class has a __construct method */
         if ($reflection->hasMethod('__construct')) {
             $reflectionMethod = $reflection->getMethod('__construct');
+            if (!$reflectionMethod->isPublic()) {
+                if ($reflection->hasMethod('instance') && $reflection->getMethod('instance')->isStatic()) {
+                    return call_user_func([$class, 'instance']);
+                }
+            }
             $arguments = $this->buildArgumentsByParameters($reflectionMethod, $parameters);
         }
         if ($reflection->hasMethod('setContainer') && $reflection->getMethod('setContainer')->isStatic()) {

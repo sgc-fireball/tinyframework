@@ -3,6 +3,10 @@
 /.gitignore     export-ignore
 /phpstan.neon   export-ignore
 /readme.md      export-ignore
+/docs           export-ignore
+/.github        export-ignore
+/tests          export-ignore
+/phpunit.xml    export-ignore
 
 * text eol=LF
 

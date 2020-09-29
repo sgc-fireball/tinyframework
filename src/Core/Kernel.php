@@ -13,7 +13,7 @@ use TinyFramework\ServiceProvider\LoggerServiceProvider;
 use TinyFramework\ServiceProvider\RouterServiceProvider;
 use TinyFramework\ServiceProvider\SessionServiceProvider;
 
-abstract class Kernel
+abstract class Kernel implements KernelInterface
 {
 
     protected ContainerInterface $container;
@@ -26,8 +26,8 @@ abstract class Kernel
 
     public function __construct(ContainerInterface $container)
     {
-        DotEnv::instance()->load('.env')->load('.env.local');
         $this->container = $container;
+        $this->container->get(DotEnvInterface::class)->load('.env')->load('.env.local');
         $this->container->alias('kernel', Kernel::class)->singleton(Kernel::class, $this);
         $this->findServiceProviders();
         $this->register();
@@ -62,8 +62,8 @@ abstract class Kernel
         }
 
         $root = (defined('ROOT') ? ROOT : '.');
-        if (is_dir($root.'/app/Providers')) {
-            foreach (glob($root.'/app/Providers/*.php') as $file) {
+        if (is_dir($root . '/app/Providers')) {
+            foreach (glob($root . '/app/Providers/*.php') as $file) {
                 $provider = 'App\\Providers\\' . str_replace('.php', '', basename($file));
                 if (class_exists($provider)) {
                     $this->serviceProviderNames[] = $provider;

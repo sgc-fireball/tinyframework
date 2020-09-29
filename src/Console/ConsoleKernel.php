@@ -7,7 +7,7 @@ use TinyFramework\Core\Kernel;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
-class ConsoleKernel extends Kernel
+class ConsoleKernel extends Kernel implements ConsoleKernelInterface
 {
 
     /** @var BaseCommand[] */
@@ -41,7 +41,7 @@ class ConsoleKernel extends Kernel
         return $this->commands;
     }
 
-    public function handle(ArgvInput $input, ConsoleOutput $output)
+    public function handle(ArgvInput $input, ConsoleOutput $output): int
     {
         $command = array_key_exists($input->getFirstArgument(), $this->commands)
             ? $this->commands[$input->getFirstArgument()]

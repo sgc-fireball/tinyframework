@@ -2,7 +2,7 @@
 
 namespace TinyFramework\Core;
 
-class DotEnv
+class DotEnv implements DotEnvInterface
 {
 
     private static ?self $instance = null;
@@ -18,7 +18,7 @@ class DotEnv
     {
     }
 
-    public static function instance(): DotEnv
+    public static function instance(): DotEnvInterface
     {
         if (!(self::$instance instanceof self)) {
             self::$instance = new self();
@@ -26,7 +26,7 @@ class DotEnv
         return self::$instance;
     }
 
-    public function load(string $file)
+    public function load(string $file): DotEnvInterface
     {
         if (!file_exists($file)) {
             return $this;
@@ -45,9 +45,10 @@ class DotEnv
             if (substr($value, 0, 1) === "'" && substr($value, -1) === "'") {
                 $value = substr($value, 1, -1);
             }
-            $value = $value === 'null' ? null : $value;
-            $value = $value === 'true' ? true : $value;
-            $value = $value === 'false' ? false : $value;
+            $value = is_string($value) && empty($value) ? 'null' : $value;
+            $value = is_string($value) && strtolower($value) === 'null' ? null : $value;
+            $value = is_string($value) && strtolower($value) === 'true' ? true : $value;
+            $value = is_string($value) && strtolower($value) === 'false' ? false : $value;
             $_ENV[$key] = $value;
         }
         return $this;

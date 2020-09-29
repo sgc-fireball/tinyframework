@@ -109,8 +109,8 @@ class Database implements DatabaseInterface
             if ($result === false) {
                 throw new \RuntimeException(
                     sprintf('Error %s: %s',
-                        mysqli_errno($this->connect()->connection),
-                        mysqli_error($this->connect()->connection)
+                        $this->connect()->connection->errno,
+                        $this->connect()->connection->error
                     )
                 );
             }

@@ -8,7 +8,7 @@ use TinyFramework\Core\Pipeline;
 use TinyFramework\Exception\HttpException;
 use TinyFramework\Template\Blade;
 
-class HttpKernel extends Kernel
+class HttpKernel extends Kernel implements HttpKernelInterface
 {
 
     /** @var Closure[] */
@@ -43,9 +43,9 @@ class HttpKernel extends Kernel
                 ]
             );
         }
-        return $response
-            ->header('X-Request-ID', $request->id())
-            ->header('X-Response-ID', $response->id());
+        $response->header('X-Request-ID', $request->id())->header('X-Response-ID', $response->id())->send();
+        $this->terminate($request, $response);
+        return $response;
     }
 
     private function callRoute(Route $route, Request $request): Response
@@ -73,7 +73,7 @@ class HttpKernel extends Kernel
         }, $request);
     }
 
-    public function terminate(Request $request, Response $response): self
+    private function terminate(Request $request, Response $response): self
     {
         foreach ($this->terminateCallbacks as $callback) {
             try {

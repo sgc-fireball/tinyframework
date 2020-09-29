@@ -111,7 +111,6 @@ class BaseModel implements JsonSerializable, ArrayAccess
         return false;
     }
 
-
     public static function query(): QueryInterface
     {
         $class = static::class;

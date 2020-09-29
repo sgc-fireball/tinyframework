@@ -13,7 +13,7 @@ interface ContainerInterface
 
     public function has(string $key): bool;
 
-    public function get(string $key);
+    public function get(string $key, array $parameters = []);
 
     /**
      * @param mixed|string $key
