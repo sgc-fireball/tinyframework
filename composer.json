@@ -16,16 +16,15 @@
     "ext-mysqli": "*",
     "ext-simplexml": "*",
     "ext-readline": "*",
+    "ext-mbstring": "*",
+    "ext-openssl": "*",
+    "ext-redis": "*",
     "composer-plugin-api": "^1.1",
     "composer/composer": "@stable",
     "psy/psysh": "@stable"
   },
   "require-dev": {
     "phpstan/phpstan": "^0.12"
-  },
-  "suggest": {
-    "ext-redis": "*",
-    "predis/predis": "@stable"
   },
   "scripts": {
     "post-install-cmd": [

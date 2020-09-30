@@ -81,6 +81,20 @@ if (!function_exists('queue')) {
     }
 }
 
+if (!function_exists('hash')) {
+    function hash(): \TinyFramework\Hash\HashInterface
+    {
+        return container('hash');
+    }
+}
+
+if (!function_exists('crypto')) {
+    function crypto(): \TinyFramework\Crypt\CryptInterface
+    {
+        return container('crypt');
+    }
+}
+
 if (!function_exists('view')) {
     /**
      * @param string|null $file

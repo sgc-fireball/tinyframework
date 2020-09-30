@@ -3,18 +3,19 @@
 namespace TinyFramework\ServiceProvider;
 
 use TinyFramework\Core\ContainerInterface;
-use TinyFramework\Template\ViewInterface;
+use TinyFramework\Crypt\CryptInterface;
 
-class ViewServiceProvider extends ServiceProviderAwesome
+class CryptServiceProvider extends ServiceProviderAwesome
 {
 
     public function register()
     {
-        $configs = $this->container->get('config')->get('view');
+        $configs = $this->container->get('config')->get('crypt');
         if (is_null($configs)) {
             return;
         }
-        $this->container->alias('view', $configs['default'])->alias(ViewInterface::class, $configs['default']);
+        $class = $configs[$configs['default']]['driver'];
+        $this->container->alias('crypt', $class)->alias(CryptInterface::class, $class);
         unset($configs['default']);
 
         foreach ($configs as $name => $config) {
@@ -23,7 +24,7 @@ class ViewServiceProvider extends ServiceProviderAwesome
             $this->container
                 ->alias($name, $class)
                 ->singleton($class, function (ContainerInterface $container) use ($class, $config) {
-                    return $this->container->call($class, ['config' => $config]);
+                    return $this->container->call($class, $config);
                 });
         }
     }
