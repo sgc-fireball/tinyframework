@@ -80,7 +80,13 @@ class Response
     private string $protocol = 'HTTP/1.0';
 
     private array $headers = [
-        'content-type' => 'text/html; charset=utf-8'
+        'content-type' => 'text/html; charset=utf-8',
+        'content-security-policy' => "default-src 'none'; script-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self';",
+        'permissions-policy' => 'accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()',
+        'referrer-policy' => 'strict-origin-when-cross-origin',
+        'x-content-type-options' => 'nosniff',
+        'x-frame-options' => 'SAMEORIGIN',
+        'x-xss-protection' => '1; mode=block',
     ];
 
     private ?string $content = null;
