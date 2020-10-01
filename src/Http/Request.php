@@ -2,7 +2,6 @@
 
 namespace TinyFramework\Http;
 
-use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 use TinyFramework\Session\SessionInterface;
 
 class Request
@@ -21,6 +20,8 @@ class Request
     private array $post = [];
 
     private array $header = [];
+
+    private array $server = [];
 
     private array $cookie = [];
 
@@ -55,10 +56,19 @@ class Request
         $request->cookie = $_COOKIE ?? [];
         $request->files = $_FILES ?? [];
         foreach ($_SERVER as $key => $value) {
-            if (strpos($key, 'HTTP_') !== false) {
+            if (strpos($key, 'HTTP_') !== 0) {
+                if ($key === 'HTTP_AUTHORIZATION') {
+                    list ($user, $pw) = explode(':', base64_decode(substr($_SERVER['HTTP_AUTHORIZATION'], 6)));
+                    $request->header['php_auth_user'] = $user ?? null;
+                    $request->header['php_auth_pass'] = $pw ?? null;
+                }
                 $key = strtolower(str_replace('HTTP_', '', $key));
                 $request->header[$key] = $request->header[$key] ?? [];
                 $request->header[$key][] = $value;
+            } else {
+                $key = strtolower($key);
+                $request->server[$key] = $request->server[$key] ?? [];
+                $request->server[$key][] = $value;
             }
         }
         if (array_key_exists('_method', $request->get)) {
@@ -197,6 +207,7 @@ class Request
         $request->get = $this->get;
         $request->post = $this->post;
         $request->header = $this->header;
+        $request->server = $this->server;
         $request->cookie = $this->cookie;
         $request->files = $this->files;
         $request->route = $this->route;
@@ -249,6 +260,20 @@ class Request
         }
         $request = $this->clone();
         $request->header[$key] = [$value];
+        return $request;
+    }
+
+    public function server(string $key = null, $value = null)
+    {
+        if (is_null($key)) {
+            return $this->server;
+        }
+        $key = strtolower(str_replace('-', '_', $key));
+        if (is_null($value)) {
+            return $this->server[$key] ?? [];
+        }
+        $request = $this->clone();
+        $request->server[$key] = [$value];
         return $request;
     }
 
