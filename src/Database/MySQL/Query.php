@@ -9,7 +9,7 @@ use TinyFramework\Database\QueryInterface;
 class Query extends AbstractQuery implements QueryInterface
 {
 
-    /** @var DatabaseInterface|Database */
+    /** @var Database */
     protected DatabaseInterface $driver;
 
     private function compileSelect(array $fields): string

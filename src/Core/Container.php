@@ -116,7 +116,7 @@ class Container implements ContainerInterface
         $self = $this;
         $innerKey = uniqid('inner-' . $key . '-');
         $this->instances[$innerKey] = $this->instances[$key];
-        $this->instances[$key] = function () use ($self, $object, $key, $innerKey) {
+        $this->instances[$key] = function () use ($self, $object, $innerKey) {
             $inner = $self->get($innerKey);
             $result = $self->get($object, ['inner' => $inner]);
             if (method_exists($result, 'setInner')) {

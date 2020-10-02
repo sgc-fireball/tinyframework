@@ -111,9 +111,7 @@ if (!function_exists('view')) {
             return $view;
         }
         $response = $view->render($file, $data);
-        if (!($response instanceof Response)) {
-            $response = Response::new($response, $code);
-        }
+        $response = Response::new($response, $code);
         return $response->headers($headers);
     }
 }

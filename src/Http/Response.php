@@ -97,7 +97,7 @@ class Response
 
     public static function new(?string $content = '', int $code = 200, array $headers = []): self
     {
-        return (new static)->code($code)->content($content ?? '')->headers($headers);
+        return (new self)->code($code)->content($content ?? '')->headers($headers);
     }
 
     public static function view(string $file, array $data = [], int $code = 200, array $headers = []): self
