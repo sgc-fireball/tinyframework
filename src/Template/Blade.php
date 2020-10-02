@@ -108,10 +108,10 @@ class Blade implements ViewInterface
         $content = preg_replace_callback(
             '/\B@(@?\w+(?:::\w+)?)([ \t]*)(\( ( (?>[^()]+) | (?3) )* \))?/x',
             function ($match) {
-                if (substr($match[1], 0, 1) === '@') {
+                if (mb_substr($match[1], 0, 1) === '@') {
                     return $match[0];
                 }
-                $match[1] = strtolower($match[1]);
+                $match[1] = mb_strtolower($match[1]);
                 if (method_exists($this, $method = 'compile' . ucfirst($match[1]))) {
                     return $this->$method($match[3] ?? '');
                 }
@@ -325,7 +325,7 @@ class Blade implements ViewInterface
 
     public function compileInclude(string $expression): string
     {
-        $expression = substr($expression, 1, -1);
+        $expression = mb_substr($expression, 1, -1);
         return sprintf('<?php echo $__env->render(%s, get_defined_vars()); ?>', $expression);
     }
 
@@ -341,7 +341,7 @@ class Blade implements ViewInterface
 
     public function compileExtends(string $expression): string
     {
-        $expression = substr($expression, 1, -1);
+        $expression = mb_substr($expression, 1, -1);
         $this->footer[] = sprintf('<?php echo $__env->render(%s, get_defined_vars()); ?>', $expression);
         return '';
     }

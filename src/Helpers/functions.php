@@ -153,9 +153,9 @@ if (!function_exists('env')) {
     {
         $value = $_ENV[$key] ?? null;
         $value = is_string($value) && empty($value) ? 'null' : $value;
-        $value = is_string($value) && strtolower($value) === 'null' ? null : $value;
-        $value = is_string($value) && strtolower($value) === 'true' ? true : $value;
-        $value = is_string($value) && strtolower($value) === 'false' ? false : $value;
+        $value = is_string($value) && mb_strtolower($value) === 'null' ? null : $value;
+        $value = is_string($value) && mb_strtolower($value) === 'true' ? true : $value;
+        $value = is_string($value) && mb_strtolower($value) === 'false' ? false : $value;
         return $value ?? $default;
     }
 }
@@ -222,8 +222,8 @@ if (!function_exists('route')) {
 if (!function_exists('toBool')) {
     function toBool($mixed): bool
     {
-        $mixed = is_string($mixed) && in_array(strtolower($mixed), ['y', 'yes', 'true', 'on']) ? true : $mixed;
-        $mixed = is_string($mixed) && in_array(strtolower($mixed), ['n', 'no', 'false', 'off', 'null']) ? false : $mixed;
+        $mixed = is_string($mixed) && in_array(mb_strtolower($mixed), ['y', 'yes', 'true', 'on']) ? true : $mixed;
+        $mixed = is_string($mixed) && in_array(mb_strtolower($mixed), ['n', 'no', 'false', 'off', 'null']) ? false : $mixed;
         return (bool)$mixed;
     }
 }

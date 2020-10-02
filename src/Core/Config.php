@@ -63,7 +63,7 @@ class Config implements ConfigInterface
         if (is_null($key)) {
             return $this->config;
         }
-        if (strpos($key, '.') !== false) {
+        if (mb_strpos($key, '.') !== false) {
             $keys = explode('.', $key);
             $config = $this->config;
             foreach ($keys as $key) {

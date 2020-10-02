@@ -218,7 +218,7 @@ class Response
         if (is_null($value)) {
             return $this->headers[$key] ?? null;
         }
-        $this->headers[strtolower($key)] = $value;
+        $this->headers[mb_strtolower($key)] = $value;
         return $this;
     }
 

@@ -20,7 +20,7 @@ class BaseModel implements JsonSerializable, ArrayAccess
 
     public function __construct(array $attributes = [])
     {
-        $this->table = $this->table ?? strtolower(basename(str_replace('\\', '/', get_class($this))));
+        $this->table = $this->table ?? mb_strtolower(basename(str_replace('\\', '/', get_class($this))));
         $this->originals = $this->attributes = $attributes;
     }
 

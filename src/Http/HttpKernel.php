@@ -56,7 +56,7 @@ class HttpKernel extends Kernel implements HttpKernelInterface
         foreach ($middlewares as $middleware) {
             $onion->layers(function (Request $request, Closure $next) use ($middleware) {
                 $parameters = [$request, $next];
-                if (strpos($middleware, ',') !== false) {
+                if (mb_strpos($middleware, ',') !== false) {
                     $additionalParameters = explode(',', $middleware);
                     $middleware = array_shift($additionalParameters);
                     $parameters = array_merge($parameters, $additionalParameters);

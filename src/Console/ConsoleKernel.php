@@ -27,7 +27,7 @@ class ConsoleKernel extends Kernel implements ConsoleKernelInterface
     {
         if (is_dir($path)) {
             foreach (glob($path . '/*.php') as $file) {
-                $class = $namespace . substr(basename($file), 0, -4);
+                $class = $namespace . mb_substr(basename($file), 0, -4);
                 if (class_exists($class)) {
                     $command = new $class;
                     $this->commands[$command->getName()] = $command;

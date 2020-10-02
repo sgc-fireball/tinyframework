@@ -118,7 +118,7 @@ class Route
         $middlewares = is_array($middlewares) ? $middlewares : [$middlewares];
         foreach ($middlewares as $middleware) {
             $class = $middleware;
-            if (strpos($middleware, ',') !== false) {
+            if (mb_strpos($middleware, ',') !== false) {
                 list($class,) = explode(',', $middleware, 2);
             }
             if (class_exists($class)) {

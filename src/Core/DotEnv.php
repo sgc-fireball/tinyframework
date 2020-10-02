@@ -35,20 +35,20 @@ class DotEnv implements DotEnvInterface
         $content = str_replace(["\r\n", "\r"], "\n", $content);
         $content = preg_replace('/^[^A-Z].*$/m', '', $content);
         foreach (explode("\n", $content) as $line) {
-            if (strpos($line, '=') < 1) {
+            if (mb_strpos($line, '=') < 1) {
                 continue;
             }
             list($key, $value) = explode('=', $line, 2);
-            if (substr($value, 0, 1) === '"' && substr($value, -1) === '"') {
-                $value = substr($value, 1, -1);
+            if (mb_substr($value, 0, 1) === '"' && mb_substr($value, -1) === '"') {
+                $value = mb_substr($value, 1, -1);
             }
-            if (substr($value, 0, 1) === "'" && substr($value, -1) === "'") {
-                $value = substr($value, 1, -1);
+            if (mb_substr($value, 0, 1) === "'" && mb_substr($value, -1) === "'") {
+                $value = mb_substr($value, 1, -1);
             }
             $value = is_string($value) && empty($value) ? 'null' : $value;
-            $value = is_string($value) && strtolower($value) === 'null' ? null : $value;
-            $value = is_string($value) && strtolower($value) === 'true' ? true : $value;
-            $value = is_string($value) && strtolower($value) === 'false' ? false : $value;
+            $value = is_string($value) && mb_strtolower($value) === 'null' ? null : $value;
+            $value = is_string($value) && mb_strtolower($value) === 'true' ? true : $value;
+            $value = is_string($value) && mb_strtolower($value) === 'false' ? false : $value;
             $_ENV[$key] = $value;
         }
         return $this;

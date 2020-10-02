@@ -105,7 +105,7 @@ class Database implements DatabaseInterface
     public function execute(string $query)
     {
         $result = $this->connect()->connection->query($query);
-        if (strpos($query, 'SELECT') === 0) {
+        if (mb_strpos($query, 'SELECT') === 0) {
             if ($result === false) {
                 throw new \RuntimeException(
                     sprintf('Error %s: %s',

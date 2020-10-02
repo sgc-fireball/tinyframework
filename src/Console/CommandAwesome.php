@@ -26,12 +26,12 @@ abstract class CommandAwesome extends BaseCommand implements CommandInterface
     public static function getDefaultName()
     {
         $command = str_replace('\\', '/', static::class);
-        if (strpos($command, '/') !== false) {
+        if (mb_strpos($command, '/') !== false) {
             $command = basename($command);
         }
         $command = preg_replace('/Command$/', '', $command);
         $command = preg_replace_callback('/([A-Z])/', function ($match) {
-            return ':' . strtolower($match[0]);
+            return ':' . mb_strtolower($match[0]);
         }, $command);
         return ltrim($command, ':');
     }

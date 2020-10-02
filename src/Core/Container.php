@@ -137,7 +137,7 @@ class Container implements ContainerInterface
             if (class_exists($callable)) {
                 return $this->callConstruct($callable, $parameters);
             }
-            if (strpos($callable, '@') !== false) {
+            if (mb_strpos($callable, '@') !== false) {
                 list ($class, $method) = explode('@', $callable, 2);
                 if (!class_exists($class)) {
                     throw new RuntimeException('Could not found class ' . $class);

@@ -254,7 +254,7 @@ class Router
                 $value = is_null($value) ? 'NULL' : $value;
                 $url = str_replace('{' . $key . '}', (string)$value, $url);
             }
-            if (strpos($url, '{') || strpos($url, '}')) {
+            if (mb_strpos($url, '{') || strpos($url, '}')) {
                 throw new \RuntimeException('Missing parameters.');
             }
             return '/' . ltrim($url, '/');

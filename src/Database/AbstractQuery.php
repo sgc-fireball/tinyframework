@@ -135,7 +135,7 @@ abstract class AbstractQuery implements QueryInterface
 
     public function orderBy($field, $order = 'asc')
     {
-        $order = strtolower($order);
+        $order = mb_strtolower($order);
         $order = in_array($order, ['asc', 'desc']) ? $order : 'asc';
         $this->orders[] = ['field' => $field, 'order' => $order];
         return $this;

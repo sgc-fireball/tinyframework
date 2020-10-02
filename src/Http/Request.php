@@ -56,17 +56,17 @@ class Request
         $request->cookie = $_COOKIE ?? [];
         $request->files = $_FILES ?? [];
         foreach ($_SERVER as $key => $value) {
-            if (strpos($key, 'HTTP_') !== 0) {
+            if (mb_strpos($key, 'HTTP_') !== 0) {
                 if ($key === 'HTTP_AUTHORIZATION') {
-                    list ($user, $pw) = explode(':', base64_decode(substr($_SERVER['HTTP_AUTHORIZATION'], 6)));
+                    list ($user, $pw) = explode(':', base64_decode(mb_substr($_SERVER['HTTP_AUTHORIZATION'], 6)));
                     $request->header['php_auth_user'] = $user ?? null;
                     $request->header['php_auth_pass'] = $pw ?? null;
                 }
-                $key = strtolower(str_replace('HTTP_', '', $key));
+                $key = mb_strtolower(str_replace('HTTP_', '', $key));
                 $request->header[$key] = $request->header[$key] ?? [];
                 $request->header[$key][] = $value;
             } else {
-                $key = strtolower($key);
+                $key = mb_strtolower($key);
                 $request->server[$key] = $request->server[$key] ?? [];
                 $request->server[$key][] = $value;
             }
@@ -254,7 +254,7 @@ class Request
         if (is_null($key)) {
             return $this->header;
         }
-        $key = strtolower(str_replace('-', '_', $key));
+        $key = mb_strtolower(str_replace('-', '_', $key));
         if (is_null($value)) {
             return $this->header[$key] ?? [];
         }
@@ -268,7 +268,7 @@ class Request
         if (is_null($key)) {
             return $this->server;
         }
-        $key = strtolower(str_replace('-', '_', $key));
+        $key = mb_strtolower(str_replace('-', '_', $key));
         if (is_null($value)) {
             return $this->server[$key] ?? [];
         }
