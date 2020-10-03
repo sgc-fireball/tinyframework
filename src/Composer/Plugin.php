@@ -20,8 +20,19 @@ class Plugin implements PluginInterface, Capable
 
     public function activate(Composer $composer, IOInterface $io)
     {
+        // composer-plugin-api@1 & composer-plugin-api@2
         $this->composer = $composer;
         $this->io = $io;
+    }
+
+    public function deactivate(Composer $composer, IOInterface $io)
+    {
+        // composer-plugin-api@2
+    }
+
+    public function uninstall(Composer $composer, IOInterface $io)
+    {
+        // composer-plugin-api@2
     }
 
     public function getCapabilities()
