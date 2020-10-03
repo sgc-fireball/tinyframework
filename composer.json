@@ -19,9 +19,11 @@
     "ext-mbstring": "*",
     "ext-openssl": "*",
     "ext-redis": "*",
+    "ext-fileinfo": "*",
     "composer-plugin-api": "^1.0|^2.0",
     "composer/composer": "@stable",
-    "psy/psysh": "@stable"
+    "psy/psysh": "@stable",
+    "swiftmailer/swiftmailer": "^6.0"
   },
   "require-dev": {
     "phpstan/phpstan": "^0.12"

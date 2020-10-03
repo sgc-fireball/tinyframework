@@ -4,6 +4,7 @@ namespace TinyFramework\Core;
 
 use TinyFramework\ServiceProvider\CryptServiceProvider;
 use TinyFramework\ServiceProvider\HashServiceProvider;
+use TinyFramework\ServiceProvider\MailServiceProvider;
 use TinyFramework\ServiceProvider\ViewServiceProvider;
 use TinyFramework\ServiceProvider\QueueServiceProvider;
 use TinyFramework\ServiceProvider\ServiceProviderInterface;
@@ -46,6 +47,7 @@ abstract class Kernel implements KernelInterface
             LoggerServiceProvider::class,
             CacheServiceProvider::class,
             ViewServiceProvider::class,
+            MailServiceProvider::class,
             DatabaseServiceProvider::class,
             RouterServiceProvider::class,
             SessionServiceProvider::class,
