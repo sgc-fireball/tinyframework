@@ -3,7 +3,7 @@
 return [
     'default' => 'smtp',
     'from' => [
-        'email' => env('MAIL_FROM_EMAIL', null),
+        'address' => env('MAIL_FROM_ADDRESS', null),
         'name' => env('MAIL_FROM_NAME', null),
     ],
     'null' => [
@@ -16,9 +16,11 @@ return [
         'encryption' => env('SMTP_ENCRYPTION', 'tls'),
         'username' => env('SMTP_USERNAME', null),
         'password' => env('SMTP_PASSWORD', null),
+        'local_domain' => env('MAIL_HOST', '_'),
     ],
     'sendmail' => [
         'driver' => \Swift_SendmailTransport::class,
-        'command' => env('SMTP_SENDMAIL', '/usr/sbin/sendmail -bs')
+        'command' => env('SMTP_SENDMAIL', '/usr/sbin/sendmail -bs'),
+        'local_domain' => env('MAIL_HOST', '_'),
     ]
 ];

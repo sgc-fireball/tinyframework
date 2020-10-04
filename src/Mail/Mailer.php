@@ -12,7 +12,7 @@ class Mailer
     private Swift_Mailer $mailer;
 
     private ?string $fromEmail;
-    
+
     private ?string $fromName;
 
     /**
@@ -27,6 +27,8 @@ class Mailer
 
     /**
      * @internal
+     * @param Swift_Mailer|null $mailer
+     * @return $this|Swift_Mailer
      */
     public function mailer(Swift_Mailer $mailer = null)
     {
@@ -56,12 +58,11 @@ class Mailer
         $message->setSubject($mail->subject());
         $message->addPart($text, 'text/plain', 'utf-8');
         $message->setBody($html, 'text/html', 'utf-8');
-
         if (!empty($mail->from())) {
             $from = $mail->from();
-            $message->setFrom([$from['email'], $from['name'] ?? $from['email']]);
+            $message->setFrom([$from['email'] => $from['name'] ?? $from['email']]);
         } else if ($this->fromEmail) {
-            $message->setFrom([$this->fromEmail, $this->fromName ?? $this->fromEmail]);
+            $message->setFrom([$this->fromEmail => $this->fromName]);
         }
         if ($mail->sender()) {
             $message->setSender($mail->sender());

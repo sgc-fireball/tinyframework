@@ -180,11 +180,6 @@ class Container implements ContainerInterface
         /** if class has a __construct method */
         if ($reflection->hasMethod('__construct')) {
             $reflectionMethod = $reflection->getMethod('__construct');
-            if (!$reflectionMethod->isPublic()) {
-                if ($reflection->hasMethod('instance') && $reflection->getMethod('instance')->isStatic()) {
-                    return call_user_func([$class, 'instance']);
-                }
-            }
             $arguments = $this->buildArgumentsByParameters($reflectionMethod, $parameters);
         }
         if ($reflection->hasMethod('setContainer') && $reflection->getMethod('setContainer')->isStatic()) {

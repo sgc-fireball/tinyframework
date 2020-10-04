@@ -33,6 +33,7 @@ class DotEnv implements DotEnvInterface
         }
         $content = file_get_contents($file);
         $content = str_replace(["\r\n", "\r"], "\n", $content);
+        $content = preg_replace('/\n+/', "\n", $content);
         $content = preg_replace('/^[^A-Z].*$/m', '', $content);
         foreach (explode("\n", $content) as $line) {
             if (mb_strpos($line, '=') < 1) {

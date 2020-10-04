@@ -20,6 +20,7 @@
         - [Route](./http/router/route.md)
     - [Uri](./http/uri.md)
 - [Logger](./logger.md)
+- [Mail](./mail.md)
 - [Queue](./queue.md)
 - [Session](./session.md)
 - [Template Engines](./template-engines.md)
