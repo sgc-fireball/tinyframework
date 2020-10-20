@@ -16,6 +16,7 @@ class Plugin implements PluginInterface, Capable
 {
 
     protected Composer $composer;
+
     protected IOInterface $io;
 
     public function activate(Composer $composer, IOInterface $io)

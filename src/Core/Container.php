@@ -154,7 +154,7 @@ class Container implements ContainerInterface
         if (is_array($callable) && method_exists($callable[0], $callable[1])) {
             return $this->callMethod($callable[0], $callable[1], $parameters);
         }
-        throw new \RuntimeException('Could not call ' . var_export($callable, true));
+        throw new \RuntimeException('Illegal reference can not be called.');
     }
 
     /**
@@ -211,7 +211,8 @@ class Container implements ContainerInterface
             new ReflectionMethod($class, $method),
             $parameters
         );
-        return call_user_func_array([$this->call($class), $method], $arguments);
+        $object = is_object($class) ? $class : $this->call($class);
+        return call_user_func_array([$object, $method], $arguments);
     }
 
     /**

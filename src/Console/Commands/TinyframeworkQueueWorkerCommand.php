@@ -2,9 +2,10 @@
 
 namespace TinyFramework\Console\Commands;
 
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use TinyFramework\Console\CommandAwesome;
+use TinyFramework\Console\Input\InputDefinitionInterface;
+use TinyFramework\Console\Input\InputInterface;
+use TinyFramework\Console\Output\OutputInterface;
 use TinyFramework\Logger\LoggerInterface;
 use TinyFramework\Queue\JobInterface;
 use TinyFramework\Queue\QueueInterface;
@@ -13,17 +14,16 @@ use TinyFramework\Queue\SyncQueue;
 class TinyframeworkQueueWorkerCommand extends CommandAwesome
 {
 
-    protected function configure()
+    protected function configure(): InputDefinitionInterface
     {
-        parent::configure();
-        $this
-            ->setDescription('Start processing jobs on the queue as a daemon');
+        return parent::configure()
+            ->description('Start processing jobs on the queue as a daemon.');
     }
 
     /**
      * @TODO implement a signal handler!
      */
-    public function run(InputInterface $input, OutputInterface $output)
+    public function run(InputInterface $input, OutputInterface $output): int
     {
         parent::run($input, $output);
 

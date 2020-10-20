@@ -13,11 +13,7 @@ class CommandProvider implements CommandProviderCapability
 
     public function getCommands()
     {
-        /** @var ConsoleKernel $console */
-        $console = Container::instance()
-            ->singleton(DotEnvInterface::class, DotEnv::class)
-            ->get(ConsoleKernel::class);
-        return $console->getCommands();
+        return []; // @TODO or remove
     }
 
 }

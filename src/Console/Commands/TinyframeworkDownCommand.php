@@ -2,35 +2,30 @@
 
 namespace TinyFramework\Console\Commands;
 
-use Symfony\Component\Console\Input\InputDefinition;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 use TinyFramework\Console\CommandAwesome;
-use TinyFramework\Template\ViewInterface;
+use TinyFramework\Console\Input\Argument;
+use TinyFramework\Console\Input\InputDefinitionInterface;
+use TinyFramework\Console\Input\InputInterface;
+use TinyFramework\Console\Input\Option;
+use TinyFramework\Console\Output\OutputInterface;
 
 class TinyframeworkDownCommand extends CommandAwesome
 {
 
-    protected function configure()
+    protected function configure(): InputDefinitionInterface
     {
-        parent::configure();
-        $this
-            ->setDescription('Put the application into maintenance mode')
-            ->setDefinition(
-                new InputDefinition([
-                    new InputOption('ip', 'i', InputOption::VALUE_OPTIONAL, 'Allowed client', '127.0.0.1'),
-                ])
-            );
+        return parent::configure()
+            ->description('Put the application into maintenance mode.')
+            ->option(Option::create('ip', null, Option::VALUE_IS_ARRAY, 'Whitelist: one address per option.', ['127.0.0.1']));
     }
 
-    public function run(InputInterface $input, OutputInterface $output)
+    public function run(InputInterface $input, OutputInterface $output): int
     {
         parent::run($input, $output);
-        $whitelist = $this->input->hasOption('ip') ? $this->input->getOption('ip') : '127.0.0.1';
+        $whitelist = $this->input->option('ip') ? $this->input->option('ip')->value() : '127.0.0.1';
         $whitelist = is_array($whitelist) ? $whitelist : explode(',', $whitelist);
         file_put_contents('storage/maintenance.json', json_encode(['whitelist' => $whitelist]));
-        $this->output->writeln('<comment>Application is now in maintenance mode.</comment>');
+        $this->output->writeln('<gold>Application is now in maintenance mode.</gold>');
         return 0;
     }
 

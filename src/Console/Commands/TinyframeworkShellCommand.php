@@ -2,25 +2,24 @@
 
 namespace TinyFramework\Console\Commands;
 
+use TinyFramework\Console\CommandAwesome;
+use TinyFramework\Console\Input\InputDefinitionInterface;
+use TinyFramework\Console\Input\InputInterface;
+use TinyFramework\Console\Output\OutputInterface;
+use TinyFramework\Shell\TabCompletion\TinyFrameworkMatcher;
 use Psy\Configuration;
 use Psy\Shell as PsySh;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use TinyFramework\Console\CommandAwesome;
-use TinyFramework\Console\ConsoleKernel;
-use TinyFramework\Shell\TabCompletion\TinyFrameworkMatcher;
 
 class TinyframeworkShellCommand extends CommandAwesome
 {
 
-    protected function configure()
+    protected function configure(): InputDefinitionInterface
     {
-        parent::configure();
-        $this
-            ->setDescription('Start a psysh');
+        return parent::configure()
+            ->description('Start a psysh.');
     }
 
-    public function run(InputInterface $input, OutputInterface $output)
+    public function run(InputInterface $input, OutputInterface $output): int
     {
         parent::run($input, $output);
 
@@ -31,7 +30,7 @@ class TinyframeworkShellCommand extends CommandAwesome
         $config = new Configuration([
             'updateCheck' => 'never',
             'prompt' => '$ ',
-            'commands' => $this->container->get(ConsoleKernel::class)->getCommands(),
+            'commands' => [],
             'runtimeDir' => $cache,
             'startupMessage' => $this->getMotd(),
             'tabCompletionMatchers' => [new TinyFrameworkMatcher()],

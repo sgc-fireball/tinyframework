@@ -22,7 +22,7 @@ class Hook
     private static function checkPublicIndex()
     {
         self::installFolder();
-        self::installIndex();
+        self::installFiles();
     }
 
     private static function installFolder()
@@ -45,8 +45,14 @@ class Hook
         }
     }
 
-    private static function installIndex()
+    private static function installFiles()
     {
+        if (!file_exists('./console')) {
+            copy(__DIR__ . '/../Files/console.php', './console');
+        }
+        if (!is_executable('./console')) {
+            chmod('./console', 0700);
+        }
         if (!file_exists('public/index.php')) {
             copy(__DIR__ . '/../Files/index.php', 'public/index.php');
         }

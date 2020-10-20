@@ -54,13 +54,17 @@ abstract class Kernel implements KernelInterface
             QueueServiceProvider::class
         ];
 
-        $composer = json_decode(file_get_contents('composer.lock'), true);
-        if (array_key_exists('packages', $composer)) {
-            foreach ($composer['packages'] as $package) {
-                if (array_key_exists('extra', $package)) {
-                    if (array_key_exists('tinyframework', $package['extra'])) {
-                        if (array_key_exists('providers', $package['extra']['tinyframework'])) {
-                            $this->serviceProviderNames += $package['extra']['tinyframework']['providers'];
+        if (file_exists('composer.lock')) {
+            if ($content = file_get_contents('composer.lock')) {
+                $composer = json_decode($content, true);
+                if (array_key_exists('packages', $composer)) {
+                    foreach ($composer['packages'] as $package) {
+                        if (array_key_exists('extra', $package)) {
+                            if (array_key_exists('tinyframework', $package['extra'])) {
+                                if (array_key_exists('providers', $package['extra']['tinyframework'])) {
+                                    $this->serviceProviderNames += $package['extra']['tinyframework']['providers'];
+                                }
+                            }
                         }
                     }
                 }

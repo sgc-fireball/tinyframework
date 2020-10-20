@@ -2,29 +2,30 @@
 
 namespace TinyFramework\Console\Commands;
 
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use TinyFramework\Cache\CacheInterface;
 use TinyFramework\Console\CommandAwesome;
+use TinyFramework\Console\Input\InputDefinition;
+use TinyFramework\Console\Input\InputDefinitionInterface;
+use TinyFramework\Console\Input\InputInterface;
+use TinyFramework\Console\Output\OutputInterface;
 
 class TinyframeworkCacheClearCommand extends CommandAwesome
 {
 
-    protected function configure()
+    protected function configure(): InputDefinitionInterface
     {
-        parent::configure();
-        $this
-            ->setDescription('Flush the application cache');
+        return parent::configure()
+            ->description('Flush the application cache.');
     }
 
-    public function run(InputInterface $input, OutputInterface $output)
+    public function run(InputInterface $input, OutputInterface $output): int
     {
         parent::run($input, $output);
-        $this->output->write('[<info>....</info>] Cache clear');
+        $this->output->write('[<green>....</green>] Cache clear');
         /** @var CacheInterface $cache */
         $cache = $this->container->get('cache');
         $cache->clear();
-        $this->output->write("\r[<info>DONE</info>]\n");
+        $this->output->write("\r[<green>DONE</green>]\n");
         return 0;
     }
 

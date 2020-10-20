@@ -2,29 +2,29 @@
 
 namespace TinyFramework\Console\Commands;
 
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use TinyFramework\Console\CommandAwesome;
+use TinyFramework\Console\Input\InputDefinitionInterface;
+use TinyFramework\Console\Input\InputInterface;
+use TinyFramework\Console\Output\OutputInterface;
 use TinyFramework\Template\ViewInterface;
 
 class TinyframeworkViewClearCommand extends CommandAwesome
 {
 
-    protected function configure()
+    protected function configure(): InputDefinitionInterface
     {
-        parent::configure();
-        $this
-            ->setDescription('Clear all compiled view files');
+        return parent::configure()
+            ->description('Clear all compiled view files');
     }
 
-    public function run(InputInterface $input, OutputInterface $output)
+    public function run(InputInterface $input, OutputInterface $output): int
     {
         parent::run($input, $output);
-        $this->output->write('[<info>....</info>] View clear');
+        $this->output->write('[<green>....</green>] View clear');
         /** @var ViewInterface $session */
         $session = $this->container->get('view');
         $session->clear();
-        $this->output->write("\r[<info>DONE</info>]\n");
+        $this->output->write("\r[<green>DONE</green>]\n");
         return 0;
     }
 

@@ -2,28 +2,23 @@
 
 namespace TinyFramework\Console;
 
-use Composer\Command\BaseCommand;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use TinyFramework\Console\Input\InputDefinition;
+use TinyFramework\Console\Input\InputDefinitionInterface;
+use TinyFramework\Console\Input\InputInterface;
+use TinyFramework\Console\Input\Option;
+use TinyFramework\Console\Output\OutputInterface;
 use TinyFramework\Core\Container;
 use TinyFramework\Core\ContainerInterface;
 
-abstract class CommandAwesome extends BaseCommand implements CommandInterface
+abstract class CommandAwesome
 {
 
-    protected ContainerInterface $container;
+    private ?InputDefinitionInterface $configure = null;
+    protected ?InputInterface $input;
+    protected ?OutputInterface $output;
+    protected ?ContainerInterface $container;
 
-    protected InputInterface $input;
-
-    protected OutputInterface $output;
-
-    public function __construct(string $name = null)
-    {
-        $name = $name ?: static::getDefaultName();
-        parent::__construct($name);
-    }
-
-    public static function getDefaultName()
+    protected function configure(): InputDefinitionInterface
     {
         $command = str_replace('\\', '/', static::class);
         if (mb_strpos($command, '/') !== false) {
@@ -33,15 +28,31 @@ abstract class CommandAwesome extends BaseCommand implements CommandInterface
         $command = preg_replace_callback('/([A-Z])/', function ($match) {
             return ':' . mb_strtolower($match[0]);
         }, $command);
-        return ltrim($command, ':');
+        return InputDefinition::create(ltrim($command, ':'))
+            ->option(Option::create('help', 'h', null, 'Print the help message.'))
+            ->option(Option::create('quiet', 'q', null, 'Do not output any message'))
+            ->option(Option::create('verbose', 'v', null, 'Increase the verbose level.'))
+            ->option(Option::create('ansi', null, null, 'Force ANSI output'))
+            ->option(Option::create('no-ansi', null, null, 'Disable ANSI output'))
+            ->option(Option::create('no-interaction', 'n', null, 'Do not ask any interactive question.'));
     }
 
-    public function run(InputInterface $input, OutputInterface $output)
+    /**
+     * @internal
+     */
+    public function configuration(): InputDefinitionInterface
+    {
+        if (is_null($this->configure)) {
+            $this->configure = $this->configure();
+        }
+        return $this->configure;
+    }
+
+    public function run(InputInterface $input, OutputInterface $output): int
     {
         $this->input = $input;
         $this->output = $output;
         $this->container = Container::instance();
-        // @TODO compile inputargs with definition
         return 0;
     }
 
