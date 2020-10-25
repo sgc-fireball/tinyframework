@@ -28,12 +28,12 @@ class Shell
         $this->readline->readHistory();
         while (true) {
             $line = $this->readline->prompt(config('app.name').' $');
-            if (empty($line)) {
-                continue;
-            }
-            if ($line === 'exit') {
+            if ($line === 'exit' || $line === false) {
                 $this->readline->saveHistory();
                 break;
+            }
+            if (empty($line)) {
+                continue;
             }
             try {
                 $this->execute($line);
