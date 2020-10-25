@@ -37,7 +37,11 @@ class Readline
         return $this;
     }
 
-    public function prompt(string $prompt = null): ?string
+    /**
+     * @param string|null $prompt
+     * @return false|string
+     */
+    public function prompt(string $prompt = null)
     {
         $prompt = trim($prompt);
         $prompt = $prompt ?? $this->prompt;
