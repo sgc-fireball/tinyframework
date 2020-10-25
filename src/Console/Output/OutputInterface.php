@@ -15,4 +15,14 @@ interface OutputInterface
 
     public function writeln(string $text);
 
+    public function box(string $text, string $start = '', string $end = '');
+
+    public function error(string $text): void;
+
+    public function warning(string $text): void;
+
+    public function info(string $text): void;
+
+    public function successful(string $text): void;
+
 }

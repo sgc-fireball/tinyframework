@@ -1,5 +1,11 @@
 <?php declare(strict_types=1);
 
+if (function_exists('pcntl_async_signals')) {
+    pcntl_async_signals(true);
+} else {
+    declare (ticks = 10);
+}
+
 use TinyFramework\Core\Container;
 use TinyFramework\Console\ConsoleKernel;
 use TinyFramework\Core\DotEnv;

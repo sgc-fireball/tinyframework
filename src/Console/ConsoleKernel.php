@@ -10,6 +10,9 @@ use TinyFramework\Console\Input\Option;
 use TinyFramework\Console\Output\Output;
 use TinyFramework\Console\Output\OutputInterface;
 use TinyFramework\Core\Kernel;
+use TinyFramework\Event\EventDispatcherInterface;
+use TinyFramework\Http\Response;
+use TinyFramework\System\SignalHandler;
 
 class ConsoleKernel extends Kernel implements ConsoleKernelInterface
 {
@@ -57,12 +60,22 @@ class ConsoleKernel extends Kernel implements ConsoleKernelInterface
         try {
             $this->input = $input ?? new Input();
             $this->output = $output ?? new Output();
-            $exitCode = $this->tryHandle();
+            $this->container
+                ->alias('input', InputInterface::class)
+                ->singleton(InputInterface::class, $this->input)
+                ->alias('output', OutputInterface::class)
+                ->singleton(OutputInterface::class, $this->output);
+            SignalHandler::init($this->container->get(EventDispatcherInterface::class));
+            return $this->tryHandle();
         } catch (\Throwable $e) {
-            $this->output->write("\n\n" . exception2text($e) . "\n\n");
-            $exitCode = min(max(1, $e->getCode()), 255);
+            return $this->handleException($e);
         }
-        return min(max(0, $exitCode), 255);
+    }
+
+    public function handleException(\Throwable $e)
+    {
+        $this->output->error(exception2text($e));
+        return min(max(1, $e->getCode()), 255);
     }
 
     private function tryHandle(): int
@@ -81,6 +94,15 @@ class ConsoleKernel extends Kernel implements ConsoleKernelInterface
             }
             if ($inputDefinition->option('help')->value()) {
                 return $this->commandUsage($inputDefinition);
+            }
+            if ($inputDefinition->option('quiet')->value()) {
+                // @TODO - load null output
+            }
+            if ($verbose = $inputDefinition->option('verbose')->value()) {
+                // @TODO - set verbose level to output
+            }
+            if ($inputDefinition->option('no-interaction')->value()) {
+                // @TODO - set no interaction on Input
             }
             return $this->commands[$command]->run($this->input, $this->output);
         }

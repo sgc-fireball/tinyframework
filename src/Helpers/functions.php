@@ -116,6 +116,13 @@ if (!function_exists('view')) {
     }
 }
 
+if (!function_exists('runningInConsole')) {
+    function runningInConsole(): bool
+    {
+        return \PHP_SAPI === 'cli' || \PHP_SAPI === 'phpdbg';
+    }
+}
+
 if (!function_exists('dump')) {
     /**
      * @param mixed ...$val
@@ -124,9 +131,9 @@ if (!function_exists('dump')) {
     function dump(...$val)
     {
         foreach ($val as $value) {
-            echo php_sapi_name() !== 'cli' ? '<code><pre>' : '';
+            echo runningInConsole() ? '' : '<code><pre>';
             var_dump($value);
-            echo php_sapi_name() !== 'cli' ? '</pre></code>' : '';
+            echo runningInConsole() ? '' : '</pre></code>';
         }
     }
 }

@@ -10,6 +10,7 @@ use TinyFramework\Logger\LoggerInterface;
 use TinyFramework\Queue\JobInterface;
 use TinyFramework\Queue\QueueInterface;
 use TinyFramework\Queue\SyncQueue;
+use TinyFramework\System\SignalHandler;
 
 class TinyframeworkQueueWorkerCommand extends CommandAwesome
 {
@@ -32,14 +33,20 @@ class TinyframeworkQueueWorkerCommand extends CommandAwesome
         if ($queue instanceof SyncQueue) {
             return 0;
         }
+
+        SignalHandler::catchAll();
         /** @var LoggerInterface $logger */
         $logger = $this->container->get('logger');
-        while (true) {
+        while (!$this->isTerminated()) {
             $job = $queue->pop(10);
             if ($job instanceof JobInterface) {
                 try {
+                    $this->output->write(sprintf('[<yellow>....</yellow>] %s', get_class($job)));
                     $job->handle();
+                    $this->output->write("\r[<green>DONE</green>]\n");
                 } catch (\Throwable $e) {
+                    $this->output->write("\r[<red>FAIL</red>]\n");
+                    $this->output->error($e->getMessage());
                     $logger->error(exception2text($e));
                 }
             }

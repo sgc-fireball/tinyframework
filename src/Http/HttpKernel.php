@@ -3,6 +3,7 @@
 namespace TinyFramework\Http;
 
 use Closure;
+use TinyFramework\Console\Output\OutputInterface;
 use TinyFramework\Core\Kernel;
 use TinyFramework\Core\Pipeline;
 use TinyFramework\Exception\HttpException;
@@ -14,9 +15,12 @@ class HttpKernel extends Kernel implements HttpKernelInterface
     /** @var Closure[] */
     private array $terminateCallbacks = [];
 
+    private ?Request $request;
+
     public function handle(Request $request): Response
     {
         try {
+            $this->request = $request;
             $response = null;
             $this->container->alias('request', Request::class)->singleton(Request::class, $request);
             if ($route = $this->container->get('router')->resolve($request)) {
@@ -26,15 +30,7 @@ class HttpKernel extends Kernel implements HttpKernelInterface
                 throw new HttpException('Page not found! ' . $request->uri(), 404);
             }
         } catch (\Throwable $e) {
-            $statusCode = $e instanceof HttpException ? $e->getCode() : 500;
-            $statusCode = ($statusCode < 400 || $statusCode > 599) ? 500 : $statusCode;
-            $response = Response::error($statusCode);
-            /** @var Blade $view */
-            $view = $this->container->get('blade');
-            if ($view->exists('errors.' . $statusCode)) {
-                $response = Response::new('', $statusCode);
-                $response->content($view->render('errors.' . $statusCode, compact('e', 'response')));
-            }
+            $response = $this->throwableToResponse($e);
             $this->container->get('logger')->error(exception2text($e),
                 [
                     'request_id' => $request->id(),
@@ -45,6 +41,30 @@ class HttpKernel extends Kernel implements HttpKernelInterface
         }
         $response->header('X-Request-ID', $request->id())->header('X-Response-ID', $response->id())->send();
         $this->terminate($request, $response);
+        return $response;
+    }
+
+    public function handleException(\Throwable $e)
+    {
+        $response = $this->throwableToResponse($e);
+        $response
+            ->header('X-Request-ID', $this->request ? $this->request->id() : '')
+            ->header('X-Response-ID', $response->id())
+            ->send();
+        die();
+    }
+
+    private function throwableToResponse(\Throwable $e): Response
+    {
+        $statusCode = $e instanceof HttpException ? $e->getCode() : 500;
+        $statusCode = ($statusCode < 400 || $statusCode > 599) ? 500 : $statusCode;
+        $response = Response::error($statusCode);
+        /** @var Blade $view */
+        $view = $this->container->get('blade');
+        if ($view->exists('errors.' . $statusCode)) {
+            $response = Response::new('', $statusCode);
+            $response->content($view->render('errors.' . $statusCode, compact('e', 'response')));
+        }
         return $response;
     }
 

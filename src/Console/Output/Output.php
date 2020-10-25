@@ -9,14 +9,30 @@ class Output implements OutputInterface
 
     private Color $color;
 
-    private bool $ansi = true;
+    private bool $ansi;
 
+    private int $width = 80;
+
+    private int $height = 25;
+
+    /**
+     * foreground;background;attributes
+     * @see https://misc.flogisoft.com/bash/tip_colors_and_formatting
+     * @see https://github.com/symfony/console/blob/b61edc965ce547319f0b9dad02ba22c96da27c5a/Color.php#L143
+     * @see https://github.com/symfony/console/blob/5.x/Formatter/OutputFormatter.php
+     * reset attributes: \e[0m
+     * background-RGB: \e[48;2;R;G;Bm
+     * foreground-RGB: \e[38;2;R;G;Bm
+     */
     private array $ansiCommands = [
-        'bold' => ["\e[1m", "\e[21m"],
+        'bold' => ["\e[1m", "\e[22m"],
         'dim' => ["\e[2m", "\e[22m"],
+        #'3' => ["\e[3m", "\e[23m"],
         'underline' => ["\e[4m", "\e[24m"],
-        'blink' => ["\e[5m", "\e[25m"],
-        'hide' => ["\e[8m", "\e[28m"],
+        #'blink' => ["\e[5m", "\e[25m"],
+        #'6' => ["\e[6m", "\e[26m"], // gray invert
+        #'invert' => ["\e[7m", "\e[27m"],
+        #'hidden' => ["\e[8m", "\e[28m"],
 
         'black' => ["\e[30m", "\e[39m"],
         'red' => ["\e[31m", "\e[39m"],
@@ -56,7 +72,20 @@ class Output implements OutputInterface
     public function __construct(Color $color = null)
     {
         $this->color = $color ?? new Color();
-        $this->ansi = array_key_exists('TERM', $_SERVER) && $_SERVER['TERM'] === 'xterm';
+        $this->ansi = false;
+        if (array_key_exists('TERM', $_SERVER)) {
+            $this->ansi = in_array($_SERVER['TERM'], [
+                'xterm',
+                'xterm-256color'
+            ]);
+        }
+        $this->onResize();
+    }
+
+    protected function onResize(): void
+    {
+        $this->width = (int)trim(shell_exec('tput cols'));
+        $this->height = (int)trim(shell_exec('tput lines'));
     }
 
     public function ansi(bool $ansi = null)
@@ -68,23 +97,16 @@ class Output implements OutputInterface
         return $this;
     }
 
-    /**
-     * @see https://misc.flogisoft.com/bash/tip_colors_and_formatting
-     */
     public function write(string $text)
     {
-        $text = preg_replace_callback('/<([#a-z0-9:]+)>(.*)<\/([#a-z0-9:]+)>/m', function (array $matches) {
-            if (count($matches) !== 4) {
-                return $matches[0];
-            }
-            [$text, $tag,] = $matches;
-            $command = $tag;
-            $start = '';
-            $end = '';
+        preg_match_all('/<(\/)?([a-zA-Z0-9#:]+)>/', $text, $matches, PREG_SET_ORDER);
+        foreach ($matches as $match) {
+            $replace = '';
             if ($this->ansi) {
-                $end = "\e[0m";
+                list($match, $end, $command) = $match;
+                $replace = "\e[0m";
                 if (array_key_exists($command, $this->ansiCommands)) {
-                    [$start, $end] = $this->ansiCommands[$command];
+                    $replace = $this->ansiCommands[$command][$end ? 1 : 0];
                 } else {
                     $value = $command;
                     if (strpos($command, ':') !== false) {
@@ -94,17 +116,16 @@ class Output implements OutputInterface
                     $xterm = is_null($xterm) && preg_match('/^#[a-z0-9]{6}$/', $value) ? $this->color->hex2xterm($value) : $xterm;
                     if ($xterm) {
                         if ($command === 'bg') {
-                            $start = sprintf("\e[48;5;%dm", $xterm);
+                            $replace = $end ? "\e[49m" : sprintf("\e[48;5;%dm", $xterm);
                         } else if ($command === 'fg' || $command === $value) {
-                            $start = sprintf("\e[38;5;%dm", $xterm);
+                            $replace = $end ? "\e[39m" : sprintf("\e[38;5;%dm", $xterm);
                         }
                     }
+
                 }
             }
-            $text = str_replace('<' . $tag . '>', $start, $text);
-            $text = str_replace('</' . $tag . '>', $end, $text);
-            return $text;
-        }, $text);
+            $text = str_replace($match, $replace, $text);
+        }
         echo $text;
         flush();
     }
@@ -112,6 +133,36 @@ class Output implements OutputInterface
     public function writeln(string $text = '')
     {
         $this->write($text . PHP_EOL);
+    }
+
+    public function box(string $text, string $start = '', string $end = '')
+    {
+        $message = str_pad(' ', $this->width) . PHP_EOL;
+        foreach (explode("\n", wordwrap($text, $this->width - 4, "\n", true)) as $text) {
+            $message .= '  ' . str_pad(trim($text), $this->width - 4) . '  ' . PHP_EOL;
+        }
+        $message .= str_pad(' ', $this->width);
+        $this->writeln($start . $message . $end);
+    }
+
+    public function error(string $text): void
+    {
+        $this->box($text, '<bg:red><white>', '</white></bg:red>');
+    }
+
+    public function warning(string $text): void
+    {
+        $this->box($text, '<bg:yellow><black>', '</black></bg:yellow>');
+    }
+
+    public function info(string $text): void
+    {
+        $this->box($text, '<bg:blue><white>', '</white></bg:blue>');
+    }
+
+    public function successful(string $text): void
+    {
+        $this->box($text, '<bg:green><black>', '</black></bg:green>');
     }
 
 }

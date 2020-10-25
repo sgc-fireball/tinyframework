@@ -9,6 +9,7 @@ use TinyFramework\Console\Input\Option;
 use TinyFramework\Console\Output\OutputInterface;
 use TinyFramework\Core\Container;
 use TinyFramework\Core\ContainerInterface;
+use TinyFramework\System\SignalHandler;
 
 abstract class CommandAwesome
 {
@@ -54,6 +55,11 @@ abstract class CommandAwesome
         $this->output = $output;
         $this->container = Container::instance();
         return 0;
+    }
+
+    protected function isTerminated(): bool
+    {
+        return SignalHandler::isTerminated();
     }
 
 }
