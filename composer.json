@@ -1,7 +1,7 @@
 {
   "name": "sgc-fireball/tinyframework",
   "license": "proprietary",
-  "type": "composer-plugin",
+  "type": "framework",
   "autoload": {
     "files": [
       "src/Helpers/functions.php"
