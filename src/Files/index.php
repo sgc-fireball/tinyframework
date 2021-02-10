@@ -10,6 +10,9 @@ define('TINYFRAMEWORK_START', microtime(true));
 define('ROOT', dirname(__DIR__));
 chdir(ROOT);
 require_once('vendor/autoload.php');
+if (file_exists('vendor/composer/platform_check.php')) {
+    require_once('vendor/composer/platform_check.php');
+}
 
 $container = Container::instance()->singleton(DotEnvInterface::class, DotEnv::class);
 $kernel = $container->get(HttpKernel::class);
