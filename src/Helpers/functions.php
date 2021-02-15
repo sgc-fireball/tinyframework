@@ -159,7 +159,7 @@ if (!function_exists('env')) {
     function env(string $key, $default = null)
     {
         $value = $_ENV[$key] ?? null;
-        $value = is_string($value) && empty($value) ? 'null' : $value;
+        $value = mb_strlen($value) === 0 ? null : $value;
         $value = is_string($value) && mb_strtolower($value) === 'null' ? null : $value;
         $value = is_string($value) && mb_strtolower($value) === 'true' ? true : $value;
         $value = is_string($value) && mb_strtolower($value) === 'false' ? false : $value;
