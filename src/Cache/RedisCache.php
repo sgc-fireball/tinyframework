@@ -21,7 +21,7 @@ class RedisCache extends CacheAwesome
         $this->config['timeout'] = max(1, (int)($config['timeout'] ?? 1));
         $this->config['read_write_timeout'] = (int)($config['read_write_timeout'] ?? -1);
         $this->config['profile'] = $config['profile'] ?? '2.6';
-        $this->config['prefix'] = $config['prefix'] ?? 'queue:';
+        $this->config['prefix'] = $config['prefix'] ?? 'cache:';
 
         $this->redis = new Redis();
         if (!$this->redis->pconnect($this->config['host'], $this->config['port'])) {
