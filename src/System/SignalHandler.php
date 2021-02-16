@@ -91,9 +91,12 @@ class SignalHandler
         }
     }
 
-    public static function catchSignal(int $signal): void
+    public static function catchSignal(int $signal): bool
     {
-        pcntl_signal($signal, [__CLASS__, 'signal']);
+        if ($signal >= 1 && !in_array($signal, [self::SIGKILL, self::SIGSTOP])) {
+            return pcntl_signal($signal, [__CLASS__, 'signal']);
+        }
+        return false;
     }
 
     /**

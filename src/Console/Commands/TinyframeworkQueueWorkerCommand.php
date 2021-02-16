@@ -38,7 +38,7 @@ class TinyframeworkQueueWorkerCommand extends CommandAwesome
         /** @var LoggerInterface $logger */
         $logger = $this->container->get('logger');
         while (!$this->isTerminated()) {
-            $job = $queue->pop(10);
+            $job = $queue->pop(3);
             if ($job instanceof JobInterface) {
                 try {
                     $this->output->write(sprintf('[<yellow>....</yellow>] %s', get_class($job)));
