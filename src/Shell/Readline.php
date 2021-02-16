@@ -25,6 +25,14 @@ class Readline
         readline_completion_function([&$this, 'autocomplete']);
     }
 
+    public function setContext(?Context $context = null): Readline
+    {
+        foreach ($this->matchers as $matcher) {
+            $matcher->setContext($context);
+        }
+        return $this;
+    }
+
     public function readHistory(): Readline
     {
         if (file_exists($this->historyFile)) {

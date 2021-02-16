@@ -2,20 +2,30 @@
 
 namespace TinyFramework\Shell\TabCompletion;
 
+use TinyFramework\Shell\Context;
+
 class VariableTabCompletion implements TabCompletionInterface
 {
 
+    private ?Context $context = null;
+
+    public function setContext(?Context $context = null): TabCompletionInterface
+    {
+        $this->context = $context;
+        return $this;
+    }
+
     public function getMatches(array $info, string $input, int $index): array
     {
-        $variables = [];
+        $variables = $this->context ? array_keys($this->context->getVariables()) : [];
         if (empty($input)) {
             return [];
         }
-        $variables = array_filter(array_keys($variables), function (string $var) use ($input) {
-            return strpos($var, $input) === 0;
+        $variables = array_filter($variables, function (string $name) use ($input) {
+            return strpos($name, $input) === 0;
         });
-        $variables = array_merge($variables, array_map(function(string $var) {
-            return '$'. $var;
+        $variables = array_merge($variables, array_map(function (string $name) {
+            return '$' . $name;
         }, $variables));
         return $variables;
     }

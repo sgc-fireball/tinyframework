@@ -9,13 +9,15 @@ class Shell
 
     private OutputInterface $output;
 
-    private array $variables = [];
+    private Context $context;
 
     private Readline $readline;
 
     public function __construct(OutputInterface $output, Readline $readline)
     {
+        $this->context = new Context();
         $this->readline = $readline;
+        $this->readline->setContext($this->context);
         $this->output = $output;
     }
 
@@ -27,7 +29,7 @@ class Shell
         #$this->output->successful('This is an successful.');
         $this->readline->readHistory();
         while (true) {
-            $line = $this->readline->prompt(config('app.name').' $');
+            $line = $this->readline->prompt(config('app.name') . ' $');
             if ($line === 'exit' || $line === false) {
                 $this->readline->saveHistory();
                 break;
@@ -49,10 +51,10 @@ class Shell
             try {
                 ob_start();
                 set_error_handler([$this, 'handleError']);
-                $this->variables['code'] = $code;
-                extract($this->variables);
+                $this->context->setVariable('code', $code);
+                extract($this->context->getVariables());
                 eval(rtrim($code, ';') . ';');
-                $this->variables = get_defined_vars();
+                $this->context->setVariables(get_defined_vars());
                 $this->readline->addHistory($code);
                 $this->readline->saveHistory();
                 $content = rtrim(ob_get_clean());
