@@ -11,6 +11,8 @@ class Output implements OutputInterface
 
     private bool $ansi;
 
+    private int $verbosity = 0;
+
     private int $width = 80;
 
     private int $height = 25;
@@ -84,8 +86,17 @@ class Output implements OutputInterface
 
     protected function onResize(): void
     {
-        $this->width = (int)trim(shell_exec('tput cols'));
-        $this->height = (int)trim(shell_exec('tput lines'));
+        $width = 80;
+        $height = 50;
+        if (is_executable(`which stty`)) {
+            list($width, $height) = explode(' ', @exec('stty size 2>/dev/null') ?: $width . ' ' . $height);
+        }
+        if (is_executable(`which tput`)) {
+            $width = (int)trim(shell_exec('tput cols'));
+            $height = (int)trim(shell_exec('tput lines'));
+        }
+        $this->width = $width;
+        $this->height = $height;
     }
 
     public function ansi(bool $ansi = null)
@@ -97,8 +108,29 @@ class Output implements OutputInterface
         return $this;
     }
 
+    public function quiet(bool $quiet = null)
+    {
+        if (is_null($quiet)) {
+            return $this->verbosity === -1;
+        }
+        $this->verbosity = -1;
+        return $this;
+    }
+
+    public function verbosity(int $verbosity = null)
+    {
+        if (is_null($verbosity)) {
+            return $this->verbosity;
+        }
+        $this->verbosity = $verbosity;
+        return $this;
+    }
+
     public function write(string $text)
     {
+        if ($this->verbosity === -1) {
+            return;
+        }
         preg_match_all('/<(\/)?([a-zA-Z0-9#:]+)>/', $text, $matches, PREG_SET_ORDER);
         foreach ($matches as $match) {
             $replace = '';

@@ -241,3 +241,24 @@ if (!function_exists('e')) {
         return htmlspecialchars((string)$content, ENT_QUOTES, "UTF-8", true);
     }
 }
+
+if (!function_exists('password')) {
+    function password(int $length = 16): string
+    {
+        $password = '';
+        $chars = ';#§$*-/<=>?@^_|~2345689abcdefghkmnpqrstwxyzABCDEFGHKMNPQRSTWXYZ';
+        $counts = strlen($chars) - 1;
+        while (strlen($password) < $length) {
+            $chars = str_shuffle($chars);
+            $password .= substr($chars, mt_rand(0, $counts), 1);
+        }
+        return $password;
+    }
+}
+
+if (!function_exists('console_size')) {
+    function console_size(): array
+    {
+        return explode(' ', @exec('stty size 2>/dev/null') ?: '80 50');
+    }
+}

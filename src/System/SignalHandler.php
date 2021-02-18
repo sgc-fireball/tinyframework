@@ -81,6 +81,7 @@ class SignalHandler
 
     public static function init(EventDispatcherInterface $eventDispatcher)
     {
+        pcntl_async_signals(true);
         self::$eventDispatcher = $eventDispatcher;
     }
 

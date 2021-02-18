@@ -24,6 +24,15 @@ class ConsoleKernel extends Kernel implements ConsoleKernelInterface
 
     private ?OutputInterface $output;
 
+    private string $header = <<<EOF
+ _____ _             _____                                            _
+|_   _(_)_ __  _   _|  ___| __ __ _ _ __ ___   _____      _____  _ __| | __
+  | | | | '_ \| | | | |_ | '__/ _` | '_ ` _ \ / _ \ \ /\ / / _ \| '__| |/ /
+  | | | | | | | |_| |  _|| | | (_| | | | | | |  __/\ V  V / (_) | |  |   <
+  |_| |_|_| |_|\__, |_|  |_|  \__,_|_| |_| |_|\___| \_/\_/ \___/|_|  |_|\_\
+               |___/
+EOF;
+
     protected function boot()
     {
         parent::boot();
@@ -82,28 +91,39 @@ class ConsoleKernel extends Kernel implements ConsoleKernelInterface
     {
         $argv = $this->input->argv();
         $command = array_key_exists(0, $argv) ? $argv[0] : null;
+        $inputDefinition = $this->input->inputDefinition();
         if (array_key_exists($command, $this->commands)) {
             $inputDefinition = $this->commands[$command]->configuration();
-            $this->input->inputDefinition($inputDefinition);
+        }
+        $this->input->inputDefinition($inputDefinition);
+
+        try {
             $this->input->parse();
-            if ($inputDefinition->option('no-ansi')->value()) {
-                $this->output->ansi(false);
-            }
-            if ($inputDefinition->option('ansi')->value()) {
-                $this->output->ansi(true);
-            }
-            if ($inputDefinition->option('help')->value()) {
-                return $this->commandUsage($inputDefinition);
-            }
-            if ($inputDefinition->option('quiet')->value()) {
-                // @TODO - load null output
-            }
-            if ($verbose = $inputDefinition->option('verbose')->value()) {
-                // @TODO - set verbose level to output
-            }
-            if ($inputDefinition->option('no-interaction')->value()) {
-                // @TODO - set no interaction on Input
-            }
+        } catch (\InvalidArgumentException $e) {
+            $this->output->error($e->getMessage());
+            $this->output->write(PHP_EOL);
+            return $this->commandUsage($inputDefinition);
+        }
+        if ($inputDefinition->option('no-ansi')->value()) {
+            $this->output->ansi(false);
+        }
+        if ($inputDefinition->option('ansi')->value()) {
+            $this->output->ansi(true);
+        }
+        if ($inputDefinition->option('quiet')->value()) {
+            $this->output->quiet(true);
+        }
+        if ($verbose = $inputDefinition->option('verbose')->value()) {
+            $this->output->verbosity($verbose);
+        }
+        if ($inputDefinition->option('no-interaction')->value()) {
+            $this->input->interaction(false);
+        }
+        if ($inputDefinition->option('help')->value()) {
+            return $this->commandUsage($inputDefinition);
+        }
+
+        if (array_key_exists($command, $this->commands)) {
             return $this->commands[$command]->run($this->input, $this->output);
         }
         if ($command) {
@@ -122,8 +142,9 @@ class ConsoleKernel extends Kernel implements ConsoleKernelInterface
          * @var CommandAwesome $command
          */
         if ($hint !== null) {
-            $this->output->writeln("<yellow>Did you mean?</yellow>");
+            $this->output->writeln(sprintf("<yellow>Command %s not found. Did you mean?</yellow>", $hint));
         } else {
+            $this->output->writeln($this->header . PHP_EOL);
             $this->output->writeln("<yellow>Available commands:</yellow>");
         }
         foreach ($this->commands as $key => $command) {
@@ -139,8 +160,11 @@ class ConsoleKernel extends Kernel implements ConsoleKernelInterface
         return 0;
     }
 
-    private function commandUsage(InputDefinitionInterface $definition): int
+    private function commandUsage(InputDefinitionInterface $definition = null): int
     {
+        if ($definition === null) {
+            return $this->commandList('usage');
+        }
         $this->output->writeln("<white>NAME</white>");
         $this->output->writeln("\t<yellow>" . $definition->name() . "</yellow>\n");
         /** @var Option[] $options */
@@ -156,7 +180,10 @@ class ConsoleKernel extends Kernel implements ConsoleKernelInterface
                 $definition->name()
             );
             if ($options) {
-                foreach ($options as $long => $option) {
+                foreach ($options as $key => $option) {
+                    if (mb_strlen($key) === 1) {
+                        continue;
+                    }
                     $message .= ' ';
                     $message .= $option->isRequired() ? '<' : '[';
                     if ($option->short()) {
@@ -188,7 +215,10 @@ class ConsoleKernel extends Kernel implements ConsoleKernelInterface
         /** @var Option[] $options */
         if ($options) {
             $this->output->writeln('<white>OPTIONS</white>');
-            foreach ($options as $long => $option) {
+            foreach ($options as $key => $option) {
+                if (mb_strlen($key) === 1) {
+                    continue;
+                }
                 $message = "\t<white>";
                 if ($option->short()) {
                     $message .= '-' . $option->short() . ', ';

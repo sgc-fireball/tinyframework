@@ -4,7 +4,6 @@ namespace TinyFramework\Console\Commands;
 
 use TinyFramework\Cache\CacheInterface;
 use TinyFramework\Console\CommandAwesome;
-use TinyFramework\Console\Input\InputDefinition;
 use TinyFramework\Console\Input\InputDefinitionInterface;
 use TinyFramework\Console\Input\InputInterface;
 use TinyFramework\Console\Output\OutputInterface;

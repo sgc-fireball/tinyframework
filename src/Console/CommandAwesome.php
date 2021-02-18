@@ -29,13 +29,7 @@ abstract class CommandAwesome
         $command = preg_replace_callback('/([A-Z])/', function ($match) {
             return ':' . mb_strtolower($match[0]);
         }, $command);
-        return InputDefinition::create(ltrim($command, ':'))
-            ->option(Option::create('help', 'h', null, 'Print the help message.'))
-            ->option(Option::create('quiet', 'q', null, 'Do not output any message'))
-            ->option(Option::create('verbose', 'v', null, 'Increase the verbose level.'))
-            ->option(Option::create('ansi', null, null, 'Force ANSI output'))
-            ->option(Option::create('no-ansi', null, null, 'Disable ANSI output'))
-            ->option(Option::create('no-interaction', 'n', null, 'Do not ask any interactive question.'));
+        return InputDefinition::create(ltrim($command, ':'));
     }
 
     /**

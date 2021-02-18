@@ -9,11 +9,16 @@ class Input implements InputInterface
 
     private array $tokens = [];
 
+    private bool $interaction = true;
+
     private InputDefinitionInterface $inputDefinition;
 
     public function __construct(array $argv = null, InputDefinitionInterface $inputDefinition = null)
     {
-        $this->inputDefinition($inputDefinition ?? new InputDefinition());
+        if ($inputDefinition === null) {
+            $inputDefinition = InputDefinition::create('', 'The TinyFramework console command.');
+        }
+        $this->inputDefinition($inputDefinition);
         $this->argv($argv ?? $_SERVER['argv'] ?? []);
         @array_shift($this->argv); // strip application name
     }
@@ -48,6 +53,15 @@ class Input implements InputInterface
         return $definition->argument($name);
     }
 
+    public function interaction(bool $interaction = null)
+    {
+        if (is_null($interaction)) {
+            return $this->interaction;
+        }
+        $this->interaction = $interaction;
+        return $this;
+    }
+
     public function parse(): ?string
     {
         $command = null;
@@ -72,44 +86,40 @@ class Input implements InputInterface
 
     private function parseLongOption(string $token): void
     {
-        $token = substr($token, 2);
+        $token = substr($token, 2); // remove the double dash
         $value = null;
         if (strpos($token, '=') > 0) {
             [$token, $value] = explode('=', $token);
         }
-        /** @var Option[] $option */
-        $option = array_values(array_filter(
-            array_values($this->inputDefinition->option()),
-            function (Option $option) use ($token) {
-                return $option->long() === $token;
+        foreach (array_values($this->inputDefinition->option()) as $option) {
+            if ($option->long() === $token) {
+                $this->parseOption($option, $value);
+                return;
             }
-        ));
-        if (count($option) === 1) {
-            $this->parseOption($option[0], $value);
-            return;
         }
-        throw new \InvalidArgumentException('Invalid option.');
+        throw new \InvalidArgumentException('Invalid long option: ' . $token);
     }
 
     private function parseShortOption(string $token): void
     {
-        $token = substr($token, 1);
-        $value = null;
-        if (strpos($token, '=') > 0) {
-            [$token, $value] = explode('=', $token);
-        }
-        /** @var Option[] $option */
-        $option = array_values(array_filter(
-            array_values($this->inputDefinition->option()),
-            function (Option $option) use ($token) {
-                return $option->short() === $token;
+        $token = mb_substr($token, 1); // remove the dash
+        while (mb_strlen($token)) {
+            if ($option = $this->inputDefinition->option($token[0])) {
+                if ($option->hasValue()) {
+                    $value = null;
+                    if (mb_strlen($token) > 1) {
+                        $value = mb_substr($token, 1, 1) === '=' ? mb_substr($token, 2) : mb_substr($token, 1);
+                    }
+                    $this->parseOption($option, $value);
+                    break;
+                } else {
+                    $this->parseOption($option, null);
+                    $token = mb_substr($token, 1); // remove current option char
+                }
+                continue;
             }
-        ));
-        if (count($option) === 1) {
-            $this->parseOption($option[0], $value);
-            return;
+            throw new \InvalidArgumentException('Invalid short option: ' . $token);
         }
-        throw new \InvalidArgumentException('Invalid option.');
     }
 
     private function parseOption(Option $option, string $value = null): void
@@ -120,7 +130,7 @@ class Input implements InputInterface
                 $values[] = !is_null($value) ? $value : array_shift($this->tokens);
                 $option->value($values);
             } else {
-                $option->value(array_shift($this->tokens));
+                $option->value(!is_null($value) ? $value : array_shift($this->tokens));
             }
         } else {
             $option->value($option->value() + 1);

@@ -21,4 +21,6 @@ interface InputInterface
 
     public function argument(string $name): ?Argument;
 
+    public function interaction(bool $quiet = null);
+
 }

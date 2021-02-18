@@ -11,6 +11,10 @@ interface OutputInterface
 
     public function ansi(bool $ansi = null);
 
+    public function quiet(bool $quiet = null);
+
+    public function verbosity(int $verbosity = null);
+
     public function write(string $text);
 
     public function writeln(string $text);

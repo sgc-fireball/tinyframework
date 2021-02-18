@@ -39,6 +39,13 @@ class Option
         $default = null
     )
     {
+        if (mb_strlen($long) === 1) {
+            throw new \InvalidArgumentException('Long option name is to short: ' . $long);
+        }
+        if ($short !== null && mb_strlen($short) > 1) {
+            throw new \InvalidArgumentException('Short option name is to long: ' . $short);
+        }
+
         $this->long = $long;
         $this->short = $short;
         $this->mode = $mode === null ? self::VALUE_NONE | self::VALUE_OPTIONAL : $mode;
