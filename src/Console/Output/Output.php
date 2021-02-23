@@ -88,15 +88,27 @@ class Output implements OutputInterface
     {
         $width = 80;
         $height = 50;
-        if (is_executable(`which stty`)) {
-            list($width, $height) = explode(' ', @exec('stty size 2>/dev/null') ?: $width . ' ' . $height);
+        $command = trim(`which stty`);
+        if (is_executable($command)) {
+            list($height, $width) = explode(' ', @exec($command . ' size 2>/dev/null') ?: $width . ' ' . $height);
         }
-        if (is_executable(`which tput`)) {
-            $width = (int)trim(shell_exec('tput cols'));
-            $height = (int)trim(shell_exec('tput lines'));
+        $command = trim(`which tput`);
+        if (is_executable($command)) {
+            $width = (int)trim(shell_exec($command . ' cols'));
+            $height = (int)trim(shell_exec($command . ' lines'));
         }
         $this->width = $width;
         $this->height = $height;
+    }
+
+    public function width(): int
+    {
+        return $this->width;
+    }
+
+    public function height(): int
+    {
+        return $this->height;
     }
 
     public function ansi(bool $ansi = null)

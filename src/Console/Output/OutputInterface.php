@@ -7,6 +7,12 @@ use TinyFramework\Color\Color;
 interface OutputInterface
 {
 
+    const VERBOSITY_QUIET = -1;
+    const VERBOSITY_NORMAL = 0;
+    const VERBOSITY_VERBOSE = 1;
+    const VERBOSITY_VERY_VERBOSE = 2;
+    const VERBOSITY_DEBUG = 3;
+
     public function __construct(Color $color = null);
 
     public function ansi(bool $ansi = null);

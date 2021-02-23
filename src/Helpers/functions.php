@@ -236,9 +236,9 @@ if (!function_exists('toBool')) {
 }
 
 if (!function_exists('e')) {
-    function e($content): string
+    function e(string $content): string
     {
-        return htmlspecialchars((string)$content, ENT_QUOTES, "UTF-8", true);
+        return htmlspecialchars($content, ENT_QUOTES, "UTF-8", true);
     }
 }
 
@@ -260,5 +260,38 @@ if (!function_exists('console_size')) {
     function console_size(): array
     {
         return explode(' ', @exec('stty size 2>/dev/null') ?: '80 50');
+    }
+}
+
+if (!function_exists('size_format')) {
+    function size_format(float $byte): string
+    {
+        $steps = [
+            ['size' => 1024, 'type' => 'KB'],
+            ['size' => 1024, 'type' => 'MB'],
+            ['size' => 1024, 'type' => 'GB'],
+            ['size' => 1024, 'type' => 'TB'],
+        ];
+        $type = 'B';
+        foreach ($steps as $step) {
+            if ($byte < $step['size']) {
+                break;
+            }
+            $byte /= $step['size'];
+            $type = $step['type'];
+        }
+        return sprintf('%.2f %s', $byte, $type);
+    }
+}
+
+if (!function_exists('time_format')) {
+    function time_format(float $seconds): string
+    {
+        if ($seconds <= 1) return '1 sec';
+        if ($seconds <= 60) return sprintf('%d secs', $seconds);
+        $minutes = $seconds / 60;
+        if ($minutes <= 60) return sprintf('%.2f mins', $minutes);
+        $hours = $minutes / 60;
+        if ($hours <= 24) return sprintf('%.2f hrs', $hours);
     }
 }
