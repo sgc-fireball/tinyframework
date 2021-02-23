@@ -54,11 +54,11 @@ class ProgressBar
         $this->max($max);
         $postfix = $max === 0 ? '_nomax' : '';
         $this->format('normal' . $postfix);
-        if ($output->verbosity() === 1) {
+        if ($output->verbosity() === OutputInterface::VERBOSITY_VERBOSE) {
             $this->format('verbose' . $postfix);
-        } else if ($output->verbosity() === 2) {
+        } else if ($output->verbosity() === OutputInterface::VERBOSITY_VERY_VERBOSE) {
             $this->format('very_verbose' . $postfix);
-        } else if ($output->verbosity() >= 3) {
+        } else if ($output->verbosity() >= OutputInterface::VERBOSITY_DEBUG) {
             $this->format('debug' . $postfix);
         }
     }
