@@ -83,7 +83,7 @@ EOF;
 
     public function handleException(\Throwable $e)
     {
-        $this->output->error(exception2text($e));
+        $this->output->error(exception2text($e, $this->output->verbosity() >= OutputInterface::VERBOSITY_VERBOSE));
         return min(max(1, $e->getCode()), 255);
     }
 
@@ -110,11 +110,11 @@ EOF;
         if ($inputDefinition->option('ansi')->value()) {
             $this->output->ansi(true);
         }
-        if ($inputDefinition->option('quiet')->value()) {
-            $this->output->quiet(true);
-        }
         if ($verbose = $inputDefinition->option('verbose')->value()) {
             $this->output->verbosity($verbose);
+        }
+        if ($inputDefinition->option('quiet')->value()) {
+            $this->output->quiet(true);
         }
         if ($inputDefinition->option('no-interaction')->value()) {
             $this->input->interaction(false);

@@ -25,6 +25,8 @@ to be implemented differently and inconsistently.
 - config
 - public
 - resources
+    - lang
+        - en
     - views
 - storage
     - cache

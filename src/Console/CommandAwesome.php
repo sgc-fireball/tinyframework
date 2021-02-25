@@ -48,6 +48,12 @@ abstract class CommandAwesome
         $this->input = $input;
         $this->output = $output;
         $this->container = Container::instance();
+
+        if ($this->output->verbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+            if ($this->container->get('kernel')->inMaintenanceMode()) {
+                $this->output->warning('Running in maintenance mode.');
+            }
+        }
         return 0;
     }
 

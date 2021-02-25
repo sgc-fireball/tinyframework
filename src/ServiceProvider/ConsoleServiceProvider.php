@@ -4,6 +4,7 @@ namespace TinyFramework\ServiceProvider;
 
 use TinyFramework\Console\Output\OutputInterface;
 use TinyFramework\Core\ContainerInterface;
+use TinyFramework\Cron\LogRotateCronjob;
 use TinyFramework\Event\EventDispatcherInterface;
 use TinyFramework\Shell\Readline;
 use TinyFramework\Shell\Shell;
@@ -23,6 +24,9 @@ class ConsoleServiceProvider extends ServiceProviderAwesome
             ConstantTabCompletion::class,
             FunctionTabCompletion::class,
             VariableTabCompletion::class
+        ]);
+        $this->container->tag('cronjob', [
+            LogRotateCronjob::class
         ]);
         $this->container->singleton(Readline::class, function (ContainerInterface $container) {
             return new Readline('$', $container->tagged('shell:tab:completion'));

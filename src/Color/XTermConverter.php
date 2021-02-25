@@ -297,7 +297,7 @@ class XTermConverter implements XTermConverterInterface
             if ($hexIn == $hex) {
                 return $xterm;
             }
-            $singleDiff = abs($dec - abs(hexdec($hex)));
+            $singleDiff = abs($dec - abs(hexdec((string)$hex)));
             if ($singleDiff > $diff) {
                 continue;
             }

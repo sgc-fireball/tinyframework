@@ -9,6 +9,7 @@ use TinyFramework\ServiceProvider\ConsoleServiceProvider;
 use TinyFramework\ServiceProvider\CryptServiceProvider;
 use TinyFramework\ServiceProvider\HashServiceProvider;
 use TinyFramework\ServiceProvider\MailServiceProvider;
+use TinyFramework\ServiceProvider\LocalizationServiceProvider;
 use TinyFramework\ServiceProvider\ViewServiceProvider;
 use TinyFramework\ServiceProvider\QueueServiceProvider;
 use TinyFramework\ServiceProvider\ServiceProviderInterface;
@@ -61,6 +62,7 @@ abstract class Kernel implements KernelInterface
             RouterServiceProvider::class,
             SessionServiceProvider::class,
             QueueServiceProvider::class,
+            LocalizationServiceProvider::class,
         ];
         if ($this->runningInConsole()) {
             $this->serviceProviderNames[] = ConsoleServiceProvider::class;
@@ -114,7 +116,12 @@ abstract class Kernel implements KernelInterface
 
     public function runningInConsole(): bool
     {
-        return runningInConsole();
+        return running_in_console();
+    }
+
+    public function inMaintenanceMode(): bool
+    {
+        return file_exists('storage/maintenance.json');
     }
 
     public function handleError(int $level, string $message, string $file = '', int $line = 0, array $context = [])

@@ -145,12 +145,7 @@ class ProgressBar
         }
         $placeholder['elapsed'] = time_format($placeholder['elapsed']);
 
-        $p = function ($format, array $args, $pattern = "/\{(\w+)(:([^\}]+))?\}/") {
-            return preg_replace_callback($pattern, function ($matches) use ($args) {
-                return sprintf($matches[3] ?? '%s', @$args[$matches[1]] ?: '');
-            }, $format);
-        };
-        $barSize = $this->output->width() - strlen($p($message, $placeholder)) - 1;
+        $barSize = $this->output->width() - strlen(vnsprintf($message, $placeholder)) - 1;
 
         if ($this->max > 0) {
             $completeSize = (int)($barSize * ($placeholder['percent'] / 100));
@@ -164,7 +159,7 @@ class ProgressBar
             $placeholder['max'] = '';
         }
 
-        $this->output->write($p($message, $placeholder));
+        $this->output->write(vnsprintf($message, $placeholder));
         return $this;
     }
 

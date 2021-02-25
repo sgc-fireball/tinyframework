@@ -21,7 +21,8 @@
     "ext-redis": "*",
     "ext-fileinfo": "*",
     "ext-pcntl": "*",
-    "swiftmailer/swiftmailer": "^6.0"
+    "swiftmailer/swiftmailer": "^6.0",
+    "dragonmantank/cron-expression": "^3.0.1"
   },
   "require-dev": {
     "phpstan/phpstan": "^0.12"

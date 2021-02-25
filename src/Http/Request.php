@@ -44,7 +44,7 @@ class Request
         $request->method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
         $request->uri = new Uri(sprintf(
             '%s://%s:%s:%d%s',
-            toBool($_SERVER['HTTPS'] ?? 'off') ? 'https' : 'http',
+            to_bool($_SERVER['HTTPS'] ?? 'off') ? 'https' : 'http',
             array_key_exists('REMOTE_USER', $_SERVER) ? $_SERVER['REMOTE_USER'] . '@' : '',
             $_SERVER['HTTP_HOST'] ?? 'localhost',
             $_SERVER['SERVER_PORT'] ?? 80,

@@ -2,7 +2,7 @@
 
 namespace TinyFramework\Logger;
 
-class FileLogger extends LoggerAwesome implements LoggerInterface
+class FileLogger extends LoggerAwesome implements LoggerInterface, LogRotateInterface
 {
 
     private string $path;
@@ -34,6 +34,12 @@ class FileLogger extends LoggerAwesome implements LoggerInterface
         if ($bytes === false) {
             trigger_error('Could not write log message.', E_USER_ERROR);
         }
+        return $this;
+    }
+
+    public function rotate(): LogRotateInterface
+    {
+        // @TODO
         return $this;
     }
 

@@ -2,10 +2,7 @@
 
 namespace TinyFramework\ServiceProvider;
 
-use TinyFramework\Core\Config;
-use TinyFramework\Core\ConfigInterface;
 use TinyFramework\Core\ContainerInterface;
-use TinyFramework\Http\Uri;
 use TinyFramework\Mail\Mailer;
 use Swift_Transport;
 use Swift_Mailer;

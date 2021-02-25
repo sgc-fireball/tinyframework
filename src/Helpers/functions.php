@@ -116,8 +116,8 @@ if (!function_exists('view')) {
     }
 }
 
-if (!function_exists('runningInConsole')) {
-    function runningInConsole(): bool
+if (!function_exists('running_in_console')) {
+    function running_in_console(): bool
     {
         return \PHP_SAPI === 'cli' || \PHP_SAPI === 'phpdbg';
     }
@@ -131,9 +131,9 @@ if (!function_exists('dump')) {
     function dump(...$val)
     {
         foreach ($val as $value) {
-            echo runningInConsole() ? '' : '<code><pre>';
+            echo running_in_console() ? '' : '<code><pre>';
             var_dump($value);
-            echo runningInConsole() ? '' : '</pre></code>';
+            echo running_in_console() ? '' : '</pre></code>';
         }
     }
 }
@@ -212,22 +212,28 @@ if (!function_exists('guid')) {
 }
 
 if (!function_exists('trans')) {
-    function trans(string $content, array $placeholder = []): string
+    function trans(string $key, array $values = [], string $locale = null): string
     {
-        // @TODO
-        return vsprintf($content, $placeholder);
+        return container('translator')->trans($key, $values, $locale);
+    }
+}
+
+if (!function_exists('trans_choice')) {
+    function trans_choice(string $key, int $count, array $values = [], string $locale = null): string
+    {
+        return container('translator')->transChoice($key, $count, $values, $locale);
     }
 }
 
 if (!function_exists('route')) {
-    function route(string $name = null, array $parameters = []): string
+    function route(string $name, array $parameters = []): string
     {
         return container('router')->path($name, $parameters);
     }
 }
 
-if (!function_exists('toBool')) {
-    function toBool($mixed): bool
+if (!function_exists('to_bool')) {
+    function to_bool($mixed): bool
     {
         $mixed = is_string($mixed) && in_array(mb_strtolower($mixed), ['y', 'yes', 'true', 'on']) ? true : $mixed;
         $mixed = is_string($mixed) && in_array(mb_strtolower($mixed), ['n', 'no', 'false', 'off', 'null']) ? false : $mixed;
@@ -292,6 +298,32 @@ if (!function_exists('time_format')) {
         $minutes = $seconds / 60;
         if ($minutes <= 60) return sprintf('%.2f mins', $minutes);
         $hours = $minutes / 60;
-        if ($hours <= 24) return sprintf('%.2f hrs', $hours);
+        return sprintf('%.2f hrs', $hours);
+    }
+}
+
+if (!function_exists('vnsprintf')) {
+    function vnsprintf(string $format, array $args, $pattern = "/\{(\w+)(:([^\}]+))?\}/"): string
+    {
+        return preg_replace_callback($pattern, function ($matches) use ($args) {
+            return sprintf($matches[3] ?? '%s', @$args[$matches[1]] ?: '');
+        }, $format);
+    }
+}
+
+if (!function_exists('array_flat')) {
+    function array_flat(array $messages): array
+    {
+        $result = [];
+        foreach ($messages as $key => $value) {
+            if (\is_array($value)) {
+                foreach (array_flat($value) as $k => $v) {
+                    $result[$key . '.' . $k] = $v;
+                }
+            } else {
+                $result[$key] = $value;
+            }
+        }
+        return $result;
     }
 }
