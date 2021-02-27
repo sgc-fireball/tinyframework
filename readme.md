@@ -14,6 +14,12 @@ The implementations of all PSR standards were already removed after the
 first few classes. The reason for this was that all subareas would have
 to be implemented differently and inconsistently.
 
+## How to start
+```bash
+composer create-project --stability=dev --remove-vcs sgc-fireball/tinyframework-skeleton my-project --repository="{\"url\": \"https://github.com/sgc-fireball/tinyframework-skeleton.git\", \"type\": \"vcs\"}" master
+cd my-project; php console
+```
+
 ## Folders
 - app
     - Commands
