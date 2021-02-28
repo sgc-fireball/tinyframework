@@ -44,7 +44,7 @@ class HttpKernel extends Kernel implements HttpKernelInterface
         return $response;
     }
 
-    public function handleException(\Throwable $e)
+    public function handleException(\Throwable $e): int
     {
         $response = $this->throwableToResponse($e);
         $response

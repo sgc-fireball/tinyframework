@@ -12,9 +12,8 @@ class Config implements ConfigInterface
     public function __construct(array $config)
     {
         $this->config = array_merge($this->config, $config);
-        $root = (defined('ROOT') ? ROOT : '.');
         $this->loadFolder(__DIR__ . '/config');
-        $this->loadFolder($root . '/config');
+        $this->loadFolder(root_dir() . '/config');
     }
 
     private function loadFolder(string $path): ConfigInterface
@@ -53,12 +52,7 @@ class Config implements ConfigInterface
         return $output;
     }
 
-    /**
-     * @param string|null $key
-     * @param null $default
-     * @return array|mixed|null
-     */
-    public function get(string $key = null, $default = null)
+    public function get(string $key = null)
     {
         if (is_null($key)) {
             return $this->config;
@@ -68,13 +62,13 @@ class Config implements ConfigInterface
             $config = $this->config;
             foreach ($keys as $key) {
                 if (!array_key_exists($key, $config)) {
-                    return $default;
+                    return null;
                 }
                 $config = $config[$key];
             }
             return $config;
         }
-        return array_key_exists($key, $this->config) ? $this->config[$key] : $default;
+        return array_key_exists($key, $this->config) ? $this->config[$key] : null;
     }
 
     /**

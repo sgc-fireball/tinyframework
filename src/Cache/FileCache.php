@@ -21,16 +21,16 @@ class FileCache extends CacheAwesome
         }
     }
 
-    private function key2file(string $key)
+    private function key2file(string $key): string
     {
         return sprintf('%s/%s.cache.tmp', $this->path, hash('sha3-256', $key));
     }
 
-    public function clear(): CacheInterface
+    public function clear(): FileCache
     {
         if (count($this->tags)) {
             foreach ($this->tags as $tag) {
-                $keys = $this->get($tag, []);
+                $keys = $this->get($tag) ?? [];
                 foreach ($keys as $key => $item) {
                     $this->forget($key);
                 }
@@ -44,18 +44,12 @@ class FileCache extends CacheAwesome
         return $this;
     }
 
-    /**
-     * @param string $key
-     * @param mixed $default
-     * @return mixed
-     */
-    public function get(string $key, $default = null)
+    public function get(string $key)
     {
-        $value = $default;
         if ($this->has($key)) {
-            $value = unserialize(file_get_contents($this->key2file($key))) ?: $default;
+            return unserialize(file_get_contents($this->key2file($key))) ?? null;
         }
-        return $value ?: $default;
+        return null;
     }
 
     public function has(string $key): bool
@@ -71,13 +65,7 @@ class FileCache extends CacheAwesome
         return true;
     }
 
-    /**
-     * @param string $key
-     * @param mixed $value
-     * @param null|int|\DateTime|\DateTimeInterface $ttl
-     * @return CacheInterface
-     */
-    public function set(string $key, $value = null, $ttl = null): CacheInterface
+    public function set(string $key, $value = null, null|int|\DateTime|\DateTimeInterface $ttl = null): FileCache
     {
         $file = $this->key2file($key);
         if (file_put_contents($file, serialize($value)) === false) {
@@ -90,7 +78,7 @@ class FileCache extends CacheAwesome
         return $this;
     }
 
-    public function forget(string $key): CacheInterface
+    public function forget(string $key): FileCache
     {
         $file = $this->key2file($key);
         if (!file_exists($file)) {
@@ -105,7 +93,7 @@ class FileCache extends CacheAwesome
     private function addKeyToTags(string $key): FileCache
     {
         foreach ($this->tags as $tag) {
-            $keys = $this->get($tag, []);
+            $keys = $this->get($tag) ?? [];
             if (!array_key_exists($key, $keys)) {
                 $keys[$key] = 1;
                 $this->set($tag, $keys);

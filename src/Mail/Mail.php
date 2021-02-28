@@ -74,12 +74,7 @@ class Mail
         return $this;
     }
 
-    /**
-     * @param string|null $email
-     * @param string|null $name
-     * @return Mailer|array
-     */
-    public function to(string $email = null, string $name = null)
+    public function to(string $email = null, string $name = null): Mail|array
     {
         if (is_null($email)) {
             return $this->to;
@@ -88,12 +83,7 @@ class Mail
         return $this;
     }
 
-    /**
-     * @param string|null $email
-     * @param string|null $name
-     * @return Mailer|array
-     */
-    public function cc(string $email = null, string $name = null)
+    public function cc(string $email = null, string $name = null): Mail|array
     {
         if (is_null($email)) {
             return $this->cc;
@@ -102,12 +92,7 @@ class Mail
         return $this;
     }
 
-    /**
-     * @param string|null $email
-     * @param string|null $name
-     * @return Mailer|array
-     */
-    public function bcc(string $email = null, string $name = null)
+    public function bcc(string $email = null, string $name = null): Mail|array
     {
         if (is_null($email)) {
             return $this->bcc;

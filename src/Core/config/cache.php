@@ -1,7 +1,5 @@
 <?php declare(strict_types=1);
 
-$root = defined('ROOT') ? ROOT : '../';
-
 return [
     'default' => env('CACHE_DRIVER', 'redis'),
     'none' => [

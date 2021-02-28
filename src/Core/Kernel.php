@@ -2,9 +2,6 @@
 
 namespace TinyFramework\Core;
 
-use TinyFramework\Console\Output\Output;
-use TinyFramework\Console\Output\OutputInterface;
-use TinyFramework\Http\Response;
 use TinyFramework\ServiceProvider\ConsoleServiceProvider;
 use TinyFramework\ServiceProvider\CryptServiceProvider;
 use TinyFramework\ServiceProvider\HashServiceProvider;
@@ -40,7 +37,7 @@ abstract class Kernel implements KernelInterface
         $this->container->get(DotEnvInterface::class)->load('.env')->load('.env.local');
         $this->container->alias('kernel', Kernel::class)->singleton(Kernel::class, $this);
         set_error_handler([$this, 'handleError']);
-        set_exception_handler([$this, 'handleException']);
+        set_exception_handler([$this, 'handleExceptionVoid']);
         register_shutdown_function([$this, 'handleShutdown']);
         $this->findServiceProviders();
         $this->register();
@@ -85,7 +82,7 @@ abstract class Kernel implements KernelInterface
             }
         }
 
-        $root = (defined('ROOT') ? ROOT : '.');
+        $root = root_dir();
         if (is_dir($root . '/app/Providers')) {
             foreach (glob($root . '/app/Providers/*.php') as $file) {
                 $provider = 'App\\Providers\\' . str_replace('.php', '', basename($file));
@@ -106,7 +103,7 @@ abstract class Kernel implements KernelInterface
         }
     }
 
-    protected function boot()
+    protected function boot(): void
     {
         foreach ($this->serviceProviders as &$serviceProvider) {
             /** @var ServiceProviderInterface $serviceProvider */
@@ -124,16 +121,27 @@ abstract class Kernel implements KernelInterface
         return file_exists('storage/maintenance.json');
     }
 
-    public function handleError(int $level, string $message, string $file = '', int $line = 0, array $context = [])
+    public function handleError(int $level, string $message, string $file = '', int $line = 0): bool
     {
         if (error_reporting() & $level) {
             $this->handleException(new \ErrorException($message, 0, $level, $file, $line));
+            return true;
         }
+        return false;
     }
 
-    abstract public function handleException(\Throwable $e);
+    /**
+     * @internal
+     */
+    public function handleExceptionVoid(\Throwable $e): void
+    {
+        $this->handleException($e);
+        die();
+    }
 
-    public function handleShutdown()
+    abstract public function handleException(\Throwable $e): int;
+
+    public function handleShutdown(): void
     {
         $error = error_get_last();
         if (!$error || !in_array($error['type'], [E_COMPILE_ERROR, E_CORE_ERROR, E_ERROR, E_PARSE])) {

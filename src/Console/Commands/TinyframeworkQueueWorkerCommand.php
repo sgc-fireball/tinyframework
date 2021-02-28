@@ -21,9 +21,6 @@ class TinyframeworkQueueWorkerCommand extends CommandAwesome
             ->description('Start processing jobs on the queue as a daemon.');
     }
 
-    /**
-     * @TODO implement a signal handler!
-     */
     public function run(InputInterface $input, OutputInterface $output): int
     {
         parent::run($input, $output);

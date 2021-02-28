@@ -21,9 +21,9 @@ class FileSession extends SessionAwesome implements SessionInterface
         $this->ttl = (int)$config['ttl'] ?? $this->ttl;
     }
 
-    public function open(?string $id): SessionInterface
+    public function open(string $id = null): SessionInterface
     {
-        if ($id) {
+        if (!is_null($id)) {
             $this->id = $id;
         }
         $file = sprintf('%s/%s.session.tmp', $this->path, $this->getId());

@@ -33,7 +33,7 @@ class RedisCache extends CacheAwesome
         $this->redis->setOption(Redis::OPT_READ_TIMEOUT, $this->config['read_write_timeout']);
     }
 
-    public function clear(): CacheInterface
+    public function clear(): RedisCache
     {
         $deleteKeys = [];
         if (count($this->tags)) {
@@ -52,18 +52,12 @@ class RedisCache extends CacheAwesome
         return $this;
     }
 
-    /**
-     * @param string $key
-     * @param mixed $default
-     * @return mixed
-     */
-    public function get(string $key, $default = null)
+    public function get(string $key)
     {
-        $value = $default;
         if ($this->has($key)) {
-            $value = unserialize($this->redis->get($key));
+            return unserialize($this->redis->get($key)) ?? null;
         }
-        return $value ?: $default;
+        return null;
     }
 
     public function has(string $key): bool
@@ -71,13 +65,7 @@ class RedisCache extends CacheAwesome
         return $this->redis->exists($key) > 0;
     }
 
-    /**
-     * @param string $key
-     * @param mixed $value
-     * @param null|int|\DateTime|\DateTimeInterface $ttl
-     * @return CacheInterface
-     */
-    public function set(string $key, $value = null, $ttl = null): CacheInterface
+    public function set(string $key, $value = null, null|int|\DateTime|\DateTimeInterface $ttl = null): RedisCache
     {
         $ttl = $this->calculateExpiration($ttl);
         if (is_null($ttl)) {
@@ -89,17 +77,13 @@ class RedisCache extends CacheAwesome
         return $this;
     }
 
-    public function forget(string $key): CacheInterface
+    public function forget(string $key): RedisCache
     {
         $this->redis->del($key);
         return $this;
     }
 
-    /**
-     * @param null|int|\DateTime|\DateTimeInterface $ttl
-     * @return null|int
-     */
-    protected function calculateExpiration($ttl): ?int
+    protected function calculateExpiration(null|int|\DateTime|\DateTimeInterface $ttl): int|null
     {
         if (is_null($ttl)) {
             return null;

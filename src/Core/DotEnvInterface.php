@@ -9,4 +9,6 @@ interface DotEnvInterface
 
     public function load(string $file): DotEnvInterface;
 
+    public function get(string $key);
+
 }

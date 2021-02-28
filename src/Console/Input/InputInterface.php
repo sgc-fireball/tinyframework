@@ -9,11 +9,7 @@ interface InputInterface
 
     public function argv(array $argv = null);
 
-    /**
-     * @param InputDefinitionInterface|null $inputDefinition
-     * @return InputDefinitionInterface|self
-     */
-    public function inputDefinition(InputDefinitionInterface $inputDefinition = null);
+    public function inputDefinition(InputDefinitionInterface $inputDefinition = null): InputInterface|InputDefinitionInterface;
 
     public function parse(): ?string;
 

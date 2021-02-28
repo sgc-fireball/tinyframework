@@ -5,21 +5,13 @@ namespace TinyFramework\Queue;
 interface JobInterface
 {
 
-    public function attempts(int $attempts = null);
+    public function attempts(int $attempts = null): JobInterface|int;
 
     public function retryAfter(): int;
 
-    /**
-     * @param null|int|\DateTime|\DateTimeInterface $delay
-     * @return $this|int
-     */
-    public function delay($delay = null);
+    public function delay(null|int|\DateTime|\DateTimeInterface $delay = null): JobInterface|int;
 
-    /**
-     * @param string|null $queue
-     * @return $this|string
-     */
-    public function queue(string $queue = null);
+    public function queue(string $queue = null): JobInterface|string;
 
     public function handle(): void;
 

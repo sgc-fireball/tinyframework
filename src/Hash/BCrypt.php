@@ -19,7 +19,7 @@ class BCrypt implements HashInterface
         return password_hash($plaintext, $this->algorithm, ['cost' => $this->cost]);
     }
 
-    public function verify(string $plaintext, string $hash = null): bool
+    public function verify(string $plaintext, string $hash): bool
     {
         return password_verify($plaintext, $hash);
     }

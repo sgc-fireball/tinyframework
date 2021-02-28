@@ -15,16 +15,12 @@ interface ContainerInterface
 
     public function get(string $key, array $parameters = []);
 
-    /**
-     * @param mixed|string $key
-     * @return mixed|string
-     */
-    public function resolveAlias($key);
+    public function resolveAlias(string|array|callable|object $key): string|array|callable|object;
 
-    public function singleton(string $key, $object);
+    public function singleton(string $key, string|array|callable|object $object): ContainerInterface;
 
     public function alias(string $alias, string $key): ContainerInterface;
 
-    public function call($callable, array $parameters = []);
+    public function call(string|array|callable|object $callable, array $parameters = []);
 
 }

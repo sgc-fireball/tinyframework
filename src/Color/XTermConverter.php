@@ -287,7 +287,7 @@ class XTermConverter implements XTermConverterInterface
         return (string)$data[$xterm];
     }
 
-    public function hex2xterm(string $hexIn): int
+    public function hex2xterm(string|int $hexIn): int
     {
         $result = 0;
         $diff = hexdec('fffffff');

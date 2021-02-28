@@ -13,16 +13,16 @@ class TranslationLoader
     {
         $this->paths = $paths;
         $this->paths[] = __DIR__ . '/lang/';
-        $this->paths[] = (defined('ROOT') ? ROOT : '.') . '/resources/lang/';
+        $this->paths[] = root_dir() . '/resources/lang/';
     }
 
-    public function addPath(string $path): self
+    public function addPath(string $path): TranslationLoader
     {
         $this->paths[] = $path;
         return $this;
     }
 
-    public function load(string $locale): self
+    public function load(string $locale): TranslationLoader
     {
         if (array_key_exists($locale, $this->translations)) {
             return $this;
@@ -34,7 +34,7 @@ class TranslationLoader
         return $this;
     }
 
-    private function loadFolder(string $locale, string $path): self
+    private function loadFolder(string $locale, string $path): TranslationLoader
     {
         if (!is_dir($path)) {
             return $this;
@@ -48,7 +48,7 @@ class TranslationLoader
         return $this;
     }
 
-    private function loadFile(string $locale, string $file)
+    private function loadFile(string $locale, string $file): TranslationLoader
     {
         if (!is_file($file)) {
             return $this;

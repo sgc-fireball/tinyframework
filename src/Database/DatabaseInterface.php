@@ -7,32 +7,16 @@ interface DatabaseInterface
 
     public function __construct(array $config = []);
 
-    /**
-     * @return DatabaseInterface
-     */
     public function connect(): DatabaseInterface;
 
-    /**
-     * @return DatabaseInterface
-     */
     public function reconnect(): DatabaseInterface;
 
-    /**
-     * @return DatabaseInterface
-     */
     public function disconnect(): DatabaseInterface;
 
-    public function escape($value);
+    public function escape($value): string|float|int;
 
-    /**
-     * @return QueryInterface
-     */
-    public function query();
+    public function query(): QueryInterface;
 
-    /**
-     * @param string $query
-     * @return array|bool
-     */
-    public function execute(string $query);
+    public function execute(string $query): array|bool;
 
 }

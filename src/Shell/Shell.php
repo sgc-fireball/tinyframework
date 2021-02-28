@@ -30,7 +30,7 @@ class Shell
         $this->readline->readHistory();
         while (true) {
             $line = $this->readline->prompt(config('app.name') . ' $');
-            if ($line === 'exit' || $line === false) {
+            if (in_array($line, ['exit', 'quit']) || $line === false) {
                 $this->readline->saveHistory();
                 break;
             }
@@ -45,17 +45,19 @@ class Shell
         }
     }
 
-    private function execute(string $code): void
+    private function execute(string $__internal__code): void
     {
-        $closure = function () use ($code) {
+        $closure = function () use ($__internal__code) {
             try {
                 ob_start();
                 set_error_handler([$this, 'handleError']);
-                $this->context->setVariable('code', $code);
-                extract($this->context->getVariables());
-                eval(rtrim($code, ';') . ';');
+                $this->context->setVariable('__internal__code', $__internal__code);
+                $__internal__variables = $this->context->getVariables();
+                extract($__internal__variables);
+                unset($__internal__variables);
+                eval(rtrim($__internal__code, ';') . ';');
                 $this->context->setVariables(get_defined_vars());
-                $this->readline->addHistory($code);
+                $this->readline->addHistory($__internal__code);
                 $this->readline->saveHistory();
                 $content = rtrim(ob_get_clean());
                 if (!empty($content)) {

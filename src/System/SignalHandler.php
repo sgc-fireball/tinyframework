@@ -79,7 +79,7 @@ class SignalHandler
 
     private static EventDispatcherInterface $eventDispatcher;
 
-    public static function init(EventDispatcherInterface $eventDispatcher)
+    public static function init(EventDispatcherInterface $eventDispatcher): void
     {
         pcntl_async_signals(true);
         self::$eventDispatcher = $eventDispatcher;
@@ -102,6 +102,7 @@ class SignalHandler
 
     /**
      * @param int $signal
+     * @param array $info
      * @return bool
      * @internal
      */

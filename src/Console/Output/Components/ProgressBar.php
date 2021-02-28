@@ -19,6 +19,10 @@ class ProgressBar
 
     private array $messages = ['message' => ''];
 
+    private float $lastPrint = 0;
+
+    private int $fps = 10;
+
     private static $formats = [
         'normal' => ' {current:%3s}/{max:%3s} [{bar}] {percent:%3s%%}',
         'normal_nomax' => ' {current:%3s} [{bar}]',
@@ -43,7 +47,7 @@ class ProgressBar
      * memory: The current memory usage;
      * message: used to display arbitrary messages in the progress bar (as explained later).
      */
-    private static function setFormatDefinition(string $name, string $format)
+    private static function setFormatDefinition(string $name, string $format): void
     {
         self::$formats[$name] = $format;
     }
@@ -58,25 +62,27 @@ class ProgressBar
             $this->format('verbose' . $postfix);
         } else if ($output->verbosity() === OutputInterface::VERBOSITY_VERY_VERBOSE) {
             $this->format('very_verbose' . $postfix);
-        } else if ($output->verbosity() >= OutputInterface::VERBOSITY_DEBUG) {
+        } else if ($output->verbosity() === OutputInterface::VERBOSITY_DEBUG) {
             $this->format('debug' . $postfix);
         }
     }
 
-    public function message(string $text, string $name = 'message')
+    public function fps(int $fps = null): ProgressBar|int
     {
-        if ($text === null) {
-            return $this->messages[$name] ?? null;
+        if ($fps === null) {
+            return $this->fps;
         }
+        $this->fps = $fps;
+        return $this;
+    }
+
+    public function message(string $text, string $name = 'message'): ProgressBar
+    {
         $this->messages[$name] = $text;
         return $this;
     }
 
-    /**
-     * @param int|null $max
-     * @return ProgressBar|int
-     */
-    public function max(int $max = null)
+    public function max(int $max = null): ProgressBar|int
     {
         if ($max === null) {
             return $this->max;
@@ -85,7 +91,7 @@ class ProgressBar
         return $this;
     }
 
-    public function format(string $format = null)
+    public function format(string $format = null): ProgressBar|string
     {
         if ($format === null) {
             return $this->format;
@@ -97,22 +103,24 @@ class ProgressBar
         return $this;
     }
 
-    public function start()
+    public function start(): ProgressBar
     {
         $this->step = 0;
         $this->startTime = microtime(true);
         return $this;
     }
 
-    public function advance()
+    public function advance(): ProgressBar
     {
         $this->step++;
-        // @TODO
-        $this->display();
+        if (microtime(true) - $this->lastPrint > 0.1) {
+            $this->lastPrint = microtime(true);
+            $this->display();
+        }
         return $this;
     }
 
-    public function stop()
+    public function stop(): ProgressBar
     {
         $this->step = $this->max;
         $this->display();
@@ -120,7 +128,7 @@ class ProgressBar
         return $this;
     }
 
-    public function display()
+    public function display(): ProgressBar
     {
         if ($this->output->verbosity() === OutputInterface::VERBOSITY_QUIET) {
             return $this;

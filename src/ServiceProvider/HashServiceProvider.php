@@ -14,19 +14,23 @@ class HashServiceProvider extends ServiceProviderAwesome
         if (is_null($configs)) {
             return;
         }
-        $class = $configs[$configs['default']]['driver'];
-        $this->container->alias('hash', $class)->alias(HashInterface::class, $class);
-        unset($configs['default']);
 
         foreach ($configs as $name => $config) {
+            if ($name === 'default') {
+                continue;
+            }
             $class = $config['driver'];
-            unset($config['driver']);
+            $parameters = $config;
+            unset($parameters['driver']);
             $this->container
-                ->alias($name, $class)
-                ->singleton($class, function (ContainerInterface $container) use ($class, $config) {
-                    return $this->container->call($class, $config);
+                ->singleton($name, function (ContainerInterface $container) use ($class, $parameters) {
+                    return $this->container->call($class, $parameters);
                 });
         }
+
+        $this->container
+            ->alias('hash', $configs['default'])
+            ->alias(HashInterface::class, $configs['default']);
     }
 
 }

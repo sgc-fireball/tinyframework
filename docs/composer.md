@@ -1,5 +1,0 @@
-# Composer
-
-- [Introduction](#introduction)
-
-## Introduction

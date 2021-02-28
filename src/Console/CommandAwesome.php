@@ -5,7 +5,6 @@ namespace TinyFramework\Console;
 use TinyFramework\Console\Input\InputDefinition;
 use TinyFramework\Console\Input\InputDefinitionInterface;
 use TinyFramework\Console\Input\InputInterface;
-use TinyFramework\Console\Input\Option;
 use TinyFramework\Console\Output\OutputInterface;
 use TinyFramework\Core\Container;
 use TinyFramework\Core\ContainerInterface;

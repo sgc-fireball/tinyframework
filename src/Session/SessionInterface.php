@@ -13,7 +13,7 @@ interface SessionInterface
 
     public function destroy(): SessionInterface;
 
-    public function get(string $key, $default = null);
+    public function get(string $key);
 
     public function has(string $key): bool;
 

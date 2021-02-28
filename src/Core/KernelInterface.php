@@ -9,10 +9,10 @@ interface KernelInterface
 
     public function runningInConsole(): bool;
 
-    public function handleError(int $level, string $message, string $file = '', int $line = 0, array $context = []);
+    public function handleError(int $level, string $message, string $file = '', int $line = 0): bool;
 
-    public function handleException(\Throwable $e);
+    public function handleException(\Throwable $e): int;
 
-    public function handleShutdown();
+    public function handleShutdown(): void;
 
 }

@@ -51,7 +51,7 @@ class Mailer
 
         $message = new Swift_Message();
         foreach ($mail->header() as $key => $value) {
-            $message->addTextHeader($key, $value);
+            $message->getHeaders()->addTextHeader($key, $value);
         }
         $message->setCharset('utf-8');
         $message->setPriority($mail->priority());

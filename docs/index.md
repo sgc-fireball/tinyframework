@@ -1,7 +1,6 @@
 # TinyFramework Documentation
 
 - [Cache](./cache.md)
-- [Composer](./composer.md)
 - [Console](./console.md)
 - [Core](./core.md)
     - [Config](./core/config.md)

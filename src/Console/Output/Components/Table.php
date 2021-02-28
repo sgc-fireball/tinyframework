@@ -31,11 +31,7 @@ class Table
         $this->output = $output;
     }
 
-    /**
-     * @param string|null $title
-     * @return $this|string|null
-     */
-    public function headerTitle(string $title = null)
+    public function headerTitle(string $title = null): Table|string|null
     {
         if ($title === null) {
             return $this->headerTitle;
@@ -44,11 +40,7 @@ class Table
         return $this;
     }
 
-    /**
-     * @param string|null $title
-     * @return $this|string|null
-     */
-    public function footerTitle(string $title = null)
+    public function footerTitle(string $title = null): Table|string|null
     {
         if ($title === null) {
             return $this->footerTitle;
@@ -57,11 +49,7 @@ class Table
         return $this;
     }
 
-    /**
-     * @param array|null $header
-     * @return $this|array
-     */
-    public function header(array $header = null)
+    public function header(array $header = null): Table|array
     {
         if ($header === null) {
             return $this->header;
@@ -74,11 +62,7 @@ class Table
         return $this;
     }
 
-    /**
-     * @param array|null $format
-     * @return $this|array
-     */
-    public function format(array $format = null)
+    public function format(array $format = null): Table|array
     {
         if ($format === null) {
             return $this->format;
@@ -87,13 +71,9 @@ class Table
         return $this;
     }
 
-    /**
-     * @param array|string|null $columnWidths
-     * @return $this|array
-     */
-    public function columnWidths($columnWidths = null)
+    public function columnWidths(array|string $columnWidths = null): Table|array
     {
-        if ($this->columnWidths === null) {
+        if ($columnWidths === null) {
             return $this->columnWidths;
         }
         if ($columnWidths === 'auto') {
@@ -111,11 +91,7 @@ class Table
         return $this;
     }
 
-    /**
-     * @param array|null $rows
-     * @return $this|array
-     */
-    public function rows(array $rows = null)
+    public function rows(array $rows = null): Table|array
     {
         if ($rows === null) {
             return $this->rows;

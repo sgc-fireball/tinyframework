@@ -2,6 +2,7 @@
 
 namespace TinyFramework\Http;
 
+use Couchbase\SearchSortScore;
 use TinyFramework\Session\SessionInterface;
 
 class Request
@@ -31,7 +32,7 @@ class Request
 
     private ?SessionInterface $session = null;
 
-    private ?array $user = null;
+    private $user = null;
 
     private ?string $body = null;
 
@@ -170,7 +171,7 @@ class Request
         return $this;
     }
 
-    public function route(Route $route = null)
+    public function route(Route $route = null): Request|Route
     {
         if (is_null($route)) {
             return $this->route;
@@ -179,7 +180,7 @@ class Request
         return $this;
     }
 
-    public function session(SessionInterface $session = null)
+    public function session(SessionInterface $session = null): Request|SessionInterface
     {
         if (is_null($session)) {
             return $this->session;
@@ -188,9 +189,13 @@ class Request
         return $this;
     }
 
-    public function user(array $user = null)
+    /**
+     * @param mixed|null $user
+     * @return $this|null|mixed
+     */
+    public function user($user = null)
     {
-        if (is_array($user)) {
+        if ($user !== null) {
             $this->user = $user;
             return $this;
         }
@@ -216,7 +221,7 @@ class Request
         return $request;
     }
 
-    public function method(string $method = null)
+    public function method(string $method = null): Request|string
     {
         if (is_null($method)) {
             return $this->method;
@@ -226,7 +231,7 @@ class Request
         return $request;
     }
 
-    public function uri(Uri $uri = null, $preserveHost = false)
+    public function uri(Uri $uri = null, $preserveHost = false): Uri|Request
     {
         if (is_null($uri)) {
             return $this->uri;
@@ -239,7 +244,7 @@ class Request
         return $request;
     }
 
-    public function protocol(string $protocol = null)
+    public function protocol(string $protocol = null): Request|string
     {
         if (is_null($protocol)) {
             return $this->protocol;
@@ -249,7 +254,7 @@ class Request
         return $request;
     }
 
-    public function header(string $key = null, $value = null)
+    public function header(string $key = null, $value = null): Request|array|string
     {
         if (is_null($key)) {
             return $this->header;
@@ -263,7 +268,7 @@ class Request
         return $request;
     }
 
-    public function server(string $key = null, $value = null)
+    public function server(string $key = null, $value = null): Request|array|string
     {
         if (is_null($key)) {
             return $this->server;
@@ -277,7 +282,7 @@ class Request
         return $request;
     }
 
-    public function body(string $body = null)
+    public function body(string $body = null): Request|string
     {
         if (is_null($body)) {
             return $this->body;
@@ -287,7 +292,7 @@ class Request
         return $request;
     }
 
-    public function ip(string $ip = null)
+    public function ip(string $ip = null): Request|string
     {
         if (is_null($ip)) {
             return $this->ip;

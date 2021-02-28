@@ -35,7 +35,7 @@ class RedisQueue implements QueueInterface
         $this->redis->setOption(Redis::OPT_READ_TIMEOUT, $this->config['read_write_timeout']);
     }
 
-    public function name(string $name = null)
+    public function name(string $name = null): QueueInterface|string
     {
         if (is_null($name)) {
             return $this->config['name'];
@@ -71,12 +71,7 @@ class RedisQueue implements QueueInterface
         return $this;
     }
 
-    /**
-     * @see https://redis.io/commands/blpop
-     * @param int $timeout
-     * @return JobInterface|null
-     */
-    public function pop(int $timeout = 1): ?JobInterface
+    public function pop(int $timeout = 1): JobInterface|null
     {
         $this->fetchDelayed();
         $result = $this->redis->blPop([$this->config['name']], $timeout);

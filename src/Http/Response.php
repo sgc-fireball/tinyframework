@@ -81,12 +81,12 @@ class Response
 
     private array $headers = [
         'content-type' => 'text/html; charset=utf-8',
-        'content-security-policy' => "default-src 'none'; script-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self';",
-        'permissions-policy' => 'accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()',
-        'referrer-policy' => 'strict-origin-when-cross-origin',
-        'x-content-type-options' => 'nosniff',
-        'x-frame-options' => 'SAMEORIGIN',
-        'x-xss-protection' => '1; mode=block',
+        #'content-security-policy' => "default-src 'none'; script-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self';",
+        #'permissions-policy' => 'accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()',
+        #'referrer-policy' => 'strict-origin-when-cross-origin',
+        #'x-content-type-options' => 'nosniff',
+        #'x-frame-options' => 'SAMEORIGIN',
+        #'x-xss-protection' => '1; mode=block',
     ];
 
     private ?string $content = null;
@@ -95,22 +95,22 @@ class Response
 
     private ?SessionInterface $session = null;
 
-    public static function new(?string $content = '', int $code = 200, array $headers = []): self
+    public static function new(?string $content = '', int $code = 200, array $headers = []): Response
     {
-        return (new self)->code($code)->content($content ?? '')->headers($headers);
+        return (new Response)->code($code)->content($content ?? '')->headers($headers);
     }
 
-    public static function view(string $file, array $data = [], int $code = 200, array $headers = []): self
+    public static function view(string $file, array $data = [], int $code = 200, array $headers = []): Response
     {
         return self::new(container('view')->render($file, $data), $code, $headers);
     }
 
-    public static function json(array $json = [], int $code = 200): self
+    public static function json(array $json = [], int $code = 200): Response
     {
         return self::new(json_encode($json), $code)->type('application/json; charset=utf-8');
     }
 
-    public static function error(int $code = 400, array $headers = []): self
+    public static function error(int $code = 400, array $headers = []): Response
     {
         $content = 'HTTP Status ' . $code;
         if (array_key_exists($code, self::$codes)) {
@@ -119,17 +119,17 @@ class Response
         return self::new($content, $code, $headers);
     }
 
-    public static function redirect(string $to, int $code = 302, array $headers = []): self
+    public static function redirect(string $to, int $code = 302, array $headers = []): Response
     {
         $code = in_array($code, [301, 302]) ? $code : 302;
         return self::new('', $code, $headers)->header('location', $to);
     }
 
-    public static function back(string $fallback = null, array $headers = []): self
+    public static function back(string $fallback = null, array $headers = []): Response
     {
         /** @var Request $request */
         $request = container('request');
-        $back = $request->header('referer') ?? $fallback ?? $request->uri()->__toString();
+        $back = ($request->header('referer') ?? $fallback) ?? $request->uri()->__toString();
         return self::redirect($back, 302, $headers);
     }
 
@@ -138,11 +138,7 @@ class Response
         $this->id = guid();
     }
 
-    /**
-     * @param SessionInterface|null $session
-     * @return $this|SessionInterface|null
-     */
-    public function session(SessionInterface $session = null)
+    public function session(SessionInterface $session = null): Response|SessionInterface|null
     {
         if (is_null($session)) {
             return $this->session;
@@ -151,7 +147,7 @@ class Response
         return $this;
     }
 
-    public function with(string $key, $value): self
+    public function with(string $key, $value): Response
     {
         if ($this->session) {
             $flash = $this->session->get('flash') ?? [];
@@ -161,7 +157,7 @@ class Response
         return $this;
     }
 
-    public function withInput(array $input = null): self
+    public function withInput(array $input = null): Response
     {
         if ($this->session) {
             if (is_null($input)) {
@@ -174,7 +170,7 @@ class Response
         return $this;
     }
 
-    public function withErrors(array $errors = []): self
+    public function withErrors(array $errors = []): Response
     {
         if ($this->session) {
             $this->session->set('flash_errors', $errors);
@@ -187,7 +183,7 @@ class Response
         return $this->id;
     }
 
-    public function code(int $code = null)
+    public function code(int $code = null): Response|int
     {
         if (is_null($code)) {
             return $this->code;
@@ -196,7 +192,7 @@ class Response
         return $this;
     }
 
-    public function protocol(string $protocol = null)
+    public function protocol(string $protocol = null): Response|string
     {
         if (is_null($protocol)) {
             return $this->protocol;
@@ -205,12 +201,12 @@ class Response
         return $this;
     }
 
-    public function type(string $type = null)
+    public function type(string $type = null): Response|string
     {
         return $this->header('content-type', $type);
     }
 
-    public function header(string $key = null, string $value = null)
+    public function header(string $key = null, string $value = null): Response|array|null|string
     {
         if (is_null($key)) {
             return $this->headers;
@@ -222,7 +218,7 @@ class Response
         return $this;
     }
 
-    public function headers(array $headers = null)
+    public function headers(array $headers = null): Response|array
     {
         if (!is_array($headers)) {
             return $this->headers;
@@ -233,7 +229,7 @@ class Response
         return $this;
     }
 
-    public function content(string $content = null)
+    public function content(string $content = null): Response|string|null
     {
         if (is_null($content)) {
             return $this->content;
@@ -242,7 +238,7 @@ class Response
         return $this;
     }
 
-    public function send()
+    public function send(): Response
     {
         header(
             sprintf('%s %d %s', $this->protocol, $this->code, static::$codes[$this->code]),

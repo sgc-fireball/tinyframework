@@ -13,7 +13,7 @@ abstract class JobAwesome implements JobInterface
 
     protected string $queue = 'default';
 
-    public function attempts(int $attempts = null)
+    public function attempts(int $attempts = null): JobInterface|int
     {
         if (is_null($attempts)) {
             return $this->attempts;
@@ -27,7 +27,7 @@ abstract class JobAwesome implements JobInterface
         return max(5, $this->tryCount * 60);
     }
 
-    public function delay($delay = null)
+    public function delay(null|int|\DateTime|\DateTimeInterface $delay = null): JobInterface|int
     {
         if (is_null($delay)) {
             return $this->delay;
@@ -42,7 +42,7 @@ abstract class JobAwesome implements JobInterface
         return $this;
     }
 
-    public function queue(string $queue = null)
+    public function queue(string $queue = null): JobInterface|string
     {
         if (is_null($queue)) {
             return $this->queue;

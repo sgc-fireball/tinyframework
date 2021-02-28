@@ -17,14 +17,13 @@ class FunctionTabCompletion implements TabCompletionInterface
 
     public function getMatches(array $info, string $input, int $index): array
     {
-        // @TODO implement token check
-        if (preg_match('(^[^a-zA-Z])', $input)) {
+        if (preg_match('(^[^a-zA-Z_])', $input)) {
             return [];
         }
 
         return array_filter(
             $this->getAllFunctions(),
-            function (string $line) use ($input, $info) {
+            function (string $line) use ($input) {
                 return strpos($line, $input) === 0;
             }
         );

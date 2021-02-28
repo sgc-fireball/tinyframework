@@ -24,12 +24,12 @@ abstract class SessionAwesome implements SessionInterface, \ArrayAccess
         return array_key_exists($key, $this->data);
     }
 
-    public function get(string $key, $default = null)
+    public function get(string $key)
     {
         if (array_key_exists($key, $this->data)) {
             return $this->data[$key];
         }
-        return $default;
+        return null;
     }
 
     public function set(string $key, $value): SessionInterface
@@ -50,11 +50,7 @@ abstract class SessionAwesome implements SessionInterface, \ArrayAccess
         return $this;
     }
 
-    /**
-     * @param null|int|\DateTime|\DateTimeInterface $ttl
-     * @return null|int
-     */
-    protected function calculateExpiration($ttl): ?int
+    protected function calculateExpiration(null|int|\DateTime|\DateTimeInterface $ttl): int|null
     {
         if (is_null($ttl)) {
             return null;

@@ -4,8 +4,6 @@ namespace TinyFramework\Database\MySQL;
 
 use mysqli;
 use TinyFramework\Database\DatabaseInterface;
-use TinyFramework\Database\QueryInterface;
-use TinyFramework\Queue\QueueInterface;
 
 class Database implements DatabaseInterface
 {
@@ -34,7 +32,7 @@ class Database implements DatabaseInterface
     /**
      * @return $this
      */
-    public function connect(): DatabaseInterface
+    public function connect(): Database
     {
         if (!$this->connection) {
             $this->connection = new mysqli($this->config['host'], $this->config['username'], $this->config['password'], $this->config['database'], $this->config['port']);
@@ -47,7 +45,7 @@ class Database implements DatabaseInterface
     /**
      * @return $this
      */
-    public function reconnect(): DatabaseInterface
+    public function reconnect(): Database
     {
         return $this->disconnect()->connect();
     }
@@ -55,7 +53,7 @@ class Database implements DatabaseInterface
     /**
      * @return $this
      */
-    public function disconnect(): DatabaseInterface
+    public function disconnect(): Database
     {
         if ($this->connection) {
             $this->connection->close();
@@ -64,11 +62,7 @@ class Database implements DatabaseInterface
         return $this;
     }
 
-    /**
-     * @param mixed $value
-     * @return mixed
-     */
-    public function escape($value)
+    public function escape($value): string|float|int
     {
         if (is_array($value)) {
             return sprintf('(%s)', implode(',', array_map(function ($value) {
@@ -90,19 +84,12 @@ class Database implements DatabaseInterface
         return '"' . $this->connect()->connection->real_escape_string($value) . '"';
     }
 
-    /**
-     * @return Query|QueryInterface
-     */
-    public function query()
+    public function query(): Query
     {
         return new Query($this);
     }
-
-    /**
-     * @param string $query
-     * @return array|bool
-     */
-    public function execute(string $query)
+    
+    public function execute(string $query): array|bool
     {
         $result = $this->connect()->connection->query($query);
         if (mb_strpos($query, 'SELECT') === 0) {
@@ -120,10 +107,7 @@ class Database implements DatabaseInterface
         return $result;
     }
 
-    /**
-     * @return int|string
-     */
-    public function getLastInsertId()
+    public function getLastInsertId(): int|string
     {
         return mysqli_insert_id($this->connect()->connection);
     }

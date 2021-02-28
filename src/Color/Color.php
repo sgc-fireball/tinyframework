@@ -247,7 +247,7 @@ class Color
         ];
     }
 
-    public function hex2rgb(string $hex = '000000'): array
+    public function hex2rgb(string|int $hex = '000000'): array
     {
         $hex = strtolower($hex);
         $hex = str_pad($hex, 6, '0', STR_PAD_LEFT);
@@ -304,21 +304,21 @@ class Color
         return $this->rgb2hsv($red, $green, $blue);
     }
 
-    public function hex2hsl(string $hex = '000000'): array
+    public function hex2hsl(string|int $hex = '000000'): array
     {
         list($red, $green, $blue) = $this->hex2rgb($hex);
 
         return $this->rgb2hsl($red, $green, $blue);
     }
 
-    public function hex2cmyk(string $hex = '000000'): array
+    public function hex2cmyk(string|int $hex = '000000'): array
     {
         list($red, $green, $blue) = $this->hex2rgb($hex);
 
         return $this->rgb2cmyk($red, $green, $blue);
     }
 
-    public function hex2hsv(string $hex = '000000'): array
+    public function hex2hsv(string|int $hex = '000000'): array
     {
         list($red, $green, $blue) = $this->hex2rgb($hex);
 
@@ -407,7 +407,7 @@ class Color
         return $this->hex2xterm($hex);
     }
 
-    public function hex2xterm(string $hex = '000000'): int
+    public function hex2xterm(string|int $hex = '000000'): int
     {
         return $this->xtermConverter->hex2xterm($hex);
     }
@@ -482,7 +482,7 @@ class Color
         return $this->nameConverter->hex2name($this->hsl2hex($hue, $saturation, $lightness));
     }
 
-    public function hex2name(string $hex = '000000'): string
+    public function hex2name(string|int $hex = '000000'): string
     {
         return $this->nameConverter->hex2name($hex);
     }

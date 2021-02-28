@@ -5,14 +5,7 @@ namespace TinyFramework\Core;
 class DotEnv implements DotEnvInterface
 {
 
-    private static ?self $instance = null;
-
-    private array $env = [
-        'APP_ENV' => 'production',
-        'APP_DEBUG' => false,
-        'APP_URL' => 'http://localhost',
-        'APP_SECRET' => null,
-    ];
+    private static ?DotEnv $instance = null;
 
     private function __construct()
     {
@@ -20,7 +13,7 @@ class DotEnv implements DotEnvInterface
 
     public static function instance(): DotEnvInterface
     {
-        if (!(self::$instance instanceof self)) {
+        if (!(self::$instance instanceof DotEnv)) {
             self::$instance = new self();
         }
         return self::$instance;
@@ -53,6 +46,16 @@ class DotEnv implements DotEnvInterface
             $_ENV[$key] = $value;
         }
         return $this;
+    }
+
+    public function get(string $key)
+    {
+        $value = $_ENV[$key] ?? null;
+        $value = is_string($value) && mb_strlen($value) === 0 ? null : $value;
+        $value = is_string($value) && mb_strtolower($value) === 'null' ? null : $value;
+        $value = is_string($value) && mb_strtolower($value) === 'true' ? true : $value;
+        $value = is_string($value) && mb_strtolower($value) === 'false' ? false : $value;
+        return $value;
     }
 
 }

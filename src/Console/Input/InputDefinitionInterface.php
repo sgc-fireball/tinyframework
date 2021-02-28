@@ -12,24 +12,16 @@ interface InputDefinitionInterface
         array $arguments = []
     ): InputDefinitionInterface;
 
-    public function name(string $name = null);
+    public function name(string $name = null): InputDefinitionInterface|string;
 
     /**
      * @param string|null $description
      * @return $this|string|null
      */
-    public function description(string $description = null);
+    public function description(string $description = null): InputDefinitionInterface|string|null;
 
-    /**
-     * @param Argument|string|int|null $option
-     * @return Argument|$this|array|null
-     */
-    public function argument($argument = null);
+    public function argument(Argument|string|int $argument = null): InputDefinitionInterface|Argument|array|null;
 
-    /**
-     * @param Option|string|null $option
-     * @return Option|$this|array|null
-     */
-    public function option($option = null);
+    public function option(Option|string $option = null): InputDefinitionInterface|Option|array|null;
 
 }

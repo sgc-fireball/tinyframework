@@ -18,7 +18,7 @@ class ConsoleKernel extends Kernel implements ConsoleKernelInterface
 {
 
     /** @var CommandAwesome[] */
-    private array $commands = [];
+    private array $commands;
 
     private ?InputInterface $input;
 
@@ -33,16 +33,16 @@ class ConsoleKernel extends Kernel implements ConsoleKernelInterface
                |___/
 EOF;
 
-    protected function boot()
+    protected function boot(): void
     {
         parent::boot();
         $this->loadCommandsByPath(__DIR__ . '/Commands', '\\TinyFramework\\Console\\Commands\\');
+        /** @var CommandAwesome $command */
         foreach ($this->container->tagged('commands') as $command) {
-            /** @var $command CommandAwesome */
             $inputDefinition = $command->configuration();
             $this->commands[$inputDefinition->name()] = $command;
         }
-        $this->loadCommandsByPath((defined('ROOT') ? ROOT : '.') . '/app/Commands', '\\App\\Commands\\');
+        $this->loadCommandsByPath(root_dir() . '/app/Commands', '\\App\\Commands\\');
     }
 
     private function loadCommandsByPath(string $path, string $namespace = '\\'): void
@@ -81,9 +81,15 @@ EOF;
         }
     }
 
-    public function handleException(\Throwable $e)
+    public function handleException(\Throwable $e): int
     {
-        $this->output->error(exception2text($e, $this->output->verbosity() >= OutputInterface::VERBOSITY_VERBOSE));
+        $stacktrace = isset($this->output) && $this->output->verbosity() >= OutputInterface::VERBOSITY_VERBOSE;
+        $message = exception2text($e, $stacktrace);
+        if (!isset($this->output)) {
+            echo $message . "\n\n";
+        } else {
+            $this->output->error($message);
+        }
         return min(max(1, $e->getCode()), 255);
     }
 
@@ -137,16 +143,16 @@ EOF;
 
     private function commandList(string $hint = null): int
     {
-        /**
-         * @var string $key
-         * @var CommandAwesome $command
-         */
         if ($hint !== null) {
             $this->output->writeln(sprintf("<yellow>Command %s not found. Did you mean?</yellow>", $hint));
         } else {
             $this->output->writeln($this->header . PHP_EOL);
             $this->output->writeln("<yellow>Available commands:</yellow>");
         }
+        /**
+         * @var string $key
+         * @var CommandAwesome $command
+         */
         foreach ($this->commands as $key => $command) {
             $configuration = $command->configuration();
             if ($hint === null || mb_strpos($configuration->name(), $hint) !== false) {

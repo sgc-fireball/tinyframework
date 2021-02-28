@@ -18,8 +18,7 @@ class Readline
 
     public function __construct(string $prompt = '$', array $matchers = [])
     {
-        $root = rtrim(defined('ROOT') ? ROOT : getcwd(), DIRECTORY_SEPARATOR);
-        $this->historyFile = $root . '/storage/shell/.php_history';
+        $this->historyFile = root_dir() . '/storage/shell/.php_history';
         $this->prompt = $prompt;
         $this->matchers = $matchers;
         readline_completion_function([&$this, 'autocomplete']);
@@ -95,7 +94,7 @@ class Readline
     {
         $info = readline_info();
         $matches = [];
-        /** @var TabCompletionInterface $matchers */
+        /** @var TabCompletionInterface $matcher */
         foreach ($this->matchers as $matcher) {
             $matches = array_merge(
                 $matches,

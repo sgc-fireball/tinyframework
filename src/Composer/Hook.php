@@ -8,24 +8,24 @@ use Composer\Installer\PackageEvent;
 class Hook
 {
 
-    public static function postInstallCommand(Event $event)
+    public static function postInstallCommand(Event $event): void
     {
         static::postUpdateCommand($event);
     }
 
-    public static function postUpdateCommand(Event $event)
+    public static function postUpdateCommand(Event $event): void
     {
         // require_once $event->getComposer()->getConfig()->get('vendor-dir') . '/autoload.php';
         static::checkPublicIndex();
     }
 
-    private static function checkPublicIndex()
+    private static function checkPublicIndex(): void
     {
         self::installFolder();
         self::installFiles();
     }
 
-    private static function installFolder()
+    private static function installFolder(): void
     {
         $folders = [
             'app/Commands',
@@ -45,7 +45,7 @@ class Hook
         }
     }
 
-    private static function installFiles()
+    private static function installFiles(): void
     {
         if (!file_exists('./console')) {
             copy(__DIR__ . '/../Files/console.php', './console');

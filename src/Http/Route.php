@@ -2,6 +2,7 @@
 
 namespace TinyFramework\Http;
 
+use Closure;
 use TinyFramework\Http\Middleware\MiddlewareInterface;
 
 class Route
@@ -15,8 +16,7 @@ class Route
 
     private string $uri = '/';
 
-    /** @var array|string|null */
-    private $action = null;
+    private Closure|array|string|null $action = null;
 
     private ?string $name = null;
 
@@ -28,11 +28,7 @@ class Route
 
     private array $attributes = [];
 
-    /**
-     * @param string|null $method
-     * @return $this|array
-     */
-    public function method(string $method = null)
+    public function method(string $method = null): Route|array
     {
         if (is_null($method)) {
             return $this->method;
@@ -41,11 +37,7 @@ class Route
         return $this;
     }
 
-    /**
-     * @param string|null $scheme
-     * @return $this|string
-     */
-    public function scheme(string $scheme = null)
+    public function scheme(string $scheme = null): Route|string
     {
         if (is_null($scheme)) {
             return $this->scheme;
@@ -54,11 +46,7 @@ class Route
         return $this;
     }
 
-    /**
-     * @param string|null $domain
-     * @return $this|string
-     */
-    public function domain(string $domain = null)
+    public function domain(string $domain = null): Route|string
     {
         if (is_null($domain)) {
             return $this->domain;
@@ -67,11 +55,7 @@ class Route
         return $this;
     }
 
-    /**
-     * @param string|null $uri
-     * @return $this|string
-     */
-    public function uri(string $uri = null)
+    public function uri(string $uri = null): Route|string
     {
         if (is_null($uri)) {
             return $this->uri;
@@ -80,11 +64,7 @@ class Route
         return $this;
     }
 
-    /**
-     * @param null $action
-     * @return $this|array|string|null
-     */
-    public function action($action = null)
+    public function action(Closure|array|string|null $action = null): Route|Closure|array|string|null
     {
         if (is_null($action)) {
             return $this->action;
@@ -93,11 +73,7 @@ class Route
         return $this;
     }
 
-    /**
-     * @param string|null $name
-     * @return $this|string|null
-     */
-    public function name(string $name = null)
+    public function name(string $name = null): Route|string|null
     {
         if (is_null($name)) {
             return $this->name;
@@ -110,7 +86,7 @@ class Route
      * @param string|array|null $middlewares
      * @return $this|array
      */
-    public function middleware($middlewares = null)
+    public function middleware($middlewares = null): Route|array
     {
         if (is_null($middlewares)) {
             return $this->middleware;
@@ -128,12 +104,7 @@ class Route
         return $this;
     }
 
-    /**
-     * @param string|null $name
-     * @param string|null $regex
-     * @return $this|array|string|string[]
-     */
-    public function pattern(string $name = null, string $regex = null)
+    public function pattern(string $name = null, string $regex = null): Route|array|string
     {
         if (!is_null($name) && is_null($regex)) {
             return array_key_exists($name, $this->pattern) ? $this->pattern[$name] : $this->pattern['default'];
@@ -145,12 +116,7 @@ class Route
         return $this;
     }
 
-    /**
-     * @param null $key
-     * @param null $value
-     * @return $this|array
-     */
-    public function parameter($key = null, $value = null)
+    public function parameter(string|array $key = null, $value = null): Route|array
     {
         if (is_null($key)) {
             return $this->parameter;

@@ -10,9 +10,9 @@ class NoCache extends CacheAwesome
         return $this;
     }
 
-    public function get(string $key, $default = null)
+    public function get(string $key)
     {
-        return $default;
+        return null;
     }
 
     public function has(string $key): bool
@@ -20,12 +20,12 @@ class NoCache extends CacheAwesome
         return false;
     }
 
-    public function set(string $key, $value = null, $ttl = null): CacheInterface
+    public function set(string $key, $value = null,null|int|\DateTime|\DateTimeInterface $ttl = null): NoCache
     {
         return $this;
     }
 
-    public function forget(string $key): CacheInterface
+    public function forget(string $key): NoCache
     {
         return $this;
     }

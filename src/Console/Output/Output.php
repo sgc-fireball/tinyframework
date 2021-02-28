@@ -111,7 +111,7 @@ class Output implements OutputInterface
         return $this->height;
     }
 
-    public function ansi(bool $ansi = null)
+    public function ansi(bool $ansi = null): OutputInterface|bool
     {
         if (is_null($ansi)) {
             return $this->ansi;
@@ -120,7 +120,7 @@ class Output implements OutputInterface
         return $this;
     }
 
-    public function quiet(bool $quiet = null)
+    public function quiet(bool $quiet = null): OutputInterface|bool
     {
         if (is_null($quiet)) {
             return $this->verbosity === -1;
@@ -129,16 +129,16 @@ class Output implements OutputInterface
         return $this;
     }
 
-    public function verbosity(int $verbosity = null)
+    public function verbosity(int $verbosity = null): OutputInterface|int
     {
         if (is_null($verbosity)) {
-            return $this->verbosity;
+            return max(-1, min($this->verbosity, 3));
         }
         $this->verbosity = $verbosity;
         return $this;
     }
 
-    public function write(string $text)
+    public function write(string $text): void
     {
         if ($this->verbosity === -1) {
             return;
@@ -174,12 +174,12 @@ class Output implements OutputInterface
         flush();
     }
 
-    public function writeln(string $text = '')
+    public function writeln(string $text = ''): void
     {
         $this->write($text . PHP_EOL);
     }
 
-    public function box(string $text, string $start = '', string $end = '')
+    public function box(string $text, string $start = '', string $end = ''): void
     {
         $message = str_pad(' ', $this->width) . PHP_EOL;
         foreach (explode("\n", wordwrap($text, $this->width - 4, "\n", true)) as $text) {

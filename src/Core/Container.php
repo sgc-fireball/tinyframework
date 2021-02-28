@@ -85,11 +85,7 @@ class Container implements ContainerInterface
         throw new RuntimeException('Could not resolve ' . $oKey);
     }
 
-    /**
-     * @param mixed|string $key
-     * @return mixed|string
-     */
-    public function resolveAlias($key)
+    public function resolveAlias(string|array|callable|object $key): string|array|callable|object
     {
         if (is_string($key)) {
             while (array_key_exists($key, $this->aliases)) {
@@ -99,7 +95,7 @@ class Container implements ContainerInterface
         return $key;
     }
 
-    public function singleton(string $key, $object)
+    public function singleton(string $key, string|array|callable|object $object): ContainerInterface
     {
         $this->instances[$key] = $object;
         return $this;
@@ -127,7 +123,7 @@ class Container implements ContainerInterface
         return $this;
     }
 
-    public function call($callable, array $parameters = [])
+    public function call(string|array|callable|object $callable, array $parameters = [])
     {
         $callable = $this->resolveAlias($callable);
         if (is_string($callable)) {

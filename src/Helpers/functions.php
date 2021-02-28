@@ -1,6 +1,21 @@
 <?php declare(strict_types=1);
 
+use TinyFramework\Core\DotEnvInterface;
 use TinyFramework\Http\Response;
+
+if (!function_exists('root_dir')) {
+    function root_dir(): string
+    {
+        if (defined('ROOT')) {
+            return ROOT;
+        }
+        $dir = realpath(__DIR__ . '/../..');
+        if (strpos($dir, '/vendor/')) {
+            $dir = preg_replace('/\/vendor\/.*$/', '', $dir);
+        }
+        return $dir;
+    }
+}
 
 if (!function_exists('base64url_encode')) {
     function base64url_encode(string $data): string
@@ -24,7 +39,11 @@ if (!function_exists('container')) {
      */
     function container(string $key = null, array $parameters = [])
     {
-        return \TinyFramework\Core\Container::instance()->get($key, $parameters);
+        $container = \TinyFramework\Core\Container::instance();
+        if ($key === null) {
+            return $container;
+        }
+        return $container->get($key, $parameters);
     }
 }
 
@@ -50,6 +69,13 @@ if (!function_exists('cache')) {
     function cache(): \TinyFramework\Cache\CacheInterface
     {
         return container('cache');
+    }
+}
+
+if (!function_exists('database')) {
+    function database(): \TinyFramework\Database\DatabaseInterface
+    {
+        return container('database');
     }
 }
 
@@ -81,8 +107,8 @@ if (!function_exists('queue')) {
     }
 }
 
-if (!function_exists('hash')) {
-    function hash(): \TinyFramework\Hash\HashInterface
+if (!function_exists('hasher')) {
+    function hasher(): \TinyFramework\Hash\HashInterface
     {
         return container('hash');
     }
@@ -146,7 +172,7 @@ if (!function_exists('dd')) {
     function dd(...$val)
     {
         call_user_func_array('dump', $val);
-        exit(1);
+        running_in_console() ? exit(1) : die();
     }
 }
 
@@ -158,12 +184,7 @@ if (!function_exists('env')) {
      */
     function env(string $key, $default = null)
     {
-        $value = $_ENV[$key] ?? null;
-        $value = is_string($value) && mb_strlen($value) === 0 ? null : $value;
-        $value = is_string($value) && mb_strtolower($value) === 'null' ? null : $value;
-        $value = is_string($value) && mb_strtolower($value) === 'true' ? true : $value;
-        $value = is_string($value) && mb_strtolower($value) === 'false' ? false : $value;
-        return $value ?? $default;
+        return container(DotEnvInterface::class)->get($key) ?? $default;
     }
 }
 
@@ -174,8 +195,8 @@ if (!function_exists('exception2text')) {
             '%s[%d] %s in %s:%d',
             get_class($e),
             $e->getCode(),
-            str_replace([getcwd()], '', $e->getMessage()),
-            ltrim(str_replace([getcwd()], '', $e->getFile()), '/'),
+            $e->getMessage(),
+            $e->getFile(),
             $e->getLine()
         );
         if ($stacktrace) {
@@ -184,6 +205,7 @@ if (!function_exists('exception2text')) {
         if ($e = $e->getPrevious()) {
             $result .= sprintf("\n - %s", exception2text($e, $stacktrace));
         }
+        $result = str_replace(root_dir(), '', $result);
         return $result;
     }
 }
@@ -249,10 +271,17 @@ if (!function_exists('e')) {
 }
 
 if (!function_exists('password')) {
-    function password(int $length = 16): string
+    function password(int $length = 16, bool $lowerChars = true, bool $upperChars = true, bool $numbers = true, bool $symbols = true): string
     {
         $password = '';
-        $chars = ';#§$*-/<=>?@^_|~2345689abcdefghkmnpqrstwxyzABCDEFGHKMNPQRSTWXYZ';
+        $chars = '';
+        if ($lowerChars) $chars .= 'abcdefghkmnpqrstwxyz';
+        if ($upperChars) $chars .= 'ABCDEFGHKMNPQRSTWXYZ';
+        if ($numbers) $chars .= '2345689';
+        if ($symbols) $chars .= ';#$*-/<=>?@^_|~';
+        if (empty($chars)) {
+            throw new \RuntimeException('Please allow minimu one of the following sets: lowerChars, upperChars, numbers, symbols.');
+        }
         $counts = strlen($chars) - 1;
         while (strlen($password) < $length) {
             $chars = str_shuffle($chars);
@@ -296,9 +325,11 @@ if (!function_exists('time_format')) {
         if ($seconds <= 1) return '1 sec';
         if ($seconds <= 60) return sprintf('%d secs', $seconds);
         $minutes = $seconds / 60;
-        if ($minutes <= 60) return sprintf('%.2f mins', $minutes);
+        $seconds = $seconds % 60;
+        if ($minutes <= 60) return sprintf('%dm%ds', $minutes, $seconds);
         $hours = $minutes / 60;
-        return sprintf('%.2f hrs', $hours);
+        $minutes = $minutes % 60;
+        return sprintf('%dh%dm', $hours, $minutes);
     }
 }
 

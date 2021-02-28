@@ -7,8 +7,7 @@ use Redis;
 class RedisSession extends SessionAwesome implements SessionInterface
 {
 
-    /** @var Redis */
-    private $redis;
+    private Redis $redis;
 
     private array $config = [];
 

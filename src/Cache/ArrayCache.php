@@ -7,11 +7,11 @@ class ArrayCache extends CacheAwesome
 
     private array $cache = [];
 
-    public function clear(): CacheInterface
+    public function clear(): ArrayCache
     {
         if (count($this->tags)) {
             foreach ($this->tags as $tag) {
-                $keys = $this->get($tag, []);
+                $keys = $this->get($tag) ?? [];
                 foreach ($keys as $key) {
                     $this->forget($key);
                 }
@@ -23,13 +23,12 @@ class ArrayCache extends CacheAwesome
         return $this;
     }
 
-    public function get(string $key, $default = null)
+    public function get(string $key)
     {
-        $value = $default;
         if ($this->has($key)) {
-            $value = unserialize($this->cache[$key]['value']) ?: $default;
+            return unserialize($this->cache[$key]['value']) ?? null;
         }
-        return $value ?: $default;
+        return null;
     }
 
     public function has(string $key): bool
@@ -43,7 +42,7 @@ class ArrayCache extends CacheAwesome
         return false;
     }
 
-    public function set(string $key, $value = null, $ttl = null): CacheInterface
+    public function set(string $key, $value = null,null|int|\DateTime|\DateTimeInterface $ttl = null): ArrayCache
     {
         $this->cache[$key] = [
             'value' => serialize($value),
@@ -53,7 +52,7 @@ class ArrayCache extends CacheAwesome
         return $this;
     }
 
-    public function forget(string $key): CacheInterface
+    public function forget(string $key): ArrayCache
     {
         if (array_key_exists($key, $this->cache)) {
             unset($this->cache[$key]);

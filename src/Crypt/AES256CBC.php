@@ -18,11 +18,7 @@ class AES256CBC implements CryptInterface
         }
     }
 
-    /**
-     * @param string|null $key
-     * @return AES256CBC|string
-     */
-    public function key(string $key = null)
+    public function key(string $key = null): AES256CBC|string
     {
         if (is_null($key)) {
             return $this->key;

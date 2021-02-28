@@ -15,7 +15,7 @@ class ThrottleMiddleware implements MiddlewareInterface
         $maxRequests = array_key_exists(0, $parameters) ? (int)$parameters[0] : 60;
         $timeInterval = array_key_exists(0, $parameters) ? (int)$parameters[0] : 60;
         $key = 'throttle:' . $this->getRequestSignature($request);
-        cache()->set($key, $current = cache()->get($key, 0) + 1, $timeInterval);
+        cache()->set($key, $current = (cache()->get($key) ?? 0) + 1, $timeInterval);
         if ($current <= $maxRequests) {
             return $next($request);
         }

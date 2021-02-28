@@ -57,11 +57,7 @@ abstract class CacheAwesome implements CacheInterface, ArrayAccess
         return $this->has($name);
     }
 
-    /**
-     * @param null|int|\DateTime|\DateTimeInterface $ttl
-     * @return null|int
-     */
-    protected function calculateExpiration($ttl): ?int
+    protected function calculateExpiration(null|int|\DateTime|\DateTimeInterface $ttl): int|null
     {
         if (is_null($ttl)) {
             return null;
@@ -75,11 +71,7 @@ abstract class CacheAwesome implements CacheInterface, ArrayAccess
         return time() + $ttl;
     }
 
-    /**
-     * @param array|string $tags
-     * @return CacheInterface
-     */
-    public function tag($tags): CacheInterface
+    public function tag(array|string $tags): CacheAwesome
     {
         if (!is_array($tags) && !is_string($tags)) {
             throw new \InvalidArgumentException('Argument #1 must be a type of array|string.');
@@ -92,13 +84,7 @@ abstract class CacheAwesome implements CacheInterface, ArrayAccess
         return $instance;
     }
 
-    /**
-     * @param string $key
-     * @param Closure $closure
-     * @param null|int|\DateTime|\DateTimeInterface $ttl
-     * @return mixed
-     */
-    public function remember(string $key, Closure $closure, $ttl = null)
+    public function remember(string $key, Closure $closure,null|int|\DateTime|\DateTimeInterface $ttl = null)
     {
         if ($this->has($key)) {
             return $this->get($key);

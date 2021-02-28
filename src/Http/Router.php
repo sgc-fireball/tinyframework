@@ -39,7 +39,7 @@ class Router
         return $this;
     }
 
-    public function pattern(string $name = null, string $regex = null)
+    public function pattern(string $name = null, string $regex = null): Router|array|string
     {
         if (!is_null($name) && is_null($regex)) {
             return array_key_exists($name, $this->pattern) ? $this->pattern[$name] : $this->pattern['default'];
@@ -51,7 +51,7 @@ class Router
         return $this;
     }
 
-    public function bind(string $name, Closure $closure = null)
+    public function bind(string $name, Closure $closure = null): Router|callable|null
     {
         if (is_null($closure)) {
             if (array_key_exists($name, $this->bindings)) {
@@ -63,7 +63,7 @@ class Router
         return $this;
     }
 
-    public function middleware($middleware = null)
+    public function middleware($middleware = null): Router|array
     {
         if (is_null($middleware)) {
             return $this->middleware;
@@ -204,7 +204,7 @@ class Router
                 }, ARRAY_FILTER_USE_BOTH);
                 foreach ($match as $name => &$value) {
                     if ($callback = $this->bind($name)) {
-                        if ($callback && is_callable($callback) && $newValue = $callback($value)) {
+                        if ($callback instanceOf Closure && $newValue = $callback($value)) {
                             $value = $newValue;
                             continue;
                         }

@@ -47,21 +47,18 @@ abstract class LoggerAwesome implements LoggerInterface
         return $this->log(LoggerInterface::DEBUG, $message, $context);
     }
 
-    protected function buildMessage(string $level, string $message, array $context = [])
+    protected function buildMessage(string $level, string $message, array $context = []): string
     {
         if (!in_array($level, LoggerInterface::LEVELS)) {
             throw new InvalidArgumentException('Invalid level.');
         }
-        $message = (string)$message;
-
         foreach ($context as $key => $value) {
             $value = is_object($value) && method_exists($value, '__toString') ? $value->__toString() : $value;
             $value = is_bool($value) ? ($value ? 'TRUE' : 'FALSE') : $value;
             $value = is_null($value) ? 'NULL' : $value;
-            $message = str_replace('{' . $key . '}', (string)$value, $message);
+            $context[$key] = (string)$value;
         }
-
-        return $message;
+        return vnsprintf($message, $context);
     }
 
 }

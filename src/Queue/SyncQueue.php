@@ -19,7 +19,7 @@ class SyncQueue implements QueueInterface
         return $this;
     }
 
-    public function name(string $name = null)
+    public function name(string $name = null): QueueInterface|string
     {
         if (is_null($name)) {
             return 'default';
