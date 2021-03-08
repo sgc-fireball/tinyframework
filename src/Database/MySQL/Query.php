@@ -25,6 +25,11 @@ class Query extends AbstractQuery implements QueryInterface
         $query = '';
         foreach ($wheres as $where) {
             if ($where['type'] === 'basic') {
+                if ($where['value'] === null) {
+                    $where['operation'] = $where['operation'] === '=' ? 'IS' : $where['operation'];
+                    $where['operation'] = $where['operation'] === '!=' ? 'IS NOT' : $where['operation'];
+                    $where['operation'] = $where['operation'] === '<>' ? 'IS NOT' : $where['operation'];
+                }
                 $query .= sprintf(
                     ' %s %s %s %s',
                     $query ? $where['boolean'] : '',
