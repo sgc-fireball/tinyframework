@@ -6,6 +6,8 @@
 ```php
 $key = 'app.debug';
 config(); // \TinyFramework\Core\Config
+config($key); // return value or null
+config($key, 'value'); // set key to value and return \TinyFramework\Core\Config 
 config()->get($key); // mixed|null
 config()->set($key, $value); // \TinyFramework\Core\Config
 ```

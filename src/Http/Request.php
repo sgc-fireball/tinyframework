@@ -86,6 +86,7 @@ class Request
         if (!preg_match('/^[A-Z]++$/D', $request->method)) {
             throw new \RuntimeException(sprintf('Invalid method override "%s".', $request->method));
         }
+        $request->body = file_get_contents("php://input");
         return $request;
     }
 

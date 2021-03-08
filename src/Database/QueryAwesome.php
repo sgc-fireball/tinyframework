@@ -4,7 +4,7 @@ namespace TinyFramework\Database;
 
 use Closure;
 
-abstract class AbstractQuery implements QueryInterface
+abstract class QueryAwesome implements QueryInterface
 {
 
     protected array $select = [];
@@ -31,42 +31,25 @@ abstract class AbstractQuery implements QueryInterface
         $this->driver = $driver;
     }
 
-    public function select(array $fields = [])
+    public function select(array $fields = []): QueryAwesome
     {
         $this->select = $fields;
         return $this;
     }
 
-    public function table(string $table)
+    public function table(string $table): QueryAwesome
     {
         $this->table = $table;
         return $this;
     }
 
-    public function class(string $class)
+    public function class(string $class): QueryAwesome
     {
         $this->class = $class;
         return $this;
     }
 
-    /**
-     * @param BaseModel|string $model
-     * @return $this
-     */
-    public function byModel($model)
-    {
-        $this->class = is_object($model) ? get_class($model) : (string)$model;
-        $this->table = $model instanceof BaseModel ? $model->getTable() : (new $this->class)->getTable();
-        return $this;
-    }
-
-    /**
-     * @param string|Closure $field
-     * @param string|null $operation
-     * @param mixed $value
-     * @return $this
-     */
-    public function where($field, string $operation = null, $value = null)
+    public function where(string|Closure $field, string $operation = null, $value = null): QueryAwesome
     {
         if ($field instanceof Closure) {
             return $this->whereNested($field);
@@ -84,13 +67,31 @@ abstract class AbstractQuery implements QueryInterface
         return $this;
     }
 
-    /**
-     * @param string|Closure $field
-     * @param string $operation
-     * @param mixed $value
-     * @return $this
-     */
-    public function orWhere($field, string $operation, $value)
+    public function whereNull(string $field): QueryAwesome
+    {
+        $this->wheres[] = [
+            'type' => 'basic',
+            'boolean' => 'and',
+            'field' => $field,
+            'operation' => '=',
+            'value' => null
+        ];
+        return $this;
+    }
+
+    public function whereNotNull(string $field): QueryAwesome
+    {
+        $this->wheres[] = [
+            'type' => 'basic',
+            'boolean' => 'and',
+            'field' => $field,
+            'operation' => '!=',
+            'value' => null
+        ];
+        return $this;
+    }
+
+    public function orWhere(string|Closure $field, string $operation, $value): QueryAwesome
     {
         if ($field instanceof Closure) {
             return $this->whereNested($field);
@@ -105,7 +106,31 @@ abstract class AbstractQuery implements QueryInterface
         return $this;
     }
 
-    public function whereNested(Closure $callback)
+    public function orWhereNull(string $field, string $operation, $value): QueryAwesome
+    {
+        $this->wheres[] = [
+            'type' => 'basic',
+            'boolean' => 'or',
+            'field' => $field,
+            'operation' => '!=',
+            'value' => null,
+        ];
+        return $this;
+    }
+
+    public function orWhereNotNull(string $field, string $operation, $value): QueryAwesome
+    {
+        $this->wheres[] = [
+            'type' => 'basic',
+            'boolean' => 'or',
+            'field' => $field,
+            'operation' => '!=',
+            'value' => null,
+        ];
+        return $this;
+    }
+
+    public function whereNested(Closure $callback): QueryAwesome
     {
         $class = get_class($this);
         call_user_func($callback, $query = (new $class($this->driver))->table($this->table));
@@ -119,7 +144,7 @@ abstract class AbstractQuery implements QueryInterface
         return $this;
     }
 
-    public function orWhereNested(Closure $callback)
+    public function orWhereNested(Closure $callback): QueryAwesome
     {
         $class = get_class($this);
         call_user_func($callback, $query = (new $class($this->driver))->table($this->table));
@@ -133,7 +158,7 @@ abstract class AbstractQuery implements QueryInterface
         return $this;
     }
 
-    public function orderBy($field, $order = 'asc')
+    public function orderBy(string $field, string $order = 'asc'): QueryAwesome
     {
         $order = mb_strtolower($order);
         $order = in_array($order, ['asc', 'desc']) ? $order : 'asc';
@@ -141,47 +166,22 @@ abstract class AbstractQuery implements QueryInterface
         return $this;
     }
 
-    public function groupBy(string $field)
+    public function groupBy(string $field): QueryAwesome
     {
         $this->groups[] = $field;
         return $this;
     }
 
-    public function limit(int $limit)
+    public function limit(int $limit): QueryAwesome
     {
         $this->limit = max(1, $limit);
         return $this;
     }
 
-    public function offset(int $offset)
+    public function offset(int $offset): QueryAwesome
     {
         $this->offset = max(0, $offset);
         return $this;
-    }
-
-    protected function buildModels(array $results = []): array
-    {
-        if ($this->class && class_exists($this->class)) {
-            return array_map(function (array $result) {
-                return $this->buildModel($result);
-            }, $results);
-        }
-        return $results;
-    }
-
-    /**
-     * @param array $result
-     * @return array|BaseModel
-     */
-    protected function buildModel(array $result = [])
-    {
-        if ($this->class && class_exists($this->class)) {
-            /** @var BaseModel $model */
-            $model = new $this->class();
-            $model->forceFill($result);
-            return $model;
-        }
-        return $result;
     }
 
     public function get(): array
@@ -189,7 +189,7 @@ abstract class AbstractQuery implements QueryInterface
         return $this->buildModels($this->load());
     }
 
-    public function first(): ?BaseModel
+    public function first(): BaseModel|null
     {
         $result = $this->limit(1)->load();
         if (is_array($result) && isset($result[0])) {
@@ -200,16 +200,13 @@ abstract class AbstractQuery implements QueryInterface
 
     public function firstOrFail(): BaseModel
     {
-        $result = $this->limit(1)->load();
-        if (is_array($result) && isset($result[0])) {
-            if ($model = $this->buildModel($result[0])) {
-                return $model;
-            }
+        if ($result = $this->first()) {
+            return $result;
         }
         throw new \RuntimeException('Model not found');
     }
 
-    public function paginate(int $perPage = 20, int $page = 1)
+    public function paginate(int $perPage = 20, int $page = 1): array
     {
         $count = $this->count();
         $perPage = min(max(1, $perPage), 1000);
@@ -223,6 +220,34 @@ abstract class AbstractQuery implements QueryInterface
                 'count' => $count,
             ]
         ];
+    }
+
+    protected function buildModels(array $results = []): array
+    {
+        if ($this->class && class_exists($this->class)) {
+            return array_map(function (array $result) {
+                return $this->buildModel($result);
+            }, $results);
+        }
+        return $results;
+    }
+
+    protected function buildModel(array $result = []): array|BaseModel
+    {
+        if ($this->class && class_exists($this->class)) {
+            /** @var BaseModel $model */
+            $model = new $this->class();
+            $model->forceFill($result);
+            return $model;
+        }
+        return $result;
+    }
+
+    public function byModel(BaseModel|string $model): QueryAwesome
+    {
+        $this->class = is_object($model) ? get_class($model) : (string)$model;
+        $this->table = $model instanceof BaseModel ? $model->getTable() : (new $this->class)->getTable();
+        return $this;
     }
 
 }

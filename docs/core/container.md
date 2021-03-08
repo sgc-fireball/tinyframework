@@ -3,9 +3,9 @@
 - [Introduction](#introduction)
 
 ## Introduction
-## Container
+How to use:
 ```php
 $container = container();
 $service = container('config');
-$service = container(ConfigInterface::class);
+$service = container(\TinyFramework\Core\ConfigInterface::class);
 ```

@@ -4,12 +4,6 @@
 
 ## Introduction
 
-## Defaults
-- APP_ENV = `production`
-- APP_DEBUG = `false`
-- APP_URL = `http://localhost`
-- APP_SECRET = `null`
-
 ## Usge
 ```php
 use TinyFramework\Core\DotEnv;

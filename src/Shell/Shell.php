@@ -29,7 +29,7 @@ class Shell
         #$this->output->successful('This is an successful.');
         $this->readline->readHistory();
         while (true) {
-            $line = $this->readline->prompt(config('app.name') . ' $');
+            $line = $this->readline->prompt('$');
             if (in_array($line, ['exit', 'quit']) || $line === false) {
                 $this->readline->saveHistory();
                 break;

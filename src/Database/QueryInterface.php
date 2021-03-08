@@ -7,39 +7,35 @@ use Closure;
 interface QueryInterface
 {
 
-    public function select(array $fields = []);
+    public function select(array $fields = []): QueryInterface;
 
-    public function table(string $table);
+    public function table(string $table): QueryInterface;
 
-    public function class(string $class);
+    public function class(string $class): QueryInterface;
 
-    /**
-     * @param string|Closure $field
-     * @param string|null $operation
-     * @param mixed $value
-     * @return QueryInterface
-     */
-    public function where($field, string $operation = null, $value = null);
+    public function where(string|Closure $field, string $operation = null, $value = null): QueryInterface;
 
-    /**
-     * @param string|Closure $field
-     * @param string $operation
-     * @param mixed $value
-     * @return QueryInterface
-     */
-    public function orWhere($field, string $operation, $value);
+    public function whereNull(string $field): QueryInterface;
 
-    public function whereNested(Closure $callback);
+    public function whereNotNull(string $field): QueryInterface;
 
-    public function orWhereNested(Closure $callback);
+    public function orWhere(string|Closure $field, string $operation, $value): QueryInterface;
 
-    public function orderBy(string $field, string $order = 'asc');
+    public function orWhereNull(string $field, string $operation, $value): QueryInterface;
 
-    public function groupBy(string $field);
+    public function orWhereNotNull(string $field, string $operation, $value): QueryInterface;
 
-    public function limit(int $limit);
+    public function whereNested(Closure $callback): QueryInterface;
 
-    public function offset(int $offset);
+    public function orWhereNested(Closure $callback): QueryInterface;
+
+    public function orderBy(string $field, string $order = 'asc'): QueryInterface;
+
+    public function groupBy(string $field): QueryInterface;
+
+    public function limit(int $limit): QueryInterface;
+
+    public function offset(int $offset): QueryInterface;
 
     public function load(): array;
 
@@ -49,7 +45,11 @@ interface QueryInterface
 
     public function get(): array;
 
-    public function first(): ?BaseModel;
+    public function first(): BaseModel|null;
+
+    public function firstOrFail(): BaseModel;
+
+    public function paginate(int $perPage = 20, int $page = 1): array;
 
     public function count(): int;
 

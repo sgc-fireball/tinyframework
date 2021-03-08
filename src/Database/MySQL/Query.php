@@ -2,14 +2,12 @@
 
 namespace TinyFramework\Database\MySQL;
 
-use TinyFramework\Database\AbstractQuery;
+use TinyFramework\Database\QueryAwesome;
 use TinyFramework\Database\DatabaseInterface;
-use TinyFramework\Database\QueryInterface;
 
-class Query extends AbstractQuery implements QueryInterface
+class Query extends QueryAwesome
 {
 
-    /** @var Database */
     protected DatabaseInterface $driver;
 
     private function compileSelect(array $fields): string
@@ -84,9 +82,9 @@ class Query extends AbstractQuery implements QueryInterface
         }, array_values($fields), array_keys($fields))), ' ,');
     }
 
-    public function load(): array
+    public function toSql(): string
     {
-        return $this->driver->execute(rtrim(sprintf(
+        return rtrim(sprintf(
             'SELECT %s FROM `%s` %s %s %s %s %s',
             $this->compileSelect($this->select),
             $this->table,
@@ -95,7 +93,12 @@ class Query extends AbstractQuery implements QueryInterface
             $this->compileOrder($this->orders),
             $this->compileLimit($this->limit),
             $this->compileOffset($this->offset)
-        )));
+        ));
+    }
+
+    public function load(): array
+    {
+        return $this->driver->execute($this->toSql());
     }
 
     public function put(array &$fields = [])

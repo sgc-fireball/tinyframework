@@ -5,12 +5,14 @@
 ## Introduction
 ```php
 use TinyFramework\Http\Response;
+
 Response::new($content, $code, $headers);
 Response::json($json, $code, $headers);
 Response::error($code, $headers);
 Response::redirect($to, $code, $headers);
 Response::back($fallback, $headers);
 Response::view($view, $data, $code, $headers);
+
 $response = new Response();
 $response
     ->protocol('HTTP/2')
@@ -19,7 +21,7 @@ $response
     ->header('X-Custom', time())
     ->headers(['X-Custom1' => time(), 'X-Custom2' => time()])
     ->content('<b>Hello, World</b>')
-    ->send() // ->_toString()
+    ->send() // ->__toString()
 ;
 ```
 ## Examples

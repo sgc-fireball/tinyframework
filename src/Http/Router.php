@@ -180,6 +180,84 @@ class Router
         return $route;
     }
 
+    /**
+     * @param string $name
+     * @param string $class
+     * @param array $options
+     * @return array
+     */
+    public function resource(string $name, string $class, array $options = []): array
+    {
+        $options['url'] = $options['url'] ?? $name;
+        $options['parameter'] = $options['parameter'] ?? $name;
+
+        $methods = ['index', 'create', 'store', 'show', 'edit', 'update', 'delete'];
+        if (isset($options['only'])) {
+            $methods = array_intersect($methods, (array)$options['only']);
+        }
+        if (isset($options['except'])) {
+            $methods = array_diff($methods, (array)$options['except']);
+        }
+
+        $options['names'] = $options['names'] ?? [];
+        $options['names']['index'] = $options['names']['index'] ?? ($name . '.index');
+        $options['names']['create'] = $options['names']['create'] ?? ($name . '.create');
+        $options['names']['store'] = $options['names']['store'] ?? ($name . '.store');
+        $options['names']['show'] = $options['names']['show'] ?? ($name . '.show');
+        $options['names']['edit'] = $options['names']['edit'] ?? ($name . '.edit');
+        $options['names']['update'] = $options['names']['update'] ?? ($name . '.update');
+        $options['names']['delete'] = $options['names']['delete'] ?? ($name . '.delete');
+
+        $list = [];
+        if (in_array('index', $methods)) {
+            $this->routes[] = $list['index'] = $this->get(
+                $options['url'],
+                $class . '@index'
+            )->name($options['names']['index']);
+        }
+        if (in_array('create', $methods)) {
+            $this->routes[] = $list['create'] = $this->get(
+                $options['url'] . '/create',
+                $class . '@create'
+            )->name($options['names']['create']);
+        }
+        if (in_array('store', $methods)) {
+            $this->routes[] = $list['store'] = $this->post(
+                $options['url'],
+                $class . '@store'
+            )->name($options['names']['store']);
+        }
+        if (in_array('show', $methods)) {
+            $this->routes[] = $list['show'] = $this->get(
+                $options['url'] . '/{' . $options['parameter'] . '}',
+                $class . '@show'
+            )->name($options['names']['show']);
+        }
+        if (in_array('edit', $methods)) {
+            $this->routes[] = $list['edit'] = $this->get(
+                $options['url'] . '/{' . $options['parameter'] . '}/edit',
+                $class . '@edit'
+            )->name($options['names']['edit']);
+        }
+        if (in_array('update', $methods)) {
+            $this->routes[] = $list['update'] = $this->put(
+                $options['url'] . '/{' . $options['parameter'] . '}',
+                $class . '@update'
+            )->name($options['names']['update']);
+            $this->routes[] = $list['update'] = $this->patch(
+                $options['url'] . '/{' . $options['parameter'] . '}',
+                $class . '@update'
+            );
+        }
+        if (in_array('delete', $methods)) {
+            $this->routes[] = $list['delete'] = $this->delete(
+                $options['url'] . '/{' . $options['parameter'] . '}',
+                $class . '@delete'
+            )->name($options['names']['update']);
+        }
+        return $list;
+    }
+
     public function fallback($action): Route
     {
         $route = (new Route())->method('any')->uri('.*')->action($action)->name('fallback');
@@ -204,7 +282,7 @@ class Router
                 }, ARRAY_FILTER_USE_BOTH);
                 foreach ($match as $name => &$value) {
                     if ($callback = $this->bind($name)) {
-                        if ($callback instanceOf Closure && $newValue = $callback($value)) {
+                        if ($callback instanceof Closure && $newValue = $callback($value)) {
                             $value = $newValue;
                             continue;
                         }
