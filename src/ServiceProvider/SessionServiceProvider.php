@@ -21,7 +21,7 @@ class SessionServiceProvider extends ServiceProviderAwesome
         $this->container
             ->alias('session', $config['driver'])
             ->alias(SessionInterface::class, $config['driver'])
-            ->singleton($config['driver'], function (ContainerInterface $container) use ($config) {
+            ->singleton($config['driver'], function () use ($config) {
                 $class = $config['driver'];
                 return new $class($config);
             });

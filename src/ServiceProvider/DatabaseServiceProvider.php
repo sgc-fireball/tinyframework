@@ -3,6 +3,7 @@
 namespace TinyFramework\ServiceProvider;
 
 use TinyFramework\Database\DatabaseInterface;
+use TinyFramework\Database\MigrationInstaller;
 
 class DatabaseServiceProvider extends ServiceProviderAwesome
 {
@@ -20,6 +21,13 @@ class DatabaseServiceProvider extends ServiceProviderAwesome
             ->singleton($config['driver'], function () use ($config) {
                 $class = $config['driver'];
                 return new $class($config);
+            });
+        $this->container
+            ->singleton(MigrationInstaller::class, function () {
+                return new MigrationInstaller(
+                    $this->container->get(DatabaseInterface::class),
+                    $this->container->tagged('migration')
+                );
             });
     }
 

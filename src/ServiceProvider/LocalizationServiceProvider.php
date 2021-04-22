@@ -13,14 +13,14 @@ class LocalizationServiceProvider extends ServiceProviderAwesome
     {
         $this->container
             ->alias('translation.loader', TranslationLoader::class)
-            ->singleton(TranslationLoader::class, function (ContainerInterface $container) {
+            ->singleton(TranslationLoader::class, function () {
                 return new TranslationLoader();
             });
         $this->container
             ->alias('translator', Translator::class)
-            ->singleton(Translator::class, function (ContainerInterface $container) {
-                $config = $container->get('config')->get('app');
-                return new Translator($container->get(TranslationLoader::class), $config['locale']);
+            ->singleton(Translator::class, function () {
+                $config = $this->container->get('config')->get('app');
+                return new Translator($this->container->get(TranslationLoader::class), $config['locale']);
             });
     }
 

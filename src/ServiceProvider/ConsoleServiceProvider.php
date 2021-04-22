@@ -28,13 +28,13 @@ class ConsoleServiceProvider extends ServiceProviderAwesome
         $this->container->tag('cronjob', [
             LogRotateCronjob::class
         ]);
-        $this->container->singleton(Readline::class, function (ContainerInterface $container) {
-            return new Readline('$', $container->tagged('shell:tab:completion'));
+        $this->container->singleton(Readline::class, function () {
+            return new Readline('$', $this->container->tagged('shell:tab:completion'));
         });
-        $this->container->singleton(Shell::class, function (ContainerInterface $container) {
+        $this->container->singleton(Shell::class, function () {
             return new Shell(
-                $container->get(OutputInterface::class),
-                $container->get(Readline::class),
+                $this->container->get(OutputInterface::class),
+                $this->container->get(Readline::class),
             );
         });
     }

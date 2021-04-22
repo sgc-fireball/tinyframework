@@ -14,7 +14,7 @@ class EventServiceProvider extends ServiceProviderAwesome
         $this->container
             ->alias('event', EventDispatcher::class)
             ->alias(EventDispatcherInterface::class, EventDispatcher::class)
-            ->singleton(EventDispatcher::class, function (ContainerInterface $container) {
+            ->singleton(EventDispatcher::class, function () {
                 return new EventDispatcher();
             });
     }

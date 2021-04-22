@@ -146,6 +146,7 @@ class ProgressBar
             'estimated' => '',
             'memory' => size_format(memory_get_usage(true))
         ]);
+
         if ($this->max > 0) {
             $placeholder['percent'] = str_pad((string)(int)($this->step / $this->max * 100), 3, ' ', STR_PAD_LEFT);
             $placeholder['estimated'] = time_format($placeholder['elapsed'] / $this->step * $this->max);

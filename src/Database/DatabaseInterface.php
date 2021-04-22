@@ -19,4 +19,6 @@ interface DatabaseInterface
 
     public function execute(string $query): array|bool;
 
+    public function createMigrationTable(): DatabaseInterface;
+
 }

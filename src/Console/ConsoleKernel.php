@@ -83,7 +83,8 @@ EOF;
 
     public function handleException(\Throwable $e): int
     {
-        $stacktrace = isset($this->output) && $this->output->verbosity() >= OutputInterface::VERBOSITY_VERBOSE;
+        $verbosity = (int)$this->output->verbosity();
+        $stacktrace = isset($this->output) && $verbosity >= OutputInterface::VERBOSITY_VERBOSE;
         $message = exception2text($e, $stacktrace);
         if (!isset($this->output)) {
             echo $message . "\n\n";

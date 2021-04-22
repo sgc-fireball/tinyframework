@@ -1,10 +1,24 @@
 <?php declare(strict_types=1);
 
+use JetBrains\PhpStorm\NoReturn;
+use JetBrains\PhpStorm\Pure;
+use TinyFramework\Cache\CacheInterface;
+use TinyFramework\Core\Config;
+use TinyFramework\Core\Container;
 use TinyFramework\Core\DotEnvInterface;
+use TinyFramework\Crypt\CryptInterface;
+use TinyFramework\Database\DatabaseInterface;
+use TinyFramework\Event\EventAwesome;
+use TinyFramework\Event\EventDispatcherInterface;
+use TinyFramework\Hash\HashInterface;
 use TinyFramework\Http\Response;
+use TinyFramework\Logger\LoggerInterface;
+use TinyFramework\Mail\Mailer;
+use TinyFramework\Queue\QueueInterface;
+use TinyFramework\Session\SessionInterface;
 
 if (!function_exists('root_dir')) {
-    function root_dir(): string
+    #[Pure] function root_dir(): string
     {
         if (defined('ROOT')) {
             return ROOT;
@@ -13,19 +27,27 @@ if (!function_exists('root_dir')) {
         if (strpos($dir, '/vendor/')) {
             $dir = preg_replace('/\/vendor\/.*$/', '', $dir);
         }
+        define('ROOT', $dir);
         return $dir;
     }
 }
 
+if (!function_exists('public_dir')) {
+    #[Pure] function public_dir(): string
+    {
+        return root_dir() . DIRECTORY_SEPARATOR . 'public';
+    }
+}
+
 if (!function_exists('base64url_encode')) {
-    function base64url_encode(string $data): string
+    #[Pure] function base64url_encode(string $data): string
     {
         return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
     }
 }
 
 if (!function_exists('base64url_decode')) {
-    function base64url_decode(string $data): string
+    #[Pure] function base64url_decode(string $data): string
     {
         return base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '=', STR_PAD_RIGHT));
     }
@@ -37,9 +59,9 @@ if (!function_exists('container')) {
      * @param array $parameters
      * @return mixed|TinyFramework\Core\Container
      */
-    function container(string $key = null, array $parameters = [])
+    function container(?string $key = null, array $parameters = [])
     {
-        $container = \TinyFramework\Core\Container::instance();
+        $container = Container::instance();
         if ($key === null) {
             return $container;
         }
@@ -50,9 +72,9 @@ if (!function_exists('container')) {
 if (!function_exists('config')) {
     /**
      * @param string|null $key
-     * @return mixed|\TinyFramework\Core\Config
+     * @return mixed|Config
      */
-    function config($key = null, $value = null)
+    function config(?string $key = null, $value = null)
     {
         $config = container('config');
         if (is_null($key)) {
@@ -66,58 +88,67 @@ if (!function_exists('config')) {
 }
 
 if (!function_exists('cache')) {
-    function cache(): \TinyFramework\Cache\CacheInterface
+    function cache(): CacheInterface
     {
         return container('cache');
     }
 }
 
 if (!function_exists('database')) {
-    function database(): \TinyFramework\Database\DatabaseInterface
+    function database(): DatabaseInterface
     {
         return container('database');
     }
 }
 
 if (!function_exists('session')) {
-    function session(): \TinyFramework\Session\SessionInterface
+    function session(): SessionInterface
     {
         return container('session');
     }
 }
 
 if (!function_exists('event')) {
-    function event(): \TinyFramework\Event\EventDispatcherInterface
+    function event(EventAwesome $event = null): EventDispatcherInterface
     {
-        return container('event');
+        /** @var EventDispatcherInterface $dispatcher */
+        $dispatcher = container('event');
+        return $event ? $dispatcher->dispatch($event) : $dispatcher;
     }
 }
 
 if (!function_exists('logger')) {
-    function logger(): \TinyFramework\Logger\LoggerInterface
+    function logger(): LoggerInterface
     {
         return container('logger');
     }
 }
 
 if (!function_exists('queue')) {
-    function queue(): \TinyFramework\Queue\QueueInterface
+    function queue(): QueueInterface
     {
         return container('queue');
     }
 }
 
 if (!function_exists('hasher')) {
-    function hasher(): \TinyFramework\Hash\HashInterface
+    function hasher(): HashInterface
     {
         return container('hash');
     }
 }
 
 if (!function_exists('crypto')) {
-    function crypto(): \TinyFramework\Crypt\CryptInterface
+    function crypto(): CryptInterface
     {
         return container('crypt');
+    }
+}
+
+if (!function_exists('mailer')) {
+    function mailer(): Mailer
+    {
+        return container('mailer');
     }
 }
 
@@ -143,9 +174,9 @@ if (!function_exists('view')) {
 }
 
 if (!function_exists('running_in_console')) {
-    function running_in_console(): bool
+    #[Pure] function running_in_console(): bool
     {
-        return \PHP_SAPI === 'cli' || \PHP_SAPI === 'phpdbg';
+        return PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg';
     }
 }
 
@@ -169,7 +200,7 @@ if (!function_exists('dd')) {
      * @param mixed ...$val
      * @return void
      */
-    function dd(...$val)
+    #[NoReturn] function dd(...$val): void
     {
         call_user_func_array('dump', $val);
         running_in_console() ? exit(1) : die();
@@ -189,7 +220,7 @@ if (!function_exists('env')) {
 }
 
 if (!function_exists('exception2text')) {
-    function exception2text(\Throwable $e, bool $stacktrace = false): string
+    function exception2text(Throwable $e, bool $stacktrace = false): string
     {
         $result = sprintf(
             '%s[%d] %s in %s:%d',
@@ -254,8 +285,24 @@ if (!function_exists('route')) {
     }
 }
 
+if (!function_exists('url')) {
+    function url(string $path = '/', array $parameters = []): string
+    {
+        return container('router')->url($path, $parameters);
+    }
+}
+
+if (!function_exists('asset_version')) {
+    function asset_version(string $path): string
+    {
+        $filepath = str_contains($path, '?') ? substr($path, 0, strpos($path, '?')) : $path;
+        $filepath = public_dir() . DIRECTORY_SEPARATOR . ltrim($filepath, '/');
+        return !file_exists($filepath) ? $path : url($path, ['_' => filemtime($filepath)]);
+    }
+}
+
 if (!function_exists('to_bool')) {
-    function to_bool($mixed): bool
+    #[Pure] function to_bool($mixed): bool
     {
         $mixed = is_string($mixed) && in_array(mb_strtolower($mixed), ['y', 'yes', 'true', 'on']) ? true : $mixed;
         $mixed = is_string($mixed) && in_array(mb_strtolower($mixed), ['n', 'no', 'false', 'off', 'null']) ? false : $mixed;
@@ -280,7 +327,7 @@ if (!function_exists('password')) {
         if ($numbers) $chars .= '2345689';
         if ($symbols) $chars .= ';#$*-/<=>?@^_|~';
         if (empty($chars)) {
-            throw new \RuntimeException('Please allow minimu one of the following sets: lowerChars, upperChars, numbers, symbols.');
+            throw new RuntimeException('Please allow minimum one of the following sets: lowerChars, upperChars, numbers, symbols.');
         }
         $counts = strlen($chars) - 1;
         while (strlen($password) < $length) {
@@ -299,13 +346,14 @@ if (!function_exists('console_size')) {
 }
 
 if (!function_exists('size_format')) {
-    function size_format(float $byte): string
+    function size_format(float $byte, int $precision = 2): string
     {
         $steps = [
             ['size' => 1024, 'type' => 'KB'],
             ['size' => 1024, 'type' => 'MB'],
             ['size' => 1024, 'type' => 'GB'],
             ['size' => 1024, 'type' => 'TB'],
+            ['size' => 1024, 'type' => 'PB'],
         ];
         $type = 'B';
         foreach ($steps as $step) {
@@ -315,12 +363,12 @@ if (!function_exists('size_format')) {
             $byte /= $step['size'];
             $type = $step['type'];
         }
-        return sprintf('%.2f %s', $byte, $type);
+        return sprintf('%.' . $precision . 'f %s', $byte, $type);
     }
 }
 
 if (!function_exists('time_format')) {
-    function time_format(float $seconds): string
+    #[Pure] function time_format(float|int $seconds): string
     {
         if ($seconds <= 1) return '1 sec';
         if ($seconds <= 60) return sprintf('%d secs', $seconds);
@@ -347,7 +395,7 @@ if (!function_exists('array_flat')) {
     {
         $result = [];
         foreach ($messages as $key => $value) {
-            if (\is_array($value)) {
+            if (is_array($value)) {
                 foreach (array_flat($value) as $k => $v) {
                     $result[$key . '.' . $k] = $v;
                 }
@@ -356,5 +404,24 @@ if (!function_exists('array_flat')) {
             }
         }
         return $result;
+    }
+}
+
+if (!function_exists('tmpreaper')) {
+    function tmpreaper(string $folder, int $expire): void
+    {
+        if (!is_dir($folder)) {
+            return;
+        }
+        $folder = rtrim(realpath($folder), '/');
+        if (strpos($folder, root_dir()) !== 0) {
+            throw new RuntimeException('Clear path\'s outside of root_dir is forbidden!');
+        }
+        $fileSystemIterator = new FilesystemIterator($folder);
+        foreach ($fileSystemIterator as $file) {
+            if ($file->getCTime() < $expire) {
+                unlink($folder . '/' . $file->getFilename());
+            }
+        }
     }
 }

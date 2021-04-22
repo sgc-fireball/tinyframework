@@ -18,7 +18,7 @@ class LoggerServiceProvider extends ServiceProviderAwesome
         $this->container
             ->alias('logger', $config['driver'])
             ->alias(LoggerInterface::class, $config['driver'])
-            ->singleton($config['driver'], function (ContainerInterface $container) use ($config) {
+            ->singleton($config['driver'], function () use ($config) {
                 $class = $config['driver'];
                 return new $class($config);
             });

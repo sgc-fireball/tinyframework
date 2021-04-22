@@ -35,6 +35,11 @@ class Mail
 
     private array $attachments = [];
 
+    public static function create(): Mail
+    {
+        return new self();
+    }
+
     public function header(string $key = null, string $value = null)
     {
         if (is_null($key)) {

@@ -17,6 +17,7 @@ use TinyFramework\ServiceProvider\EventServiceProvider;
 use TinyFramework\ServiceProvider\LoggerServiceProvider;
 use TinyFramework\ServiceProvider\RouterServiceProvider;
 use TinyFramework\ServiceProvider\SessionServiceProvider;
+use TinyFramework\ServiceProvider\XhprofServiceProvider;
 
 abstract class Kernel implements KernelInterface
 {
@@ -49,6 +50,7 @@ abstract class Kernel implements KernelInterface
         $this->serviceProviderNames = [
             EventServiceProvider::class,
             ConfigServiceProvider::class,
+            XhprofServiceProvider::class,
             CryptServiceProvider::class,
             HashServiceProvider::class,
             LoggerServiceProvider::class,
@@ -88,6 +90,8 @@ abstract class Kernel implements KernelInterface
                 $provider = 'App\\Providers\\' . str_replace('.php', '', basename($file));
                 if (class_exists($provider)) {
                     $this->serviceProviderNames[] = $provider;
+                } else {
+                    throw new \RuntimeException('Could not found service provider: ' . $provider);
                 }
             }
         }

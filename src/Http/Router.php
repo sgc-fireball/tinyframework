@@ -335,9 +335,24 @@ class Router
             if (mb_strpos($url, '{') || strpos($url, '}')) {
                 throw new \RuntimeException('Missing parameters.');
             }
-            return '/' . ltrim($url, '/');
+            return rtrim('/' . ltrim($url, '/'), '?&');
         }
         throw new \RuntimeException('Could not found route.');
+    }
+
+    public function url(string $path = '/', array $parameters = []): string
+    {
+        $url = '/' . ltrim($path, '/');
+        $url .= mb_strpos($url, '?') === false ? '?' : '&';
+        $url .= http_build_query($parameters);
+        if ($request = $this->container->get('request')) {
+            return (new Uri($url))
+                ->scheme($request->uri()->scheme())
+                ->host($request->uri()->host())
+                ->port($request->uri()->port())
+                ->__toString();
+        }
+        return rtrim($url, '?&');
     }
 
 }

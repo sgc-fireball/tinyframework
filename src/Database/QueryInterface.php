@@ -39,18 +39,24 @@ interface QueryInterface
 
     public function load(): array;
 
-    public function put(array &$fields = []);
+    public function put(array $fields = []);
 
     public function delete();
 
     public function get(): array;
 
-    public function first(): BaseModel|null;
+    public function first(): BaseModel|array|null;
 
     public function firstOrFail(): BaseModel;
 
     public function paginate(int $perPage = 20, int $page = 1): array;
 
     public function count(): int;
+
+    public function transaction(): void;
+
+    public function commit(): void;
+
+    public function rollback(): void;
 
 }

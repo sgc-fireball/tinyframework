@@ -28,7 +28,7 @@ class Uri
             $this->schema = $parts['scheme'] ?? null;
             $this->user = $parts['user'] ?? null;
             $this->pass = $parts['pass'] ?? null;
-            $this->host = $parts['host'] ? ltrim($parts['host'], ':') : null;
+            $this->host = array_key_exists('host', $parts) && $parts['host'] ? ltrim($parts['host'], ':') : null;
             $this->port = $parts['port'] ?? null;
             $this->path = $parts['path'] ?? '/';
             $this->query = $parts['query'] ?? null;
@@ -55,7 +55,7 @@ class Uri
         if (is_null($scheme)) {
             return $this->schema;
         }
-        if (preg_match('/^[a-z]([a-z0-9+.-]+)$/', $scheme)) {
+        if (!preg_match('/^[a-z]([a-z0-9+.-]+)$/', $scheme)) {
             throw new \InvalidArgumentException('Invalid schema.');
         }
         $uri = $this->clone();
@@ -84,7 +84,7 @@ class Uri
         if (is_null($host)) {
             return $this->host;
         }
-        if (!filter_var($host, FILTER_VALIDATE_IP) && !filter_var('info@' . $host, FILTER_FLAG_HOSTNAME)) {
+        if (!filter_var($host, FILTER_VALIDATE_IP) && !filter_var('info@' . $host, FILTER_VALIDATE_DOMAIN)) {
             throw new \InvalidArgumentException('Invalid host.');
         }
         $uri = $this->clone();
@@ -115,7 +115,7 @@ class Uri
         return $uri;
     }
 
-    public function query(string|array $query = null): Uri|array
+    public function query(string|array $query = null): Uri|string
     {
         if (is_null($query)) {
             return $this->query;

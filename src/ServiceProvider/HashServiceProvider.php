@@ -23,7 +23,7 @@ class HashServiceProvider extends ServiceProviderAwesome
             $parameters = $config;
             unset($parameters['driver']);
             $this->container
-                ->singleton($name, function (ContainerInterface $container) use ($class, $parameters) {
+                ->singleton($name, function () use ($class, $parameters) {
                     return $this->container->call($class, $parameters);
                 });
         }

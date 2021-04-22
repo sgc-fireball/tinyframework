@@ -40,5 +40,27 @@ cd my-project; php console
     - psych
     - sessions 
 
+## Performance
+1. Enable composer classmap authoritative.
+    ```bash
+    composer dump-autoload --classmap-authoritative
+    ```
+
+2. Disable xhprof:
+    ```dotenv
+    XHPROF_ENABLE=false
+    ```
+
+3. Uninstall!!!! xdebug
+
+4. Use PHP OpCache
+    But be case, and disable caching files under /storage/.
+
+### Swoole Server
+You can use theses server with and/or without an reverse nginx proxy.
+```bash
+php swoole
+```
+
 ## Author
 Richard Hülsberg <rh+github@hrdns.de>

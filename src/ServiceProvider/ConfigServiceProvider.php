@@ -14,7 +14,7 @@ class ConfigServiceProvider extends ServiceProviderAwesome
         $this->container
             ->alias('config', Config::Class)
             ->alias(ConfigInterface::class, Config::Class)
-            ->singleton(Config::class, function (ContainerInterface $container) {
+            ->singleton(Config::class, function () {
                 return new Config(['base_path' => getcwd()]);
             });
     }

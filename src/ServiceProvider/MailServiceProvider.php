@@ -12,13 +12,13 @@ class MailServiceProvider extends ServiceProviderAwesome
 
     public function register()
     {
-        if (!class_exists(Swift_Mailer::class)) {
-            $this->container->get('logger')->warning('MailServiceProvider: Could not found class Swift_Mailer.');
-            return null;
-        }
         $this->container
             ->alias('mailer', Mailer::Class)
-            ->singleton(Mailer::class, function (ContainerInterface $container) {
+            ->singleton(Mailer::class, function () {
+                if (!class_exists(Swift_Mailer::class)) {
+                    throw new \RuntimeException('MailServiceProvider: Could not found class Swift_Mailer.');
+                }
+
                 $config = $this->container->get('config')->get('mail');
                 $driver = $config['default'];
                 $fromAddress = ($config['from'] ?? [])['address'] ?? null;
@@ -32,7 +32,7 @@ class MailServiceProvider extends ServiceProviderAwesome
                 $mailer->mailer(
                     new Swift_Mailer(
                         $this->setParameterFromArray(
-                            $adapter = $container->call($driver, $config),
+                            $adapter = $this->container->call($driver, $config),
                             $config
                         )
                     )

@@ -8,6 +8,7 @@ use TinyFramework\Database\DatabaseInterface;
 class Query extends QueryAwesome
 {
 
+    /** @var Database */
     protected DatabaseInterface $driver;
 
     private function compileSelect(array $fields): string
@@ -101,7 +102,7 @@ class Query extends QueryAwesome
         return $this->driver->execute($this->toSql());
     }
 
-    public function put(array &$fields = [])
+    public function put(array $fields = [])
     {
         if (array_key_exists('id', $fields) && $fields['id']) {
             return $this->driver->execute(sprintf(
@@ -145,6 +146,21 @@ class Query extends QueryAwesome
             $this->compileWhere($this->wheres, true),
             $this->compileGroup($this->groups)
         )))[0]['c'];
+    }
+
+    public function transaction(): void
+    {
+        $this->driver->execute('START TRANSACTION');
+    }
+
+    public function commit(): void
+    {
+        $this->driver->execute('COMMIT');
+    }
+
+    public function rollback(): void
+    {
+        $this->driver->execute('ROLLBACK');
     }
 
 }

@@ -121,7 +121,7 @@ class Blade implements ViewInterface
         );
 
         $content = $this->restorePlaceholder($content);
-        if (count($this->footer) > 0) {
+        if (count($this->footer)) {
             $content = ltrim($content, PHP_EOL) . PHP_EOL . implode(PHP_EOL, array_reverse($this->footer));
         }
 
@@ -314,6 +314,7 @@ class Blade implements ViewInterface
 
     public function compileJson(string $expression): string
     {
+        // @TODO JSON_HEX_TAG, JSON_HEX_APOS, JSON_HEX_AMP, and JSON_HEX_QUOT
         return sprintf('<?php echo json_encode%s ?>', $expression);
     }
 

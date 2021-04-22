@@ -20,7 +20,7 @@ class QueueServiceProvider extends ServiceProviderAwesome
         $this->container
             ->alias('queue', $config['driver'])
             ->alias(QueueInterface::class, $config['driver'])
-            ->singleton($config['driver'], function (ContainerInterface $container) use ($config) {
+            ->singleton($config['driver'], function () use ($config) {
                 $class = $config['driver'];
                 return new $class($config);
             });

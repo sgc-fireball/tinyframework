@@ -38,7 +38,7 @@ abstract class JobAwesome implements JobInterface
         if ($delay instanceof \DateTimeInterface) {
             $delay = $delay->getTimestamp();
         }
-        $this->delay = is_int($delay) ? $delay : 0;
+        $this->delay = (int)$delay;
         return $this;
     }
 
@@ -56,6 +56,7 @@ abstract class JobAwesome implements JobInterface
         try {
             $this->tryHandle();
         } catch (\Throwable $e) {
+            /** @var int $attempts */
             $attempts = $this->attempts();
             if ($this->tryCount < $attempts) {
                 $retryAfter = $this->retryAfter();

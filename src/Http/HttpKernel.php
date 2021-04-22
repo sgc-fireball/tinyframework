@@ -15,7 +15,10 @@ class HttpKernel extends Kernel implements HttpKernelInterface
     /** @var Closure[] */
     private array $terminateCallbacks = [];
 
-    private ?Request $request;
+    /** @var Closure[] */
+    private array $terminateRequestCallbacks = [];
+
+    private ?Request $request = null;
 
     public function handle(Request $request): Response
     {
@@ -39,9 +42,7 @@ class HttpKernel extends Kernel implements HttpKernelInterface
                 ]
             );
         }
-        $response->header('X-Request-ID', $request->id())->header('X-Response-ID', $response->id())->send();
-        $this->terminate($request, $response);
-        return $response;
+        return $response->header('X-Request-ID', $request->id())->header('X-Response-ID', $response->id());
     }
 
     public function handleException(\Throwable $e): int
@@ -51,6 +52,8 @@ class HttpKernel extends Kernel implements HttpKernelInterface
             ->header('X-Request-ID', $this->request ? $this->request->id() : '')
             ->header('X-Response-ID', $response->id())
             ->send();
+        $this->terminateRequest($this->request, $response);
+        $this->terminate();
         die();
     }
 
@@ -93,11 +96,24 @@ class HttpKernel extends Kernel implements HttpKernelInterface
         }, $request);
     }
 
-    private function terminate(Request $request, Response $response): self
+    public function terminateRequest(Request $request, Response $response): self
+    {
+        foreach ($this->terminateRequestCallbacks as $callback) {
+            try {
+                $this->container->call($callback, ['request' => $request, 'response' => $response]);
+            } catch (\Throwable $e) {
+                $this->container->get('logger')->error(exception2text($e));
+            }
+        }
+        $this->terminateRequestCallbacks = [];
+        return $this;
+    }
+
+    public function terminate(): self
     {
         foreach ($this->terminateCallbacks as $callback) {
             try {
-                $this->container->call($callback, ['request' => $request, 'response' => $response]);
+                $this->container->call($callback);
             } catch (\Throwable $e) {
                 $this->container->get('logger')->error(exception2text($e));
             }
@@ -108,6 +124,12 @@ class HttpKernel extends Kernel implements HttpKernelInterface
     public function terminateCallback(Closure $closure): self
     {
         $this->terminateCallbacks[] = $closure;
+        return $this;
+    }
+
+    public function terminateRequestCallback(Closure $closure): self
+    {
+        $this->terminateRequestCallbacks[] = $closure;
         return $this;
     }
 

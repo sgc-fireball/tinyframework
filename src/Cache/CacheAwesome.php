@@ -73,9 +73,6 @@ abstract class CacheAwesome implements CacheInterface, ArrayAccess
 
     public function tag(array|string $tags): CacheAwesome
     {
-        if (!is_array($tags) && !is_string($tags)) {
-            throw new \InvalidArgumentException('Argument #1 must be a type of array|string.');
-        }
         $class = get_class($this);
         $instance = new $class($this->config);
         $instance->tags = array_map(function (string $tag) {

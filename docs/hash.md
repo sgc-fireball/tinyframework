@@ -3,7 +3,9 @@
 - [Introduction](#introduction)
 
 ## Introduction
+
 ```php
-$hash = hash()->hash($value); // string
-hash()->verify($value, $hash); // bool
+$value = 'foobar';
+$hash = hasher()->hash($value); // string
+hasher()->verify($value, $hash); // bool
 ```

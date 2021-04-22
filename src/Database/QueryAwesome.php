@@ -189,7 +189,7 @@ abstract class QueryAwesome implements QueryInterface
         return $this->buildModels($this->load());
     }
 
-    public function first(): BaseModel|null
+    public function first(): BaseModel|array|null
     {
         $result = $this->limit(1)->load();
         if (is_array($result) && isset($result[0])) {
@@ -209,7 +209,7 @@ abstract class QueryAwesome implements QueryInterface
     public function paginate(int $perPage = 20, int $page = 1): array
     {
         $count = $this->count();
-        $perPage = min(max(1, $perPage), 1000);
+        $perPage = max(1, $perPage);
         $pages = max(1, ceil($count / $perPage));
         $page = min(max(1, $page), $pages);
         return [
@@ -220,6 +220,36 @@ abstract class QueryAwesome implements QueryInterface
                 'count' => $count,
             ]
         ];
+    }
+
+    public function each(callable $callable, int $chunk = 1000): array
+    {
+        $next = 1;
+        $results = [];
+        do {
+            $paginate = $this->paginate($chunk, $next);
+            foreach ($paginate['data'] as &$item) {
+                call_user_func($callable, $results[] = $this->buildModel($item));
+            }
+            $next++;
+        } while ($next <= $paginate['paging']['pages']);
+        return $results;
+    }
+
+    public function filter(callable $callable, int $chunk = 1000): array
+    {
+        $next = 1;
+        $results = [];
+        do {
+            $paginate = $this->paginate($chunk, $next);
+            foreach ($paginate['data'] as &$item) {
+                if (call_user_func($callable, $item = $this->buildModel($item))) {
+                    $results[] = $item;
+                }
+            }
+            $next++;
+        } while ($next <= $paginate['paging']['pages']);
+        return $results;
     }
 
     protected function buildModels(array $results = []): array
@@ -245,8 +275,16 @@ abstract class QueryAwesome implements QueryInterface
 
     public function byModel(BaseModel|string $model): QueryAwesome
     {
-        $this->class = is_object($model) ? get_class($model) : (string)$model;
-        $this->table = $model instanceof BaseModel ? $model->getTable() : (new $this->class)->getTable();
+        $class = is_object($model) ? get_class($model) : (string)$model;
+        if (!class_exists($class)) {
+            throw new \RuntimeException('Class does not exists: ' . $class);
+        }
+        $this->class = $class;
+        $model = $model instanceof BaseModel ? $model : (new $this->class);
+        if (!method_exists($model, 'getTable')) {
+            throw new \RuntimeException('Missing method ' . $class . '@getTable.');
+        }
+        $this->table = $model->getTable();
         return $this;
     }
 

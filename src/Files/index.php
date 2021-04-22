@@ -15,5 +15,9 @@ if (file_exists('vendor/composer/platform_check.php')) {
 }
 
 $container = Container::instance()->singleton(DotEnvInterface::class, DotEnv::class);
+/** @var HttpKernel $kernel */
 $kernel = $container->get(HttpKernel::class);
-$container->call([$kernel, 'handle'], ['request' => Request::fromGlobal()]);
+$response = $container->call([$kernel, 'handle'], ['request' => $request = Request::fromGlobal()]);
+$response->send();
+$kernel->terminateRequest($request, $response);
+$kernel->terminate();

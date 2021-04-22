@@ -16,6 +16,7 @@ class Database implements DatabaseInterface
         'database' => null,
         'charset' => 'utf8mb4',
         'collation' => 'utf8mb4_general_ci',
+        'timezone' => 'UTC',
     ];
 
     protected ?mysqli $connection = null;
@@ -37,6 +38,7 @@ class Database implements DatabaseInterface
         if (!$this->connection) {
             $this->connection = new mysqli($this->config['host'], $this->config['username'], $this->config['password'], $this->config['database'], $this->config['port']);
             $this->connection->query(sprintf("SET NAMES %s COLLATE %s", $this->config['charset'], $this->config['collation']));
+            $this->connection->query(sprintf('SET time_zone = "%s";', (new \DateTime('now', new \DateTimeZone($this->config['timezone'])))->format('P')));
             $this->connection->query('SET SESSION sql_mode = "STRICT_TRANS_TABLES"');
         }
         return $this;
@@ -88,21 +90,20 @@ class Database implements DatabaseInterface
     {
         return new Query($this);
     }
-    
+
     public function execute(string $query): array|bool
     {
         $result = $this->connect()->connection->query($query);
+        if ($result === false) {
+            throw new \RuntimeException(
+                sprintf('Error %s: %s',
+                    $this->connect()->connection->errno,
+                    $this->connect()->connection->error
+                )
+            );
+        }
         if (mb_strpos($query, 'SELECT') === 0) {
-            if ($result === false) {
-                throw new \RuntimeException(
-                    sprintf('Error %s: %s',
-                        $this->connect()->connection->errno,
-                        $this->connect()->connection->error
-                    )
-                );
-            }
-            $data = (array)mysqli_fetch_all($result, MYSQLI_ASSOC);
-            return $data;
+            return (array)mysqli_fetch_all($result, MYSQLI_ASSOC);
         }
         return $result;
     }
@@ -110,6 +111,18 @@ class Database implements DatabaseInterface
     public function getLastInsertId(): int|string
     {
         return mysqli_insert_id($this->connect()->connection);
+    }
+
+    public function createMigrationTable(): Database
+    {
+        $this->connect()->execute(implode(" ", [
+            'CREATE TABLE IF NOT EXISTS `migrations` (',
+            '`id` varchar(255) NOT NULL,',
+            '`batch` int(11) unsigned NOT NULL,',
+            'PRIMARY KEY (`migration`)',
+            ')',
+        ]));
+        return $this;
     }
 
 }

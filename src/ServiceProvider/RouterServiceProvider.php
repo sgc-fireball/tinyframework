@@ -12,9 +12,8 @@ class RouterServiceProvider extends ServiceProviderAwesome
     {
         $this->container
             ->alias('router', Router::class)
-            ->singleton(Router::class, function (ContainerInterface $container) {
-                $router = new Router($container);
-                return $router->load();
+            ->singleton(Router::class, function () {
+                return (new Router($this->container))->load();
             });
     }
 

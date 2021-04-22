@@ -33,7 +33,9 @@ class TinyframeworkCronjobCommand extends CommandAwesome
             function (CronjobInterface $job) use ($now) {
                 $cron = CronExpression::factory($job->expression());
                 $mustRun = $cron->isDue($now);
-                if (!$mustRun && $this->output->verbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                /** @var int $verbosity */
+                $verbosity = $this->output->verbosity();
+                if (!$mustRun && $verbosity >= OutputInterface::VERBOSITY_VERBOSE) {
                     $this->output->writeln(sprintf(
                         "\r[<gold>SKIP</gold>] <yellow>%s</yellow> next: %s",
                         get_class($job),

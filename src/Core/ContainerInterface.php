@@ -13,6 +13,11 @@ interface ContainerInterface
 
     public function has(string $key): bool;
 
+    /**
+     * @param string $key
+     * @param array $parameters
+     * @return mixed
+     */
     public function get(string $key, array $parameters = []);
 
     public function resolveAlias(string|array|callable|object $key): string|array|callable|object;

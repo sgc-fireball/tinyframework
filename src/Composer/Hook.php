@@ -37,25 +37,28 @@ class Hook
             'storage/psych',
             'storage/cache',
             'storage/sessions',
+            'storage/xhprof',
         ];
         foreach ($folders as $folder) {
             if (!is_dir('./' . $folder)) {
-                mkdir('./' . $folder, 0755, true);
+                mkdir('./' . $folder, 0750, true);
             }
         }
     }
 
     private static function installFiles(): void
     {
-        if (!file_exists('./console')) {
-            copy(__DIR__ . '/../Files/console.php', './console');
-        }
+        copy(__DIR__ . '/../Files/console.php', './console');
         if (!is_executable('./console')) {
             chmod('./console', 0700);
         }
-        if (!file_exists('public/index.php')) {
-            copy(__DIR__ . '/../Files/index.php', 'public/index.php');
+
+        copy(__DIR__ . '/../Files/swoole.php', './swoole');
+        if (!is_executable('./swoole')) {
+            chmod('./swoole', 0700);
         }
+
+        copy(__DIR__ . '/../Files/index.php', 'public/index.php');
     }
 
 }

@@ -23,7 +23,7 @@ class CryptServiceProvider extends ServiceProviderAwesome
             unset($config['driver']);
             $this->container
                 ->alias($name, $class)
-                ->singleton($class, function (ContainerInterface $container) use ($class, $config) {
+                ->singleton($class, function () use ($class, $config) {
                     return $this->container->call($class, $config);
                 });
         }

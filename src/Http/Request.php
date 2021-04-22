@@ -2,8 +2,8 @@
 
 namespace TinyFramework\Http;
 
-use Couchbase\SearchSortScore;
 use TinyFramework\Session\SessionInterface;
+use Swoole\Http\Request as SwooleRequest;
 
 class Request
 {
@@ -38,7 +38,46 @@ class Request
 
     private ?string $ip = null;
 
-    public static function fromGlobal()
+    public static function fromSwooleRequest(SwooleRequest $req): Request
+    {
+        /** @see https://www.swoole.co.uk/docs/modules/swoole-http-request */
+        $request = new self();
+        $request->ip = $req->server['remote_addr'];
+        $request->method = strtoupper($req->getMethod());
+        $request->uri = new Uri(sprintf(
+            '%s://%s%s%s',
+            to_bool($req->server['https'] ?? 'off') ? 'https' : 'http',
+            array_key_exists('remote_user', $req->server) ? $req->server['remote_user'] . '@' : '',
+            $req->header['host'] ?? 'localhost',
+            $req->server['request_uri'] ?? '/'
+        ));
+        $request->protocol = $req->server['server_protocol'] ?? 'HTTP/1.0';
+        $request->get = $req->get ?? [];
+        $request->post = $req->post ?? [];
+        $request->cookie = $req->cookie ?? [];
+        $request->files = $req->files ?? [];
+        $request->header = $req->header ?? [];
+        $request->server = $req->server ?? [];
+        $request->server['swoole'] = true;
+        if (array_key_exists('_method', $request->get)) {
+            $request->method = strtoupper($request->get['_method'] ?: $request->method);
+            unset($request->get['_method']);
+        }
+        if (array_key_exists('_method', $request->post)) {
+            $request->method = strtoupper($request->post['_method'] ?: $request->method);
+            unset($request->post['_method']);
+        }
+        if (in_array($request->method, ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'PATCH', 'PURGE', 'TRACE'], true)) {
+            return $request;
+        }
+        if (!preg_match('/^[A-Z]++$/D', $request->method)) {
+            throw new \RuntimeException(sprintf('Invalid method override "%s".', $request->method));
+        }
+        $request->body = $req->rawcontent();
+        return $request;
+    }
+
+    public static function fromGlobal(): Request
     {
         $request = new self();
         $request->ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
@@ -181,7 +220,7 @@ class Request
         return $this;
     }
 
-    public function session(SessionInterface $session = null): Request|SessionInterface
+    public function session(SessionInterface $session = null): Request|SessionInterface|null
     {
         if (is_null($session)) {
             return $this->session;

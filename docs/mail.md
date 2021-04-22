@@ -3,11 +3,12 @@
 - [Introduction](#introduction)
 
 ## Introduction
+
 ```php
-/** @var \TinyFramework\Mail\Mailer $mailer */
-$mailer = container('mailer');
-$mailer->send(
-    (new \TinyFramework\Mail\Mail())
+use TinyFramework\Mail\Mail;
+
+mailer()->send(
+    Mail::create()
         ->to('example@domain.tld', 'Example')
         ->subject('my subject')
         ->text('My plaintext message')
