@@ -1,6 +1,6 @@
 {
   "name": "sgc-fireball/tinyframework",
-  "license": "CC-BY-4.0-or-later",
+  "license": "CC-BY-4.0",
   "type": "framework",
   "autoload": {
     "files": [
