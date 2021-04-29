@@ -24,6 +24,7 @@ class TranslationLoader
 
     public function load(string $locale): TranslationLoader
     {
+        // @TODO implement cache
         if (array_key_exists($locale, $this->translations)) {
             return $this;
         }

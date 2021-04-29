@@ -231,14 +231,8 @@ class Container implements ContainerInterface
      * @param array $parameters
      * @return array
      */
-    private function buildArgumentsByParameters($reflection, array $parameters = []): array
+    private function buildArgumentsByParameters(ReflectionFunction|ReflectionMethod $reflection, array $parameters = []): array
     {
-        if (!($reflection instanceof ReflectionFunction || $reflection instanceof ReflectionMethod)) {
-            throw new \InvalidArgumentException(sprintf(
-                'Argument #1 must be a type of ReflectionFunction|ReflectionMethod, but %s given.',
-                get_class($reflection)
-            ));
-        }
         $arguments = [];
         /**
          * @var int $index

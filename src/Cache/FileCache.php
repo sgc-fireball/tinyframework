@@ -26,7 +26,7 @@ class FileCache extends CacheAwesome
         return sprintf('%s/%s.cache.tmp', $this->path, hash('sha3-256', $key));
     }
 
-    public function clear(): FileCache
+    public function clear(): static
     {
         if (count($this->tags)) {
             foreach ($this->tags as $tag) {
@@ -65,7 +65,7 @@ class FileCache extends CacheAwesome
         return true;
     }
 
-    public function set(string $key, $value = null, null|int|\DateTime|\DateTimeInterface $ttl = null): FileCache
+    public function set(string $key, $value = null, null|int|\DateTime|\DateTimeInterface $ttl = null): static
     {
         $file = $this->key2file($key);
         if (file_put_contents($file, serialize($value)) === false) {
@@ -78,7 +78,7 @@ class FileCache extends CacheAwesome
         return $this;
     }
 
-    public function forget(string $key): FileCache
+    public function forget(string $key): static
     {
         $file = $this->key2file($key);
         if (!file_exists($file)) {
@@ -90,7 +90,7 @@ class FileCache extends CacheAwesome
         throw new \RuntimeException('Could not clear cache key.');
     }
 
-    private function addKeyToTags(string $key): FileCache
+    private function addKeyToTags(string $key): static
     {
         foreach ($this->tags as $tag) {
             $keys = $this->get($tag) ?? [];

@@ -54,9 +54,6 @@ abstract class QueryAwesome implements QueryInterface
         if ($field instanceof Closure) {
             return $this->whereNested($field);
         }
-        if (!is_string($field)) {
-            throw new \TypeError(sprintf('Argument 1 passed to %s() must be of the type string or Closure.', __METHOD__));
-        }
         $this->wheres[] = [
             'type' => 'basic',
             'boolean' => 'and',

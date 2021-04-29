@@ -84,6 +84,7 @@ abstract class Kernel implements KernelInterface
             }
         }
 
+        // @TODO implement load Providers by Namespace
         $root = root_dir();
         if (is_dir($root . '/app/Providers')) {
             foreach (glob($root . '/app/Providers/*.php') as $file) {

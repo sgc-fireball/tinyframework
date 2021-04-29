@@ -33,7 +33,7 @@ class RedisCache extends CacheAwesome
         $this->redis->setOption(Redis::OPT_READ_TIMEOUT, $this->config['read_write_timeout']);
     }
 
-    public function clear(): RedisCache
+    public function clear(): static
     {
         $deleteKeys = [];
         if (count($this->tags)) {
@@ -65,7 +65,7 @@ class RedisCache extends CacheAwesome
         return $this->redis->exists($key) > 0;
     }
 
-    public function set(string $key, $value = null, null|int|\DateTime|\DateTimeInterface $ttl = null): RedisCache
+    public function set(string $key, $value = null, null|int|\DateTime|\DateTimeInterface $ttl = null): static
     {
         $ttl = $this->calculateExpiration($ttl);
         if (is_null($ttl)) {
@@ -77,7 +77,7 @@ class RedisCache extends CacheAwesome
         return $this;
     }
 
-    public function forget(string $key): RedisCache
+    public function forget(string $key): static
     {
         $this->redis->del($key);
         return $this;
@@ -97,7 +97,7 @@ class RedisCache extends CacheAwesome
         return $ttl;
     }
 
-    private function addKeyToTags(string $key): RedisCache
+    private function addKeyToTags(string $key): static
     {
         foreach ($this->tags as $tag) {
             $insert = true;

@@ -36,6 +36,7 @@ EOF;
     protected function boot(): void
     {
         parent::boot();
+        // @TODO implement loadCommandsByNamespace
         $this->loadCommandsByPath(__DIR__ . '/Commands', '\\TinyFramework\\Console\\Commands\\');
         /** @var CommandAwesome $command */
         foreach ($this->container->tagged('commands') as $command) {

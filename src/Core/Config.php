@@ -12,6 +12,7 @@ class Config implements ConfigInterface
     public function __construct(array $config)
     {
         $this->config = array_merge($this->config, $config);
+        // @TODO implement config cache
         $this->loadFolder(__DIR__ . '/config');
         $this->loadFolder(root_dir() . '/config');
     }

@@ -7,7 +7,7 @@ class ArrayCache extends CacheAwesome
 
     private array $cache = [];
 
-    public function clear(): ArrayCache
+    public function clear(): static
     {
         if (count($this->tags)) {
             foreach ($this->tags as $tag) {
@@ -42,7 +42,7 @@ class ArrayCache extends CacheAwesome
         return false;
     }
 
-    public function set(string $key, $value = null,null|int|\DateTime|\DateTimeInterface $ttl = null): ArrayCache
+    public function set(string $key, $value = null,null|int|\DateTime|\DateTimeInterface $ttl = null): static
     {
         $this->cache[$key] = [
             'value' => serialize($value),
@@ -52,7 +52,7 @@ class ArrayCache extends CacheAwesome
         return $this;
     }
 
-    public function forget(string $key): ArrayCache
+    public function forget(string $key): static
     {
         if (array_key_exists($key, $this->cache)) {
             unset($this->cache[$key]);
@@ -60,7 +60,7 @@ class ArrayCache extends CacheAwesome
         return $this;
     }
 
-    private function addKeyToTags(string $key): ArrayCache
+    private function addKeyToTags(string $key): static
     {
         foreach ($this->tags as $tag) {
             if (!array_key_exists($tag, $this->cache)) {

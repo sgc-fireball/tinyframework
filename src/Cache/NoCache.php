@@ -20,12 +20,12 @@ class NoCache extends CacheAwesome
         return false;
     }
 
-    public function set(string $key, $value = null,null|int|\DateTime|\DateTimeInterface $ttl = null): NoCache
+    public function set(string $key, $value = null,null|int|\DateTime|\DateTimeInterface $ttl = null): static
     {
         return $this;
     }
 
-    public function forget(string $key): NoCache
+    public function forget(string $key): static
     {
         return $this;
     }
