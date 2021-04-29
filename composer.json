@@ -21,6 +21,8 @@
     "ext-redis": "*",
     "ext-fileinfo": "*",
     "ext-pcntl": "*",
+    "roave/security-advisories": "dev-master",
+    "jetbrains/phpstorm-attributes": "dev-master",
     "swiftmailer/swiftmailer": "^6.0",
     "dragonmantank/cron-expression": "^3.0.1"
   },
