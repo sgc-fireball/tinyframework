@@ -21,7 +21,7 @@ class FileSession extends SessionAwesome implements SessionInterface
         $this->ttl = (int)$config['ttl'] ?? $this->ttl;
     }
 
-    public function open(string $id = null): SessionInterface
+    public function open(string $id = null): static
     {
         if (!is_null($id)) {
             $this->id = $id;
@@ -37,7 +37,7 @@ class FileSession extends SessionAwesome implements SessionInterface
         return $this;
     }
 
-    public function clear(): SessionInterface
+    public function clear(): static
     {
         foreach (glob(sprintf('%s/*.session.tmp', $this->path)) as $file) {
             if (file_exists($file)) {
@@ -47,7 +47,7 @@ class FileSession extends SessionAwesome implements SessionInterface
         return $this;
     }
 
-    public function close(): SessionInterface
+    public function close(): static
     {
         $file = sprintf('%s/%s.session.tmp', $this->path, $this->getId());
         if (!is_writable($this->path)) {
@@ -62,7 +62,7 @@ class FileSession extends SessionAwesome implements SessionInterface
         return $this;
     }
 
-    public function destroy(): SessionInterface
+    public function destroy(): static
     {
         $file = sprintf('%s/%s.session.tmp', $this->path, $this->getId());
         if (file_exists($file)) {

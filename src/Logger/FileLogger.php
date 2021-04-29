@@ -21,7 +21,7 @@ class FileLogger extends LoggerAwesome implements LoggerInterface
         throw new \RuntimeException('Missing logs folder.');
     }
 
-    public function log(string $level, string $message, array $context = []): LoggerInterface
+    public function log(string $level, string $message, array $context = []): static
     {
         $message = sprintf(
             '[%s|%s] %s', date('Y-m-d H:i:s'),

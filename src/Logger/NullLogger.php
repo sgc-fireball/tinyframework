@@ -5,7 +5,7 @@ namespace TinyFramework\Logger;
 class NullLogger extends LoggerAwesome implements LoggerInterface
 {
 
-    public function log(string $level, string $message, array $context = []): LoggerInterface
+    public function log(string $level, string $message, array $context = []): static
     {
         return $this;
     }

@@ -67,7 +67,7 @@ class ProgressBar
         }
     }
 
-    public function fps(int $fps = null): ProgressBar|int
+    public function fps(int $fps = null): static|int
     {
         if ($fps === null) {
             return $this->fps;
@@ -76,13 +76,13 @@ class ProgressBar
         return $this;
     }
 
-    public function message(string $text, string $name = 'message'): ProgressBar
+    public function message(string $text, string $name = 'message'): static
     {
         $this->messages[$name] = $text;
         return $this;
     }
 
-    public function max(int $max = null): ProgressBar|int
+    public function max(int $max = null): static|int
     {
         if ($max === null) {
             return $this->max;
@@ -91,7 +91,7 @@ class ProgressBar
         return $this;
     }
 
-    public function format(string $format = null): ProgressBar|string
+    public function format(string $format = null): static|string
     {
         if ($format === null) {
             return $this->format;
@@ -103,14 +103,14 @@ class ProgressBar
         return $this;
     }
 
-    public function start(): ProgressBar
+    public function start(): static
     {
         $this->step = 0;
         $this->startTime = microtime(true);
         return $this;
     }
 
-    public function advance(): ProgressBar
+    public function advance(): static
     {
         $this->step++;
         if (microtime(true) - $this->lastPrint > 0.1) {
@@ -120,7 +120,7 @@ class ProgressBar
         return $this;
     }
 
-    public function stop(): ProgressBar
+    public function stop(): static
     {
         $this->step = $this->max;
         $this->display();
@@ -128,7 +128,7 @@ class ProgressBar
         return $this;
     }
 
-    public function display(): ProgressBar
+    public function display(): static
     {
         if ($this->output->verbosity() === OutputInterface::VERBOSITY_QUIET) {
             return $this;

@@ -36,7 +36,7 @@ class Uri
         }
     }
 
-    private function clone(): self
+    private function clone(): Uri
     {
         $uri = new self();
         $uri->schema = $this->schema;

@@ -26,7 +26,7 @@ class Router
         $this->container = $container;
     }
 
-    public function load(): self
+    public function load(): static
     {
         $router = $this;
         $files = ['config', 'api', 'web'];
@@ -39,7 +39,7 @@ class Router
         return $this;
     }
 
-    public function pattern(string $name = null, string $regex = null): Router|array|string
+    public function pattern(string $name = null, string $regex = null): static|array|string
     {
         if (!is_null($name) && is_null($regex)) {
             return array_key_exists($name, $this->pattern) ? $this->pattern[$name] : $this->pattern['default'];
@@ -51,7 +51,7 @@ class Router
         return $this;
     }
 
-    public function bind(string $name, Closure $closure = null): Router|callable|null
+    public function bind(string $name, Closure $closure = null): static|callable|null
     {
         if (is_null($closure)) {
             if (array_key_exists($name, $this->bindings)) {
@@ -63,7 +63,7 @@ class Router
         return $this;
     }
 
-    public function middleware($middleware = null): Router|array
+    public function middleware($middleware = null): static|array
     {
         if (is_null($middleware)) {
             return $this->middleware;
@@ -75,7 +75,7 @@ class Router
         return $this;
     }
 
-    public function group(array $options, Closure $inner): self
+    public function group(array $options, Closure $inner): static
     {
         $options['prefix'] = $options['prefix'] ?? '';
         $router = new Router($this->container);

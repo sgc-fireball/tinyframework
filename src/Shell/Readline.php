@@ -24,7 +24,7 @@ class Readline
         readline_completion_function([&$this, 'autocomplete']);
     }
 
-    public function setContext(?Context $context = null): Readline
+    public function setContext(?Context $context = null): static
     {
         foreach ($this->matchers as $matcher) {
             $matcher->setContext($context);
@@ -32,7 +32,7 @@ class Readline
         return $this;
     }
 
-    public function readHistory(): Readline
+    public function readHistory(): static
     {
         if (file_exists($this->historyFile)) {
             if (!is_readable($this->historyFile)) {
@@ -56,7 +56,7 @@ class Readline
         return readline($prompt);
     }
 
-    public function addHistory(string $command): Readline
+    public function addHistory(string $command): static
     {
         if ($command) {
             readline_add_history($command);
@@ -64,7 +64,7 @@ class Readline
         return $this;
     }
 
-    public function saveHistory(): Readline
+    public function saveHistory(): static
     {
         $dir = dirname($this->historyFile);
         if (!is_dir($dir)) {

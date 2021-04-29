@@ -28,7 +28,7 @@ class Route
 
     private array $attributes = [];
 
-    public function method(string $method = null): Route|array
+    public function method(string $method = null): static|array
     {
         if (is_null($method)) {
             return $this->method;
@@ -37,7 +37,7 @@ class Route
         return $this;
     }
 
-    public function scheme(string $scheme = null): Route|string
+    public function scheme(string $scheme = null): static|string
     {
         if (is_null($scheme)) {
             return $this->scheme;
@@ -46,7 +46,7 @@ class Route
         return $this;
     }
 
-    public function domain(string $domain = null): Route|string
+    public function domain(string $domain = null): static|string
     {
         if (is_null($domain)) {
             return $this->domain;
@@ -55,7 +55,7 @@ class Route
         return $this;
     }
 
-    public function uri(string $uri = null): Route|string
+    public function uri(string $uri = null): static|string
     {
         if (is_null($uri)) {
             return $this->uri;
@@ -64,7 +64,7 @@ class Route
         return $this;
     }
 
-    public function action(Closure|array|string|null $action = null): Route|Closure|array|string|null
+    public function action(Closure|array|string|null $action = null): static|Closure|array|string|null
     {
         if (is_null($action)) {
             return $this->action;
@@ -73,7 +73,7 @@ class Route
         return $this;
     }
 
-    public function name(string $name = null): Route|string|null
+    public function name(string $name = null): static|string|null
     {
         if (is_null($name)) {
             return $this->name;
@@ -84,9 +84,9 @@ class Route
 
     /**
      * @param string|array|null $middlewares
-     * @return $this|array
+     * @return static|array
      */
-    public function middleware($middlewares = null): Route|array
+    public function middleware($middlewares = null): static|array
     {
         if (is_null($middlewares)) {
             return $this->middleware;
@@ -104,7 +104,7 @@ class Route
         return $this;
     }
 
-    public function pattern(string $name = null, string $regex = null): Route|array|string
+    public function pattern(string $name = null, string $regex = null): static|array|string
     {
         if (!is_null($name) && is_null($regex)) {
             return array_key_exists($name, $this->pattern) ? $this->pattern[$name] : $this->pattern['default'];
@@ -116,7 +116,7 @@ class Route
         return $this;
     }
 
-    public function parameter(string|array $key = null, $value = null): Route|array
+    public function parameter(string|array $key = null, $value = null): static|array
     {
         if (is_null($key)) {
             return $this->parameter;

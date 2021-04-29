@@ -9,7 +9,7 @@ class VariableTabCompletion implements TabCompletionInterface
 
     private ?Context $context = null;
 
-    public function setContext(?Context $context = null): TabCompletionInterface
+    public function setContext(?Context $context = null): static
     {
         $this->context = $context;
         return $this;

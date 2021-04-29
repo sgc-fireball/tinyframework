@@ -139,7 +139,7 @@ class Request
         return $this->id;
     }
 
-    public function get($key = null, $value = null)
+    public function get($key = null, $value = null): mixed
     {
         if (is_null($key)) {
             return $this->get;
@@ -157,7 +157,7 @@ class Request
         return $this;
     }
 
-    public function post($key = null, string $value = null)
+    public function post($key = null, string $value = null): mixed
     {
         if (is_null($key)) {
             return $this->post;
@@ -175,7 +175,7 @@ class Request
         return $this;
     }
 
-    public function cookie($key = null, string $value = null)
+    public function cookie($key = null, string $value = null): mixed
     {
         if (is_null($key)) {
             return $this->cookie;
@@ -193,7 +193,7 @@ class Request
         return $this;
     }
 
-    public function file($key = null, string $value = null)
+    public function file($key = null, string $value = null): mixed
     {
         if (is_null($key)) {
             return $this->files;
@@ -211,7 +211,7 @@ class Request
         return $this;
     }
 
-    public function route(Route $route = null): Request|Route
+    public function route(Route $route = null): static|Route
     {
         if (is_null($route)) {
             return $this->route;
@@ -220,7 +220,7 @@ class Request
         return $this;
     }
 
-    public function session(SessionInterface $session = null): Request|SessionInterface|null
+    public function session(SessionInterface $session = null): static|SessionInterface|null
     {
         if (is_null($session)) {
             return $this->session;
@@ -231,7 +231,7 @@ class Request
 
     /**
      * @param mixed|null $user
-     * @return $this|null|mixed
+     * @return static|null|mixed
      */
     public function user($user = null)
     {
@@ -261,7 +261,7 @@ class Request
         return $request;
     }
 
-    public function method(string $method = null): Request|string
+    public function method(string $method = null): static|string
     {
         if (is_null($method)) {
             return $this->method;
@@ -284,7 +284,7 @@ class Request
         return $request;
     }
 
-    public function protocol(string $protocol = null): Request|string
+    public function protocol(string $protocol = null): static|string
     {
         if (is_null($protocol)) {
             return $this->protocol;
@@ -294,7 +294,7 @@ class Request
         return $request;
     }
 
-    public function header(string $key = null, $value = null): Request|array|string
+    public function header(string $key = null, $value = null): static|array|string
     {
         if (is_null($key)) {
             return $this->header;
@@ -308,7 +308,7 @@ class Request
         return $request;
     }
 
-    public function server(string $key = null, $value = null): Request|array|string
+    public function server(string $key = null, $value = null): static|array|string
     {
         if (is_null($key)) {
             return $this->server;
@@ -322,7 +322,7 @@ class Request
         return $request;
     }
 
-    public function body(string $body = null): Request|string
+    public function body(string $body = null): static|string
     {
         if (is_null($body)) {
             return $this->body;
@@ -332,7 +332,7 @@ class Request
         return $request;
     }
 
-    public function ip(string $ip = null): Request|string
+    public function ip(string $ip = null): static|string
     {
         if (is_null($ip)) {
             return $this->ip;

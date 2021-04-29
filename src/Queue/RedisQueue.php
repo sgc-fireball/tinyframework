@@ -35,7 +35,7 @@ class RedisQueue implements QueueInterface
         $this->redis->setOption(Redis::OPT_READ_TIMEOUT, $this->config['read_write_timeout']);
     }
 
-    public function name(string $name = null): QueueInterface|string
+    public function name(string $name = null): RedisQueue|string
     {
         if (is_null($name)) {
             return $this->config['name'];
@@ -47,10 +47,8 @@ class RedisQueue implements QueueInterface
 
     /**
      * @see https://redis.io/commands/rpush
-     * @param JobInterface $job
-     * @return QueueInterface
      */
-    public function push(JobInterface $job): QueueInterface
+    public function push(JobInterface $job): static
     {
         if (!$job->delay()) {
             return $this->repush($job);
@@ -63,7 +61,7 @@ class RedisQueue implements QueueInterface
         return $this;
     }
 
-    private function repush(JobInterface $job): QueueInterface
+    private function repush(JobInterface $job): static
     {
         $queue = method_exists($job, 'queue') ? $job->queue() : $this->config['name'];
         $data = serialize($job);

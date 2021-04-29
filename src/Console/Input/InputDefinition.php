@@ -42,7 +42,7 @@ class InputDefinition implements InputDefinitionInterface
             ->option(Option::create('no-interaction', 'n', null, 'Do not ask any interactive question.'));
     }
 
-    public function name(string $name = null): InputDefinitionInterface|string
+    public function name(string $name = null): static|string
     {
         if (is_null($name)) {
             return $this->name;
@@ -51,7 +51,7 @@ class InputDefinition implements InputDefinitionInterface
         return $this;
     }
 
-    public function description(string $description = null): InputDefinitionInterface|string|null
+    public function description(string $description = null): static|string|null
     {
         if (is_null($description)) {
             return $this->description;
@@ -60,7 +60,7 @@ class InputDefinition implements InputDefinitionInterface
         return $this;
     }
 
-    public function option(Option|string $option = null): InputDefinitionInterface|Option|array|null
+    public function option(Option|string $option = null): static|Option|array|null
     {
         if (is_null($option)) {
             return $this->options;
@@ -79,7 +79,7 @@ class InputDefinition implements InputDefinitionInterface
         return $this;
     }
 
-    public function argument(Argument|string|int $argument = null): InputDefinitionInterface|Argument|array|null
+    public function argument(Argument|string|int $argument = null): static|Argument|array|null
     {
         if (is_null($argument)) {
             return $this->arguments;

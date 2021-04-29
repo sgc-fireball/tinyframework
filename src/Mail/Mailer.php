@@ -18,7 +18,7 @@ class Mailer
     /**
      * @internal
      */
-    public function from(string $email = null, string $name = null): Mailer
+    public function from(string $email = null, string $name = null): static
     {
         $this->fromEmail = $email;
         $this->fromName = $name;
@@ -27,10 +27,8 @@ class Mailer
 
     /**
      * @internal
-     * @param Swift_Mailer|null $mailer
-     * @return $this|Swift_Mailer
      */
-    public function mailer(Swift_Mailer $mailer = null)
+    public function mailer(Swift_Mailer $mailer = null): static|Swift_Mailer
     {
         if (is_null($mailer)) {
             return $this->mailer;

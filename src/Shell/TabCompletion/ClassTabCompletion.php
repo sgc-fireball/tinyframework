@@ -8,7 +8,7 @@ class ClassTabCompletion implements TabCompletionInterface
 {
 
 
-    public function setContext(?Context $context = null): TabCompletionInterface
+    public function setContext(?Context $context = null): static
     {
         return $this;
     }

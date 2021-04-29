@@ -21,9 +21,9 @@ class Pipeline implements PipelineInterface
 
     /**
      * @param Closure|Closure[] $layers
-     * @return PipelineInterface
+     * @return static
      */
-    public function layers($layers): PipelineInterface
+    public function layers($layers): static
     {
         if ($layers instanceof Closure) {
             $layers = [$layers];

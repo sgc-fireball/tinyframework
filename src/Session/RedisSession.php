@@ -34,7 +34,7 @@ class RedisSession extends SessionAwesome implements SessionInterface
         $this->redis->setOption(Redis::OPT_READ_TIMEOUT, $this->config['read_write_timeout']);
     }
 
-    public function open(?string $id): SessionInterface
+    public function open(?string $id): static
     {
         if ($id) {
             $this->id = $id;
@@ -47,13 +47,13 @@ class RedisSession extends SessionAwesome implements SessionInterface
         return $this;
     }
 
-    public function close(): SessionInterface
+    public function close(): static
     {
         $this->redis->setex($this->getId(), $this->config['ttl'], serialize($this->data));
         return $this;
     }
 
-    public function destroy(): SessionInterface
+    public function destroy(): static
     {
         if ($this->redis->exists($this->getId())) {
             $this->redis->del($this->getId());
@@ -61,7 +61,7 @@ class RedisSession extends SessionAwesome implements SessionInterface
         return $this;
     }
 
-    public function clear(): SessionInterface
+    public function clear(): static
     {
         $deleteKeys = $this->redis->keys('*');
         if (count($deleteKeys)) {

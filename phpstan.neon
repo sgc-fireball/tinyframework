@@ -1,11 +1,9 @@
 parameters:
     ignoreErrors:
-        -
-            # @see https://github.com/phpstan/phpstan/issues/2673
-            # @see https://github.com/phpstan/phpstan/issues/2548
-            # @see https://github.com/phpstan/phpstan/issues/3831
-            message: '(^Comparison operation ">" between 0 and 0 is always false\.$)'
-            path: src/Template/Blade.php
+        - '#If condition is always false.#'
+        - '#has invalid typehint type Composer\\Script\\Event#'
+        - '#Function tideways_#'
+        - '#Constant TIDEWAYS_#'
     level: 5
     paths:
         - src

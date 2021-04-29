@@ -71,7 +71,7 @@ class PHP implements ViewInterface
         return $content;
     }
 
-    public function clear(): ViewInterface
+    public function clear(): static
     {
         return $this;
     }

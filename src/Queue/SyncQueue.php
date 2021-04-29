@@ -5,11 +5,7 @@ namespace TinyFramework\Queue;
 class SyncQueue implements QueueInterface
 {
 
-    /**
-     * @param JobInterface $job
-     * @return QueueInterface
-     */
-    public function push(JobInterface $job): QueueInterface
+    public function push(JobInterface $job): static
     {
         try {
             $job->handle();
@@ -19,7 +15,7 @@ class SyncQueue implements QueueInterface
         return $this;
     }
 
-    public function name(string $name = null): QueueInterface|string
+    public function name(string $name = null): static|string
     {
         if (is_null($name)) {
             return 'default';

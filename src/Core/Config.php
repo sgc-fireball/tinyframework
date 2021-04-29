@@ -17,7 +17,7 @@ class Config implements ConfigInterface
         $this->loadFolder(root_dir() . '/config');
     }
 
-    private function loadFolder(string $path): ConfigInterface
+    private function loadFolder(string $path): static
     {
         if (is_dir($path)) {
             foreach (glob($path . '/*.php') as $file) {
@@ -27,7 +27,7 @@ class Config implements ConfigInterface
         return $this;
     }
 
-    public function load(string $name, string $file): ConfigInterface
+    public function load(string $name, string $file): static
     {
         if (!file_exists($file) || !is_readable($file)) {
             throw new RuntimeException('Could not load config.');
@@ -75,9 +75,9 @@ class Config implements ConfigInterface
     /**
      * @param string $key
      * @param mixed $value
-     * @return $this|ConfigInterface
+     * @return static
      */
-    public function set(string $key, $value): ConfigInterface
+    public function set(string $key, $value): static
     {
         $keys = strpos($key, '.') === false ? [$key] : explode('.', $key);
         $key = $keys[count($keys) - 1];

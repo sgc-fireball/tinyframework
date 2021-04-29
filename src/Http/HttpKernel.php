@@ -96,7 +96,7 @@ class HttpKernel extends Kernel implements HttpKernelInterface
         }, $request);
     }
 
-    public function terminateRequest(Request $request, Response $response): self
+    public function terminateRequest(Request $request, Response $response): static
     {
         foreach ($this->terminateRequestCallbacks as $callback) {
             try {
@@ -109,7 +109,7 @@ class HttpKernel extends Kernel implements HttpKernelInterface
         return $this;
     }
 
-    public function terminate(): self
+    public function terminate(): static
     {
         foreach ($this->terminateCallbacks as $callback) {
             try {
@@ -121,13 +121,13 @@ class HttpKernel extends Kernel implements HttpKernelInterface
         return $this;
     }
 
-    public function terminateCallback(Closure $closure): self
+    public function terminateCallback(Closure $closure): static
     {
         $this->terminateCallbacks[] = $closure;
         return $this;
     }
 
-    public function terminateRequestCallback(Closure $closure): self
+    public function terminateRequestCallback(Closure $closure): static
     {
         $this->terminateRequestCallbacks[] = $closure;
         return $this;

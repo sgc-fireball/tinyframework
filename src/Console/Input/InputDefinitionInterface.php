@@ -16,7 +16,7 @@ interface InputDefinitionInterface
 
     /**
      * @param string|null $description
-     * @return $this|string|null
+     * @return static|string|null
      */
     public function description(string $description = null): InputDefinitionInterface|string|null;
 

@@ -15,7 +15,7 @@ class Translator implements TranslatorInterface
         $this->locale($locale);
     }
 
-    public function locale(string $locale = null): TranslatorInterface|string
+    public function locale(string $locale = null): static|string
     {
         if ($locale === null) {
             return $this->locale;

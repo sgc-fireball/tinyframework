@@ -54,7 +54,11 @@ class Argument
         return ($this->mode & self::VALUE_OPTIONAL) === self::VALUE_OPTIONAL;
     }
 
-    public function value($value = null)
+    /**
+     * @param mixed|null $value
+     * @return static|mixed
+     */
+    public function value(mixed $value = null)
     {
         if (is_null($value)) {
             return $this->value;

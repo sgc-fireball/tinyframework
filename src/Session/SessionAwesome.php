@@ -32,7 +32,7 @@ abstract class SessionAwesome implements SessionInterface, \ArrayAccess
         return null;
     }
 
-    public function set(string $key, $value): SessionInterface
+    public function set(string $key, $value): static
     {
         if ($value === null && array_key_exists($key, $this->data)) {
             unset($this->data[$key]);
@@ -42,7 +42,7 @@ abstract class SessionAwesome implements SessionInterface, \ArrayAccess
         return $this;
     }
 
-    public function forget(string $key): SessionInterface
+    public function forget(string $key): static
     {
         if (array_key_exists($key, $this->data)) {
             unset($this->data[$key]);

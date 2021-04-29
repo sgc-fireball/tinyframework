@@ -32,7 +32,7 @@ class Input implements InputInterface
         return $this->argv;
     }
 
-    public function inputDefinition(InputDefinitionInterface $inputDefinition = null): InputInterface|InputDefinitionInterface
+    public function inputDefinition(InputDefinitionInterface $inputDefinition = null): static|InputDefinitionInterface
     {
         if (!is_null($inputDefinition)) {
             $this->inputDefinition = $inputDefinition;

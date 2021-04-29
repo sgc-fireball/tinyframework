@@ -27,11 +27,11 @@ class Mail
 
     private int $priority = 3;
 
-    private string $subject = '';
+    private ?string $subject = null;
 
-    private string $text = '';
+    private ?string $text = null;
 
-    private string $html = '';
+    private ?string $html = null;
 
     private array $attachments = [];
 
@@ -40,7 +40,7 @@ class Mail
         return new self();
     }
 
-    public function header(string $key = null, string $value = null)
+    public function header(string $key = null, string $value = null): static|array
     {
         if (is_null($key)) {
             return $this->header;
@@ -52,7 +52,7 @@ class Mail
         return $this;
     }
 
-    public function sender(string $email = null)
+    public function sender(string $email = null): static|string|null
     {
         if (is_null($email)) {
             return $this->sender;
@@ -61,7 +61,7 @@ class Mail
         return $this;
     }
 
-    public function returnPath(string $email = null)
+    public function returnPath(string $email = null): static|string|null
     {
         if (is_null($email)) {
             return $this->returnPath;
@@ -70,7 +70,7 @@ class Mail
         return $this;
     }
 
-    public function from(string $email = null, string $name = null)
+    public function from(string $email = null, string $name = null): static|array
     {
         if (is_null($email)) {
             return $this->from;
@@ -79,7 +79,7 @@ class Mail
         return $this;
     }
 
-    public function to(string $email = null, string $name = null): Mail|array
+    public function to(string $email = null, string $name = null): static|array
     {
         if (is_null($email)) {
             return $this->to;
@@ -88,7 +88,7 @@ class Mail
         return $this;
     }
 
-    public function cc(string $email = null, string $name = null): Mail|array
+    public function cc(string $email = null, string $name = null): static|array
     {
         if (is_null($email)) {
             return $this->cc;
@@ -97,7 +97,7 @@ class Mail
         return $this;
     }
 
-    public function bcc(string $email = null, string $name = null): Mail|array
+    public function bcc(string $email = null, string $name = null): static|array
     {
         if (is_null($email)) {
             return $this->bcc;
@@ -106,7 +106,7 @@ class Mail
         return $this;
     }
 
-    public function priority(int $priority = null)
+    public function priority(int $priority = null): static|int
     {
         if (is_null($priority)) {
             return $this->priority;
@@ -115,11 +115,7 @@ class Mail
         return $this;
     }
 
-    /**
-     * @param string|null $subject
-     * @return $this|string
-     */
-    public function subject(string $subject = null)
+    public function subject(string $subject = null): static|string|null
     {
         if (is_null($subject)) {
             return $this->subject;
@@ -128,11 +124,7 @@ class Mail
         return $this;
     }
 
-    /**
-     * @param string|null $text
-     * @return $this|string
-     */
-    public function text(string $text = null)
+    public function text(string $text = null): static|string|null
     {
         if (is_null($text)) {
             return $this->text;
@@ -141,11 +133,7 @@ class Mail
         return $this;
     }
 
-    /**
-     * @param string|null $html
-     * @return $this|string
-     */
-    public function html(string $html = null)
+    public function html(string $html = null): static|string|null
     {
         if (is_null($html)) {
             return $this->html;
@@ -159,7 +147,7 @@ class Mail
         return $this->attachments;
     }
 
-    public function attachmentFile(string $path, string $filename = null, string $mimeType = null)
+    public function attachmentFile(string $path, string $filename = null, string $mimeType = null): static
     {
         if (!file_exists($path)) {
             throw new \RuntimeException('File not found.');
@@ -172,7 +160,7 @@ class Mail
         return $this;
     }
 
-    public function attachmentBody(string $content, string $filename, string $mimeType)
+    public function attachmentBody(string $content, string $filename, string $mimeType): static
     {
         $this->attachments = ['content' => $content, 'filename' => $filename, 'mimetype' => $mimeType];
         return $this;

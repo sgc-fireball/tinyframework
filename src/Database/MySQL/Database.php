@@ -31,9 +31,9 @@ class Database implements DatabaseInterface
     }
 
     /**
-     * @return $this
+     * @return static
      */
-    public function connect(): Database
+    public function connect(): static
     {
         if (!$this->connection) {
             $this->connection = new mysqli($this->config['host'], $this->config['username'], $this->config['password'], $this->config['database'], $this->config['port']);
@@ -45,17 +45,17 @@ class Database implements DatabaseInterface
     }
 
     /**
-     * @return $this
+     * @return static
      */
-    public function reconnect(): Database
+    public function reconnect(): static
     {
         return $this->disconnect()->connect();
     }
 
     /**
-     * @return $this
+     * @return static
      */
-    public function disconnect(): Database
+    public function disconnect(): static
     {
         if ($this->connection) {
             $this->connection->close();
@@ -113,7 +113,7 @@ class Database implements DatabaseInterface
         return mysqli_insert_id($this->connect()->connection);
     }
 
-    public function createMigrationTable(): Database
+    public function createMigrationTable(): static
     {
         $this->connect()->execute(implode(" ", [
             'CREATE TABLE IF NOT EXISTS `migrations` (',

@@ -71,7 +71,7 @@ abstract class CacheAwesome implements CacheInterface, ArrayAccess
         return time() + $ttl;
     }
 
-    public function tag(array|string $tags): static
+    public function tag(array|string $tags): CacheAwesome
     {
         $class = get_class($this);
         $instance = new $class($this->config);

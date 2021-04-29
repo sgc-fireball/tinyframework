@@ -11,7 +11,7 @@ class DotEnv implements DotEnvInterface
     {
     }
 
-    public static function instance(): DotEnvInterface
+    public static function instance(): DotEnv
     {
         if (!(self::$instance instanceof DotEnv)) {
             self::$instance = new self();
@@ -19,7 +19,7 @@ class DotEnv implements DotEnvInterface
         return self::$instance;
     }
 
-    public function load(string $file): DotEnvInterface
+    public function load(string $file): static
     {
         if (!file_exists($file)) {
             return $this;

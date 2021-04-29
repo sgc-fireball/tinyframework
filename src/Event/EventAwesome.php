@@ -7,7 +7,7 @@ abstract class EventAwesome implements EventInterface
 
     protected bool $propagationStopped = false;
 
-    final public function stopPropagation(): EventInterface
+    final public function stopPropagation(): static
     {
         $this->propagationStopped = true;
         return $this;

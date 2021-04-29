@@ -132,13 +132,13 @@ class Blade implements ViewInterface
         return trim($content);
     }
 
-    public function addPreCompiler(Closure $compiler): ViewInterface
+    public function addPreCompiler(Closure $compiler): static
     {
         $this->preCompilers[] = $compiler;
         return $this;
     }
 
-    public function addPostCompiler(Closure $compiler): ViewInterface
+    public function addPostCompiler(Closure $compiler): static
     {
         $this->postCompilers[] = $compiler;
         return $this;
@@ -491,7 +491,7 @@ class Blade implements ViewInterface
         return trim(str_replace($id, '', $sectionContent));
     }
 
-    public function clear(): ViewInterface
+    public function clear(): static
     {
         $this->cache->clear();
         return $this;

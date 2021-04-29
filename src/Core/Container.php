@@ -32,9 +32,9 @@ class Container implements ContainerInterface
     /**
      * @param string|string[] $tags
      * @param string|string[] $instances
-     * @return self
+     * @return static
      */
-    public function tag($tags, $instances): ContainerInterface
+    public function tag($tags, $instances): static
     {
         $tags = is_string($tags) ? [$tags] : $tags;
         $instances = is_string($instances) ? [$instances] : $instances;
@@ -55,7 +55,7 @@ class Container implements ContainerInterface
         }, $this->tags[$tag] ?? []);
     }
 
-    public static function instance(): ContainerInterface
+    public static function instance(): Container
     {
         if (is_null(self::$container)) {
             self::$container = new self();
@@ -95,13 +95,13 @@ class Container implements ContainerInterface
         return $key;
     }
 
-    public function singleton(string $key, string|array|callable|object $object): ContainerInterface
+    public function singleton(string $key, string|array|callable|object $object): static
     {
         $this->instances[$key] = $object;
         return $this;
     }
 
-    public function alias(string $alias, string $key): ContainerInterface
+    public function alias(string $alias, string $key): static
     {
         $this->aliases[$alias] = $key;
         return $this;

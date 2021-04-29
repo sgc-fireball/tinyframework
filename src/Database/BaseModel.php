@@ -29,7 +29,7 @@ class BaseModel implements JsonSerializable, ArrayAccess
         return $this->table;
     }
 
-    public function fill(array $attributes = [], bool $force = false)
+    public function fill(array $attributes = [], bool $force = false): static
     {
         foreach ($attributes as $key => $value) {
             if (in_array($key, $this->fillable) || $force) {
@@ -41,10 +41,10 @@ class BaseModel implements JsonSerializable, ArrayAccess
 
     /**
      * @param array $attributes
-     * @return $this
+     * @return static
      * @internal use only from Database
      */
-    public function forceFill(array $attributes = [])
+    public function forceFill(array $attributes = []): static
     {
         $this->attributes = $this->originals = $attributes;
         return $this;
@@ -119,7 +119,7 @@ class BaseModel implements JsonSerializable, ArrayAccess
         return $database->query()->table((new $class())->getTable())->class($class);
     }
 
-    public function save(): self
+    public function save(): static
     {
         if (!array_key_exists('id', $this->attributes) || empty($this->attributes['id'])) {
             if ($this->primaryType === 'string') {
@@ -134,7 +134,7 @@ class BaseModel implements JsonSerializable, ArrayAccess
         return $this;
     }
 
-    public function delete(): self
+    public function delete(): static
     {
         if (array_key_exists('id', $this->attributes) && !empty($this->attributes['id'])) {
             $this::query()->where('id', '=', $this->attributes['id'])->delete();

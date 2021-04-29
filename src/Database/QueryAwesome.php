@@ -31,25 +31,25 @@ abstract class QueryAwesome implements QueryInterface
         $this->driver = $driver;
     }
 
-    public function select(array $fields = []): QueryAwesome
+    public function select(array $fields = []): static
     {
         $this->select = $fields;
         return $this;
     }
 
-    public function table(string $table): QueryAwesome
+    public function table(string $table): static
     {
         $this->table = $table;
         return $this;
     }
 
-    public function class(string $class): QueryAwesome
+    public function class(string $class): static
     {
         $this->class = $class;
         return $this;
     }
 
-    public function where(string|Closure $field, string $operation = null, $value = null): QueryAwesome
+    public function where(string|Closure $field, string $operation = null, $value = null): static
     {
         if ($field instanceof Closure) {
             return $this->whereNested($field);
@@ -64,7 +64,7 @@ abstract class QueryAwesome implements QueryInterface
         return $this;
     }
 
-    public function whereNull(string $field): QueryAwesome
+    public function whereNull(string $field): static
     {
         $this->wheres[] = [
             'type' => 'basic',
@@ -76,7 +76,7 @@ abstract class QueryAwesome implements QueryInterface
         return $this;
     }
 
-    public function whereNotNull(string $field): QueryAwesome
+    public function whereNotNull(string $field): static
     {
         $this->wheres[] = [
             'type' => 'basic',
@@ -88,7 +88,7 @@ abstract class QueryAwesome implements QueryInterface
         return $this;
     }
 
-    public function orWhere(string|Closure $field, string $operation, $value): QueryAwesome
+    public function orWhere(string|Closure $field, string $operation, $value): static
     {
         if ($field instanceof Closure) {
             return $this->whereNested($field);
@@ -103,7 +103,7 @@ abstract class QueryAwesome implements QueryInterface
         return $this;
     }
 
-    public function orWhereNull(string $field, string $operation, $value): QueryAwesome
+    public function orWhereNull(string $field, string $operation, $value): static
     {
         $this->wheres[] = [
             'type' => 'basic',
@@ -115,7 +115,7 @@ abstract class QueryAwesome implements QueryInterface
         return $this;
     }
 
-    public function orWhereNotNull(string $field, string $operation, $value): QueryAwesome
+    public function orWhereNotNull(string $field, string $operation, $value): static
     {
         $this->wheres[] = [
             'type' => 'basic',
@@ -127,7 +127,7 @@ abstract class QueryAwesome implements QueryInterface
         return $this;
     }
 
-    public function whereNested(Closure $callback): QueryAwesome
+    public function whereNested(Closure $callback): static
     {
         $class = get_class($this);
         call_user_func($callback, $query = (new $class($this->driver))->table($this->table));
@@ -141,7 +141,7 @@ abstract class QueryAwesome implements QueryInterface
         return $this;
     }
 
-    public function orWhereNested(Closure $callback): QueryAwesome
+    public function orWhereNested(Closure $callback): static
     {
         $class = get_class($this);
         call_user_func($callback, $query = (new $class($this->driver))->table($this->table));
@@ -155,7 +155,7 @@ abstract class QueryAwesome implements QueryInterface
         return $this;
     }
 
-    public function orderBy(string $field, string $order = 'asc'): QueryAwesome
+    public function orderBy(string $field, string $order = 'asc'): static
     {
         $order = mb_strtolower($order);
         $order = in_array($order, ['asc', 'desc']) ? $order : 'asc';
@@ -163,19 +163,19 @@ abstract class QueryAwesome implements QueryInterface
         return $this;
     }
 
-    public function groupBy(string $field): QueryAwesome
+    public function groupBy(string $field): static
     {
         $this->groups[] = $field;
         return $this;
     }
 
-    public function limit(int $limit): QueryAwesome
+    public function limit(int $limit): static
     {
         $this->limit = max(1, $limit);
         return $this;
     }
 
-    public function offset(int $offset): QueryAwesome
+    public function offset(int $offset): static
     {
         $this->offset = max(0, $offset);
         return $this;
@@ -270,7 +270,7 @@ abstract class QueryAwesome implements QueryInterface
         return $result;
     }
 
-    public function byModel(BaseModel|string $model): QueryAwesome
+    public function byModel(BaseModel|string $model): static
     {
         $class = is_object($model) ? get_class($model) : (string)$model;
         if (!class_exists($class)) {

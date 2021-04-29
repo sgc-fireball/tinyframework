@@ -111,7 +111,7 @@ class Output implements OutputInterface
         return $this->height;
     }
 
-    public function ansi(bool $ansi = null): OutputInterface|bool
+    public function ansi(bool $ansi = null): static|bool
     {
         if (is_null($ansi)) {
             return $this->ansi;
@@ -120,7 +120,7 @@ class Output implements OutputInterface
         return $this;
     }
 
-    public function quiet(bool $quiet = null): OutputInterface|bool
+    public function quiet(bool $quiet = null): static|bool
     {
         if (is_null($quiet)) {
             return $this->verbosity === -1;
@@ -129,7 +129,7 @@ class Output implements OutputInterface
         return $this;
     }
 
-    public function verbosity(int $verbosity = null): OutputInterface|int
+    public function verbosity(int $verbosity = null): static|int
     {
         if (is_null($verbosity)) {
             return max(-1, min($this->verbosity, 3));

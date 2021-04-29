@@ -7,7 +7,7 @@ class EventDispatcher implements EventDispatcherInterface
 
     private array $listeners = [];
 
-    public function addListener(string $eventName, callable $listener, int $priority = 0): EventDispatcherInterface
+    public function addListener(string $eventName, callable $listener, int $priority = 0): static
     {
         if (!array_key_exists($eventName, $this->listeners)) {
             $this->listeners[$eventName] = [];
@@ -19,7 +19,7 @@ class EventDispatcher implements EventDispatcherInterface
         return $this;
     }
 
-    public function removeListener(string $eventName, callable $listener): EventDispatcherInterface
+    public function removeListener(string $eventName, callable $listener): static
     {
         if (array_key_exists($eventName, $this->listeners)) {
             foreach ($this->listeners[$eventName] as $priority => &$listeners) {
@@ -33,7 +33,7 @@ class EventDispatcher implements EventDispatcherInterface
         return $this;
     }
 
-    public function dispatch(EventInterface $event): EventDispatcherInterface
+    public function dispatch(EventInterface $event): static
     {
         $listeners = $this->getListenersForEvent($event);
         foreach ($listeners as $listener) {

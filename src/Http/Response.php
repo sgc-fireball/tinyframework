@@ -3,7 +3,6 @@
 namespace TinyFramework\Http;
 
 use TinyFramework\Session\SessionInterface;
-use TinyFramework\Template\ViewInterface;
 
 class Response
 {
@@ -138,7 +137,7 @@ class Response
         $this->id = guid();
     }
 
-    public function session(SessionInterface $session = null): Response|SessionInterface|null
+    public function session(SessionInterface $session = null): static|SessionInterface|null
     {
         if (is_null($session)) {
             return $this->session;
@@ -147,7 +146,7 @@ class Response
         return $this;
     }
 
-    public function with(string $key, $value): Response
+    public function with(string $key, $value): static
     {
         if ($this->session) {
             $flash = $this->session->get('flash') ?? [];
@@ -157,7 +156,7 @@ class Response
         return $this;
     }
 
-    public function withInput(array $input = null): Response
+    public function withInput(array $input = null): static
     {
         if ($this->session) {
             if (is_null($input)) {
@@ -170,7 +169,7 @@ class Response
         return $this;
     }
 
-    public function withErrors(array $errors = []): Response
+    public function withErrors(array $errors = []): static
     {
         if ($this->session) {
             $this->session->set('flash_errors', $errors);
@@ -183,7 +182,7 @@ class Response
         return $this->id;
     }
 
-    public function code(int $code = null): Response|int
+    public function code(int $code = null): static|int
     {
         if (is_null($code)) {
             return $this->code;
@@ -192,7 +191,7 @@ class Response
         return $this;
     }
 
-    public function protocol(string $protocol = null): Response|string
+    public function protocol(string $protocol = null): static|string
     {
         if (is_null($protocol)) {
             return $this->protocol;
@@ -201,12 +200,12 @@ class Response
         return $this;
     }
 
-    public function type(string $type = null): Response|string
+    public function type(string $type = null): static|string
     {
         return $this->header('content-type', $type);
     }
 
-    public function header(string $key = null, string $value = null): Response|array|null|string
+    public function header(string $key = null, string $value = null): static|array|null|string
     {
         if (is_null($key)) {
             return $this->headers;
@@ -218,7 +217,7 @@ class Response
         return $this;
     }
 
-    public function headers(array $headers = null): Response|array
+    public function headers(array $headers = null): static|array
     {
         if (!is_array($headers)) {
             return $this->headers;
@@ -229,7 +228,7 @@ class Response
         return $this;
     }
 
-    public function content(string $content = null): Response|string|null
+    public function content(string $content = null): static|string|null
     {
         if (is_null($content)) {
             return $this->content;
@@ -238,7 +237,7 @@ class Response
         return $this;
     }
 
-    public function send(): Response
+    public function send(): static
     {
         header(
             sprintf('%s %d %s', $this->protocol, $this->code, static::$codes[$this->code]),

@@ -31,7 +31,7 @@ class Table
         $this->output = $output;
     }
 
-    public function headerTitle(string $title = null): Table|string|null
+    public function headerTitle(string $title = null): static|string|null
     {
         if ($title === null) {
             return $this->headerTitle;
@@ -40,7 +40,7 @@ class Table
         return $this;
     }
 
-    public function footerTitle(string $title = null): Table|string|null
+    public function footerTitle(string $title = null): static|string|null
     {
         if ($title === null) {
             return $this->footerTitle;
@@ -49,7 +49,7 @@ class Table
         return $this;
     }
 
-    public function header(array $header = null): Table|array
+    public function header(array $header = null): static|array
     {
         if ($header === null) {
             return $this->header;
@@ -62,7 +62,7 @@ class Table
         return $this;
     }
 
-    public function format(array $format = null): Table|array
+    public function format(array $format = null): static|array
     {
         if ($format === null) {
             return $this->format;
@@ -71,7 +71,7 @@ class Table
         return $this;
     }
 
-    public function columnWidths(array|string $columnWidths = null): Table|array
+    public function columnWidths(array|string $columnWidths = null): static|array
     {
         if ($columnWidths === null) {
             return $this->columnWidths;
@@ -91,7 +91,7 @@ class Table
         return $this;
     }
 
-    public function rows(array $rows = null): Table|array
+    public function rows(array $rows = null): static|array
     {
         if ($rows === null) {
             return $this->rows;
@@ -116,9 +116,9 @@ class Table
 
     /**
      * @param array|string $row
-     * @return $this
+     * @return static
      */
-    public function row($row): Table
+    public function row($row): static
     {
         if (!is_array($row)) {
             $this->rows[] = 'hr';
@@ -135,7 +135,7 @@ class Table
         return $this;
     }
 
-    public function render(): Table
+    public function render(): static
     {
         $totalLength = $this->output->width() - 2;
         $length = (int)(($totalLength - (1 + $this->cols * 3)) / $this->cols);

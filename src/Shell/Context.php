@@ -7,7 +7,7 @@ class Context
 
     private array $variables = [];
 
-    public function setVariable(string $key, $value): Context
+    public function setVariable(string $key, $value): static
     {
         $this->variables[$key] = $value;
         return $this;
@@ -18,7 +18,7 @@ class Context
         return $this->variables;
     }
 
-    public function setVariables(array $variables): Context
+    public function setVariables(array $variables): static
     {
         $this->variables = $variables;
         return $this;

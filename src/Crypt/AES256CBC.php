@@ -18,7 +18,7 @@ class AES256CBC implements CryptInterface
         }
     }
 
-    public function key(string $key = null): AES256CBC|string
+    public function key(string $key = null): static|string
     {
         if (is_null($key)) {
             return $this->key;

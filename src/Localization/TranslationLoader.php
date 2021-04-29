@@ -16,13 +16,13 @@ class TranslationLoader
         $this->paths[] = root_dir() . '/resources/lang/';
     }
 
-    public function addPath(string $path): TranslationLoader
+    public function addPath(string $path): static
     {
         $this->paths[] = $path;
         return $this;
     }
 
-    public function load(string $locale): TranslationLoader
+    public function load(string $locale): static
     {
         // @TODO implement cache
         if (array_key_exists($locale, $this->translations)) {
@@ -35,7 +35,7 @@ class TranslationLoader
         return $this;
     }
 
-    private function loadFolder(string $locale, string $path): TranslationLoader
+    private function loadFolder(string $locale, string $path): static
     {
         if (!is_dir($path)) {
             return $this;
@@ -49,7 +49,7 @@ class TranslationLoader
         return $this;
     }
 
-    private function loadFile(string $locale, string $file): TranslationLoader
+    private function loadFile(string $locale, string $file): static
     {
         if (!is_file($file)) {
             return $this;

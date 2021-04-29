@@ -18,7 +18,7 @@ class Option
 
     private ?string $description;
 
-    private $value = null;
+    private mixed $value = null;
 
     public static function create(
         string $long,
@@ -80,6 +80,10 @@ class Option
         return ($this->mode & self::VALUE_IS_ARRAY) === self::VALUE_IS_ARRAY;
     }
 
+    /**
+     * @param mixed|null $value
+     * @return static|mixed
+     */
     public function value($value = null)
     {
         if (is_null($value)) {
