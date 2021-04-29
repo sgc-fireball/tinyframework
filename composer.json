@@ -29,6 +29,9 @@
   "require-dev": {
     "phpstan/phpstan": "^0.12"
   },
+  "suggest": {
+    "ext-swoole": "(v4.6.4) To run threaded php webserver"
+  },
   "scripts": {
     "post-install-cmd": [
       "TinyFramework\\Composer\\Hook::postInstallCommand"
