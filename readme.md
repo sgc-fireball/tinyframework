@@ -16,7 +16,7 @@ to be implemented differently and inconsistently.
 
 ## How to start
 ```bash
-composer create-project --stability=dev --remove-vcs sgc-fireball/tinyframework-skeleton my-project --repository="{\"url\": \"https://github.com/sgc-fireball/tinyframework-skeleton.git\", \"type\": \"vcs\"}" master
+composer create-project --stability=dev --remove-vcs sgc-fireball/tinyframework-skeleton my-project master
 cd my-project; php console
 ```
 
