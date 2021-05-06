@@ -30,8 +30,7 @@ class Shell
         $this->readline->readHistory();
         while (true) {
             $line = $this->readline->prompt('$');
-            if (in_array($line, ['exit', 'quit']) || $line === false) {
-                $this->readline->saveHistory();
+            if (in_array($line, ['exit', 'quit', 'bye', 'cya', 'die']) || $line === false) {
                 break;
             }
             if (empty($line)) {
@@ -39,6 +38,7 @@ class Shell
             }
             try {
                 $this->execute($line);
+                $this->readline->saveHistory();
             } catch (\Throwable $e) {
                 $this->output->error($e->getMessage());
             };
@@ -49,7 +49,7 @@ class Shell
     {
         $closure = function () use ($__internal__code) {
             try {
-                ob_start();
+                //ob_start();
                 set_error_handler([$this, 'handleError']);
                 $this->context->setVariable('__internal__code', $__internal__code);
                 $__internal__variables = $this->context->getVariables();
@@ -59,12 +59,12 @@ class Shell
                 $this->context->setVariables(get_defined_vars());
                 $this->readline->addHistory($__internal__code);
                 $this->readline->saveHistory();
-                $content = rtrim(ob_get_clean());
-                if (!empty($content)) {
-                    echo rtrim($content) . PHP_EOL;
-                }
+                //$content = rtrim(ob_get_clean());
+                //if (!empty($content)) {
+                //echo rtrim($content) . PHP_EOL;
+                //}
             } catch (\Throwable $e) {
-                ob_end_clean();
+                //ob_end_clean();
                 throw $e;
             } finally {
                 restore_error_handler();

@@ -2,6 +2,7 @@
 
 namespace TinyFramework\Core;
 
+use TinyFramework\ServiceProvider\BroadcastServiceProvider;
 use TinyFramework\ServiceProvider\ConsoleServiceProvider;
 use TinyFramework\ServiceProvider\CryptServiceProvider;
 use TinyFramework\ServiceProvider\HashServiceProvider;
@@ -61,6 +62,7 @@ abstract class Kernel implements KernelInterface
             RouterServiceProvider::class,
             SessionServiceProvider::class,
             QueueServiceProvider::class,
+            BroadcastServiceProvider::class,
             LocalizationServiceProvider::class,
         ];
         if ($this->runningInConsole()) {
