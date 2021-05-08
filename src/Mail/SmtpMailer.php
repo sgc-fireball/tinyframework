@@ -136,14 +136,23 @@ class SmtpMailer implements MailerInterface
         foreach ($mail->attachments() as $attachment) {
             if (array_key_exists('content', $attachment) || (array_key_exists('path', $attachment) && file_exists($attachment['path']))) {
                 $this->write($fp, sprintf("--%s\r\n", $mixedBoundary), false);
-                $this->write($fp, sprintf("Content-Type: %s; name=\"%s\"\r\n", $attachment['mimetype'] ?? 'application/octet-stream', $attachment['filename']), false);
+                $this->write($fp, sprintf(
+                    "Content-Type: %s; name=\"%s\"\r\n",
+                    $attachment['mimetype'] ?? 'application/octet-stream', $attachment['filename']
+                ), false);
                 $this->write($fp, "Content-Transfer-Encoding: base64\r\n", false);
-                $this->write($fp, sprintf("Content-Disposition: attachment; filename=\"%s\"\r\n\r\n", mb_encode_mimeheader($attachment['filename'], 'UTF-8', 'Q')), false);
-                if (array_key_exists('content', $attachment)) {
-                    $this->write($fp, base64_encode($attachment['content']) . "\r\n", false);
-                } else {
-                    $this->write($fp, base64_encode(file_get_contents($attachment['path'])) . "\r\n", false);
+                $this->write($fp, sprintf(
+                    "Content-Disposition: attachment; filename=\"%s\"\r\n\r\n",
+                    mb_encode_mimeheader($attachment['filename'], 'UTF-8', 'Q')
+                ), false);
+                if (!array_key_exists('content', $attachment)) {
+                    $attachment['content'] = file_get_contents($attachment['path']);
                 }
+                $this->write(
+                    $fp,
+                    trim(wordwrap(base64_encode($attachment['content']), 76, "\r\n", true)) . "\r\n\r\n",
+                    false
+                );
             }
         }
 
@@ -184,7 +193,6 @@ class SmtpMailer implements MailerInterface
 
     private function write($fp, string $message, bool $read = true): string
     {
-        #printf("OUT: %s\n", trim($message));
         fwrite($fp, $message);
         if ($read === false) {
             return '';
@@ -209,7 +217,6 @@ class SmtpMailer implements MailerInterface
         if ($result === false) {
             return false;
         }
-        #printf("IN : %s\n", trim($result));
         return $result;
     }
 
