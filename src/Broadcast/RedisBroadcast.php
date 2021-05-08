@@ -11,6 +11,8 @@ class RedisBroadcast implements BroadcastInterface
 
     private array $config = [];
 
+    private \Closure|array|string|null $callback = null;
+
     public function __construct(array $config = [])
     {
         $this->config['host'] = $config['host'] ?? '127.0.0.1';
@@ -39,23 +41,29 @@ class RedisBroadcast implements BroadcastInterface
 
     public function subscribe(string|array $channel, callable $callback): static
     {
-        $this->redis->subscribe(
-            (array)$channel,
-            function (Redis $connection, string $channel, string $message) use ($callback) {
-                $callback($channel, (array)json_decode($message));
-            }
-        );
+        $this->callback = $callback;
+        $this->redis->subscribe((array)$channel, [$this, 'onMessage']);
         return $this;
+    }
+
+    /**
+     * @param Redis $connection
+     * @param string $channel
+     * @param string $message
+     * @internal
+     */
+    public function onMessage(Redis $connection, string $channel, string $message): void
+    {
+        $callback = $this->callback;
+        if (is_callable($callback)) {
+            $callback($channel, (array)json_decode($message));
+        }
     }
 
     public function psubscribe(string|array $pattern, callable $callback): static
     {
-        $this->redis->psubscribe(
-            (array)$pattern,
-            function (Redis $connection, string $channel, string $message) use ($callback) {
-                $callback($channel, (array)json_decode($message));
-            }
-        );
+        $this->callback = $callback;
+        $this->redis->psubscribe((array)$pattern, [$this, 'onMessage']);
         return $this;
     }
 

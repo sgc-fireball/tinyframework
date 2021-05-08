@@ -175,7 +175,7 @@ class SmtpMailer implements MailerInterface
             $local = $address;
         }
         if (preg_match('/[^\x00-\x7F]/', $local)) {
-            throw new \InvalidArgumentException('Non-ASCII characters not supported in local-part', $address);
+            throw new \InvalidArgumentException('Non-ASCII characters not supported in local-part.');
         }
         return $address;
     }
