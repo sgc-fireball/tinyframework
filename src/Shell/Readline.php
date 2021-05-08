@@ -22,6 +22,7 @@ class Readline
         $this->prompt = $prompt;
         $this->matchers = $matchers;
         readline_completion_function([&$this, 'autocomplete']);
+        readline_info('readline_name', 'tinyframework');
     }
 
     public function setContext(?Context $context = null): static

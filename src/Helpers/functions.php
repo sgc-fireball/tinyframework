@@ -14,6 +14,7 @@ use TinyFramework\Hash\HashInterface;
 use TinyFramework\Http\Response;
 use TinyFramework\Logger\LoggerInterface;
 use TinyFramework\Mail\Mailer;
+use TinyFramework\Mail\MailerInterface;
 use TinyFramework\Queue\QueueInterface;
 use TinyFramework\Session\SessionInterface;
 
@@ -146,7 +147,7 @@ if (!function_exists('crypto')) {
 }
 
 if (!function_exists('mailer')) {
-    function mailer(): Mailer
+    function mailer(): MailerInterface
     {
         return container('mailer');
     }

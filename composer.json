@@ -24,7 +24,6 @@
     "ext-intl": "*",
     "roave/security-advisories": "dev-latest",
     "jetbrains/phpstorm-attributes": "^1.0",
-    "swiftmailer/swiftmailer": "^6.0",
     "dragonmantank/cron-expression": "^3.0.1"
   },
   "require-dev": {

@@ -1,0 +1,216 @@
+<?php declare(strict_types=1);
+
+namespace TinyFramework\Mail;
+
+class SmtpMailer implements MailerInterface
+{
+
+    private array $config = [
+        'host' => 'localhost',
+        'port' => 25,
+        'encryption' => 'tls',
+        'username' => null,
+        'password' => null,
+        'local_domain' => '_',
+        'from_address' => null,
+        'from_name' => null,
+    ];
+
+    public function __construct(array $config = [])
+    {
+        $this->config = array_merge($this->config, $config);
+        $this->config['encryption'] = strtolower($this->config['encryption']);
+        if ($this->config['local_domain'] === '_') {
+            $this->config['local_domain'] = gethostname();
+        }
+    }
+
+    public function send(Mail $mail): bool
+    {
+        /** @see https://tools.ietf.org/html/rfc2821 */
+
+        $from = $mail->from();
+        if (!array_key_exists('email', $from) || !$from['email']) {
+            $mail->from($this->config['from_address'], $this->config['from_name']);
+        }
+
+        $crypto = STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT;
+        if (defined('STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT')) {
+            $crypto = STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT | STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT;
+        }
+
+        $fp = stream_socket_client($this->config['host'] . ':' . $this->config['port'], $errno, $errstr);
+        if ($this->config['encryption'] === 'ssl') {
+            stream_socket_enable_crypto($fp, true, $crypto);
+        }
+        $this->read($fp);
+        if ($this->config['encryption'] === 'tls') {
+            $this->write($fp, "STARTTLS\r\n");
+            stream_socket_enable_crypto($fp, true, $crypto);
+        }
+        $this->write($fp, sprintf("HELO %s\r\n", idn_to_ascii($this->config['local_domain'])));
+
+        if (strlen((string)$this->config['username']) && strlen((string)$this->config['password'])) {
+            if (!in_array($this->config['encryption'], ['ssl', 'tls'])) {
+                throw new \RuntimeException('Does not support login without encryption!');
+            }
+            $this->write($fp, "AUTH LOGIN\r\n");
+            $this->write($fp, base64_encode($this->config['username']) . "\r\n");
+            $this->write($fp, base64_encode($this->config['password']) . "\r\n");
+        }
+
+        $this->write($fp, sprintf("MAIL FROM: <%s>\r\n", $this->encodeAddress($mail->from()['email'])));
+        foreach ($mail->to() as $to) {
+            $this->write($fp, sprintf("RCPT TO: <%s>\r\n", $this->encodeAddress($to['email'])));
+        }
+        $this->write($fp, "DATA\r\n");
+
+        $this->write($fp, sprintf("Message-ID: <%s>\r\n", $this->encodeAddress(guid() . '@' . $this->config['local_domain'])), false);
+        $this->write($fp, sprintf("Date: %s\r\n", date('r')), false);
+        $this->write($fp, sprintf("User-Agent: TinyFramework/0.1 PHP/%s\r\n", phpversion()), false);
+        $this->write($fp, sprintf("Subject: %s\r\n", mb_encode_mimeheader($mail->subject(), 'UTF-8', 'Q')), false);
+
+        if ($from = $this->compileAddressHeader([$mail->from()])) {
+            $this->write($fp, "From: " . trim($from) . "\r\n", false);
+        }
+        if ($to = $this->compileAddressHeader($mail->to())) {
+            $this->write($fp, "To: " . trim($to) . "\r\n", false);
+        }
+        if ($cc = $this->compileAddressHeader($mail->cc())) {
+            $this->write($fp, "Cc: " . trim($cc) . "\r\n", false);
+        }
+        if ($bcc = $this->compileAddressHeader($mail->bcc())) {
+            $this->write($fp, "Bcc: " . trim($bcc) . "\r\n", false);
+        }
+        if ($mail->returnPath()) {
+            $this->write($fp, sprintf("Return-Path: %s\r\n", $this->encodeAddress($mail->returnPath())), false);
+        }
+        if ($mail->replyTo()) {
+            $this->write($fp, sprintf("Reply-To: %s\r\n", $this->encodeAddress($mail->replyTo())), false);
+        }
+        if ($mail->priority() !== Mail::PRIORITY_NORMAL) {
+            $this->write($fp, sprintf("X-Priority: %d\r\n", $mail->priority()), false);
+        }
+        foreach ($mail->header() as $key => $values) {
+            if (is_array($values)) {
+                foreach ($values as $value) {
+                    $this->write($fp, sprintf("%s: %s\r\n", $key, $value), false);
+                }
+            } else {
+                $this->write($fp, sprintf("%s: %s\r\n", $key, $values), false);
+            }
+        }
+
+        /**
+         * @see https://stackoverflow.com/questions/3902455/mail-multipart-alternative-vs-multipart-mixed
+         */
+        $this->write($fp, "MIME-Version: 1.0\r\n", false);
+
+        $this->write($fp, sprintf("Content-Type: multipart/mixed; boundary=\"%s\"\r\n\r\n", $mixedBoundary = guid()), false);
+        $this->write($fp, sprintf("--%s\r\n", $mixedBoundary), false);
+
+        $this->write($fp, sprintf("Content-Type: multipart/related; boundary=\"%s\"\r\n\r\n", $relatedBoundary = guid()), false);
+        $this->write($fp, sprintf("--%s\r\n", $relatedBoundary), false);
+
+        $this->write($fp, sprintf("Content-Type: multipart/alternative; boundary=\"%s\"\r\n\r\n", $alternativeBoundary = guid()), false);
+        $this->write($fp, sprintf("--%s\r\n", $alternativeBoundary), false);
+        $this->write($fp, "Content-Type: text/plain;charset=\"utf-8\"\r\n", false);
+        $this->write($fp, "Content-Transfer-Encoding: quoted-printable\r\n\r\n", false);
+        $this->write($fp, quoted_printable_encode(trim($mail->text())) . "\r\n\r\n", false);
+        $this->write($fp, sprintf("--%s\r\n", $alternativeBoundary), false);
+        $this->write($fp, "Content-Type: text/html;charset=\"utf-8\"\r\n", false);
+        $this->write($fp, "Content-Transfer-Encoding: quoted-printable\r\n\r\n", false);
+        $this->write($fp, quoted_printable_encode(trim($mail->html())) . "\r\n\r\n", false);
+        $this->write($fp, sprintf("--%s--\r\n\r\n", $alternativeBoundary), false);
+
+        //$this->write($fp, sprintf("--%s\r\n", $relatedBoundary), false);
+        //$this->write($fp, "Content-Type: image/jpgeg;name=\"masthead.png\"\r\n", false);
+        //$this->write($fp, "Content-Transfer-Encoding: base64\r\n", false);
+        //$this->write($fp, "Content-Disposition: inline;filename=\"masthead.png\"\r\n", false);
+        //$this->write($fp, "Content-ID: <masthead.png@".idn_to_ascii($this->config['local_domain']).">\r\n\r\n", false); // src=\"cid:masthead.png@".idn_to_ascii($this->config['local_domain'])."\"
+        //$this->write($fp, base64_encode(file_get_contents('/dev/null')."\r\n".), false);
+        // html images
+
+        $this->write($fp, sprintf("--%s--\r\n\r\n", $relatedBoundary), false);
+
+        foreach ($mail->attachments() as $attachment) {
+            if (array_key_exists('content', $attachment) || (array_key_exists('path', $attachment) && file_exists($attachment['path']))) {
+                $this->write($fp, sprintf("--%s\r\n", $mixedBoundary), false);
+                $this->write($fp, sprintf("Content-Type: %s; name=\"%s\"\r\n", $attachment['mimetype'] ?? 'application/octet-stream', $attachment['filename']), false);
+                $this->write($fp, "Content-Transfer-Encoding: base64\r\n", false);
+                $this->write($fp, sprintf("Content-Disposition: attachment; filename=\"%s\"\r\n\r\n", mb_encode_mimeheader($attachment['filename'], 'UTF-8', 'Q')), false);
+                if (array_key_exists('content', $attachment)) {
+                    $this->write($fp, base64_encode($attachment['content']) . "\r\n", false);
+                } else {
+                    $this->write($fp, base64_encode(file_get_contents($attachment['path'])) . "\r\n", false);
+                }
+            }
+        }
+
+        $this->write($fp, sprintf("--%s--\r\n\r\n", $mixedBoundary), false);
+
+        $this->write($fp, ".\r\n",);
+        $this->write($fp, "QUIT\r\n", false);
+        fclose($fp);
+
+        return true;
+    }
+
+    private function encodeAddress(string $address): string
+    {
+        if ($i = strrpos($address, '@')) {
+            $local = substr($address, 0, $i);
+            $domain = substr($address, $i + 1);
+            $address = sprintf('%s@%s', $local, idn_to_ascii($domain));
+        } else {
+            $local = $address;
+        }
+        if (preg_match('/[^\x00-\x7F]/', $local)) {
+            throw new \InvalidArgumentException('Non-ASCII characters not supported in local-part', $address);
+        }
+        return $address;
+    }
+
+    private function compileAddressHeader(array $items): string
+    {
+        return trim(array_reduce($items, function ($result, $item) {
+            $line = $this->encodeAddress($item['email']);
+            if ($item['name'] && $item['name'] !== $item['email']) {
+                $line = sprintf('%s <%s>', mb_encode_mimeheader($item['name'], 'UTF-8', 'Q'), $line);
+            }
+            return $result . ', ' . $line;
+        }, ''), ',');
+    }
+
+    private function write($fp, string $message, bool $read = true): string
+    {
+        #printf("OUT: %s\n", trim($message));
+        fwrite($fp, $message);
+        if ($read === false) {
+            return '';
+        }
+        $response = '';
+        do {
+            $line = $this->read($fp);
+            if ($line === false) {
+                throw new \RuntimeException('Could not read from mail socket.');
+            }
+            if (preg_match('/^(\d{3})\s.*/', $line) && !preg_match('/^([23]\d{2})\s.*/', $line)) {
+                throw new \RuntimeException(trim($line));
+            }
+            $response .= $line;
+        } while (!preg_match('/^([23]\d{2})\s.*/', $line));
+        return $response;
+    }
+
+    private function read($fp): string|false
+    {
+        $result = fread($fp, 8192);
+        if ($result === false) {
+            return false;
+        }
+        #printf("IN : %s\n", trim($result));
+        return $result;
+    }
+
+}

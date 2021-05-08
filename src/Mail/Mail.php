@@ -17,6 +17,8 @@ class Mail
 
     private ?string $returnPath = null;
 
+    private ?string $replyTo = null;
+
     private array $from = [];
 
     private array $to = [];
@@ -40,7 +42,7 @@ class Mail
         return new self();
     }
 
-    public function header(string $key = null, string $value = null): static|array
+    public function header(string $key = null, array|string $value = null, bool $replace = true): static|array
     {
         if (is_null($key)) {
             return $this->header;
@@ -48,7 +50,11 @@ class Mail
         if (is_null($value)) {
             throw new \RuntimeException('Missing header value!');
         }
-        $this->header[$key] = $value;
+        if ($replace) {
+            $this->header[$key] = $value;
+        } else {
+            $this->header[$key] = array_merge([$this->header[$key]], (array)$value);
+        }
         return $this;
     }
 
@@ -70,10 +76,25 @@ class Mail
         return $this;
     }
 
+    public function replyTo(string $email = null): static|string|null
+    {
+        if (is_null($email)) {
+            return $this->replyTo;
+        }
+        $this->replyTo = $email;
+        return $this;
+    }
+
     public function from(string $email = null, string $name = null): static|array
     {
         if (is_null($email)) {
             return $this->from;
+        }
+        if (is_null($this->sender)) {
+            $this->sender = $email;
+        }
+        if (is_null($this->returnPath)) {
+            $this->returnPath = $email;
         }
         $this->from = ['email' => $email, 'name' => $name ?? $email];
         return $this;
@@ -127,6 +148,11 @@ class Mail
     public function text(string $text = null): static|string|null
     {
         if (is_null($text)) {
+            if (is_null($this->text)) {
+                $text = str_replace(["\r", "\n"], '', (string)$this->html);
+                $text = str_replace(['<br>', '<br/>', '<br />'], "\n", $text);
+                return strip_tags($text);
+            }
             return $this->text;
         }
         $this->text = $text;
@@ -136,6 +162,9 @@ class Mail
     public function html(string $html = null): static|string|null
     {
         if (is_null($html)) {
+            if (is_null($this->html)) {
+                return nl2br((string)$this->text);
+            }
             return $this->html;
         }
         $this->html = $html;
@@ -152,17 +181,21 @@ class Mail
         if (!file_exists($path)) {
             throw new \RuntimeException('File not found.');
         }
-        $this->attachments = [
+        $this->attachments[] = [
             'path' => $path,
             'filename' => $filename ?? basename($path),
-            'mimetype' => $mimeType ?? mime_content_type($path)
+            'mimetype' => $mimeType ?? mime_content_type($path) ?? 'application/octet-stream'
         ];
         return $this;
     }
 
-    public function attachmentBody(string $content, string $filename, string $mimeType): static
+    public function attachmentBody(string $content, string $filename, string $mimeType = 'application/octet-stream'): static
     {
-        $this->attachments = ['content' => $content, 'filename' => $filename, 'mimetype' => $mimeType];
+        $this->attachments[] = [
+            'content' => $content,
+            'filename' => $filename,
+            'mimetype' => $mimeType ?? 'application/octet-stream'
+        ];
         return $this;
     }
 

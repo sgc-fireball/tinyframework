@@ -11,9 +11,6 @@ class SessionServiceProvider extends ServiceProviderAwesome
     public function register()
     {
         $globalConfig = $this->container->get('config')->get('session');
-        if (is_null($globalConfig)) {
-            return;
-        }
 
         $config = $globalConfig[$globalConfig['default']] ?? [];
         $config['ttl'] = $globalConfig['ttl'];

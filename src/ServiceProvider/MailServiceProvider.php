@@ -2,61 +2,27 @@
 
 namespace TinyFramework\ServiceProvider;
 
-use TinyFramework\Core\ContainerInterface;
 use TinyFramework\Mail\Mailer;
-use Swift_Transport;
-use Swift_Mailer;
+use TinyFramework\Mail\MailerInterface;
 
 class MailServiceProvider extends ServiceProviderAwesome
 {
 
     public function register()
     {
+        $globalConfig = $this->container->get('config')->get('mail');
+        $config = $globalConfig[$globalConfig['default']] ?? [];
+        $config['from_address'] = $globalConfig['from']['address'] ?? null;
+        $config['from_name'] = $globalConfig['from']['name'] ?? null;
+
         $this->container
-            ->alias('mailer', Mailer::Class)
-            ->singleton(Mailer::class, function () {
-                if (!class_exists(Swift_Mailer::class)) {
-                    throw new \RuntimeException('MailServiceProvider: Could not found class Swift_Mailer.');
-                }
-
-                $config = $this->container->get('config')->get('mail');
-                $driver = $config['default'];
-                $fromAddress = ($config['from'] ?? [])['address'] ?? null;
-                $fromName = ($config['from'] ?? [])['name'] ?? null;
-                $config = $config[$driver] ?? [];
-                $driver = $config['driver'];
-                unset($config['driver']);
-
-                $mailer = new Mailer();
-                $mailer->from($fromAddress, $fromName ?? $fromAddress);
-                $mailer->mailer(
-                    new Swift_Mailer(
-                        $this->setParameterFromArray(
-                            $adapter = $this->container->call($driver, $config),
-                            $config
-                        )
-                    )
-                );
-                return $mailer;
+            ->alias('mail', $config['driver'])
+            ->alias('mailer', $config['driver'])
+            ->alias(MailerInterface::class, $config['driver'])
+            ->singleton($config['driver'], function () use ($config) {
+                $class = $config['driver'];
+                return new $class($config);
             });
-    }
-
-    private function setParameterFromArray(Swift_Transport $adapter, array $config): Swift_Transport
-    {
-        foreach ($config as $key => $value) {
-            $key = preg_replace_callback("/_[a-z]/", function ($match) {
-                return ltrim(strtoupper($match[0]), '_');
-            }, $key);
-            $method = 'set' . ucfirst($key);
-            if (method_exists($adapter, '__call') || method_exists($adapter, $method) && !is_null($value)) {
-                try {
-                    $adapter->{$method}($value);
-                } catch (\Throwable $e) {
-                    // ignore
-                }
-            }
-        }
-        return $adapter;
     }
 
 }
