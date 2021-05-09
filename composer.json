@@ -10,6 +10,11 @@
       "TinyFramework\\": "src/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "TinyFramework\\Tests\\": "tests/"
+    }
+  },
   "require": {
     "php": ">=8.0",
     "ext-json": "*",
@@ -23,11 +28,11 @@
     "ext-pcntl": "*",
     "ext-intl": "*",
     "roave/security-advisories": "dev-latest",
-    "jetbrains/phpstorm-attributes": "^1.0",
-    "dragonmantank/cron-expression": "^3.0.1"
+    "jetbrains/phpstorm-attributes": "^1.0"
   },
   "require-dev": {
-    "phpstan/phpstan": "^0.12"
+    "phpstan/phpstan": "^0.12",
+    "phpunit/phpunit": "^9.5.4"
   },
   "suggest": {
     "ext-swoole": "(v4.6.4) To run threaded php webserver"
@@ -42,9 +47,13 @@
     "analyse": [
       "@php $(which composer) dump-autoload",
       "@php vendor/bin/phpstan analyse"
+    ],
+    "test": [
+      "@php vendor/bin/phpunit"
     ]
   },
   "scripts-descriptions": {
-    "analyse": "Dump autoload and analyse the source with phpstan!"
+    "analyse": "Dump autoload and analyse the source with phpstan!",
+    "test": "Starts the framework unit tests."
   }
 }

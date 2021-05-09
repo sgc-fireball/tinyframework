@@ -2,8 +2,8 @@
 
 namespace TinyFramework\Console\Commands;
 
-use Cron\CronExpression;
 use TinyFramework\Console\CommandAwesome;
+use TinyFramework\Cron\CronExpression;
 use TinyFramework\Cron\CronjobInterface;
 use TinyFramework\Console\Input\InputDefinitionInterface;
 use TinyFramework\Console\Input\InputInterface;
@@ -31,7 +31,7 @@ class TinyframeworkCronjobCommand extends CommandAwesome
         $jobs = array_filter(
             $this->container->tagged('cronjob'),
             function (CronjobInterface $job) use ($now) {
-                $cron = CronExpression::factory($job->expression());
+                $cron = new CronExpression($job->expression());
                 $mustRun = $cron->isDue($now);
                 /** @var int $verbosity */
                 $verbosity = $this->output->verbosity();

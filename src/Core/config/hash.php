@@ -5,7 +5,7 @@ return [
 
     'bcrypt' => [
         'driver' => \TinyFramework\Hash\BCrypt::class,
-        'cost' => 10,
+        'cost' => env('BCRYPT_COST', 10),
     ],
 
     'sha1' => [

@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 return [
-    'enable' => extension_loaded('xhprof') ? env('XHPROF_ENABLE', false) : false,
+    'enable' => extension_loaded('xhprof') ? to_bool(env('XHPROF_ENABLE', false)) : false,
 
     'percent' => env('XHPROF_PERCENT', 100),
 
