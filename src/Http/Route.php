@@ -14,7 +14,7 @@ class Route
 
     private string $domain = '.*';
 
-    private string $uri = '/';
+    private string $url = '/';
 
     private Closure|array|string|null $action = null;
 
@@ -55,12 +55,12 @@ class Route
         return $this;
     }
 
-    public function uri(string $uri = null): static|string
+    public function url(string $url = null): static|string
     {
-        if (is_null($uri)) {
-            return $this->uri;
+        if (is_null($url)) {
+            return $this->url;
         }
-        $this->uri = $uri;
+        $this->url = $url;
         return $this;
     }
 

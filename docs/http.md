@@ -5,6 +5,6 @@
 - [Response](./http/response.md)
 - [Router](./http/router.md)
     - [Route](./http/router/route.md)
-- [Uri](./http/uri.md)
+- [Url](./http/url.md)
 
 ## Introduction

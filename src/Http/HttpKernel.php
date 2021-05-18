@@ -30,7 +30,7 @@ class HttpKernel extends Kernel implements HttpKernelInterface
                 $response = $this->callRoute($route, $request);
             }
             if (!$response) {
-                throw new HttpException('Page not found! ' . $request->uri(), 404);
+                throw new HttpException('Page not found! ' . $request->url(), 404);
             }
         } catch (\Throwable $e) {
             $response = $this->throwableToResponse($e);
@@ -42,7 +42,10 @@ class HttpKernel extends Kernel implements HttpKernelInterface
                 ]
             );
         }
-        return $response->header('X-Request-ID', $request->id())->header('X-Response-ID', $response->id());
+        return $response
+            ->header('X-Request-ID', $request->id())
+            ->header('X-Response-ID', $response->id())
+            ->header('X-Response-Duration', round(microtime(true) - TINYFRAMEWORK_START, 4) . ' sec.');
     }
 
     public function handleException(\Throwable $e): int
@@ -51,6 +54,7 @@ class HttpKernel extends Kernel implements HttpKernelInterface
         $response
             ->header('X-Request-ID', $this->request ? $this->request->id() : '')
             ->header('X-Response-ID', $response->id())
+            ->header('X-Response-Duration', round(microtime(true) - TINYFRAMEWORK_START, 4) . ' sec.')
             ->send();
         $this->terminateRequest($this->request, $response);
         $this->terminate();

@@ -2,16 +2,16 @@
 
 namespace TinyFramework\Http;
 
-class Uri
+class URL implements \Stringable
 {
 
     private ?string $schema = null;
 
-    private ?string$user = null;
+    private ?string $user = null;
 
-    private ?string$pass = null;
+    private ?string $pass = null;
 
-    private ?string$host = null;
+    private ?string $host = null;
 
     private ?int $port = null;
 
@@ -21,10 +21,10 @@ class Uri
 
     private ?string $fragment = null;
 
-    public function __construct(string $uri = null)
+    public function __construct(string $url = null)
     {
-        if (!empty($uri)) {
-            $parts = parse_url($uri);
+        if (!empty($url)) {
+            $parts = parse_url($url);
             $this->schema = $parts['scheme'] ?? null;
             $this->user = $parts['user'] ?? null;
             $this->pass = $parts['pass'] ?? null;
@@ -36,21 +36,21 @@ class Uri
         }
     }
 
-    private function clone(): Uri
+    private function clone(): URL
     {
-        $uri = new self();
-        $uri->schema = $this->schema;
-        $uri->user = $this->user;
-        $uri->pass = $this->pass;
-        $uri->host = $this->host;
-        $uri->port = $this->port;
-        $uri->path = $this->path;
-        $uri->query = $this->query;
-        $uri->fragment = $this->fragment;
-        return $uri;
+        $url = new self();
+        $url->schema = $this->schema;
+        $url->user = $this->user;
+        $url->pass = $this->pass;
+        $url->host = $this->host;
+        $url->port = $this->port;
+        $url->path = $this->path;
+        $url->query = $this->query;
+        $url->fragment = $this->fragment;
+        return $url;
     }
 
-    public function scheme(string $scheme = null): Uri|string|null
+    public function scheme(string $scheme = null): URL|string|null
     {
         if (is_null($scheme)) {
             return $this->schema;
@@ -58,20 +58,20 @@ class Uri
         if (!preg_match('/^[a-z]([a-z0-9+.-]+)$/', $scheme)) {
             throw new \InvalidArgumentException('Invalid schema.');
         }
-        $uri = $this->clone();
-        $uri->schema = $scheme;
-        return $uri;
+        $url = $this->clone();
+        $url->schema = $scheme;
+        return $url;
     }
 
-    public function userInfo(string $user = null, string $pass = null): Uri|string|null
+    public function userInfo(string $user = null, string $pass = null): URL|string|null
     {
         if (is_null($user)) {
             return ($this->user . ($this->pass ? ':' . $this->pass : '')) ?: null;
         }
-        $uri = $this->clone();
-        $uri->user = $user;
-        $uri->pass = $pass;
-        return $uri;
+        $url = $this->clone();
+        $url->user = $user;
+        $url->pass = $pass;
+        return $url;
     }
 
     public function authority(): string|null
@@ -79,7 +79,7 @@ class Uri
         return (($this->user ? $this->user . '@' : '') . $this->host . ($this->port ? ':' . $this->port : '')) ?: null;
     }
 
-    public function host(string $host = null): Uri|string|null
+    public function host(string $host = null): URL|string|null
     {
         if (is_null($host)) {
             return $this->host;
@@ -87,12 +87,12 @@ class Uri
         if (!filter_var($host, FILTER_VALIDATE_IP) && !filter_var('info@' . $host, FILTER_VALIDATE_DOMAIN)) {
             throw new \InvalidArgumentException('Invalid host.');
         }
-        $uri = $this->clone();
-        $uri->host = $host;
-        return $uri;
+        $url = $this->clone();
+        $url->host = $host;
+        return $url;
     }
 
-    public function port(int $port = null): Uri|int|null
+    public function port(int $port = null): URL|int|null
     {
         if (is_null($port)) {
             return $this->port;
@@ -100,39 +100,39 @@ class Uri
         if ($port < 0 || $port > 65535) {
             throw new \InvalidArgumentException('Invalid port.');
         }
-        $uri = $this->clone();
-        $uri->port = (int)$port;
-        return $uri;
+        $url = $this->clone();
+        $url->port = (int)$port;
+        return $url;
     }
 
-    public function path(string $path = null): Uri|string
+    public function path(string $path = null): URL|string
     {
         if (is_null($path)) {
             return $this->path ?: '/';
         }
-        $uri = $this->clone();
-        $uri->path = $path;
-        return $uri;
+        $url = $this->clone();
+        $url->path = $path;
+        return $url;
     }
 
-    public function query(string|array $query = null): Uri|string
+    public function query(string|array $query = null): URL|string
     {
         if (is_null($query)) {
             return $this->query;
         }
-        $uri = $this->clone();
-        $uri->query = is_array($query) ? http_build_query($query) : $query;
-        return $uri;
+        $url = $this->clone();
+        $url->query = is_array($query) ? http_build_query($query) : $query;
+        return $url;
     }
 
-    public function fragment(string $fragment = null): Uri|string|null
+    public function fragment(string $fragment = null): URL|string|null
     {
         if (is_null($fragment)) {
             return $this->fragment;
         }
-        $uri = $this->clone();
-        $uri->fragment = $fragment;
-        return $uri;
+        $url = $this->clone();
+        $url->fragment = $fragment;
+        return $url;
     }
 
     private function needPort(): bool
@@ -392,21 +392,21 @@ class Uri
      */
     public function __toString()
     {
-        $uri = '';
-        $uri .= $this->schema ? $this->schema . '://' : '';
+        $url = '';
+        $url .= $this->schema ? $this->schema . '://' : '';
         if ($this->user) {
-            $uri .= $this->user;
-            $uri .= $this->pass ? ':' . $this->pass : '';
-            $uri .= '@';
+            $url .= $this->user;
+            $url .= $this->pass ? ':' . $this->pass : '';
+            $url .= '@';
         }
-        $uri .= $this->host;
+        $url .= $this->host;
         if ($this->needPort()) {
-            $uri .= $this->port ? ':' . $this->port : '';
+            $url .= $this->port ? ':' . $this->port : '';
         }
-        $uri .= $this->path ?? '/';
-        $uri .= $this->query ? '?' . $this->query : '';
-        $uri .= $this->fragment ? '#' . $this->fragment : '';
-        return $uri;
+        $url .= $this->path ?? '/';
+        $url .= $this->query ? '?' . $this->query : '';
+        $url .= $this->fragment ? '#' . $this->fragment : '';
+        return $url;
     }
 
 }

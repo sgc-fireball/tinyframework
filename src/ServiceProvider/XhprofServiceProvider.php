@@ -67,7 +67,7 @@ class XhprofServiceProvider extends ServiceProviderAwesome
                     return;
                 }
 
-                if (strpos($request->uri()->path(), '/__xhprof') === 0) {
+                if (strpos($request->url()->path(), '/__xhprof') === 0) {
                     return;
                 }
 
@@ -75,17 +75,14 @@ class XhprofServiceProvider extends ServiceProviderAwesome
                  * @see https://github.com/bbc/programmes-xhprof/blob/master/Document/XhguiRuns.php#L51
                  */
                 $end = microtime(true);
-                if (!defined('TINYFRAMEWORK_START')) {
-                    define('TINYFRAMEWORK_START', 0);
-                }
                 $data = [
                     '_id' => $request->id() . '-' . $response->id(),
                     'meta' => [
-                        'url' => $request->uri()->userInfo('', '')->fragment('')->__toString(),
+                        'url' => $request->url()->userInfo('', '')->fragment('')->__toString(),
                         'SERVER' => $request->server(),
                         'get' => $request->get(),
                         'env' => [],
-                        'simple_url' => $request->uri()->userInfo('', '')->fragment('')->__toString(),
+                        'simple_url' => $request->url()->userInfo('', '')->fragment('')->__toString(),
                         'request_ts' => round(TINYFRAMEWORK_START),
                         'request_ts_micro' => [
                             'sec' => (int)TINYFRAMEWORK_START,

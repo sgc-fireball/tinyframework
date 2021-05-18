@@ -3,10 +3,8 @@
 namespace TinyFramework\Http\Middleware;
 
 use Closure;
-use TinyFramework\Core\ContainerInterface;
 use TinyFramework\Http\Request;
 use TinyFramework\Http\Response;
-use TinyFramework\Session\SessionInterface;
 
 class CsrfMiddlewaere implements MiddlewareInterface
 {

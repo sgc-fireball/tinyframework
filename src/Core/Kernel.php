@@ -8,6 +8,7 @@ use TinyFramework\ServiceProvider\CryptServiceProvider;
 use TinyFramework\ServiceProvider\HashServiceProvider;
 use TinyFramework\ServiceProvider\MailServiceProvider;
 use TinyFramework\ServiceProvider\LocalizationServiceProvider;
+use TinyFramework\ServiceProvider\ValidationServiceProvider;
 use TinyFramework\ServiceProvider\ViewServiceProvider;
 use TinyFramework\ServiceProvider\QueueServiceProvider;
 use TinyFramework\ServiceProvider\ServiceProviderInterface;
@@ -64,6 +65,7 @@ abstract class Kernel implements KernelInterface
             QueueServiceProvider::class,
             BroadcastServiceProvider::class,
             LocalizationServiceProvider::class,
+            ValidationServiceProvider::class,
         ];
         if ($this->runningInConsole()) {
             $this->serviceProviderNames[] = ConsoleServiceProvider::class;

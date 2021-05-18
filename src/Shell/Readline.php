@@ -80,7 +80,12 @@ class Readline
         }
         $history = array_reverse(readline_list_history());
         $history = array_reverse(array_unique($history, SORT_STRING));
-        file_put_contents($this->historyFile, "_HiStOrY_V2_\n" . implode("\n", $history));
+        if (isset($_SERVER) && is_array($_SERVER) && array_key_exists('HISTSIZE', $_SERVER)) {
+            $history = array_slice($history, count($history) - $_SERVER['HISTSIZE']);
+        }
+        $content = "_HiStOrY_V2_\n" . implode("\n", $history);
+        $content = str_replace("\\", "\\\\", $content);
+        file_put_contents($this->historyFile, $content);
         chmod($this->historyFile, 0600);
         return $this;
     }

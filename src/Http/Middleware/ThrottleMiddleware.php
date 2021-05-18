@@ -24,7 +24,7 @@ class ThrottleMiddleware implements MiddlewareInterface
 
     private function getRequestSignature(Request $request): string
     {
-        return hash('sha3-256', $request->uri()->host() . '|' . $request->ip());
+        return hash('sha3-256', $request->url()->host() . '|' . $request->ip());
     }
 
 }

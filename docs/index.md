@@ -18,7 +18,7 @@
     - [Response](./http/response.md)
     - [Router](./http/router.md)
         - [Route](./http/router/route.md)
-    - [Uri](./http/uri.md)
+    - [Url](./http/url.md)
 - [Localization](localization.md)
 - [Logger](./logger.md)
 - [Mail](./mail.md)
@@ -28,3 +28,4 @@
 - [Template Engines](./template-engines.md)
     - [Blade](./template-engines/blade.md)
     - [PHP](./template-engines/php.md)
+- [Validation](validation.md)

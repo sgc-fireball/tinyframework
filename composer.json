@@ -27,6 +27,7 @@
     "ext-fileinfo": "*",
     "ext-pcntl": "*",
     "ext-intl": "*",
+    "ext-iconv": "*",
     "roave/security-advisories": "dev-latest",
     "jetbrains/phpstorm-attributes": "^1.0"
   },

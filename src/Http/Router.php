@@ -83,7 +83,7 @@ class Router
         $inner($router);
         /** @var Route $route */
         foreach ($router->routes as $route) {
-            $route->uri($options['prefix'] . $route->uri());
+            $route->url($options['prefix'] . $route->url());
             if (array_key_exists('scheme', $options)) {
                 $route->scheme($options['scheme']);
             }
@@ -96,86 +96,86 @@ class Router
         return $this;
     }
 
-    public function any(string $uri, $action): Route
+    public function any(string $url, $action): Route
     {
-        $route = (new Route())->method('ANY')->uri($uri)->action($action);
+        $route = (new Route())->method('ANY')->url($url)->action($action);
         $this->routes[] = $route;
         return $route;
     }
 
-    public function get(string $uri, $action): Route
+    public function get(string $url, $action): Route
     {
-        $route = (new Route())->method('GET')->uri($uri)->action($action);
+        $route = (new Route())->method('GET')->url($url)->action($action);
         $this->routes[] = $route;
         return $route;
     }
 
-    public function head(string $uri, $action): Route
+    public function head(string $url, $action): Route
     {
-        $route = (new Route())->method('head')->uri($uri)->action($action);
+        $route = (new Route())->method('head')->url($url)->action($action);
         $this->routes[] = $route;
         return $route;
     }
 
-    public function post(string $uri, $action): Route
+    public function post(string $url, $action): Route
     {
-        $route = (new Route())->method('POST')->uri($uri)->action($action);
+        $route = (new Route())->method('POST')->url($url)->action($action);
         $this->routes[] = $route;
         return $route;
     }
 
-    public function put(string $uri, $action): Route
+    public function put(string $url, $action): Route
     {
-        $route = (new Route())->method('PUT')->uri($uri)->action($action);
+        $route = (new Route())->method('PUT')->url($url)->action($action);
         $this->routes[] = $route;
         return $route;
     }
 
-    public function delete(string $uri, $action): Route
+    public function delete(string $url, $action): Route
     {
-        $route = (new Route())->method('DELETE')->uri($uri)->action($action);
+        $route = (new Route())->method('DELETE')->url($url)->action($action);
         $this->routes[] = $route;
         return $route;
     }
 
-    public function connect(string $uri, $action): Route
+    public function connect(string $url, $action): Route
     {
-        $route = (new Route())->method('CONNECT')->uri($uri)->action($action);
+        $route = (new Route())->method('CONNECT')->url($url)->action($action);
         $this->routes[] = $route;
         return $route;
     }
 
-    public function options(string $uri, $action): Route
+    public function options(string $url, $action): Route
     {
-        $route = (new Route())->method('OPTIONS')->uri($uri)->action($action);
+        $route = (new Route())->method('OPTIONS')->url($url)->action($action);
         $this->routes[] = $route;
         return $route;
     }
 
-    public function patch(string $uri, $action): Route
+    public function patch(string $url, $action): Route
     {
-        $route = (new Route())->method('PATCH')->uri($uri)->action($action);
+        $route = (new Route())->method('PATCH')->url($url)->action($action);
         $this->routes[] = $route;
         return $route;
     }
 
-    public function purge(string $uri, $action): Route
+    public function purge(string $url, $action): Route
     {
-        $route = (new Route())->method('PURGE')->uri($uri)->action($action);
+        $route = (new Route())->method('PURGE')->url($url)->action($action);
         $this->routes[] = $route;
         return $route;
     }
 
-    public function trace(string $uri, $action): Route
+    public function trace(string $url, $action): Route
     {
-        $route = (new Route())->method('TRACE')->uri($uri)->action($action);
+        $route = (new Route())->method('TRACE')->url($url)->action($action);
         $this->routes[] = $route;
         return $route;
     }
 
-    public function custom(string $method, string $uri, $action): Route
+    public function custom(string $method, string $url, $action): Route
     {
-        $route = (new Route())->method($method)->uri($uri)->action($action);
+        $route = (new Route())->method($method)->url($url)->action($action);
         $this->routes[] = $route;
         return $route;
     }
@@ -260,14 +260,14 @@ class Router
 
     public function fallback($action): Route
     {
-        $route = (new Route())->method('any')->uri('.*')->action($action)->name('fallback');
+        $route = (new Route())->method('any')->url('.*')->action($action)->name('fallback');
         $this->routes[] = $route;
         return $route;
     }
 
     public function resolve(Request $request): ?Route
     {
-        $url = $request->uri()->query([])->fragment('')->__toString();
+        $url = $request->url()->query([])->fragment('')->__toString();
 
         /** @var Route $route */
         foreach ($this->routes as $route) {
@@ -275,7 +275,7 @@ class Router
             if (!in_array($request->method(), $allowedMethods) && !in_array('ANY', $allowedMethods)) {
                 continue;
             }
-            $regex = $this->translateUri($route);
+            $regex = $this->translateUrl($route);
             if (preg_match($regex, $url, $match)) {
                 $match = array_filter($match, function ($value, $key) {
                     return !is_numeric($key);
@@ -296,24 +296,24 @@ class Router
         return null;
     }
 
-    protected function translateUri(Route $route): string
+    protected function translateUrl(Route $route): string
     {
         $patterns = array_merge($this->pattern(), $route->pattern());
-        $uri = $route->uri();
-        preg_match_all('/\{([a-zA-Z0-9]+)\}/m', $uri, $matches, PREG_SET_ORDER);
+        $url = $route->url();
+        preg_match_all('/\{([a-zA-Z0-9]+)\}/m', $url, $matches, PREG_SET_ORDER);
         $matches = array_map(function ($value) {
             return $value[1];
         }, $matches);
         foreach ($matches as $name) {
             $pattern = sprintf('(?<%s>%s)', $name, $patterns[$name] ?? $patterns['default']);
-            $uri = str_replace('{' . $name . '}', $pattern, $uri);
+            $url = str_replace('{' . $name . '}', $pattern, $url);
         }
         $regex = '#^';
         $regex .= sprintf('(?<_scheme>%s)', $route->scheme());
         $regex .= '://';
         $regex .= sprintf('(?<_domain>%s)', $route->domain());
         $regex .= '/';
-        $regex .= sprintf('(?<_uri>%s)', $uri);
+        $regex .= sprintf('(?<_url>%s)', $url);
         $regex .= '$#i';
         return $regex;
     }
@@ -325,7 +325,7 @@ class Router
             if ($name !== $route->name()) {
                 continue;
             }
-            $url = $route->uri();
+            $url = $route->url();
             foreach ($parameters as $key => $value) {
                 $value = is_object($value) && method_exists($value, '__toString') ? $value->__toString() : $value;
                 $value = is_bool($value) ? ($value ? 'TRUE' : 'FALSE') : $value;
@@ -345,11 +345,12 @@ class Router
         $url = '/' . ltrim($path, '/');
         $url .= mb_strpos($url, '?') === false ? '?' : '&';
         $url .= http_build_query($parameters);
+        /** @var Request $request */
         if ($request = $this->container->get('request')) {
-            return (new Uri($url))
-                ->scheme($request->uri()->scheme())
-                ->host($request->uri()->host())
-                ->port($request->uri()->port())
+            return (new URL($url))
+                ->scheme($request->url()->scheme())
+                ->host($request->url()->host())
+                ->port($request->url()->port())
                 ->__toString();
         }
         return rtrim($url, '?&');

@@ -40,7 +40,48 @@ class Shell
                 $this->execute($line);
                 $this->readline->saveHistory();
             } catch (\Throwable $e) {
-                $this->output->error($e->getMessage());
+                $this->output->error(sprintf(
+                    "%s[%d]\n%s\nin %s:%d",
+                    get_class($e),
+                    $e->getCode(),
+                    $e->getMessage(),
+                    str_replace(root_dir() . '/', '', $e->getFile()),
+                    $e->getLine(),
+                ));
+                if ($this->output->verbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                    $this->output->write("\n");
+                    foreach ($e->getTrace() as $index => $trace) {
+                        if (array_key_exists('class', $trace)) {
+                            $call = $trace['class'] . $trace['type'] . $trace['function'];
+                        } else {
+                            $call = $trace['function'];
+                        }
+
+                        $color = 'yellow';
+                        if (!isset($trace['file'])) {
+                            $trace['file'] = 'PHP Internal call';
+                            $color = 'orange';
+                        }
+                        if (str_contains($trace['file'], 'eval()\'d code')) {
+                            $trace['file'] = 'eval() code';
+                            $color = 'orange';
+                        }
+
+                        if ($trace['file'] === __FILE__ && $call === 'eval') {
+                            break;
+                        }
+
+                        $this->output->write(sprintf(
+                            "<green>%2d)</green> <%s>%s:%d</%s>\n    %s\n\n",
+                            $index,
+                            $color,
+                            str_replace(root_dir() . '/', '', $trace['file']),
+                            $trace['line'] ?? 0,
+                            $color,
+                            $call
+                        ));
+                    }
+                }
             };
         }
     }

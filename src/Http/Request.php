@@ -12,7 +12,7 @@ class Request
 
     private string $method = 'GET';
 
-    private Uri $uri;
+    private URL $url;
 
     private string $protocol = 'HTTP/1.0';
 
@@ -44,7 +44,7 @@ class Request
         $request = new self();
         $request->ip = $req->server['remote_addr'];
         $request->method = strtoupper($req->getMethod());
-        $request->uri = new Uri(sprintf(
+        $request->url = new URL(sprintf(
             '%s://%s%s%s',
             to_bool($req->server['https'] ?? 'off') ? 'https' : 'http',
             array_key_exists('remote_user', $req->server) ? $req->server['remote_user'] . '@' : '',
@@ -82,7 +82,7 @@ class Request
         $request = new self();
         $request->ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
         $request->method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
-        $request->uri = new Uri(sprintf(
+        $request->url = new URL(sprintf(
             '%s://%s:%s:%d%s',
             to_bool($_SERVER['HTTPS'] ?? 'off') ? 'https' : 'http',
             array_key_exists('REMOTE_USER', $_SERVER) ? $_SERVER['REMOTE_USER'] . '@' : '',
@@ -94,7 +94,7 @@ class Request
         $request->get = $_GET ?? [];
         $request->post = $_POST ?? [];
         $request->cookie = $_COOKIE ?? [];
-        $request->files = $_FILES ?? [];
+        self::migrateFiles($_FILES ?? [], $request->files);
         foreach ($_SERVER as $key => $value) {
             if (mb_strpos($key, 'HTTP_') !== 0) {
                 if ($key === 'HTTP_AUTHORIZATION') {
@@ -248,7 +248,7 @@ class Request
         $request->method = $this->method;
         $request->ip = $this->ip;
         $request->id = $this->id;
-        $request->uri = $this->uri;
+        $request->url = $this->url;
         $request->get = $this->get;
         $request->post = $this->post;
         $request->header = $this->header;
@@ -271,16 +271,16 @@ class Request
         return $request;
     }
 
-    public function uri(Uri $uri = null, $preserveHost = false): Uri|Request
+    public function url(URL $url = null, $preserveHost = false): URL|Request
     {
-        if (is_null($uri)) {
-            return $this->uri;
+        if (is_null($url)) {
+            return $this->url;
         }
         if ($preserveHost) {
-            $uri->host($this->uri->host());
+            $url->host($this->url->host());
         }
         $request = $this->clone();
-        $request->uri = $uri;
+        $request->url = $url;
         return $request;
     }
 
@@ -339,6 +339,28 @@ class Request
         }
         $this->ip = $ip;
         return $this;
+    }
+
+    private static function migrateFiles(array $files, array &$results): void
+    {
+        foreach ($files as $key => $file) {
+            if (!is_array($file)) {
+                continue;
+            }
+
+            if (
+                array_key_exists('name', $file)
+                && array_key_exists('type', $file)
+                && array_key_exists('size', $file)
+                && array_key_exists('tmp_name', $file)
+                && array_key_exists('error', $file)
+            ) {
+                $results[$key] = new UploadedFile($file);
+            } else {
+                $results[$key] = [];
+                self::migrateFiles($file, $results[$key]);
+            }
+        }
     }
 
 }

@@ -75,7 +75,7 @@ $server = $container->singleton('swoole', function () use (&$container, &$kernel
             if (strpos($staticFile, $publicPath) === 0) {
                 $type = pathinfo($staticFile, PATHINFO_EXTENSION);
                 if (array_key_exists($type, $staticFileTypes)) {
-                    printf("200 - %s %s\n", $request->method(), $request->uri()->path());
+                    printf("200 - %s %s\n", $request->method(), $request->url()->path());
                     $res->header('Content-Type', $staticFileTypes[$type]);
                     $res->sendfile($staticFile);
                     return;
@@ -85,7 +85,7 @@ $server = $container->singleton('swoole', function () use (&$container, &$kernel
 
         /** @var \TinyFramework\Http\Response $response */
         $response = $container->call([$kernel, 'handle'], ['request' => $request]);
-        printf("%3d - %s %s\n", $response->code(), $request->method(), $request->uri()->path());
+        printf("%3d - %s %s\n", $response->code(), $request->method(), $request->url()->path());
         $res->status($response->code());
         foreach ($response->headers() as $key => $value) {
             $res->header($key, $value);

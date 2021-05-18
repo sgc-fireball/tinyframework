@@ -128,7 +128,7 @@ class Response
     {
         /** @var Request $request */
         $request = container('request');
-        $back = ($request->header('referer') ?? $fallback) ?? $request->uri()->__toString();
+        $back = ($request->header('referer') ?? $fallback) ?? $request->url()->__toString();
         return self::redirect($back, 302, $headers);
     }
 

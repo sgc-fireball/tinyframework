@@ -2,9 +2,9 @@
 
 namespace TinyFramework\ServiceProvider;
 
-use TinyFramework\Core\ContainerInterface;
 use TinyFramework\Localization\TranslationLoader;
 use TinyFramework\Localization\Translator;
+use TinyFramework\Localization\TranslatorInterface;
 
 class LocalizationServiceProvider extends ServiceProviderAwesome
 {
@@ -18,6 +18,7 @@ class LocalizationServiceProvider extends ServiceProviderAwesome
             });
         $this->container
             ->alias('translator', Translator::class)
+            ->alias(TranslatorInterface::class, Translator::class)
             ->singleton(Translator::class, function () {
                 $config = $this->container->get('config')->get('app');
                 return new Translator($this->container->get(TranslationLoader::class), $config['locale']);

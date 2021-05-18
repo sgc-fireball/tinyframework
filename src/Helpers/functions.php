@@ -11,12 +11,16 @@ use TinyFramework\Database\DatabaseInterface;
 use TinyFramework\Event\EventAwesome;
 use TinyFramework\Event\EventDispatcherInterface;
 use TinyFramework\Hash\HashInterface;
+use TinyFramework\Helpers\Arr;
+use TinyFramework\Helpers\Htmlable;
+use TinyFramework\Helpers\Str;
 use TinyFramework\Http\Response;
 use TinyFramework\Logger\LoggerInterface;
 use TinyFramework\Mail\Mailer;
 use TinyFramework\Mail\MailerInterface;
 use TinyFramework\Queue\QueueInterface;
 use TinyFramework\Session\SessionInterface;
+use TinyFramework\Validation\ValidatorInterface;
 
 if (!function_exists('root_dir')) {
     #[Pure] function root_dir(): string
@@ -293,6 +297,13 @@ if (!function_exists('url')) {
     }
 }
 
+if (!function_exists('validator')) {
+    function validator(): ValidatorInterface
+    {
+        return container('validator');
+    }
+}
+
 if (!function_exists('asset_version')) {
     function asset_version(string $path): string
     {
@@ -312,8 +323,11 @@ if (!function_exists('to_bool')) {
 }
 
 if (!function_exists('e')) {
-    function e(string $content): string
+    function e(Htmlable|string $content): string
     {
+        if ($content instanceof Htmlable) {
+            return (string)$content;
+        }
         return htmlspecialchars($content, ENT_QUOTES, "UTF-8", true);
     }
 }
@@ -424,5 +438,44 @@ if (!function_exists('tmpreaper')) {
                 unlink($folder . '/' . $file->getFilename());
             }
         }
+    }
+}
+
+if (!function_exists('data_get')) {
+    function data_get(mixed $target, mixed $key, string $delimiter = '.'): mixed
+    {
+        // exact match
+        if (is_array($target) && array_key_exists($key, $target)) {
+            return $target[$key];
+        } elseif (is_object($target) && property_exists($target, $key)) {
+            return $target[$key];
+        }
+
+        // deep search
+        $keys = is_array($key) ? $key : explode($delimiter, $key);
+        foreach ($keys as $key) {
+            if (is_array($target) && array_key_exists($key, $target)) {
+                $target = &$target[$key];
+            } elseif (is_object($target) && property_exists($target, $key)) {
+                $target = &$target[$key];
+            } else {
+                return null;
+            }
+        }
+        return $target;
+    }
+}
+
+if (!function_exists('arr')) {
+    function arr(array $arr): Arr
+    {
+        return Arr::factory($arr);
+    }
+}
+
+if (!function_exists('str')) {
+    function str(string $str): Str
+    {
+        return Str::factory($str);
     }
 }

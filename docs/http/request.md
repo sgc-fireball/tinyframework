@@ -29,8 +29,8 @@ $request->session(); // return the current session, if started
 $request->user(); // return the current user information (mixed type)
 $request->method(); // return the current method 
 $request->method('POST'); // overwrite the method
-$request->uri(); // return the current uri 
-$request->uri(new \TinyFramework\Http\Uri(), true); // overwrite the uri and preserve the hostname
+$request->url(); // return the current uri 
+$request->url(new \TinyFramework\Http\URL(), true); // overwrite the uri and preserve the hostname
 $request->protocol(); // return the current protocol 
 $request->protocol('HTTP/2'); // overwrite the protocol
 $request->header(); // return all headers as array
