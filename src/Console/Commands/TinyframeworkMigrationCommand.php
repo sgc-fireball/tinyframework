@@ -2,6 +2,7 @@
 
 namespace TinyFramework\Console\Commands;
 
+use InvalidArgumentException;
 use TinyFramework\Console\CommandAwesome;
 use TinyFramework\Console\Input\Argument;
 use TinyFramework\Console\Input\InputDefinitionInterface;
@@ -28,7 +29,7 @@ class TinyframeworkMigrationCommand extends CommandAwesome
         if (in_array($direction, ['up', 'down'])) {
             $migrationInstaller->{$direction}();
         } else {
-            throw new \InvalidArgumentException('Please pass a valid direction: up or down');
+            throw new InvalidArgumentException('Please pass a valid direction: up or down');
         }
         return 0;
     }

@@ -2,6 +2,9 @@
 
 namespace TinyFramework\Mail;
 
+use InvalidArgumentException;
+use RuntimeException;
+
 class SmtpMailer implements MailerInterface
 {
 
@@ -52,7 +55,7 @@ class SmtpMailer implements MailerInterface
 
         if (strlen((string)$this->config['username']) && strlen((string)$this->config['password'])) {
             if (!in_array($this->config['encryption'], ['ssl', 'tls'])) {
-                throw new \RuntimeException('Does not support login without encryption!');
+                throw new RuntimeException('Does not support login without encryption!');
             }
             $this->write($fp, "AUTH LOGIN\r\n");
             $this->write($fp, base64_encode($this->config['username']) . "\r\n");
@@ -175,7 +178,7 @@ class SmtpMailer implements MailerInterface
             $local = $address;
         }
         if (preg_match('/[^\x00-\x7F]/', $local)) {
-            throw new \InvalidArgumentException('Non-ASCII characters not supported in local-part.');
+            throw new InvalidArgumentException('Non-ASCII characters not supported in local-part.');
         }
         return $address;
     }
@@ -191,8 +194,11 @@ class SmtpMailer implements MailerInterface
         }, ''), ',');
     }
 
-    private function write($fp, string $message, bool $read = true): string
+    private function write(mixed $fp, string $message, bool $read = true): string
     {
+        if (!is_resource($fp)) {
+            throw new InvalidArgumentException('Argument #1 of write must be an resource.');
+        }
         fwrite($fp, $message);
         if ($read === false) {
             return '';
@@ -201,18 +207,21 @@ class SmtpMailer implements MailerInterface
         do {
             $line = $this->read($fp);
             if ($line === false) {
-                throw new \RuntimeException('Could not read from mail socket.');
+                throw new RuntimeException('Could not read from mail socket.');
             }
             if (preg_match('/^(\d{3})\s.*/', $line) && !preg_match('/^([23]\d{2})\s.*/', $line)) {
-                throw new \RuntimeException(trim($line));
+                throw new RuntimeException(trim($line));
             }
             $response .= $line;
         } while (!preg_match('/^([23]\d{2})\s.*/', $line));
         return $response;
     }
 
-    private function read($fp): string|false
+    private function read(mixed $fp): string|false
     {
+        if (!is_resource($fp)) {
+            throw new InvalidArgumentException('Argument #1 of read must be an resource.');
+        }
         $result = fread($fp, 8192);
         if ($result === false) {
             return false;

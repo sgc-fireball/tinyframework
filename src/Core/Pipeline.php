@@ -9,21 +9,14 @@ class Pipeline implements PipelineInterface
 
     private array $layers = [];
 
-    /**
-     * @param Closure|Closure[]|null $layers
-     */
-    public function __construct($layers = null)
+    public function __construct(Closure|array|null $layers = null)
     {
         if (is_array($layers) || $layers instanceof Closure) {
             $this->layers($layers);
         }
     }
 
-    /**
-     * @param Closure|Closure[] $layers
-     * @return static
-     */
-    public function layers($layers): static
+    public function layers(Closure|array $layers): static
     {
         if ($layers instanceof Closure) {
             $layers = [$layers];
@@ -43,7 +36,7 @@ class Pipeline implements PipelineInterface
      * @param mixed|null $parameter
      * @return mixed
      */
-    public function call(Closure $core, $parameter = null)
+    public function call(Closure $core, $parameter = null): mixed
     {
         $chain = $arr = array_reduce(
             array_reverse($this->layers),

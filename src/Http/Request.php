@@ -2,6 +2,7 @@
 
 namespace TinyFramework\Http;
 
+use RuntimeException;
 use TinyFramework\Session\SessionInterface;
 use Swoole\Http\Request as SwooleRequest;
 
@@ -32,7 +33,7 @@ class Request
 
     private ?SessionInterface $session = null;
 
-    private $user = null;
+    private mixed $user = null;
 
     private ?string $body = null;
 
@@ -71,7 +72,7 @@ class Request
             return $request;
         }
         if (!preg_match('/^[A-Z]++$/D', $request->method)) {
-            throw new \RuntimeException(sprintf('Invalid method override "%s".', $request->method));
+            throw new RuntimeException(sprintf('Invalid method override "%s".', $request->method));
         }
         $request->body = $req->rawcontent();
         return $request;
@@ -123,9 +124,9 @@ class Request
             return $request;
         }
         if (!preg_match('/^[A-Z]++$/D', $request->method)) {
-            throw new \RuntimeException(sprintf('Invalid method override "%s".', $request->method));
+            throw new RuntimeException(sprintf('Invalid method override "%s".', $request->method));
         }
-        $request->body = file_get_contents("php://input");
+        $request->body = (string)file_get_contents("php://input");
         return $request;
     }
 
@@ -139,7 +140,7 @@ class Request
         return $this->id;
     }
 
-    public function get($key = null, $value = null): mixed
+    public function get(string|array|null $key = null, mixed $value = null): mixed
     {
         if (is_null($key)) {
             return $this->get;
@@ -147,7 +148,7 @@ class Request
         if (is_array($key)) {
             foreach ($key as $k => $value) {
                 $this->get[$k] = $value;
-            };
+            }
             return $this;
         }
         if (is_null($value)) {
@@ -157,7 +158,7 @@ class Request
         return $this;
     }
 
-    public function post($key = null, string $value = null): mixed
+    public function post(string|array|null $key = null, mixed $value = null): mixed
     {
         if (is_null($key)) {
             return $this->post;
@@ -165,7 +166,7 @@ class Request
         if (is_array($key)) {
             foreach ($key as $k => $value) {
                 $this->post[$k] = $value;
-            };
+            }
             return $this;
         }
         if (is_null($value)) {
@@ -175,7 +176,7 @@ class Request
         return $this;
     }
 
-    public function cookie($key = null, string $value = null): mixed
+    public function cookie(string|array|null $key = null, mixed $value = null): mixed
     {
         if (is_null($key)) {
             return $this->cookie;
@@ -183,7 +184,7 @@ class Request
         if (is_array($key)) {
             foreach ($key as $k => $value) {
                 $this->cookie[$k] = $value;
-            };
+            }
             return $this;
         }
         if (is_null($value)) {
@@ -193,7 +194,7 @@ class Request
         return $this;
     }
 
-    public function file($key = null, string $value = null): mixed
+    public function file(string|array|null $key = null, mixed $value = null): mixed
     {
         if (is_null($key)) {
             return $this->files;
@@ -201,7 +202,7 @@ class Request
         if (is_array($key)) {
             foreach ($key as $k => $value) {
                 $this->files[$k] = $value;
-            };
+            }
             return $this;
         }
         if (is_null($value)) {
@@ -211,7 +212,7 @@ class Request
         return $this;
     }
 
-    public function route(Route $route = null): static|Route
+    public function route(Route $route = null): static|Route|null
     {
         if (is_null($route)) {
             return $this->route;
@@ -229,11 +230,7 @@ class Request
         return $this;
     }
 
-    /**
-     * @param mixed|null $user
-     * @return static|null|mixed
-     */
-    public function user($user = null)
+    public function user(mixed $user = null): mixed
     {
         if ($user !== null) {
             $this->user = $user;
@@ -242,7 +239,7 @@ class Request
         return $this->user;
     }
 
-    private function clone()
+    private function clone(): Request
     {
         $request = new self();
         $request->method = $this->method;
@@ -261,7 +258,7 @@ class Request
         return $request;
     }
 
-    public function method(string $method = null): static|string
+    public function method(string $method = null): Request|string
     {
         if (is_null($method)) {
             return $this->method;
@@ -271,20 +268,20 @@ class Request
         return $request;
     }
 
-    public function url(URL $url = null, $preserveHost = false): URL|Request
+    public function url(URL $url = null, bool $preserveHost = false): URL|Request
     {
         if (is_null($url)) {
             return $this->url;
         }
         if ($preserveHost) {
-            $url->host($this->url->host());
+            $url->host((string)$this->url->host());
         }
         $request = $this->clone();
         $request->url = $url;
         return $request;
     }
 
-    public function protocol(string $protocol = null): static|string
+    public function protocol(string $protocol = null): Request|string
     {
         if (is_null($protocol)) {
             return $this->protocol;
@@ -294,7 +291,7 @@ class Request
         return $request;
     }
 
-    public function header(string $key = null, $value = null): static|array|string
+    public function header(string $key = null, mixed $value = null): Request|array|string
     {
         if (is_null($key)) {
             return $this->header;
@@ -308,7 +305,7 @@ class Request
         return $request;
     }
 
-    public function server(string $key = null, $value = null): static|array|string
+    public function server(string $key = null, mixed $value = null): Request|array|string
     {
         if (is_null($key)) {
             return $this->server;
@@ -322,7 +319,7 @@ class Request
         return $request;
     }
 
-    public function body(string $body = null): static|string
+    public function body(string $body = null): Request|string|null
     {
         if (is_null($body)) {
             return $this->body;
@@ -332,7 +329,7 @@ class Request
         return $request;
     }
 
-    public function ip(string $ip = null): static|string
+    public function ip(string $ip = null): static|string|null
     {
         if (is_null($ip)) {
             return $this->ip;

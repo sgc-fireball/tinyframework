@@ -5,6 +5,7 @@ namespace TinyFramework\Template;
 use Closure;
 use Illuminate\Contracts\View\View;
 use InvalidArgumentException;
+use RuntimeException;
 use TinyFramework\Cache\CacheInterface;
 
 class Blade implements ViewInterface
@@ -82,10 +83,10 @@ class Blade implements ViewInterface
                 break;
             }
         }
-        if (is_null($file) || !file_exists($file)) {
-            throw new InvalidArgumentException('View does not exists: ' . $view);
+        if (is_null($file) || !file_exists($file) || !is_readable($file)) {
+            throw new InvalidArgumentException('View does not exists or unreadable: ' . $view);
         }
-        $content = trim($this->compileString(file_get_contents($file)));
+        $content = trim($this->compileString((string)file_get_contents($file)));
         if ($this->config['cache']) {
             $this->cache->set($key, $content);
         }
@@ -105,7 +106,7 @@ class Blade implements ViewInterface
         $content = $this->compileEcho($content);
         $content = $this->compilePhp($content);
 
-        $content = preg_replace_callback(
+        $content = (string)preg_replace_callback(
             '/\B@(@?\w+(?:::\w+)?)([ \t]*)(\( ( (?>[^()]+) | (?3) )* \))?/x',
             function ($match) {
                 if (mb_substr($match[1], 0, 1) === '@') {
@@ -115,7 +116,7 @@ class Blade implements ViewInterface
                 if (method_exists($this, $method = 'compile' . ucfirst($match[1]))) {
                     return $this->$method($match[3] ?? '');
                 }
-                throw new \RuntimeException('Unknown blade command: ' . $match[1]);
+                throw new RuntimeException('Unknown blade command: ' . $match[1]);
             },
             $content
         );
@@ -155,7 +156,7 @@ class Blade implements ViewInterface
         } catch (\Throwable $e) {
             throw $e;
         } finally {
-            $__content = ob_get_clean();
+            $__content = (string)ob_get_clean();
         }
         return trim($__content) . PHP_EOL;
     }
@@ -167,7 +168,7 @@ class Blade implements ViewInterface
 
     public function compileVerbatim(string $content): string
     {
-        return preg_replace_callback('/(?<!@)@verbatim(.*?)@endverbatim/s', function ($matches) {
+        return (string)preg_replace_callback('/(?<!@)@verbatim(.*?)@endverbatim/s', function ($matches) {
             $id = $this->getPlaceholder('verbatim');
             $this->placeholder[$id] = $matches[1];
             return $id;
@@ -184,7 +185,7 @@ class Blade implements ViewInterface
 
     public function compileComment(string $content): string
     {
-        return preg_replace('/\{\{--.*--\}\}/', '', $content);
+        return (string)preg_replace('/\{\{--.*--\}\}/', '', $content);
     }
 
     public function compileEcho(string $content): string
@@ -195,7 +196,7 @@ class Blade implements ViewInterface
 
     public function compilePhp(string $content): string
     {
-        return preg_replace_callback('/(?<!@)@php(.*?)@endphp/s', function ($matches) {
+        return (string)preg_replace_callback('/(?<!@)@php(.*?)@endphp/s', function ($matches) {
             return sprintf('<?php %s ?>', $matches[1]);
         }, $content);
     }
@@ -247,7 +248,7 @@ class Blade implements ViewInterface
 
     public function compileInject(string $expression): string
     {
-        [$variable, $service] = explode(',', preg_replace("/[\(\)\\\"\']/", '', $expression));
+        [$variable, $service] = explode(',', (string)preg_replace("/[\(\)\\\"\']/", '', $expression));
         return sprintf('<?php $%s = container("%s"); ?>', trim($variable), trim($service));
     }
 
@@ -423,7 +424,7 @@ class Blade implements ViewInterface
     {
         $id = $this->getPlaceholder('section', $section);
         if (array_key_exists($id, $this->placeholder)) {
-            $content = str_replace($id, $content, $this->placeholder[$id]);
+            $content = (string)str_replace($id, (string)$content, $this->placeholder[$id]);
         }
         $this->placeholder[$id] = $content;
         return $section;
@@ -432,13 +433,13 @@ class Blade implements ViewInterface
     public function stopSection(bool $overwrite = false): string
     {
         if (empty($this->sectionStack)) {
-            throw new \RuntimeException('Cannot end a section without first starting one.');
+            throw new RuntimeException('Cannot end a section without first starting one.');
         }
         $section = array_pop($this->sectionStack);
         if ($overwrite) {
             $this->placeholder[$this->getPlaceholder('section', $section)] = ob_get_clean();
         } else {
-            $this->extendSection($section, ob_get_clean());
+            $this->extendSection($section, (string)ob_get_clean());
         }
         return $section;
     }
@@ -446,14 +447,14 @@ class Blade implements ViewInterface
     public function prependSection(): string
     {
         if (empty($this->sectionStack)) {
-            throw new \RuntimeException('Cannot end a section without first starting one.');
+            throw new RuntimeException('Cannot end a section without first starting one.');
         }
         $section = array_pop($this->sectionStack);
         $id = $this->getPlaceholder('section', $section);
         if (array_key_exists($id, $this->placeholder)) {
-            $this->placeholder[$id] = ob_get_clean() . $this->placeholder[$id];
+            $this->placeholder[$id] = (string)ob_get_clean() . $this->placeholder[$id];
         } else {
-            $this->placeholder[$id] = ob_get_clean();
+            $this->placeholder[$id] = (string)ob_get_clean();
         }
         return $section;
     }
@@ -461,7 +462,7 @@ class Blade implements ViewInterface
     public function appendSection(): string
     {
         if (empty($this->sectionStack)) {
-            throw new \RuntimeException('Cannot end a section without first starting one.');
+            throw new RuntimeException('Cannot end a section without first starting one.');
         }
         $section = array_pop($this->sectionStack);
         $id = $this->getPlaceholder('section', $section);

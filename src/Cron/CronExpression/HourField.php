@@ -2,6 +2,8 @@
 
 namespace TinyFramework\Cron\CronExpression;
 
+use DateTime;
+
 class HourField extends AbstractField
 {
 
@@ -9,16 +11,16 @@ class HourField extends AbstractField
 
     protected int $maxValue = 23;
 
-    public function increment(\DateTime $time): \DateTime
+    public function increment(DateTime $time): DateTime
     {
         $time->modify('+1 hour');
-        return $time->setTime(intval($time->format('H')), 0, 0, 0);
+        return $time->setTime(intval($time->format('H')), 0);
     }
 
-    public function decrement(\DateTime $time): \DateTime
+    public function decrement(DateTime $time): DateTime
     {
         $time->modify('-1 hour');
-        return $time->setTime(intval($time->format('H')), 59, 0, 0);
+        return $time->setTime(intval($time->format('H')), 59);
     }
 
 }

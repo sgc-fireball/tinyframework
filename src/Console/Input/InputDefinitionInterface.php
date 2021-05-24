@@ -14,10 +14,6 @@ interface InputDefinitionInterface
 
     public function name(string $name = null): InputDefinitionInterface|string;
 
-    /**
-     * @param string|null $description
-     * @return static|string|null
-     */
     public function description(string $description = null): InputDefinitionInterface|string|null;
 
     public function argument(Argument|string|int $argument = null): InputDefinitionInterface|Argument|array|null;

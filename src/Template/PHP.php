@@ -41,11 +41,13 @@ class PHP implements ViewInterface
         unset($__data);
         ob_start();
         try {
-            require($__template);
+            if (file_exists($__template)) {
+                require($__template);
+            }
         } catch (\Throwable $e) {
             throw $e;
         } finally {
-            $content = ob_get_clean();
+            $content = (string)ob_get_clean();
         }
         return $content;
     }
@@ -66,7 +68,7 @@ class PHP implements ViewInterface
         } catch (\Throwable $e) {
             throw $e;
         } finally {
-            $content = ob_get_clean();
+            $content = (string)ob_get_clean();
         }
         return $content;
     }

@@ -10,7 +10,7 @@ use TinyFramework\Queue\QueueInterface;
 class QueueServiceProvider extends ServiceProviderAwesome
 {
 
-    public function register()
+    public function register(): void
     {
         $config = $this->container->get('config')->get('queue');
         if (is_null($config)) {

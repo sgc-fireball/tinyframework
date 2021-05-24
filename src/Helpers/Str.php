@@ -33,7 +33,7 @@ class Str implements \Stringable
         $this->value = $value;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->value;
     }
@@ -54,7 +54,7 @@ class Str implements \Stringable
         $value = preg_replace('![^' . preg_quote($separator) . '\pL\pN\s]+!u', '', strtolower($value));
         $value = preg_replace('![' . preg_quote($separator) . '\s]+!u', $separator, $value);
         $value = trim($value, $separator);
-        return new static($value);
+        return new self($value);
     }
 
     public function kebabCase(string $language = null): Str
@@ -69,49 +69,49 @@ class Str implements \Stringable
 
     public function camelCase(string $language = null): Str
     {
-        return new static(str_replace(' ', '', lcfirst(ucwords(str_replace(['-', '_'], ' ', $this->kebabCase($language))))));
+        return new self(str_replace(' ', '', lcfirst(ucwords(str_replace(['-', '_'], ' ', $this->kebabCase($language))))));
     }
 
     public function lowerCase(): Str
     {
-        return new static(mb_strtolower($this->value));
+        return new self(mb_strtolower($this->value));
     }
 
     public function upperCase(): Str
     {
-        return new static(mb_strtoupper($this->value));
+        return new self(mb_strtoupper($this->value));
     }
 
     public function addCSlashes(string $characters): Str
     {
-        return new static(addcslashes($this->value, $characters));
+        return new self(addcslashes($this->value, $characters));
     }
 
     public function addSlashes(): Str
     {
-        return new static(addslashes($this->value));
+        return new self(addslashes($this->value));
     }
 
     public function chunkSplit(int $length = 76, string $separator = "\r\n"): Str
     {
-        return new static(chunk_split($this->value, $length, $separator));
+        return new self(chunk_split($this->value, $length, $separator));
     }
 
     public function substr(int $offset, int|null $length = null): Str
     {
-        return new static(substr($this->value, $offset, $length));
+        return new self(substr($this->value, $offset, $length));
     }
 
     public function countChars(int $mode = 0): Arr|Str
     {
         $result = count_chars($this->value, $mode);
-        return is_string($result) ? new static($result) : Arr::factory($result);
+        return is_string($result) ? new self($result) : Arr::factory($result);
     }
 
     public function substrReplace(array|string $replace, array|int $offset, array|int|null $length = null): Arr|Str
     {
         $result = substr_replace($this->value, $replace, $offset, $length);
-        return is_string($result) ? new static($result) : Arr::factory($result);
+        return is_string($result) ? new self($result) : Arr::factory($result);
     }
 
     public function wordCount(int $format = 0, string|null $characters = null): Arr|int
@@ -122,163 +122,163 @@ class Str implements \Stringable
 
     public function htmlEntityDecode(int $flags = ENT_COMPAT, string|null $encoding = null): Str
     {
-        return new static(html_entity_decode($this->value, $flags, $encoding));
+        return new self(html_entity_decode($this->value, $flags, $encoding));
     }
 
     public function htmlEntityEncode(int $flags = ENT_COMPAT, string|null $encoding = null, bool $double_encode = true): Str
     {
-        return new static(htmlentities($this->value, $flags, $encoding, $double_encode));
+        return new self(htmlentities($this->value, $flags, $encoding, $double_encode));
     }
 
     public function htmlSpecialCharsDecode(int $flags = ENT_COMPAT): Str
     {
-        return new static(htmlspecialchars_decode($this->value, $flags));
+        return new self(htmlspecialchars_decode($this->value, $flags));
     }
 
     public function htmlSpecialCharsEncode(int $flags = ENT_COMPAT, string|null $encoding = null, bool $double_encode = true): Str
     {
-        return new static(htmlspecialchars($this->value, $flags, $encoding, $double_encode));
+        return new self(htmlspecialchars($this->value, $flags, $encoding, $double_encode));
     }
 
     public function lcfirst(): Str
     {
-        return new static(lcfirst($this->value));
+        return new self(lcfirst($this->value));
     }
 
     public function ucfirst(): Str
     {
-        return new static(ucfirst($this->value));
+        return new self(ucfirst($this->value));
     }
 
     public function trim(string $characters = " \n\r\t\v\0"): Str
     {
-        return new static(trim($this->value, $characters));
+        return new self(trim($this->value, $characters));
     }
 
     public function ltrim(string $characters = " \n\r\t\v\0"): Str
     {
-        return new static(ltrim($this->value, $characters));
+        return new self(ltrim($this->value, $characters));
     }
 
     public function rtrim(string $characters = " \n\r\t\v\0"): Str
     {
-        return new static(rtrim($this->value, $characters));
+        return new self(rtrim($this->value, $characters));
     }
 
     public function padLeft(int $length, string $pad_string = " "): Str
     {
-        return new static(str_pad($this->value, $length, $pad_string, STR_PAD_LEFT));
+        return new self(str_pad($this->value, $length, $pad_string, STR_PAD_LEFT));
     }
 
     public function padBoth(int $length, string $pad_string = " "): Str
     {
-        return new static(str_pad($this->value, $length, $pad_string, STR_PAD_BOTH));
+        return new self(str_pad($this->value, $length, $pad_string, STR_PAD_BOTH));
     }
 
     public function padRight(int $length, string $pad_string = " "): Str
     {
-        return new static(str_pad($this->value, $length, $pad_string, STR_PAD_RIGHT));
+        return new self(str_pad($this->value, $length, $pad_string, STR_PAD_RIGHT));
     }
 
     public function replace(array|string $search, array|string $replace, int &$count = null): Str
     {
-        return new static(str_replace($search, $replace, $this->value, $count));
+        return new self(str_replace($search, $replace, $this->value, $count));
     }
 
     public function ireplace(array|string $search, array|string $replace, int &$count = null): Str
     {
-        return new static(str_ireplace($search, $replace, $this->value, $count));
+        return new self(str_ireplace($search, $replace, $this->value, $count));
     }
 
     public function strstr(string $needle, bool $before_needle = false): Str
     {
-        return new static(strstr($this->value, $needle, $before_needle));
+        return new self(strstr($this->value, $needle, $before_needle));
     }
 
     public function stristr(string $needle, bool $before_needle = false): Str
     {
-        return new static(stristr($this->value, $needle, $before_needle));
+        return new self(stristr($this->value, $needle, $before_needle));
     }
 
     public function strtok(string $token): Str|bool
     {
         $result = strtok($this->value, $token);
-        return is_bool($result) ? false : new static($result);
+        return is_bool($result) ? false : new self($result);
     }
 
-    public function strtr(array|string $from, ?string $to = null): Str|bool
+    public function strtr(array|string $from, ?string $to = null): Str
     {
         if (is_array($from)) {
-            return new static(strtr($this->value, $from));
+            return new self(strtr($this->value, $from));
         }
-        return new static(strtr($this->value, $from, $to));
+        return new self(strtr($this->value, $from, $to));
     }
 
     public function shuffle(): Str
     {
-        return new static(str_shuffle($this->value));
+        return new self(str_shuffle($this->value));
     }
 
     public function repeat(int $times): Str
     {
-        return new static(str_repeat($this->value, $times));
+        return new self(str_repeat($this->value, $times));
     }
 
     public function reverse(): Str
     {
-        return new static(strrev($this->value));
+        return new self(strrev($this->value));
     }
 
     public function nl2br(bool $use_xhtml = true): Str
     {
-        return new static(nl2br($this->value, $use_xhtml));
+        return new self(nl2br($this->value, $use_xhtml));
     }
 
     public function quotedPrintableDecode(): Str
     {
-        return new static(quoted_printable_decode($this->value));
+        return new self(quoted_printable_decode($this->value));
     }
 
     public function quotedPrintableEncode(): Str
     {
-        return new static(quoted_printable_encode($this->value));
+        return new self(quoted_printable_encode($this->value));
     }
 
     public function quotemeta(): Str
     {
-        return new static(quotemeta($this->value));
+        return new self(quotemeta($this->value));
     }
 
     public function stripTags(array|string|null $allowed_tags = null): Str
     {
-        return new static(strip_tags($this->value, $allowed_tags));
+        return new self(strip_tags($this->value, $allowed_tags));
     }
 
     public function stripCSlashes(): Str
     {
-        return new static(stripcslashes($this->value));
+        return new self(stripcslashes($this->value));
     }
 
     public function stripSlashes(): Str
     {
-        return new static(stripslashes($this->value));
+        return new self(stripslashes($this->value));
     }
 
     public function wordwrap(int $width = 75, string $break = "\n", bool $cut_long_words = false): Str
     {
-        return new static(wordwrap($this->value, $width, $break, $cut_long_words));
+        return new self(wordwrap($this->value, $width, $break, $cut_long_words));
     }
 
     public function strpbrk(string $characters): Str|bool
     {
         $result = strpbrk($this->value, $characters);
-        return is_bool($result) ? false : new static($result);
+        return is_bool($result) ? false : new self($result);
     }
 
     public function strrchr(string $needle): Str|bool
     {
         $result = strrchr($this->value, $needle);
-        return is_bool($result) ? false : new static($result);
+        return is_bool($result) ? false : new self($result);
     }
 
     #[Pure] public function contains(string $chars): bool
@@ -412,7 +412,7 @@ class Str implements \Stringable
             return new URL($this->value);
         }
         $result = parse_url($this->value, $component);
-        if (is_string($result)) return new static($result);
+        if (is_string($result)) return new self($result);
         if (is_array($result)) return Arr::factory($result);
         return $result;
     }

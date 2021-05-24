@@ -8,7 +8,7 @@ use TinyFramework\Hash\HashInterface;
 class HashServiceProvider extends ServiceProviderAwesome
 {
 
-    public function register()
+    public function register(): void
     {
         $configs = $this->container->get('config')->get('hash');
         if (is_null($configs)) {

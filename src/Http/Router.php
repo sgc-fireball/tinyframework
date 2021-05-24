@@ -3,6 +3,7 @@
 namespace TinyFramework\Http;
 
 use Closure;
+use RuntimeException;
 use TinyFramework\Core\ContainerInterface;
 use TinyFramework\Http\Middleware\MaintenanceMiddleware;
 
@@ -63,7 +64,7 @@ class Router
         return $this;
     }
 
-    public function middleware($middleware = null): static|array
+    public function middleware(array|string|null $middleware = null): static|array
     {
         if (is_null($middleware)) {
             return $this->middleware;
@@ -96,84 +97,84 @@ class Router
         return $this;
     }
 
-    public function any(string $url, $action): Route
+    public function any(string $url, Closure|array|string $action): Route
     {
         $route = (new Route())->method('ANY')->url($url)->action($action);
         $this->routes[] = $route;
         return $route;
     }
 
-    public function get(string $url, $action): Route
+    public function get(string $url, Closure|array|string $action): Route
     {
         $route = (new Route())->method('GET')->url($url)->action($action);
         $this->routes[] = $route;
         return $route;
     }
 
-    public function head(string $url, $action): Route
+    public function head(string $url, Closure|array|string $action): Route
     {
         $route = (new Route())->method('head')->url($url)->action($action);
         $this->routes[] = $route;
         return $route;
     }
 
-    public function post(string $url, $action): Route
+    public function post(string $url, Closure|array|string $action): Route
     {
         $route = (new Route())->method('POST')->url($url)->action($action);
         $this->routes[] = $route;
         return $route;
     }
 
-    public function put(string $url, $action): Route
+    public function put(string $url, Closure|array|string $action): Route
     {
         $route = (new Route())->method('PUT')->url($url)->action($action);
         $this->routes[] = $route;
         return $route;
     }
 
-    public function delete(string $url, $action): Route
+    public function delete(string $url, Closure|array|string $action): Route
     {
         $route = (new Route())->method('DELETE')->url($url)->action($action);
         $this->routes[] = $route;
         return $route;
     }
 
-    public function connect(string $url, $action): Route
+    public function connect(string $url, Closure|array|string $action): Route
     {
         $route = (new Route())->method('CONNECT')->url($url)->action($action);
         $this->routes[] = $route;
         return $route;
     }
 
-    public function options(string $url, $action): Route
+    public function options(string $url, Closure|array|string $action): Route
     {
         $route = (new Route())->method('OPTIONS')->url($url)->action($action);
         $this->routes[] = $route;
         return $route;
     }
 
-    public function patch(string $url, $action): Route
+    public function patch(string $url, Closure|array|string $action): Route
     {
         $route = (new Route())->method('PATCH')->url($url)->action($action);
         $this->routes[] = $route;
         return $route;
     }
 
-    public function purge(string $url, $action): Route
+    public function purge(string $url, Closure|array|string $action): Route
     {
         $route = (new Route())->method('PURGE')->url($url)->action($action);
         $this->routes[] = $route;
         return $route;
     }
 
-    public function trace(string $url, $action): Route
+    public function trace(string $url, Closure|array|string $action): Route
     {
         $route = (new Route())->method('TRACE')->url($url)->action($action);
         $this->routes[] = $route;
         return $route;
     }
 
-    public function custom(string $method, string $url, $action): Route
+    public function custom(string $method, string $url, Closure|array|string $action): Route
     {
         $route = (new Route())->method($method)->url($url)->action($action);
         $this->routes[] = $route;
@@ -258,7 +259,7 @@ class Router
         return $list;
     }
 
-    public function fallback($action): Route
+    public function fallback(Closure|array|string $action): Route
     {
         $route = (new Route())->method('any')->url('.*')->action($action)->name('fallback');
         $this->routes[] = $route;
@@ -333,11 +334,11 @@ class Router
                 $url = str_replace('{' . $key . '}', (string)$value, $url);
             }
             if (mb_strpos($url, '{') || strpos($url, '}')) {
-                throw new \RuntimeException('Missing parameters.');
+                throw new RuntimeException('Missing parameters.');
             }
             return rtrim('/' . ltrim($url, '/'), '?&');
         }
-        throw new \RuntimeException('Could not found route.');
+        throw new RuntimeException('Could not found route.');
     }
 
     public function url(string $path = '/', array $parameters = []): string
@@ -345,8 +346,8 @@ class Router
         $url = '/' . ltrim($path, '/');
         $url .= mb_strpos($url, '?') === false ? '?' : '&';
         $url .= http_build_query($parameters);
-        /** @var Request $request */
         if ($request = $this->container->get('request')) {
+            /** @var Request $request */
             return (new URL($url))
                 ->scheme($request->url()->scheme())
                 ->host($request->url()->host())

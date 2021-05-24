@@ -2,6 +2,8 @@
 
 namespace TinyFramework\Session;
 
+use RuntimeException;
+
 class FileSession extends SessionAwesome implements SessionInterface
 {
 
@@ -12,11 +14,11 @@ class FileSession extends SessionAwesome implements SessionInterface
         $this->path = $config['path'] ?? sys_get_temp_dir();
         if (!is_dir($this->path)) {
             if (!mkdir($this->path, 0770, true)) {
-                throw new \RuntimeException('Could not create session folder.');
+                throw new RuntimeException('Could not create session folder.');
             }
         }
         if (!is_readable($this->path) || !is_writable($this->path)) {
-            throw new \RuntimeException('Invalid session folder permission.');
+            throw new RuntimeException('Invalid session folder permission.');
         }
         $this->ttl = (int)$config['ttl'] ?? $this->ttl;
     }
@@ -31,16 +33,16 @@ class FileSession extends SessionAwesome implements SessionInterface
             return $this;
         }
         if (!is_readable($file)) {
-            throw new \RuntimeException('Could not read session file.');
+            throw new RuntimeException('Could not read session file.');
         }
-        $this->data = unserialize(file_get_contents($file));
+        $this->data = unserialize((string)file_get_contents($file));
         return $this;
     }
 
     public function clear(): static
     {
-        foreach (glob(sprintf('%s/*.session.tmp', $this->path)) as $file) {
-            if (file_exists($file)) {
+        foreach ((array)glob(sprintf('%s/*.session.tmp', $this->path)) as $file) {
+            if (is_string($file) && file_exists($file) && is_writable($file)) {
                 @unlink($file);
             }
         }
@@ -51,13 +53,13 @@ class FileSession extends SessionAwesome implements SessionInterface
     {
         $file = sprintf('%s/%s.session.tmp', $this->path, $this->getId());
         if (!is_writable($this->path)) {
-            throw new \RuntimeException('Could not save session file. (1)');
+            throw new RuntimeException('Could not save session file. (1)');
         }
         if (file_exists($file) && !is_writable($file)) {
-            throw new \RuntimeException('Could not save session file. (2)');
+            throw new RuntimeException('Could not save session file. (2)');
         }
         if (file_put_contents($file, serialize($this->data)) === false) {
-            throw new \RuntimeException('Could not save session file. (3)');
+            throw new RuntimeException('Could not save session file. (3)');
         }
         return $this;
     }
@@ -67,7 +69,7 @@ class FileSession extends SessionAwesome implements SessionInterface
         $file = sprintf('%s/%s.session.tmp', $this->path, $this->getId());
         if (file_exists($file)) {
             if (!is_writable($file)) {
-                throw new \RuntimeException('Could not delete session file.');
+                throw new RuntimeException('Could not delete session file.');
             }
             unlink($file);
         }

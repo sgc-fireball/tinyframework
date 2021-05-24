@@ -45,7 +45,7 @@ class TestCommand extends CommandAwesome
         return 0;
     }
 
-    private function testTable()
+    private function testTable(): void
     {
         $table = new Table($this->output);
         $table->headerTitle('Books');
@@ -63,7 +63,7 @@ class TestCommand extends CommandAwesome
         $table->render();
     }
 
-    private function testProgressBar()
+    private function testProgressBar(): void
     {
         $max = 1000;
         $progressBar = new ProgressBar($this->output);

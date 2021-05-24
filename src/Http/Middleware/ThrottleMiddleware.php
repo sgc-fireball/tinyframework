@@ -3,7 +3,7 @@
 namespace TinyFramework\Http\Middleware;
 
 use Closure;
-use http\Exception\RuntimeException;
+use RuntimeException;
 use TinyFramework\Http\Request;
 use TinyFramework\Http\Response;
 
@@ -19,7 +19,7 @@ class ThrottleMiddleware implements MiddlewareInterface
         if ($current <= $maxRequests) {
             return $next($request);
         }
-        throw new \RuntimeException('', 429);
+        throw new RuntimeException('', 429);
     }
 
     private function getRequestSignature(Request $request): string

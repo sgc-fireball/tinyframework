@@ -3,6 +3,7 @@
 namespace TinyFramework\Database;
 
 use Closure;
+use RuntimeException;
 
 abstract class QueryAwesome implements QueryInterface
 {
@@ -49,7 +50,7 @@ abstract class QueryAwesome implements QueryInterface
         return $this;
     }
 
-    public function where(string|Closure $field, string $operation = null, $value = null): static
+    public function where(string|Closure $field, string $operation = null, mixed $value = null): static
     {
         if ($field instanceof Closure) {
             return $this->whereNested($field);
@@ -88,7 +89,7 @@ abstract class QueryAwesome implements QueryInterface
         return $this;
     }
 
-    public function orWhere(string|Closure $field, string $operation, $value): static
+    public function orWhere(string|Closure $field, string $operation, mixed $value): static
     {
         if ($field instanceof Closure) {
             return $this->whereNested($field);
@@ -103,7 +104,7 @@ abstract class QueryAwesome implements QueryInterface
         return $this;
     }
 
-    public function orWhereNull(string $field, string $operation, $value): static
+    public function orWhereNull(string $field, string $operation, mixed $value): static
     {
         $this->wheres[] = [
             'type' => 'basic',
@@ -115,7 +116,7 @@ abstract class QueryAwesome implements QueryInterface
         return $this;
     }
 
-    public function orWhereNotNull(string $field, string $operation, $value): static
+    public function orWhereNotNull(string $field, string $operation, mixed $value): static
     {
         $this->wheres[] = [
             'type' => 'basic',
@@ -200,7 +201,7 @@ abstract class QueryAwesome implements QueryInterface
         if ($result = $this->first()) {
             return $result;
         }
-        throw new \RuntimeException('Model not found');
+        throw new RuntimeException('Model not found');
     }
 
     public function paginate(int $perPage = 20, int $page = 1): array
@@ -274,12 +275,12 @@ abstract class QueryAwesome implements QueryInterface
     {
         $class = is_object($model) ? get_class($model) : (string)$model;
         if (!class_exists($class)) {
-            throw new \RuntimeException('Class does not exists: ' . $class);
+            throw new RuntimeException('Class does not exists: ' . $class);
         }
         $this->class = $class;
         $model = $model instanceof BaseModel ? $model : (new $this->class);
         if (!method_exists($model, 'getTable')) {
-            throw new \RuntimeException('Missing method ' . $class . '@getTable.');
+            throw new RuntimeException('Missing method ' . $class . '@getTable.');
         }
         $this->table = $model->getTable();
         return $this;

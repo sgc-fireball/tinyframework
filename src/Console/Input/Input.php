@@ -2,6 +2,8 @@
 
 namespace TinyFramework\Console\Input;
 
+use InvalidArgumentException;
+
 class Input implements InputInterface
 {
 
@@ -23,7 +25,7 @@ class Input implements InputInterface
         @array_shift($this->argv); // strip application name
     }
 
-    public function argv(array $argv = null)
+    public function argv(array $argv = null): array|static
     {
         if (!is_null($argv)) {
             $this->argv = $argv;
@@ -53,7 +55,7 @@ class Input implements InputInterface
         return $definition->argument($name);
     }
 
-    public function interaction(bool $interaction = null)
+    public function interaction(bool $interaction = null): bool|static
     {
         if (is_null($interaction)) {
             return $this->interaction;
@@ -97,7 +99,7 @@ class Input implements InputInterface
                 return;
             }
         }
-        throw new \InvalidArgumentException('Invalid long option: ' . $token);
+        throw new InvalidArgumentException('Invalid long option: ' . $token);
     }
 
     private function parseShortOption(string $token): void
@@ -118,7 +120,7 @@ class Input implements InputInterface
                 }
                 continue;
             }
-            throw new \InvalidArgumentException('Invalid short option: ' . $token);
+            throw new InvalidArgumentException('Invalid short option: ' . $token);
         }
     }
 
@@ -141,7 +143,7 @@ class Input implements InputInterface
     {
         $argument = $this->inputDefinition->argument($position);
         if (is_null($argument)) {
-            throw new \InvalidArgumentException('Too many arguments');
+            throw new InvalidArgumentException('Too many arguments');
         }
         $argument->value($token);
     }

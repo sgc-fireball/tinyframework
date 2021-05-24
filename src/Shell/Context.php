@@ -7,7 +7,7 @@ class Context
 
     private array $variables = [];
 
-    public function setVariable(string $key, $value): static
+    public function setVariable(string $key, mixed $value): static
     {
         $this->variables[$key] = $value;
         return $this;

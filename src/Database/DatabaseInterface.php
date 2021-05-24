@@ -13,7 +13,7 @@ interface DatabaseInterface
 
     public function disconnect(): DatabaseInterface;
 
-    public function escape($value): string|float|int;
+    public function escape(mixed $value): string|float|int;
 
     public function query(): QueryInterface;
 

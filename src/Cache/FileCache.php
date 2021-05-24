@@ -2,6 +2,8 @@
 
 namespace TinyFramework\Cache;
 
+use RuntimeException;
+
 class FileCache extends CacheAwesome
 {
 
@@ -13,11 +15,11 @@ class FileCache extends CacheAwesome
         $this->path = $this->config['path'] ?? sys_get_temp_dir();
         if (!is_dir($this->path)) {
             if (!mkdir($this->path, 0770, true)) {
-                throw new \RuntimeException('Could not create cache folder.');
+                throw new RuntimeException('Could not create cache folder.');
             }
         }
         if (!is_readable($this->path) || !is_writable($this->path)) {
-            throw new \RuntimeException('Invalid cache folder permission.');
+            throw new RuntimeException('Invalid cache folder permission.');
         }
     }
 
@@ -44,7 +46,7 @@ class FileCache extends CacheAwesome
         return $this;
     }
 
-    public function get(string $key)
+    public function get(string $key): mixed
     {
         if ($this->has($key)) {
             return unserialize(file_get_contents($this->key2file($key))) ?? null;
@@ -65,14 +67,14 @@ class FileCache extends CacheAwesome
         return true;
     }
 
-    public function set(string $key, $value = null, null|int|\DateTime|\DateTimeInterface $ttl = null): static
+    public function set(string $key, mixed $value = null, null|int|\DateTime|\DateTimeInterface $ttl = null): static
     {
         $file = $this->key2file($key);
         if (file_put_contents($file, serialize($value)) === false) {
-            throw new \RuntimeException('Could not write cache.');
+            throw new RuntimeException('Could not write cache.');
         }
         if (!touch($file, $ttl ? $this->calculateExpiration($ttl) : time() + 60 * 60 * 24 * 7 * 52)) {
-            throw new \RuntimeException('Could set cache ttl.');
+            throw new RuntimeException('Could set cache ttl.');
         }
         $this->addKeyToTags($key);
         return $this;
@@ -87,7 +89,7 @@ class FileCache extends CacheAwesome
         if (@unlink($key)) {
             return $this;
         }
-        throw new \RuntimeException('Could not clear cache key.');
+        throw new RuntimeException('Could not clear cache key.');
     }
 
     private function addKeyToTags(string $key): static

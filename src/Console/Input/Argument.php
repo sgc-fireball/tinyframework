@@ -14,13 +14,13 @@ class Argument
 
     private ?string $description;
 
-    private $value = null;
+    private mixed $value = null;
 
     public static function create(
         string $name,
         int $mode = null,
         string $description = '',
-        $default = null
+        mixed $default = null
     ): Argument
     {
         return new Argument($name, $mode, $description, $default);
@@ -30,7 +30,7 @@ class Argument
         string $name,
         int $mode = null,
         string $description = '',
-        $default = null
+        mixed $default = null
     )
     {
         $this->name = $name;
@@ -54,11 +54,7 @@ class Argument
         return ($this->mode & self::VALUE_OPTIONAL) === self::VALUE_OPTIONAL;
     }
 
-    /**
-     * @param mixed|null $value
-     * @return static|mixed
-     */
-    public function value(mixed $value = null)
+    public function value(mixed $value = null): mixed
     {
         if (is_null($value)) {
             return $this->value;

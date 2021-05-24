@@ -8,7 +8,7 @@ use TinyFramework\Database\MigrationInstaller;
 class DatabaseServiceProvider extends ServiceProviderAwesome
 {
 
-    public function register()
+    public function register(): void
     {
         $config = $this->container->get('config')->get('database');
         if (is_null($config)) {

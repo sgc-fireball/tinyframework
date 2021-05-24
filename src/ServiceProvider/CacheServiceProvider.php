@@ -9,7 +9,7 @@ use TinyFramework\Core\ContainerInterface;
 class CacheServiceProvider extends ServiceProviderAwesome
 {
 
-    public function register()
+    public function register(): void
     {
         $config = $this->container->get('config')->get('cache');
         if (is_null($config)) {

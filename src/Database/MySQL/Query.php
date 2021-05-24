@@ -102,6 +102,9 @@ class Query extends QueryAwesome
         return $this->driver->execute($this->toSql());
     }
 
+    /**
+     * @TODO return type
+     */
     public function put(array $fields = [])
     {
         if (array_key_exists('id', $fields) && $fields['id']) {
@@ -126,9 +129,9 @@ class Query extends QueryAwesome
         }
     }
 
-    public function delete()
+    public function delete(): bool
     {
-        return $this->driver->execute(rtrim(sprintf(
+        return (bool)$this->driver->execute(rtrim(sprintf(
             'DELETE FROM `%s` %s %s %s %s',
             $this->table,
             $this->compileWhere($this->wheres, true),

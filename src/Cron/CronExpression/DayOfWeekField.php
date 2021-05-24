@@ -2,6 +2,8 @@
 
 namespace TinyFramework\Cron\CronExpression;
 
+use DateTime;
+
 class DayOfWeekField extends AbstractField
 {
 
@@ -9,14 +11,14 @@ class DayOfWeekField extends AbstractField
 
     protected int $maxValue = 7;
 
-    public function increment(\DateTime $time): \DateTime
+    public function increment(DateTime $time): DateTime
     {
-        return $time->modify('+1 day')->setTime(0, 0, 0, 0);
+        return $time->modify('+1 day')->setTime(0, 0);
     }
 
-    public function decrement(\DateTime $time): \DateTime
+    public function decrement(DateTime $time): DateTime
     {
-        return $time->modify('-1 day')->setTime(23, 59, 0, 0);
+        return $time->modify('-1 day')->setTime(23, 59);
     }
 
     public function inExpression(int $value): bool

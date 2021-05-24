@@ -9,8 +9,8 @@ interface ServiceProviderInterface
 
     public function __construct(ContainerInterface $container);
 
-    public function register();
+    public function register(): void;
 
-    public function boot();
+    public function boot(): void;
 
 }

@@ -40,8 +40,6 @@ class BaseModel implements JsonSerializable, ArrayAccess
     }
 
     /**
-     * @param array $attributes
-     * @return static
      * @internal use only from Database
      */
     public function forceFill(array $attributes = []): static
@@ -50,49 +48,49 @@ class BaseModel implements JsonSerializable, ArrayAccess
         return $this;
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return $this->attributes;
     }
 
-    public function __get($name)
+    public function __get(string $name): mixed
     {
         return $this->attributes[$name] ?? null;
     }
 
-    public function __isset($name)
+    public function __isset(string $name): bool
     {
         return array_key_exists($name, $this->attributes);
     }
 
-    public function __set($name, $value)
+    public function __set(string $name, mixed $value): void
     {
         $this->attributes[$name] = $value;
     }
 
-    public function toArray()
+    public function toArray(): array
     {
         return $this->attributes;
     }
 
-    public function offsetExists($offset)
+    public function offsetExists(mixed $offset): bool
     {
-        return array_key_exists($offset, $this->attributes);
+        return array_key_exists((string)$offset, $this->attributes);
     }
 
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): mixed
     {
-        return $this->attributes[$offset] ?? null;
+        return $this->attributes[(string) $offset] ?? null;
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet(mixed $offset, mixed $value): void
     {
-        $this->attributes[$offset] = $value;
+        $this->attributes[(string)$offset] = $value;
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset(mixed $offset): void
     {
-        $this->attributes[$offset] = null;
+        $this->attributes[(string) $offset] = null;
     }
 
     public function isDirty(): bool

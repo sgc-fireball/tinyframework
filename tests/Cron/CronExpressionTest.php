@@ -2,6 +2,7 @@
 
 namespace TinyFramework\Tests\Cron;
 
+use DateTime;
 use PHPUnit\Framework\TestCase;
 use TinyFramework\Cron\CronExpression;
 
@@ -16,7 +17,7 @@ class CronExpressionTest extends TestCase
 
     public function testEveryTwoMinute()
     {
-        $time = new \DateTime();
+        $time = new DateTime();
         $cronExpression = new CronExpression('*/2 * * * *');
         $this->assertEquals(($time->format('i') % 2) === 0, $cronExpression->isDue($time));
     }

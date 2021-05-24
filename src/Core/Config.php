@@ -53,7 +53,7 @@ class Config implements ConfigInterface
         return $output;
     }
 
-    public function get(string $key = null)
+    public function get(string $key = null): mixed
     {
         if (is_null($key)) {
             return $this->config;
@@ -72,12 +72,7 @@ class Config implements ConfigInterface
         return array_key_exists($key, $this->config) ? $this->config[$key] : null;
     }
 
-    /**
-     * @param string $key
-     * @param mixed $value
-     * @return static
-     */
-    public function set(string $key, $value): static
+    public function set(string $key, mixed $value): static
     {
         $keys = strpos($key, '.') === false ? [$key] : explode('.', $key);
         $key = $keys[count($keys) - 1];

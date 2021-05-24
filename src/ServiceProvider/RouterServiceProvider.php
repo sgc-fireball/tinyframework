@@ -8,7 +8,7 @@ use TinyFramework\Http\Router;
 class RouterServiceProvider extends ServiceProviderAwesome
 {
 
-    public function register()
+    public function register(): void
     {
         $this->container
             ->alias('router', Router::class)

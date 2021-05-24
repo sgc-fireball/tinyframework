@@ -3,12 +3,13 @@
 namespace TinyFramework\Queue;
 
 use Redis;
+use RuntimeException;
 
 class RedisQueue implements QueueInterface
 {
 
     /** @var Redis */
-    private $redis;
+    private Redis $redis;
 
     private array $config = [];
 
@@ -24,7 +25,7 @@ class RedisQueue implements QueueInterface
 
         $this->redis = new Redis();
         if (!$this->redis->pconnect($this->config['host'], $this->config['port'])) {
-            throw new \RuntimeException('Could not connect to redis');
+            throw new RuntimeException('Could not connect to redis');
         }
         $this->redis->auth($this->config['password']);
         $this->redis->select($this->config['database']);
@@ -104,7 +105,7 @@ class RedisQueue implements QueueInterface
     public function count(): int
     {
         $this->fetchDelayed();
-        return $this->redis->llen($this->config['name']);
+        return (int)$this->redis->llen($this->config['name']);
     }
 
 }

@@ -2,6 +2,8 @@
 
 namespace TinyFramework\Cron\CronExpression;
 
+use DateTime;
+
 class MinuteField extends AbstractField
 {
 
@@ -9,12 +11,12 @@ class MinuteField extends AbstractField
 
     protected int $maxValue = 59;
 
-    public function increment(\DateTime $time): \DateTime
+    public function increment(DateTime $time): DateTime
     {
         return $time->modify('+1 minute');
     }
 
-    public function decrement(\DateTime $time): \DateTime
+    public function decrement(DateTime $time): DateTime
     {
         return $time->modify('-1 minute');
     }

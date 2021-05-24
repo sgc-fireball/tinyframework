@@ -14,12 +14,12 @@ abstract class ServiceProviderAwesome implements ServiceProviderInterface
         $this->container = $container;
     }
 
-    public function register()
+    public function register(): void
     {
 
     }
 
-    public function boot()
+    public function boot(): void
     {
 
     }

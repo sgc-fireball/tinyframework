@@ -46,15 +46,15 @@ class Readline
     }
 
     /**
-     * @param string|null $prompt
-     * @return false|string
+     * @param string $prompt
+     * @return string
      */
-    public function prompt(string $prompt = null)
+    public function prompt(string $prompt = ''): string
     {
         $prompt = trim($prompt);
         $prompt = $prompt ?? $this->prompt;
         $prompt = $prompt ? $prompt . ' ' : '';
-        return readline($prompt);
+        return (string)readline($prompt);
     }
 
     public function addHistory(string $command): static
@@ -80,7 +80,7 @@ class Readline
         }
         $history = array_reverse(readline_list_history());
         $history = array_reverse(array_unique($history, SORT_STRING));
-        if (isset($_SERVER) && is_array($_SERVER) && array_key_exists('HISTSIZE', $_SERVER)) {
+        if (array_key_exists('HISTSIZE', $_SERVER)) {
             $history = array_slice($history, count($history) - $_SERVER['HISTSIZE']);
         }
         $content = "_HiStOrY_V2_\n" . implode("\n", $history);
@@ -95,7 +95,7 @@ class Readline
      */
     public function autocomplete(string $input, int $index): array
     {
-        $info = readline_info();
+        $info = (array)readline_info();
         $matches = [];
         /** @var TabCompletionInterface $matcher */
         foreach ($this->matchers as $matcher) {

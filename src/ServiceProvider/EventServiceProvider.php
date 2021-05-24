@@ -9,7 +9,7 @@ use TinyFramework\Event\EventDispatcherInterface;
 class EventServiceProvider extends ServiceProviderAwesome
 {
 
-    public function register()
+    public function register(): void
     {
         $this->container
             ->alias('event', EventDispatcher::class)

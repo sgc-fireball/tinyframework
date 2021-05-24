@@ -2,6 +2,8 @@
 
 namespace TinyFramework\Database;
 
+use ReflectionClass;
+
 class MigrationInstaller
 {
 
@@ -25,8 +27,8 @@ class MigrationInstaller
             return $class instanceof MigrationInterface;
         });
         usort($this->migrations, function ($migrationA, $migrationB) {
-            $timeA = (int)explode('_', (new \ReflectionClass($migrationA))->getShortName())[1];
-            $timeB = (int)explode('_', (new \ReflectionClass($migrationB))->getShortName())[1];
+            $timeA = (int)explode('_', (new ReflectionClass($migrationA))->getShortName())[1];
+            $timeB = (int)explode('_', (new ReflectionClass($migrationB))->getShortName())[1];
             return $timeA === $timeB ? 0 : ($timeA <= $timeB ? -1 : 1);
         });
         return $this->migrations;
@@ -45,7 +47,7 @@ class MigrationInstaller
         return $this->database;
     }
 
-    public function up()
+    public function up(): void
     {
         $this->sortMigrations();
         $migrated = $this->getRan();
@@ -69,7 +71,7 @@ class MigrationInstaller
         }
     }
 
-    public function down()
+    public function down(): void
     {
         $migrations = array_reverse($this->sortMigrations());
         $batch = 0;

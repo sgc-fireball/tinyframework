@@ -146,7 +146,7 @@ class Response
         return $this;
     }
 
-    public function with(string $key, $value): static
+    public function with(string $key, mixed $value): static
     {
         if ($this->session) {
             $flash = $this->session->get('flash') ?? [];
@@ -252,7 +252,7 @@ class Response
         return $this;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         $response = sprintf("%s %d %s\n", $this->protocol, $this->code, static::$codes[$this->code]);
         foreach ($this->headers as $key => $value) {

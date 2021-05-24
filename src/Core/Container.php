@@ -29,12 +29,7 @@ class Container implements ContainerInterface
             ->singleton(self::class, $this);
     }
 
-    /**
-     * @param string|string[] $tags
-     * @param string|string[] $instances
-     * @return static
-     */
-    public function tag($tags, $instances): static
+    public function tag(string|array $tags, string|array $instances): static
     {
         $tags = is_string($tags) ? [$tags] : $tags;
         $instances = is_string($instances) ? [$instances] : $instances;
@@ -69,7 +64,7 @@ class Container implements ContainerInterface
         return array_key_exists($key, $this->instances);
     }
 
-    public function get(string $key, array $parameters = [])
+    public function get(string $key, array $parameters = []): mixed
     {
         $oKey = $key;
         $key = $this->resolveAlias($key);
@@ -107,14 +102,14 @@ class Container implements ContainerInterface
         return $this;
     }
 
-    public function decorator(string $key, $object)
+    public function decorator(string $key, string|array|callable|object $object): static
     {
         $self = $this;
         $innerKey = uniqid('inner-' . $key . '-');
         $this->instances[$innerKey] = $this->instances[$key];
         $this->instances[$key] = function () use ($self, $object, $innerKey) {
             $inner = $self->get($innerKey);
-            $result = $self->get($object, ['inner' => $inner]);
+            $result = $self->call($object, ['inner' => $inner]);
             if (method_exists($result, 'setInner')) {
                 $result->setInner($inner);
             }
@@ -123,7 +118,7 @@ class Container implements ContainerInterface
         return $this;
     }
 
-    public function call(string|array|callable|object $callable, array $parameters = [])
+    public function call(string|array|callable|object $callable, array $parameters = []): mixed
     {
         $callable = $this->resolveAlias($callable);
         if (is_string($callable)) {
@@ -150,16 +145,16 @@ class Container implements ContainerInterface
         if (is_array($callable) && method_exists($callable[0], $callable[1])) {
             return $this->callMethod($callable[0], $callable[1], $parameters);
         }
-        throw new \RuntimeException('Illegal reference can not be called.');
+        throw new RuntimeException('Illegal reference can not be called.');
     }
 
     /**
      * @param string $class
      * @param array $parameters
-     * @return object
+     * @return mixed
      * @throws \ReflectionException
      */
-    private function callConstruct(string $class, array $parameters = [])
+    private function callConstruct(string $class, array $parameters = []): mixed
     {
         $arguments = [];
         $reflection = new ReflectionClass($class);
@@ -195,7 +190,7 @@ class Container implements ContainerInterface
      * @return mixed
      * @throws \ReflectionException
      */
-    private function callMethod($class, string $method, array $parameters = [])
+    private function callMethod($class, string $method, array $parameters = []): mixed
     {
         if (!method_exists($class, $omethod = $method)) {
             $method = '__call';
@@ -217,7 +212,7 @@ class Container implements ContainerInterface
      * @return mixed
      * @throws \ReflectionException
      */
-    private function callFunction($function, array $parameters = [])
+    private function callFunction($function, array $parameters = []): mixed
     {
         $arguments = $this->buildArgumentsByParameters(
             new ReflectionFunction($function),

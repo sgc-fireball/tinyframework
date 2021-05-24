@@ -2,6 +2,7 @@
 
 namespace TinyFramework\Shell;
 
+use RuntimeException;
 use TinyFramework\Console\Output\OutputInterface;
 
 class Shell
@@ -21,7 +22,7 @@ class Shell
         $this->output = $output;
     }
 
-    public function run()
+    public function run(): void
     {
         #$this->output->error('This is an error.');
         #$this->output->warning('This is an warning.');
@@ -30,7 +31,7 @@ class Shell
         $this->readline->readHistory();
         while (true) {
             $line = $this->readline->prompt('$');
-            if (in_array($line, ['exit', 'quit', 'bye', 'cya', 'die']) || $line === false) {
+            if (in_array($line, ['exit', 'quit', 'bye', 'cya', 'die'])) {
                 break;
             }
             if (empty($line)) {
@@ -120,11 +121,13 @@ class Shell
      * @param string $errstr
      * @param string $errfile
      * @param int $errline
+     * @return bool
+     * @throws RuntimeException
      * @internal
      */
-    public function handleError(int $errno, string $errstr, string $errfile, int $errline)
+    public function handleError(int $errno, string $errstr, string $errfile, int $errline): bool
     {
-        throw new \RuntimeException($errstr, $errno);
+        throw new RuntimeException($errstr, $errno);
     }
 
 }

@@ -11,7 +11,7 @@ use TinyFramework\Http\Response;
 class XhprofServiceProvider extends ServiceProviderAwesome
 {
 
-    public function register()
+    public function register(): void
     {
         if (!extension_loaded('tideways_xhprof') && !extension_loaded('xhprof')) {
             return;

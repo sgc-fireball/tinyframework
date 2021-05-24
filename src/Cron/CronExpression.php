@@ -2,6 +2,7 @@
 
 namespace TinyFramework\Cron;
 
+use DateTime;
 use TinyFramework\Cron\CronExpression\DayOfMonthField;
 use TinyFramework\Cron\CronExpression\DayOfWeekField;
 use TinyFramework\Cron\CronExpression\HourField;
@@ -37,9 +38,9 @@ class CronExpression
         $this->month = new MonthField($month);
     }
 
-    public function isDue(\DateTime|\DateTimeImmutable $time = null): bool
+    public function isDue(DateTime|\DateTimeImmutable $time = null): bool
     {
-        $time ??= new \DateTime();
+        $time ??= new DateTime();
         if (!$this->month->inExpression(intval($time->format('m')))) {
             return false;
         }
@@ -58,11 +59,11 @@ class CronExpression
         return true;
     }
 
-    public function getNextRunDate(\DateTime|\DateTimeImmutable $next = null): \DateTime
+    public function getNextRunDate(DateTime|\DateTimeImmutable $next = null): DateTime
     {
-        $next ??= new \DateTime();
+        $next ??= new DateTime();
         if ($next instanceof \DateTimeImmutable) {
-            $next = new \DateTime($next->format('Y-m-d H:i:00'), $next->getTimezone());
+            $next = new DateTime($next->format('Y-m-d H:i:00'), $next->getTimezone());
         }
         $next->modify('+1 minute');
         while (true) {
@@ -91,11 +92,11 @@ class CronExpression
         return $next;
     }
 
-    public function getPreviousRunDate(\DateTime|\DateTimeImmutable $previous = null): \DateTime
+    public function getPreviousRunDate(DateTime|\DateTimeImmutable $previous = null): DateTime
     {
-        $previous ??= new \DateTime();
+        $previous ??= new DateTime();
         if ($previous instanceof \DateTimeImmutable) {
-            $previous = new \DateTime($previous->format('Y-m-d H:i:00'), $previous->getTimezone());
+            $previous = new DateTime($previous->format('Y-m-d H:i:00'), $previous->getTimezone());
         }
         $previous->modify('-1 minute');
         while (true) {

@@ -3,6 +3,7 @@
 namespace TinyFramework\Broadcast;
 
 use Redis;
+use RuntimeException;
 
 class RedisBroadcast implements BroadcastInterface
 {
@@ -24,7 +25,7 @@ class RedisBroadcast implements BroadcastInterface
 
         $this->redis = new Redis();
         if (!$this->redis->pconnect($this->config['host'], $this->config['port'])) {
-            throw new \RuntimeException('Could not connect to redis');
+            throw new RuntimeException('Could not connect to redis');
         }
         $this->redis->auth($this->config['password']);
         $this->redis->select($this->config['database']);

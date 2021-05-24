@@ -9,8 +9,8 @@ interface ConfigInterface
 
     public function load(string $name, string $file): ConfigInterface;
 
-    public function get(string $key = null);
+    public function get(string $key = null): mixed;
 
-    public function set(string $key, $value): ConfigInterface;
+    public function set(string $key, mixed $value): ConfigInterface;
 
 }

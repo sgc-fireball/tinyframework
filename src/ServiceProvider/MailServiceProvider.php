@@ -8,7 +8,7 @@ use TinyFramework\Mail\MailerInterface;
 class MailServiceProvider extends ServiceProviderAwesome
 {
 
-    public function register()
+    public function register(): void
     {
         $globalConfig = $this->container->get('config')->get('mail');
         $config = $globalConfig[$globalConfig['default']] ?? [];

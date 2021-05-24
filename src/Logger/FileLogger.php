@@ -2,6 +2,8 @@
 
 namespace TinyFramework\Logger;
 
+use RuntimeException;
+
 class FileLogger extends LoggerAwesome implements LoggerInterface
 {
 
@@ -11,14 +13,14 @@ class FileLogger extends LoggerAwesome implements LoggerInterface
     {
         if (!is_dir($config['path'])) {
             if (!mkdir($config['path'], 0770, true)) {
-                throw new \RuntimeException('Could not create logs folder.');
+                throw new RuntimeException('Could not create logs folder.');
             }
         }
         if (is_dir($config['path']) && is_writable($config['path'])) {
             $this->path = $config['path'];
             return;
         }
-        throw new \RuntimeException('Missing logs folder.');
+        throw new RuntimeException('Missing logs folder.');
     }
 
     public function log(string $level, string $message, array $context = []): static

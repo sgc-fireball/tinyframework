@@ -17,42 +17,42 @@ abstract class CacheAwesome implements CacheInterface, ArrayAccess
         $this->config = $config;
     }
 
-    public function offsetExists($offset): bool
+    public function offsetExists(mixed $offset): bool
     {
-        return $this->has($offset);
+        return $this->has((string)$offset);
     }
 
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): mixed
     {
-        return $this->get($offset);
+        return $this->get((string)$offset);
     }
 
-    public function offsetSet($offset, $value): void
+    public function offsetSet(mixed $offset, mixed $value): void
     {
-        $this->set($offset, $value);
+        $this->set((string)$offset, $value);
     }
 
-    public function offsetUnset($offset): void
+    public function offsetUnset(mixed $offset): void
     {
-        $this->forget($offset);
+        $this->forget((string)$offset);
     }
 
-    public function __get($name)
+    public function __get(string $name): mixed
     {
         return $this->get($name);
     }
 
-    public function __set($name, $value)
+    public function __set(string $name, mixed $value): void
     {
-        return $this->set($name, $value);
+        $this->set($name, $value);
     }
 
-    public function __unset($name)
+    public function __unset(string $name): void
     {
         $this->forget($name);
     }
 
-    public function __isset($name)
+    public function __isset(string $name): bool
     {
         return $this->has($name);
     }
@@ -81,7 +81,7 @@ abstract class CacheAwesome implements CacheInterface, ArrayAccess
         return $instance;
     }
 
-    public function remember(string $key, Closure $closure,null|int|\DateTime|\DateTimeInterface $ttl = null)
+    public function remember(string $key, Closure $closure, null|int|\DateTime|\DateTimeInterface $ttl = null): mixed
     {
         if ($this->has($key)) {
             return $this->get($key);

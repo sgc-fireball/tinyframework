@@ -64,7 +64,7 @@ if (!function_exists('container')) {
      * @param array $parameters
      * @return mixed|TinyFramework\Core\Container
      */
-    function container(?string $key = null, array $parameters = [])
+    function container(?string $key = null, array $parameters = []): mixed
     {
         $container = Container::instance();
         if ($key === null) {
@@ -75,11 +75,7 @@ if (!function_exists('container')) {
 }
 
 if (!function_exists('config')) {
-    /**
-     * @param string|null $key
-     * @return mixed|Config
-     */
-    function config(?string $key = null, $value = null)
+    function config(?string $key = null, mixed $value = null): Config|array|string|bool|int|null
     {
         $config = container('config');
         if (is_null($key)) {
@@ -165,7 +161,7 @@ if (!function_exists('view')) {
      * @param array $headers
      * @return \TinyFramework\Http\Response|\TinyFramework\Template\ViewInterface
      */
-    function view(string $file = null, array $data = [], int $code = 200, array $headers = [])
+    function view(string $file = null, array $data = [], int $code = 200, array $headers = []): mixed
     {
         /** @var \TinyFramework\Template\ViewInterface $view */
         $view = container('view');
@@ -190,7 +186,7 @@ if (!function_exists('dump')) {
      * @param mixed ...$val
      * @return void
      */
-    function dump(...$val)
+    function dump(...$val): void
     {
         foreach ($val as $value) {
             echo running_in_console() ? '' : '<code><pre>';
@@ -218,7 +214,7 @@ if (!function_exists('env')) {
      * @param mixed|null $default
      * @return mixed|null
      */
-    function env(string $key, $default = null)
+    function env(string $key, $default = null): mixed
     {
         return container(DotEnvInterface::class)->get($key) ?? $default;
     }
@@ -314,7 +310,7 @@ if (!function_exists('asset_version')) {
 }
 
 if (!function_exists('to_bool')) {
-    #[Pure] function to_bool($mixed): bool
+    #[Pure] function to_bool(mixed $mixed): bool
     {
         $mixed = is_string($mixed) && in_array(mb_strtolower($mixed), ['y', 'yes', 'true', 'on']) ? true : $mixed;
         $mixed = is_string($mixed) && in_array(mb_strtolower($mixed), ['n', 'no', 'false', 'off', 'null']) ? false : $mixed;
@@ -397,7 +393,7 @@ if (!function_exists('time_format')) {
 }
 
 if (!function_exists('vnsprintf')) {
-    function vnsprintf(string $format, array $args, $pattern = "/\{(\w+)(:([^\}]+))?\}/"): string
+    function vnsprintf(string $format, array $args, string $pattern = "/\{(\w+)(:([^\}]+))?\}/"): string
     {
         return preg_replace_callback($pattern, function ($matches) use ($args) {
             return sprintf($matches[3] ?? '%s', @$args[$matches[1]] ?: '');

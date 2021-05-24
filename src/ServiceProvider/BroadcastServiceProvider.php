@@ -4,14 +4,11 @@ namespace TinyFramework\ServiceProvider;
 
 use Psr\Log\LoggerInterface;
 use TinyFramework\Broadcast\BroadcastInterface;
-use TinyFramework\Core\ContainerInterface;
-use TinyFramework\Logger\FileLogger;
-use TinyFramework\Queue\QueueInterface;
 
 class BroadcastServiceProvider extends ServiceProviderAwesome
 {
 
-    public function register()
+    public function register(): void
     {
         $config = $this->container->get('config')->get('broadcast');
         if (is_null($config)) {

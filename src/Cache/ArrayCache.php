@@ -23,7 +23,7 @@ class ArrayCache extends CacheAwesome
         return $this;
     }
 
-    public function get(string $key)
+    public function get(string $key): mixed
     {
         if ($this->has($key)) {
             return unserialize($this->cache[$key]['value']) ?? null;
@@ -42,7 +42,7 @@ class ArrayCache extends CacheAwesome
         return false;
     }
 
-    public function set(string $key, $value = null,null|int|\DateTime|\DateTimeInterface $ttl = null): static
+    public function set(string $key, mixed $value = null,null|int|\DateTime|\DateTimeInterface $ttl = null): static
     {
         $this->cache[$key] = [
             'value' => serialize($value),

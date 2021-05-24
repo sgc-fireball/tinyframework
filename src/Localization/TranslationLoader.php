@@ -68,7 +68,7 @@ class TranslationLoader
         return $this;
     }
 
-    public function get($locale, $key): string
+    public function get(string $locale, string $key): string
     {
         return $this->load($locale)->translations[$locale][$key] ?? $key;
     }

@@ -7,7 +7,7 @@ interface InputInterface
 
     public function __construct(array $argv = null, InputDefinitionInterface $inputDefinition = null);
 
-    public function argv(array $argv = null);
+    public function argv(array $argv = null): array|InputInterface;
 
     public function inputDefinition(InputDefinitionInterface $inputDefinition = null): InputInterface|InputDefinitionInterface;
 
@@ -17,6 +17,6 @@ interface InputInterface
 
     public function argument(string $name): ?Argument;
 
-    public function interaction(bool $quiet = null);
+    public function interaction(bool $interaction = null): bool|InputInterface;
 
 }

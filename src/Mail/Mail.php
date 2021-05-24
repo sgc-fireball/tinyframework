@@ -2,6 +2,8 @@
 
 namespace TinyFramework\Mail;
 
+use RuntimeException;
+
 class Mail
 {
 
@@ -48,7 +50,7 @@ class Mail
             return $this->header;
         }
         if (is_null($value)) {
-            throw new \RuntimeException('Missing header value!');
+            throw new RuntimeException('Missing header value!');
         }
         if ($replace) {
             $this->header[$key] = $value;
@@ -179,7 +181,7 @@ class Mail
     public function attachmentFile(string $path, string $filename = null, string $mimeType = null): static
     {
         if (!file_exists($path)) {
-            throw new \RuntimeException('File not found.');
+            throw new RuntimeException('File not found.');
         }
         $this->attachments[] = [
             'path' => $path,

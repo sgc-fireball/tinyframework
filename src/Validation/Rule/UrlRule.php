@@ -16,7 +16,7 @@ class UrlRule extends RuleAwesome
         if (filter_var($value, FILTER_VALIDATE_URL)) {
             if ($host = parse_url($value, PHP_URL_HOST)) {
                 $host = idn_to_ascii($host);
-                if (dns_check_record($host, 'A') || dns_check_record($host, 'AAAA')) {
+                if ($host && (dns_check_record($host, 'A') || dns_check_record($host, 'AAAA'))) {
                     return null;
                 }
             }

@@ -8,7 +8,7 @@ use TinyFramework\Crypt\CryptInterface;
 class CryptServiceProvider extends ServiceProviderAwesome
 {
 
-    public function register()
+    public function register(): void
     {
         $configs = $this->container->get('config')->get('crypt');
         if (is_null($configs)) {

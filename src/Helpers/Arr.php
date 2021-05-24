@@ -2,6 +2,8 @@
 
 namespace TinyFramework\Helpers;
 
+use RuntimeException;
+
 /**
  * @see https://www.php.net/manual/de/ref.array.php
  */
@@ -44,12 +46,12 @@ class Arr implements \ArrayAccess, \Iterator
         return $this->items;
     }
 
-    public function __get(string $name)
+    public function __get(string $name): mixed
     {
         return $this->items[$name] ?? null;
     }
 
-    public function __set(string $name, $value): void
+    public function __set(string $name, mixed $value): void
     {
         $this->items[$name] = $value;
     }
@@ -66,86 +68,86 @@ class Arr implements \ArrayAccess, \Iterator
         }
     }
 
-    public function offsetExists($offset)
+    public function offsetExists(mixed $offset): bool
     {
         return array_key_exists($offset, $this->items);
     }
 
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): mixed
     {
         return $this->items[$offset];
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         $this->items[$offset] = $value;
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset(mixed $offset): void
     {
         unset($this->items[$offset]);
     }
 
-    public function current()
+    public function current(): mixed
     {
         return current($this->items);
     }
 
-    public function next()
+    public function next(): mixed
     {
         return next($this->items);
     }
 
-    public function key()
+    public function key(): int|null|string
     {
         return key($this->items);
     }
 
-    public function valid()
+    public function valid(): bool
     {
         return $this->current() !== false;
     }
 
-    public function rewind()
+    public function rewind(): void
     {
         reset($this->items);
     }
 
     public function changeKeyCase(int $case = CASE_LOWER): Arr
     {
-        return new static(array_change_key_case($this->items, $case));
+        return new self(array_change_key_case($this->items, $case));
     }
 
     public function chunk(int $size, bool $preserve_keys = false): Arr
     {
-        return new static(array_chunk($this->items, $size, $preserve_keys));
+        return new self(array_chunk($this->items, $size, $preserve_keys));
     }
 
     public function column(int|string|null $column_key, int|string|null $index_key = null): Arr
     {
-        return new static(array_column($this->items, $column_key, $index_key));
+        return new self(array_column($this->items, $column_key, $index_key));
     }
 
     public function combineWithValues(array $values): Arr
     {
-        return new static(array_combine($this->items, $values));
+        return new self(array_combine($this->items, $values));
     }
 
     public function combineWithKeys(array $keys): Arr
     {
-        return new static(array_combine($keys, $this->items));
+        return new self(array_combine($keys, $this->items));
     }
 
     public function countValues(): Arr
     {
-        return new static(array_count_values($this->items));
+        return new self(array_count_values($this->items));
     }
 
     public function diffAssoc(array $array2, array ...$arrays): Arr
     {
         array_unshift($arrays, $this->items);
         array_unshift($arrays, $array2);
-        return new static((array)call_user_func_array('array_diff_assoc', $arrays));
+        return new self((array)call_user_func_array('array_diff_assoc', $arrays));
     }
 
     public function diffUAssoc(array $array2, array ...$arrays): Arr
@@ -153,16 +155,16 @@ class Arr implements \ArrayAccess, \Iterator
         array_unshift($arrays, $this->items);
         array_unshift($arrays, $array2);
         if (!is_callable($arrays[array_key_last($arrays)])) {
-            throw new \RuntimeException('The last value must be a callable');
+            throw new RuntimeException('The last value must be a callable');
         }
-        return new static((array)call_user_func_array('array_diff_uassoc', $arrays));
+        return new self((array)call_user_func_array('array_diff_uassoc', $arrays));
     }
 
     public function diffKey(array $array2, array ...$arrays): Arr
     {
         array_unshift($arrays, $this->items);
         array_unshift($arrays, $array2);
-        return new static((array)call_user_func_array('array_diff_key', $arrays));
+        return new self((array)call_user_func_array('array_diff_key', $arrays));
     }
 
     public function diffUKey(array $array2, array ...$arrays): Arr
@@ -170,51 +172,50 @@ class Arr implements \ArrayAccess, \Iterator
         array_unshift($arrays, $this->items);
         array_unshift($arrays, $array2);
         if (!is_callable($arrays[array_key_last($arrays)])) {
-            throw new \RuntimeException('The last value must be a callable');
+            throw new RuntimeException('The last value must be a callable');
         }
-        return new static((array)call_user_func_array('array_diff_ukey', $arrays));
+        return new self((array)call_user_func_array('array_diff_ukey', $arrays));
     }
 
     public function diff(array $array2, array ...$arrays): Arr
     {
         array_unshift($arrays, $this->items);
         array_unshift($arrays, $array2);
-        return new static((array)call_user_func_array('array_diff', $arrays));
+        return new self((array)call_user_func_array('array_diff', $arrays));
     }
 
-    public function flatten(int $depth = INF): Arr
+    public function flatten(int $depth = -1): Arr
     {
+        $depth = $depth === -1 ? PHP_INT_MAX : $depth;
         $result = [];
         foreach ($this->items as $item) {
             $item = $item instanceof Arr ? (array)$item : $item;
             if (!is_array($item)) {
                 $result[] = $item;
             } else {
-                $values = $depth === 1 ? array_values($item) : (new static($item))->flatten($depth - 1);
+                $values = $depth === 1 ? array_values($item) : (new self($item))->flatten($depth - 1);
                 foreach ($values as $value) {
                     $result[] = $value;
                 }
             }
         }
-        return new static($result);
+        return new self($result);
     }
 
     public function filter(callable $callback): Arr
     {
-        return new static(array_filter($this->items, $callback, ARRAY_FILTER_USE_BOTH));
+        return new self(array_filter($this->items, $callback, ARRAY_FILTER_USE_BOTH));
     }
 
     public function first(callable $callback = null): mixed
     {
-        if (!count($this->items)) {
-            return null;
-        }
         if (is_callable($callback)) {
             foreach ($this->items as $key => $item) {
                 if ($callback($item, $key)) {
                     return $item;
                 }
             }
+            return null;
         }
         foreach ($this->items as $key => $item) {
             return $item;
@@ -224,14 +225,14 @@ class Arr implements \ArrayAccess, \Iterator
 
     public function flip(callable $callback): Arr
     {
-        return new static(array_flip($this->items));
+        return new self(array_flip($this->items));
     }
 
     public function intersectAssoc(array $array2, array ...$arrays): Arr
     {
         array_unshift($arrays, $this->items);
         array_unshift($arrays, $array2);
-        return new static(call_user_func_array('array_intersect_assoc', $arrays));
+        return new self(call_user_func_array('array_intersect_assoc', $arrays));
     }
 
     public function intersectUAssoc(array $array2, array ...$arrays): Arr
@@ -239,16 +240,16 @@ class Arr implements \ArrayAccess, \Iterator
         array_unshift($arrays, $this->items);
         array_unshift($arrays, $array2);
         if (!is_callable($arrays[array_key_last($arrays)])) {
-            throw new \RuntimeException('The last value must be a callable');
+            throw new RuntimeException('The last value must be a callable');
         }
-        return new static(call_user_func_array('array_intersect_uassoc', $arrays));
+        return new self(call_user_func_array('array_intersect_uassoc', $arrays));
     }
 
     public function intersectByKeys(array $array2, array ...$arrays): Arr
     {
         array_unshift($arrays, $this->items);
         array_unshift($arrays, $array2);
-        return new static(call_user_func_array('array_intersect_key', $arrays));
+        return new self(call_user_func_array('array_intersect_key', $arrays));
     }
 
     public function intersectUKey(array $array2, array ...$arrays): Arr
@@ -256,16 +257,16 @@ class Arr implements \ArrayAccess, \Iterator
         array_unshift($arrays, $this->items);
         array_unshift($arrays, $array2);
         if (!is_callable($arrays[array_key_last($arrays)])) {
-            throw new \RuntimeException('The last value must be a callable');
+            throw new RuntimeException('The last value must be a callable');
         }
-        return new static(call_user_func_array('array_intersect_ukey', $arrays));
+        return new self(call_user_func_array('array_intersect_ukey', $arrays));
     }
 
     public function intersect(array $array2, array ...$arrays): Arr
     {
         array_unshift($arrays, $this->items);
         array_unshift($arrays, $array2);
-        return new static(call_user_func_array('array_intersect', $arrays));
+        return new self(call_user_func_array('array_intersect', $arrays));
     }
 
     public function keyExists(mixed $key): bool
@@ -285,7 +286,7 @@ class Arr implements \ArrayAccess, \Iterator
 
     public function keys(): Arr
     {
-        return new static(array_keys($this->items));
+        return new self(array_keys($this->items));
     }
 
     public function last(callable $callback = null): mixed
@@ -298,7 +299,7 @@ class Arr implements \ArrayAccess, \Iterator
 
     public function map(callable $callback): Arr
     {
-        return new static(array_map($callback, $this->items));
+        return new self(array_map($callback, $this->items));
     }
 
     public function transform(callable $callback): static
@@ -316,7 +317,7 @@ class Arr implements \ArrayAccess, \Iterator
                 $result[$mapKey] = $mapValue;
             }
         }
-        return new static($result);
+        return new self($result);
     }
 
     public function transformWithKeys(callable $callback): static
@@ -336,14 +337,14 @@ class Arr implements \ArrayAccess, \Iterator
     {
         array_unshift($arrays, $this->items);
         array_unshift($arrays, $array2);
-        return new static(call_user_func_array('array_merge_recursive', $arrays));
+        return new self(call_user_func_array('array_merge_recursive', $arrays));
     }
 
     public function merge(array $array2, array ...$arrays): Arr
     {
         array_unshift($arrays, $this->items);
         array_unshift($arrays, $array2);
-        return new static(call_user_func_array('array_merge', $arrays));
+        return new self(call_user_func_array('array_merge', $arrays));
     }
 
     public function multisort(mixed $array1_sort_order = SORT_ASC, mixed $array1_sort_flags = SORT_REGULAR, array ...$arrays): Arr
@@ -351,12 +352,12 @@ class Arr implements \ArrayAccess, \Iterator
         array_unshift($arrays, $this->items);
         array_unshift($arrays, $array1_sort_order);
         array_unshift($arrays, $array1_sort_flags);
-        return new static(call_user_func_array('array_multisort', $arrays));
+        return new self(call_user_func_array('array_multisort', $arrays));
     }
 
     public function pad(int $size, mixed $value = null): Arr
     {
-        return new static(array_pad($this->items, $size, $value));
+        return new self(array_pad($this->items, $size, $value));
     }
 
     public function pop(): mixed
@@ -379,7 +380,7 @@ class Arr implements \ArrayAccess, \Iterator
 
     public function concat(array $source): Arr
     {
-        $arr = new static($this->items);
+        $arr = new self($this->items);
         foreach ($source as $item) {
             $arr->push($item);
         }
@@ -394,7 +395,7 @@ class Arr implements \ArrayAccess, \Iterator
     public function reduce(callable $callback, mixed $initial = null): mixed
     {
         $result = array_reduce($this->items, $callback, $initial);
-        if (is_array($result)) return new static($result);
+        if (is_array($result)) return new self($result);
         if (is_string($result)) return Str::factory($result);
         return $result;
     }
@@ -402,18 +403,18 @@ class Arr implements \ArrayAccess, \Iterator
     public function replaceRecurisve(array ...$replacements): Arr
     {
         array_unshift($replacements, $this->items);
-        return new static(call_user_func_array('array_replace_recursive', $replacements));
+        return new self(call_user_func_array('array_replace_recursive', $replacements));
     }
 
     public function replace(array ...$replacements): Arr
     {
         array_unshift($replacements, $this->items);
-        return new static(call_user_func_array('array_replace', $replacements));
+        return new self(call_user_func_array('array_replace', $replacements));
     }
 
     public function reserve(bool $preserve_keys = false): Arr
     {
-        return new static(array_reverse($this->items, $preserve_keys));
+        return new self(array_reverse($this->items, $preserve_keys));
     }
 
     public function search(mixed $needle, bool $strict = false): string|int|bool
@@ -429,7 +430,7 @@ class Arr implements \ArrayAccess, \Iterator
 
     public function slice(int $offset, int $length = null, bool $preserve_keys = false): Arr
     {
-        return new static(array_slice($this->items, $offset, $length, $preserve_keys));
+        return new self(array_slice($this->items, $offset, $length, $preserve_keys));
     }
 
     public function skip(int $count): Arr
@@ -445,12 +446,12 @@ class Arr implements \ArrayAccess, \Iterator
         return $this->slice(0, $count);
     }
 
-    public function splice(int $offset, int $length = null, mixed $replacement = [])
+    public function splice(int $offset, int $length = null, mixed $replacement = []): Arr
     {
         if (is_null($length)) {
             $length = count($this->items);
         }
-        return new static(array_splice($this->items, $offset, $length, $replacement));
+        return new self(array_splice($this->items, $offset, $length, $replacement));
     }
 
     public function sum(): int|float
@@ -477,9 +478,9 @@ class Arr implements \ArrayAccess, \Iterator
         array_unshift($arrays, $this->items);
         array_unshift($arrays, $array2);
         if (!is_callable($arrays[array_key_last($arrays)])) {
-            throw new \RuntimeException('The last value must be a callable');
+            throw new RuntimeException('The last value must be a callable');
         }
-        return new static(call_user_func_array('array_udiff_assoc', $arrays));
+        return new self(call_user_func_array('array_udiff_assoc', $arrays));
     }
 
     public function uDiffUAssoc(array $array2, array ...$arrays): Arr
@@ -487,12 +488,12 @@ class Arr implements \ArrayAccess, \Iterator
         array_unshift($arrays, $this->items);
         array_unshift($arrays, $array2);
         if (!is_callable($arrays[array_key_last($arrays)])) {
-            throw new \RuntimeException('The last value must be a callable');
+            throw new RuntimeException('The last value must be a callable');
         }
         if (!is_callable(array_reverse(array_values($arrays))[1])) {
-            throw new \RuntimeException('The second last value must be a callable');
+            throw new RuntimeException('The second last value must be a callable');
         }
-        return new static(call_user_func_array('array_udiff_uassoc', $arrays));
+        return new self(call_user_func_array('array_udiff_uassoc', $arrays));
     }
 
     public function uDiff(array $array2, array ...$arrays): Arr
@@ -500,9 +501,9 @@ class Arr implements \ArrayAccess, \Iterator
         array_unshift($arrays, $this->items);
         array_unshift($arrays, $array2);
         if (!is_callable($arrays[array_key_last($arrays)])) {
-            throw new \RuntimeException('The last value must be a callable');
+            throw new RuntimeException('The last value must be a callable');
         }
-        return new static(call_user_func_array('array_udiff', $arrays));
+        return new self(call_user_func_array('array_udiff', $arrays));
     }
 
     public function uIntersectAssoc(array $array2, array ...$arrays): Arr
@@ -510,9 +511,9 @@ class Arr implements \ArrayAccess, \Iterator
         array_unshift($arrays, $this->items);
         array_unshift($arrays, $array2);
         if (!is_callable($arrays[array_key_last($arrays)])) {
-            throw new \RuntimeException('The last value must be a callable');
+            throw new RuntimeException('The last value must be a callable');
         }
-        return new static(call_user_func_array('array_uintersect_assoc', $arrays));
+        return new self(call_user_func_array('array_uintersect_assoc', $arrays));
     }
 
     public function uIntersectUAssoc(array $array2, array ...$arrays): Arr
@@ -520,12 +521,12 @@ class Arr implements \ArrayAccess, \Iterator
         array_unshift($arrays, $this->items);
         array_unshift($arrays, $array2);
         if (!is_callable($arrays[array_key_last($arrays)])) {
-            throw new \RuntimeException('The last value must be a callable');
+            throw new RuntimeException('The last value must be a callable');
         }
         if (!is_callable(array_reverse(array_values($arrays))[1])) {
-            throw new \RuntimeException('The second last value must be a callable');
+            throw new RuntimeException('The second last value must be a callable');
         }
-        return new static(call_user_func_array('array_uintersect_uassoc', $arrays));
+        return new self(call_user_func_array('array_uintersect_uassoc', $arrays));
     }
 
     public function uIntersect(array $array2, array ...$arrays): Arr
@@ -533,14 +534,14 @@ class Arr implements \ArrayAccess, \Iterator
         array_unshift($arrays, $this->items);
         array_unshift($arrays, $array2);
         if (!is_callable($arrays[array_key_last($arrays)])) {
-            throw new \RuntimeException('The last value must be a callable');
+            throw new RuntimeException('The last value must be a callable');
         }
-        return new static(call_user_func_array('array_uintersect', $arrays));
+        return new self(call_user_func_array('array_uintersect', $arrays));
     }
 
     public function unique(int $sort_flags = SORT_STRING): Arr
     {
-        return new static(array_unique($this->items, $sort_flags));
+        return new self(array_unique($this->items, $sort_flags));
     }
 
     public function unshift(mixed $value): int
@@ -550,35 +551,35 @@ class Arr implements \ArrayAccess, \Iterator
 
     public function values(): Arr
     {
-        return new static(array_values($this->items));
+        return new self(array_values($this->items));
     }
 
     public function walkRecursive(callable $callback, mixed $userdata = null): Arr
     {
         $items = $this->items;
         array_walk_recursive($items, $callback, $userdata);
-        return new static($items);
+        return new self($items);
     }
 
     public function walk(callable $callback, mixed $userdata = null): Arr
     {
         $items = $this->items;
         array_walk($items, $callback, $userdata);
-        return new static($items);
+        return new self($items);
     }
 
-    public function sort(callable $callback = null)
+    public function sort(callable $callback = null): Arr
     {
         $items = $this->items;
         $callback && is_callable($callback) ? uasort($items, $callback) : asort($items, $callback ?? SORT_REGULAR);
-        return new static($items);
+        return new self($items);
     }
 
     public function sortDesc(int $sort_flags = SORT_REGULAR): Arr
     {
         $items = $this->items;
         arsort($items, $sort_flags);
-        return new static($items);
+        return new self($items);
     }
 
     public function count(): int
@@ -595,42 +596,42 @@ class Arr implements \ArrayAccess, \Iterator
     {
         $items = $this->items;
         $descending ? krsort($items, $sort_flags) : ksort($items, $sort_flags);
-        return new static($items);
+        return new self($items);
     }
 
     public function natcasesort(): Arr
     {
         $items = $this->items;
         natcasesort($items);
-        return new static($items);
+        return new self($items);
     }
 
     public function natsort(): Arr
     {
         $items = $this->items;
         natsort($items);
-        return new static($items);
+        return new self($items);
     }
 
     public function shuffle(): Arr
     {
         $items = $this->items;
         shuffle($items);
-        return new static($items);
+        return new self($items);
     }
 
     public function uksort(callable $callback): Arr
     {
         $items = $this->items;
         uksort($items, $callback);
-        return new static($items);
+        return new self($items);
     }
 
     public function usort(callable $callback): Arr
     {
         $items = $this->items;
         usort($items, $callback);
-        return new static($items);
+        return new self($items);
     }
 
     public function each(callable $callback): Arr
@@ -645,10 +646,10 @@ class Arr implements \ArrayAccess, \Iterator
 
     public function only(array $keys): Arr
     {
-        return new static(array_intersect_key($this->items, array_flip($keys)));
+        return new self(array_intersect_key($this->items, array_flip($keys)));
     }
 
-    public function prepend($value, $key = null): Arr
+    public function prepend(mixed $value, string|bool|null|float|int $key = null): Arr
     {
         if ($key === null) {
             array_unshift($this->items, $value);
@@ -658,7 +659,7 @@ class Arr implements \ArrayAccess, \Iterator
         return $this;
     }
 
-    public function append($value, $key = null): Arr
+    public function append(mixed $value, string|bool|null|float|int $key = null): Arr
     {
         if ($key === null) {
             array_push($this->items, $value);
@@ -670,20 +671,23 @@ class Arr implements \ArrayAccess, \Iterator
 
     public function divide(): Arr
     {
-        return new static([array_keys($this->items), array_values($this->items)]);
+        return new self([array_keys($this->items), array_values($this->items)]);
     }
 
-    public function dot(string $prepend = '', string $delimiter = '.')
+    public function dot(string $prepend = '', string $delimiter = '.'): Arr
     {
         $results = [];
         foreach ($this->items as $key => $value) {
             if (is_array($value) && !empty($value)) {
-                $results = array_merge($results, (new static($value))->dot($prepend . $key . $delimiter));
+                $results = array_merge(
+                    $results,
+                    (new self($value))->dot($prepend . $key . $delimiter)->__toArray()
+                );
             } else {
                 $results[$prepend . $key] = $value;
             }
         }
-        return new static($results);
+        return new self($results);
     }
 
     public function implode(string $separator): Str
@@ -700,7 +704,7 @@ class Arr implements \ArrayAccess, \Iterator
     {
         $keys = (array)$keys;
         if (count($keys) === 0) {
-            return new static();
+            return new self();
         }
         $items = $this->items;
         foreach ($keys as $key) {
@@ -721,7 +725,7 @@ class Arr implements \ArrayAccess, \Iterator
             }
             unset($array[array_shift($parts)]);
         }
-        return new static($items);
+        return new self($items);
     }
 
     public function except(array $keys): Arr
@@ -791,9 +795,9 @@ class Arr implements \ArrayAccess, \Iterator
         return true;
     }
 
-    public function union(array $items)
+    public function union(array $items): Arr
     {
-        return new static($this->items + $items);
+        return new self($this->items + $items);
     }
 
     public function nth(int $step, int $offset = 0): Arr
@@ -806,10 +810,10 @@ class Arr implements \ArrayAccess, \Iterator
             }
             $position++;
         }
-        return new static($new);
+        return new self($new);
     }
 
-    public function pluck(string $value, string $key, string $delimiter = '.'): Arr
+    public function pluck(string $value, string|null $key = null, string $delimiter = '.'): Arr
     {
         $result = [];
         foreach ($this->items as $item) {
@@ -820,7 +824,7 @@ class Arr implements \ArrayAccess, \Iterator
                 $result[data_get($item, $key, $delimiter)] = $value;
             }
         }
-        return new static($result);
+        return new self($result);
     }
 
 }

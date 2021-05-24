@@ -5,7 +5,7 @@ namespace TinyFramework\Hash;
 class BCrypt implements HashInterface
 {
 
-    private $algorithm = PASSWORD_BCRYPT;
+    private string $algorithm = PASSWORD_BCRYPT;
 
     private int $cost;
 

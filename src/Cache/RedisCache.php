@@ -3,12 +3,13 @@
 namespace TinyFramework\Cache;
 
 use Redis;
+use RuntimeException;
 
 class RedisCache extends CacheAwesome
 {
 
     /** @var Redis */
-    private $redis;
+    private Redis $redis;
 
     public function __construct(array $config = [])
     {
@@ -22,7 +23,7 @@ class RedisCache extends CacheAwesome
 
         $this->redis = new Redis();
         if (!$this->redis->pconnect($this->config['host'], $this->config['port'])) {
-            throw new \RuntimeException('Could not connect to redis');
+            throw new RuntimeException('Could not connect to redis');
         }
         $this->redis->auth($this->config['password']);
         $this->redis->select($this->config['database']);
@@ -50,7 +51,7 @@ class RedisCache extends CacheAwesome
         return $this;
     }
 
-    public function get(string $key)
+    public function get(string $key): mixed
     {
         if ($this->has($key)) {
             return unserialize($this->redis->get($key)) ?? null;
@@ -63,7 +64,7 @@ class RedisCache extends CacheAwesome
         return $this->redis->exists($key) > 0;
     }
 
-    public function set(string $key, $value = null, null|int|\DateTime|\DateTimeInterface $ttl = null): static
+    public function set(string $key, mixed $value = null, null|int|\DateTime|\DateTimeInterface $ttl = null): static
     {
         $ttl = $this->calculateExpiration($ttl);
         if (is_null($ttl)) {

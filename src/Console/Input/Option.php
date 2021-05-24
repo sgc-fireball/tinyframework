@@ -2,6 +2,8 @@
 
 namespace TinyFramework\Console\Input;
 
+use InvalidArgumentException;
+
 class Option
 {
 
@@ -25,7 +27,7 @@ class Option
         string $short = null,
         int $mode = null,
         string $description = '',
-        $default = null
+        mixed $default = null
     ): Option
     {
         return new Option($long, $short, $mode, $description, $default);
@@ -36,14 +38,14 @@ class Option
         string $short = null,
         int $mode = null,
         string $description = '',
-        $default = null
+        mixed $default = null
     )
     {
         if (mb_strlen($long) === 1) {
-            throw new \InvalidArgumentException('Long option name is to short: ' . $long);
+            throw new InvalidArgumentException('Long option name is to short: ' . $long);
         }
         if ($short !== null && mb_strlen($short) > 1) {
-            throw new \InvalidArgumentException('Short option name is to long: ' . $short);
+            throw new InvalidArgumentException('Short option name is to long: ' . $short);
         }
 
         $this->long = $long;
@@ -80,11 +82,7 @@ class Option
         return ($this->mode & self::VALUE_IS_ARRAY) === self::VALUE_IS_ARRAY;
     }
 
-    /**
-     * @param mixed|null $value
-     * @return static|mixed
-     */
-    public function value($value = null)
+    public function value(mixed $value = null): mixed
     {
         if (is_null($value)) {
             return $this->value;

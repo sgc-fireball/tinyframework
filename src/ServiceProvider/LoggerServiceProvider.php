@@ -8,7 +8,7 @@ use TinyFramework\Logger\LoggerInterface;
 class LoggerServiceProvider extends ServiceProviderAwesome
 {
 
-    public function register()
+    public function register(): void
     {
         $config = $this->container->get('config')->get('logger');
         if (is_null($config)) {

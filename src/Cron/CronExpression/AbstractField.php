@@ -2,6 +2,9 @@
 
 namespace TinyFramework\Cron\CronExpression;
 
+use DateTime;
+use RuntimeException;
+
 abstract class AbstractField
 {
 
@@ -79,11 +82,11 @@ abstract class AbstractField
                     continue;
                 }
             }
-            throw new \RuntimeException('Invalid cron expression: ' . get_class($this) . '(' . $this->expression . ')');
+            throw new RuntimeException('Invalid cron expression: ' . get_class($this) . '(' . $this->expression . ')');
         }
 
         if (empty($this->values)) {
-            throw new \RuntimeException('Invalid cron expression: ' . get_class($this) . '(' . $this->expression . ')');
+            throw new RuntimeException('Invalid cron expression: ' . get_class($this) . '(' . $this->expression . ')');
         }
 
         sort($this->values);
@@ -103,8 +106,8 @@ abstract class AbstractField
         return $list;
     }
 
-    abstract public function increment(\DateTime $time): \DateTime;
+    abstract public function increment(DateTime $time): DateTime;
 
-    abstract public function decrement(\DateTime $time): \DateTime;
+    abstract public function decrement(DateTime $time): DateTime;
 
 }

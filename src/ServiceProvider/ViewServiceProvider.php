@@ -8,7 +8,7 @@ use TinyFramework\Template\ViewInterface;
 class ViewServiceProvider extends ServiceProviderAwesome
 {
 
-    public function register()
+    public function register(): void
     {
         $configs = $this->container->get('config')->get('view');
         if (is_null($configs)) {

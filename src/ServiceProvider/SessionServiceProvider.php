@@ -8,7 +8,7 @@ use TinyFramework\Session\SessionInterface;
 class SessionServiceProvider extends ServiceProviderAwesome
 {
 
-    public function register()
+    public function register(): void
     {
         $globalConfig = $this->container->get('config')->get('session');
 

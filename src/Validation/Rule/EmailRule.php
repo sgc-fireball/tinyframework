@@ -25,6 +25,9 @@ class EmailRule extends RuleAwesome
         if (in_array('dns', $parameters)) {
             list($user, $domain) = explode('@', $value);
             $domain = idn_to_ascii($domain);
+            if (!$domain) {
+                return [$this->translator->trans('validation.email', ['attribute' => $this->getTransName($name)])];
+            }
             if (!dns_check_record($domain, 'MX') && !dns_check_record($domain, 'A') && !dns_check_record($domain, 'AAAA')) {
                 return [$this->translator->trans('validation.email', ['attribute' => $this->getTransName($name)])];
             }

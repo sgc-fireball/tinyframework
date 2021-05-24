@@ -14,7 +14,7 @@ class JsonRule extends RuleAwesome
     {
         $value = $attributes[$name] ?? null;
         try {
-            json_decode($value, JSON_THROW_ON_ERROR);
+            json_decode($value, false, 512, JSON_THROW_ON_ERROR);
         } catch (\Throwable $e) {
             return [$this->translator->trans('validation.json', ['attribute' => $this->getTransName($name)])];
         }

@@ -7,7 +7,7 @@ interface ContainerInterface
 
     public static function instance(): ContainerInterface;
 
-    public function tag($tags, $instances): ContainerInterface;
+    public function tag(string|array $tags, string|array $instances): ContainerInterface;
 
     public function tagged(string $tag): array;
 
@@ -18,7 +18,7 @@ interface ContainerInterface
      * @param array $parameters
      * @return mixed
      */
-    public function get(string $key, array $parameters = []);
+    public function get(string $key, array $parameters = []): mixed;
 
     public function resolveAlias(string|array|callable|object $key): string|array|callable|object;
 
@@ -26,6 +26,6 @@ interface ContainerInterface
 
     public function alias(string $alias, string $key): ContainerInterface;
 
-    public function call(string|array|callable|object $callable, array $parameters = []);
+    public function call(string|array|callable|object $callable, array $parameters = []): mixed;
 
 }

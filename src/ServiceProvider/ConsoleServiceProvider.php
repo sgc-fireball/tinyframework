@@ -17,7 +17,7 @@ use TinyFramework\System\SignalHandler;
 class ConsoleServiceProvider extends ServiceProviderAwesome
 {
 
-    public function register()
+    public function register(): void
     {
         $this->container->tag('shell:tab:completion', [
             ClassTabCompletion::class,

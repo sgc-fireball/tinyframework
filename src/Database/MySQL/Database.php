@@ -2,7 +2,10 @@
 
 namespace TinyFramework\Database\MySQL;
 
+use DateTime;
+use DateTimeZone;
 use mysqli;
+use RuntimeException;
 use TinyFramework\Database\DatabaseInterface;
 
 class Database implements DatabaseInterface
@@ -30,23 +33,17 @@ class Database implements DatabaseInterface
         }
     }
 
-    /**
-     * @return static
-     */
     public function connect(): static
     {
         if (!$this->connection) {
             $this->connection = new mysqli($this->config['host'], $this->config['username'], $this->config['password'], $this->config['database'], $this->config['port']);
             $this->connection->query(sprintf("SET NAMES %s COLLATE %s", $this->config['charset'], $this->config['collation']));
-            $this->connection->query(sprintf('SET time_zone = "%s";', (new \DateTime('now', new \DateTimeZone($this->config['timezone'])))->format('P')));
+            $this->connection->query(sprintf('SET time_zone = "%s";', (new DateTime('now', new DateTimeZone($this->config['timezone'])))->format('P')));
             $this->connection->query('SET SESSION sql_mode = "STRICT_TRANS_TABLES"');
         }
         return $this;
     }
 
-    /**
-     * @return static
-     */
     public function reconnect(): static
     {
         return $this->disconnect()->connect();
@@ -64,7 +61,7 @@ class Database implements DatabaseInterface
         return $this;
     }
 
-    public function escape($value): string|float|int
+    public function escape(mixed $value): string|float|int
     {
         if (is_array($value)) {
             return sprintf('(%s)', implode(',', array_map(function ($value) {
@@ -95,7 +92,7 @@ class Database implements DatabaseInterface
     {
         $result = $this->connect()->connection->query($query);
         if ($result === false) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 sprintf('Error %s: %s',
                     $this->connect()->connection->errno,
                     $this->connect()->connection->error

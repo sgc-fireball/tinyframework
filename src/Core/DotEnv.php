@@ -48,7 +48,7 @@ class DotEnv implements DotEnvInterface
         return $this;
     }
 
-    public function get(string $key)
+    public function get(string $key): mixed
     {
         $value = $_ENV[$key] ?? null;
         $value = is_string($value) && mb_strlen($value) === 0 ? null : $value;

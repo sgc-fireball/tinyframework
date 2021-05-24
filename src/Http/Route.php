@@ -82,11 +82,7 @@ class Route
         return $this;
     }
 
-    /**
-     * @param string|array|null $middlewares
-     * @return static|array
-     */
-    public function middleware($middlewares = null): static|array
+    public function middleware(string|array|null $middlewares = null): static|array
     {
         if (is_null($middlewares)) {
             return $this->middleware;
@@ -94,6 +90,9 @@ class Route
         $middlewares = is_array($middlewares) ? $middlewares : [$middlewares];
         foreach ($middlewares as $middleware) {
             $class = $middleware;
+            if (!is_string($middleware)) {
+                continue;
+            }
             if (mb_strpos($middleware, ',') !== false) {
                 list($class,) = explode(',', $middleware, 2);
             }
@@ -116,7 +115,7 @@ class Route
         return $this;
     }
 
-    public function parameter(string|array $key = null, $value = null): static|array
+    public function parameter(string|array $key = null, mixed $value = null): static|array
     {
         if (is_null($key)) {
             return $this->parameter;

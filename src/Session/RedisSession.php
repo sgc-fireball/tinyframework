@@ -3,6 +3,7 @@
 namespace TinyFramework\Session;
 
 use Redis;
+use RuntimeException;
 
 class RedisSession extends SessionAwesome implements SessionInterface
 {
@@ -23,7 +24,7 @@ class RedisSession extends SessionAwesome implements SessionInterface
 
         $this->redis = new Redis();
         if (!$this->redis->pconnect($this->config['host'], $this->config['port'])) {
-            throw new \RuntimeException('Could not connect to redis');
+            throw new RuntimeException('Could not connect to redis');
         }
         $this->redis->auth($this->config['password']);
         $this->redis->select($this->config['database']);

@@ -2,6 +2,7 @@
 
 namespace TinyFramework\Validation;
 
+use RuntimeException;
 use TinyFramework\Http\Request;
 use TinyFramework\Localization\TranslatorInterface;
 use TinyFramework\Validation\Rule\RuleInterface;
@@ -68,7 +69,7 @@ class Validator implements ValidatorInterface
                 $parameters = explode(',', $parameters);
             }
             if (!array_key_exists($rule, $this->rules)) {
-                throw new \RuntimeException('Invalid rule: ' . $rule);
+                throw new RuntimeException('Invalid rule: ' . $rule);
             }
 
             array_unshift($parameters, $name); // prepend name

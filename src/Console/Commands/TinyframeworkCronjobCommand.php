@@ -2,6 +2,8 @@
 
 namespace TinyFramework\Console\Commands;
 
+use DateTimeImmutable;
+use DateTimeZone;
 use TinyFramework\Console\CommandAwesome;
 use TinyFramework\Cron\CronExpression;
 use TinyFramework\Cron\CronjobInterface;
@@ -23,8 +25,8 @@ class TinyframeworkCronjobCommand extends CommandAwesome
     {
         parent::run($input, $output);
 
-        $timezone = new \DateTimeZone($this->container->get('config')->get('app.timezone', 'UTC'));
-        $now = new \DateTimeImmutable('now', $timezone);
+        $timezone = new DateTimeZone($this->container->get('config')->get('app.timezone', 'UTC'));
+        $now = new DateTimeImmutable('now', $timezone);
         /** @var LoggerInterface $logger */
         $logger = $this->container->get('logger');
         /** @var CronjobInterface[] $jobs */

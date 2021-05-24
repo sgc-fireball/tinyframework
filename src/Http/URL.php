@@ -2,6 +2,8 @@
 
 namespace TinyFramework\Http;
 
+use InvalidArgumentException;
+
 class URL implements \Stringable
 {
 
@@ -56,7 +58,7 @@ class URL implements \Stringable
             return $this->schema;
         }
         if (!preg_match('/^[a-z]([a-z0-9+.-]+)$/', $scheme)) {
-            throw new \InvalidArgumentException('Invalid schema.');
+            throw new InvalidArgumentException('Invalid schema.');
         }
         $url = $this->clone();
         $url->schema = $scheme;
@@ -85,7 +87,7 @@ class URL implements \Stringable
             return $this->host;
         }
         if (!filter_var($host, FILTER_VALIDATE_IP) && !filter_var('info@' . $host, FILTER_VALIDATE_DOMAIN)) {
-            throw new \InvalidArgumentException('Invalid host.');
+            throw new InvalidArgumentException('Invalid host.');
         }
         $url = $this->clone();
         $url->host = $host;
@@ -98,7 +100,7 @@ class URL implements \Stringable
             return $this->port;
         }
         if ($port < 0 || $port > 65535) {
-            throw new \InvalidArgumentException('Invalid port.');
+            throw new InvalidArgumentException('Invalid port.');
         }
         $url = $this->clone();
         $url->port = (int)$port;
@@ -390,7 +392,7 @@ class URL implements \Stringable
     /**
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         $url = '';
         $url .= $this->schema ? $this->schema . '://' : '';

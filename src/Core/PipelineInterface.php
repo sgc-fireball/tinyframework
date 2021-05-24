@@ -7,22 +7,10 @@ use Closure;
 interface PipelineInterface
 {
 
-    /**
-     * @param Closure|Closure[]|null $layers
-     */
-    public function __construct($layers = null);
+    public function __construct(Closure|array|null $layers = null);
 
-    /**
-     * @param Closure|Closure[] $layers
-     * @return PipelineInterface
-     */
-    public function layers($layers): PipelineInterface;
+    public function layers(Closure|array $layers): PipelineInterface;
 
-    /**
-     * @param Closure $core
-     * @param mixed|null $parameter
-     * @return mixed
-     */
-    public function call(Closure $core, $parameter = null);
+    public function call(Closure $core, mixed $parameter = null): mixed;
 
 }

@@ -13,17 +13,17 @@ interface QueryInterface
 
     public function class(string $class): QueryInterface;
 
-    public function where(string|Closure $field, string $operation = null, $value = null): QueryInterface;
+    public function where(string|Closure $field, string $operation = null, mixed $value = null): QueryInterface;
 
     public function whereNull(string $field): QueryInterface;
 
     public function whereNotNull(string $field): QueryInterface;
 
-    public function orWhere(string|Closure $field, string $operation, $value): QueryInterface;
+    public function orWhere(string|Closure $field, string $operation, mixed $value): QueryInterface;
 
-    public function orWhereNull(string $field, string $operation, $value): QueryInterface;
+    public function orWhereNull(string $field, string $operation, mixed $value): QueryInterface;
 
-    public function orWhereNotNull(string $field, string $operation, $value): QueryInterface;
+    public function orWhereNotNull(string $field, string $operation, mixed $value): QueryInterface;
 
     public function whereNested(Closure $callback): QueryInterface;
 
@@ -41,7 +41,7 @@ interface QueryInterface
 
     public function put(array $fields = []);
 
-    public function delete();
+    public function delete(): bool;
 
     public function get(): array;
 

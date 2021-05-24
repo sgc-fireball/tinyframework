@@ -2,6 +2,8 @@
 
 namespace TinyFramework\Core;
 
+use ErrorException;
+use RuntimeException;
 use TinyFramework\ServiceProvider\BroadcastServiceProvider;
 use TinyFramework\ServiceProvider\ConsoleServiceProvider;
 use TinyFramework\ServiceProvider\CryptServiceProvider;
@@ -47,7 +49,7 @@ abstract class Kernel implements KernelInterface
         $this->boot();
     }
 
-    protected function findServiceProviders()
+    protected function findServiceProviders(): void
     {
         $this->serviceProviderNames = [
             EventServiceProvider::class,
@@ -96,13 +98,13 @@ abstract class Kernel implements KernelInterface
                 if (class_exists($provider)) {
                     $this->serviceProviderNames[] = $provider;
                 } else {
-                    throw new \RuntimeException('Could not found service provider: ' . $provider);
+                    throw new RuntimeException('Could not found service provider: ' . $provider);
                 }
             }
         }
     }
 
-    protected function register()
+    protected function register(): void
     {
         /** @var string $serviceProvider */
         foreach ($this->serviceProviderNames as $serviceProvider) {
@@ -133,7 +135,7 @@ abstract class Kernel implements KernelInterface
     public function handleError(int $level, string $message, string $file = '', int $line = 0): bool
     {
         if (error_reporting() & $level) {
-            $this->handleException(new \ErrorException($message, 0, $level, $file, $line));
+            $this->handleException(new ErrorException($message, 0, $level, $file, $line));
             return true;
         }
         return false;
@@ -156,7 +158,7 @@ abstract class Kernel implements KernelInterface
         if (!$error || !in_array($error['type'], [E_COMPILE_ERROR, E_CORE_ERROR, E_ERROR, E_PARSE])) {
             return;
         }
-        $this->handleException(new \RuntimeException($error['message'], 0));
+        $this->handleException(new RuntimeException($error['message'], 0));
     }
 
 }

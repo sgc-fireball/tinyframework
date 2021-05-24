@@ -2,6 +2,7 @@
 
 namespace TinyFramework\Console\Output\Components;
 
+use RuntimeException;
 use TinyFramework\Console\Output\OutputInterface;
 
 class ProgressBar
@@ -23,7 +24,7 @@ class ProgressBar
 
     private int $fps = 10;
 
-    private static $formats = [
+    private static array $formats = [
         'normal' => ' {current:%3s}/{max:%3s} [{bar}] {percent:%3s%%}',
         'normal_nomax' => ' {current:%3s} [{bar}]',
         'verbose' => ' {current:%3s}/{max:%3s} [{bar}] {percent:%3s%%} {elapsed}',
@@ -97,7 +98,7 @@ class ProgressBar
             return $this->format;
         }
         if (!array_key_exists($format, self::$formats)) {
-            throw new \RuntimeException('Unknown format: ' . $format);
+            throw new RuntimeException('Unknown format: ' . $format);
         }
         $this->format = self::$formats[$format];
         return $this;

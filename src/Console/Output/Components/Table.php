@@ -2,6 +2,7 @@
 
 namespace TinyFramework\Console\Output\Components;
 
+use InvalidArgumentException;
 use TinyFramework\Console\Output\OutputInterface;
 
 /**
@@ -83,7 +84,7 @@ class Table
             return $this;
         }
         if (count($columnWidths) !== $this->cols) {
-            throw new \InvalidArgumentException('Table head and col width should have an equal number of elements');
+            throw new InvalidArgumentException('Table head and col width should have an equal number of elements');
         }
         foreach ($columnWidths as $index => $size) {
             $this->columnWidths[$index] = $size ?: $this->columnWidths[$index];
@@ -101,10 +102,10 @@ class Table
                 continue;
             }
             if (!is_array($row)) {
-                throw new \InvalidArgumentException('Row value is not an array.');
+                throw new InvalidArgumentException('Row value is not an array.');
             }
             if (count($row) !== $this->cols) {
-                throw new \InvalidArgumentException('Table head and rows should have an equal number of elements');
+                throw new InvalidArgumentException('Table head and rows should have an equal number of elements');
             }
             foreach ($row as $index => $title) {
                 $this->columnWidths[$index] = max($this->columnWidths[$index] ?? 0, mb_strlen($title));
@@ -114,11 +115,7 @@ class Table
         return $this;
     }
 
-    /**
-     * @param array|string $row
-     * @return static
-     */
-    public function row($row): static
+    public function row(array|string $row): static
     {
         if (!is_array($row)) {
             $this->rows[] = 'hr';
@@ -126,7 +123,7 @@ class Table
         }
         $row = array_values($row);
         if (count($row) !== $this->cols) {
-            throw new \InvalidArgumentException('Table head and rows should have an equal number of elements');
+            throw new InvalidArgumentException('Table head and rows should have an equal number of elements');
         }
         foreach ($row as $index => $title) {
             $this->columnWidths[$index] = max($this->columnWidths[$index] ?? 0, mb_strlen($title));
