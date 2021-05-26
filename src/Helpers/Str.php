@@ -41,7 +41,7 @@ class Str implements \Stringable
     public function slug(string $separator = '-', string $language = null): Str
     {
         $value = $this->value;
-        if (in_array(setlocale(LC_CTYPE, 0), [null, 'C', 'POSIX'])) {
+        if (in_array(setlocale(LC_CTYPE, "0"), [null, 'C', 'POSIX'])) {
             if (str_contains($value = htmlentities($value, ENT_QUOTES, 'UTF-8'), '&')) {
                 $value = html_entity_decode(preg_replace('~&([a-z]{1,2})(?:acute|cedil|circ|grave|lig|orn|ring|slash|tilde|uml);~i', '$1', $value), ENT_QUOTES, 'UTF-8');
             }
