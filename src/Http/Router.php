@@ -327,16 +327,26 @@ class Router
                 continue;
             }
             $url = $route->url();
-            foreach ($parameters as $key => $value) {
+            foreach (array_keys($parameters) as $key) {
+                if (!str_contains($url, '{' . $key . '}')) {
+                    continue;
+                }
+                $value = $parameters[$key];
                 $value = is_object($value) && method_exists($value, '__toString') ? $value->__toString() : $value;
                 $value = is_bool($value) ? ($value ? 'TRUE' : 'FALSE') : $value;
                 $value = is_null($value) ? 'NULL' : $value;
                 $url = str_replace('{' . $key . '}', (string)$value, $url);
+                unset($parameters[$key]);
             }
             if (mb_strpos($url, '{') || strpos($url, '}')) {
                 throw new RuntimeException('Missing parameters.');
             }
-            return rtrim('/' . ltrim($url, '/'), '?&');
+            $url = rtrim('/' . ltrim($url, '/'), '?&');
+            if (!empty($url)) {
+                $url .= str_contains($url, '?') ? '&' : '?';
+                $url .= http_build_query($parameters);
+            }
+            return $url;
         }
         throw new RuntimeException('Could not found route.');
     }
