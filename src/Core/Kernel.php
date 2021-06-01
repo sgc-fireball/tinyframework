@@ -78,12 +78,20 @@ abstract class Kernel implements KernelInterface
                 $composer = json_decode($content, true);
                 if (array_key_exists('packages', $composer)) {
                     foreach ($composer['packages'] as $package) {
-                        if (array_key_exists('extra', $package)) {
-                            if (array_key_exists('tinyframework', $package['extra'])) {
-                                if (array_key_exists('providers', $package['extra']['tinyframework'])) {
-                                    $this->serviceProviderNames += $package['extra']['tinyframework']['providers'];
-                                }
-                            }
+                        if (!array_key_exists('extra', $package)) {
+                            continue;
+                        }
+                        if (!array_key_exists('tinyframework', $package['extra'])) {
+                            continue;
+                        }
+                        if (!array_key_exists('providers', $package['extra']['tinyframework'])) {
+                            continue;
+                        }
+                        if (!is_array($package['extra']['tinyframework']['providers'])) {
+                            continue;
+                        }
+                        foreach ($package['extra']['tinyframework']['providers'] as $provider) {
+                            $this->serviceProviderNames[] = ltrim($provider, '\\');
                         }
                     }
                 }
