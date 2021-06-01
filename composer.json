@@ -1,7 +1,7 @@
 {
   "name": "sgc-fireball/tinyframework",
   "license": "CC-BY-4.0",
-  "type": "framework",
+  "type": "library",
   "autoload": {
     "files": [
       "src/Helpers/functions.php"
