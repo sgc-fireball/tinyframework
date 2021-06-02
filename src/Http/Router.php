@@ -14,6 +14,8 @@ class Router
 
     private array $routes = [];
 
+    private ?Route $fallback = null;
+
     private array $pattern = ['default' => '[^\/]+'];
 
     private array $bindings = [];
@@ -261,9 +263,7 @@ class Router
 
     public function fallback(Closure|array|string $action): Route
     {
-        $route = (new Route())->method('any')->url('.*')->action($action)->name('fallback');
-        $this->routes[] = $route;
-        return $route;
+        return $this->fallback = (new Route())->method('any')->url('.*')->action($action)->name('fallback');
     }
 
     public function resolve(Request $request): ?Route
@@ -271,7 +271,8 @@ class Router
         $url = $request->url()->query([])->fragment('')->__toString();
 
         /** @var Route $route */
-        foreach ($this->routes as $route) {
+        $routes = array_merge($this->routes, $this->fallback ? [$this->fallback] : []);
+        foreach ($routes as $route) {
             $allowedMethods = $route->method();
             if (!in_array($request->method(), $allowedMethods) && !in_array('ANY', $allowedMethods)) {
                 continue;
