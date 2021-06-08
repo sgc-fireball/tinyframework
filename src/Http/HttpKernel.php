@@ -56,7 +56,9 @@ class HttpKernel extends Kernel implements HttpKernelInterface
             ->header('X-Response-ID', $response->id())
             ->header('X-Response-Duration', round(microtime(true) - TINYFRAMEWORK_START, 4) . ' sec.')
             ->send();
-        $this->terminateRequest($this->request, $response);
+        if ($this->request) {
+            $this->terminateRequest($this->request, $response);
+        }
         $this->terminate();
         die();
     }
