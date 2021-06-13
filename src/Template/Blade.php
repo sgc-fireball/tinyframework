@@ -21,6 +21,8 @@ class Blade implements ViewInterface
 
     public CacheInterface $cache;
 
+    private array $vendorDirectories = [];
+
     /** @var Closure[] */
     public array $preCompilers = [];
 
@@ -35,12 +37,36 @@ class Blade implements ViewInterface
         $this->cache = $cache->tag('template');
     }
 
+    public function addNamespaceDirectory(string $namespace, string $dir): static
+    {
+        if (!is_dir($dir) || !is_readable($dir)) {
+            throw new \RuntimeException('Folder does not exists or is not readable: ' . $dir);
+        }
+        $this->vendorDirectories[$namespace] = $dir;
+        return $this;
+    }
+
     private function view2file(string $view): array
     {
-        return [
-            sprintf('%s/%s.blade.php', $this->config['source'], str_replace('.', '/', $view)),
-            sprintf('%s/%s.blade.php', __DIR__ . '/views', str_replace('.', '/', $view)),
-        ];
+        $namespace = null;
+        if (str_contains($view, '@')) {
+            list($namespace, $view) = explode('@', $view, 2);
+        }
+        $view = ltrim(str_replace('.', '/', $view), '/');
+        if (is_null($namespace)) {
+            $directories = [
+                sprintf('%s/%s.blade.php', $this->config['source'], $view),
+                sprintf('%s/%s.blade.php', __DIR__ . '/views', $view),
+            ];
+        } else {
+            $directories = [
+                sprintf('%s/vendor/%s/%s.blade.php', $this->config['source'], $namespace, $view),
+            ];
+            if (array_key_exists($namespace, $this->vendorDirectories)) {
+                $directories[] = sprintf('%s/%s.blade.php', $this->vendorDirectories[$namespace], $view);
+            }
+        }
+        return $directories;
     }
 
     public function exists(string $view): bool
