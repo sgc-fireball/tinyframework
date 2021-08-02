@@ -66,6 +66,12 @@ You can use theses server with and/or without an reverse nginx proxy.
 php swoole
 ```
 
+## Todos
+
+- https://github.com/opis/closure/
+- Drop Swoole Support
+- Broadcasting Channels with permissions
+
 ## Author
 
 Richard Hülsberg <rh+github@hrdns.de>

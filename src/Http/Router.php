@@ -342,10 +342,12 @@ class Router
             if (mb_strpos($url, '{') || strpos($url, '}')) {
                 throw new RuntimeException('Missing parameters.');
             }
-            $url = rtrim('/' . ltrim($url, '/'), '?&');
+            $url = rtrim('/' . ltrim($url, '/'));
             if (!empty($url)) {
+                $url = rtrim($url, '&');
                 $url .= str_contains($url, '?') ? '&' : '?';
                 $url .= http_build_query($parameters);
+                $url = rtrim($url, '?&');
             }
             return $url;
         }

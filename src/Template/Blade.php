@@ -15,6 +15,8 @@ class Blade implements ViewInterface
 
     public array $placeholder = [];
 
+    private array $directive = [];
+
     public array $footer = [];
 
     public array $sectionStack = [];
@@ -35,6 +37,12 @@ class Blade implements ViewInterface
         $this->config['cache'] = $this->config['cache'] ?? true;
         $this->config['source'] = $this->config['source'] ?? 'resources/views';
         $this->cache = $cache->tag('template');
+    }
+
+    public function addDirective(string $directive, \Closure $callback): static
+    {
+        $this->directive[$directive] = $callback;
+        return $this;
     }
 
     public function addNamespaceDirectory(string $namespace, string $dir): static
@@ -142,6 +150,9 @@ class Blade implements ViewInterface
                 if (method_exists($this, $method = 'compile' . ucfirst($match[1]))) {
                     return $this->$method($match[3] ?? '');
                 }
+                if (array_key_exists($match[1], $this->directive)) {
+                    return $this->directive[$match[1]]($match[3] ?? '');
+                }
                 throw new RuntimeException('Unknown blade command: ' . $match[1]);
             },
             $content
@@ -225,6 +236,11 @@ class Blade implements ViewInterface
         return (string)preg_replace_callback('/(?<!@)@php(.*?)@endphp/s', function ($matches) {
             return sprintf('<?php %s ?>', $matches[1]);
         }, $content);
+    }
+
+    public function compileClass(string $expression): string
+    {
+        return sprintf('<?php echo implode(" ",array_keys(array_filter%s)); ?>', $expression);
     }
 
     public function compileIf(string $expression): string

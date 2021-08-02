@@ -75,6 +75,14 @@ $view->compileString('<b>{{ $key }}</b>'); // php code
 @this_is_not_a_blade_comment
 ```
 
+### Class
+
+```blade
+<span class="@class(['alert' => 1, alert-error' => 0, 'alert-info' => 1])">
+  Info
+</span>
+```
+
 ### Comments
 
 ```blade

@@ -29,6 +29,13 @@ class PasswordRule extends RuleAwesome
         if (!preg_match('/[^a-zA-Z0-9]/', $value)) {
             $errors[] = $this->translator->trans('validation.password.symbols', ['attribute' => $this->getTransName($name)]);
         }
+
+        $prefix = substr($hash = strtoupper(sha1($value)), 0, 5);
+        $postfix = substr($hash, 5);
+        // @TODO response = fetch(https://api.pwnedpasswords.com/range/$prefix)
+        // @TODO count = search $postfix in response ?? 0
+        // @TODO count > 0 then errors = []
+
         return count($errors) ? $errors : null;
     }
 
