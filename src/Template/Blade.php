@@ -11,25 +11,26 @@ use TinyFramework\Cache\CacheInterface;
 class Blade implements ViewInterface
 {
 
-    public array $config;
+    private array $config;
 
-    public array $placeholder = [];
+    private array $placeholder = [];
 
+    /** @var Closure[] */
     private array $directive = [];
 
-    public array $footer = [];
+    private array $footer = [];
 
-    public array $sectionStack = [];
+    private array $sectionStack = [];
 
-    public CacheInterface $cache;
+    private CacheInterface $cache;
 
     private array $vendorDirectories = [];
 
     /** @var Closure[] */
-    public array $preCompilers = [];
+    private array $preCompilers = [];
 
     /** @var Closure[] */
-    public array $postCompilers = [];
+    private array $postCompilers = [];
 
     public function __construct(array $config, CacheInterface $cache)
     {
@@ -39,7 +40,7 @@ class Blade implements ViewInterface
         $this->cache = $cache->tag('template');
     }
 
-    public function addDirective(string $directive, \Closure $callback): static
+    public function addDirective(string $directive, Closure $callback): static
     {
         $this->directive[$directive] = $callback;
         return $this;
@@ -142,19 +143,7 @@ class Blade implements ViewInterface
 
         $content = (string)preg_replace_callback(
             '/\B@(@?\w+(?:::\w+)?)([ \t]*)(\( ( (?>[^()]+) | (?3) )* \))?/x',
-            function ($match) {
-                if (mb_substr($match[1], 0, 1) === '@') {
-                    return $match[0];
-                }
-                $match[1] = mb_strtolower($match[1]);
-                if (method_exists($this, $method = 'compile' . ucfirst($match[1]))) {
-                    return $this->$method($match[3] ?? '');
-                }
-                if (array_key_exists($match[1], $this->directive)) {
-                    return $this->directive[$match[1]]($match[3] ?? '');
-                }
-                throw new RuntimeException('Unknown blade command: ' . $match[1]);
-            },
+            fn($match) => $this->compileStatement($match),
             $content
         );
 
@@ -168,6 +157,20 @@ class Blade implements ViewInterface
         }
 
         return trim($content);
+    }
+
+    private function compileStatement(array $match): string
+    {
+        if (mb_substr($match[1], 0, 1) === '@') {
+            return $match[0];
+        }
+        $match[1] = mb_strtolower($match[1]);
+        if (array_key_exists($match[1], $this->directive)) {
+            return $this->directive[$match[1]]($match[3] ?? '');
+        } else if (method_exists($this, $method = 'compile' . ucfirst($match[1]))) {
+            return $this->$method($match[3] ?? '');
+        }
+        throw new RuntimeException('Unknown blade command: ' . $match[1]);
     }
 
     public function addPreCompiler(Closure $compiler): static
@@ -288,12 +291,6 @@ class Blade implements ViewInterface
         return '<?php endswitch ?>';
     }
 
-    public function compileInject(string $expression): string
-    {
-        [$variable, $service] = explode(',', (string)preg_replace("/[\(\)\\\"\']/", '', $expression));
-        return sprintf('<?php $%s = container("%s"); ?>', trim($variable), trim($service));
-    }
-
     public function compileBreak(string $expression): string
     {
         if (!empty($expression)) {
@@ -313,16 +310,6 @@ class Blade implements ViewInterface
             return sprintf('<?php if %s { continue; } ?>', $expression);
         }
         return '<?php continue; ?>';
-    }
-
-    public function compileDump(string $expression): string
-    {
-        return sprintf('<?php dump%s ?>', $expression);
-    }
-
-    public function compileDd(string $expression): string
-    {
-        return sprintf('<?php dd%s ?>', $expression);
     }
 
     public function compileWhile(string $expression): string
@@ -357,7 +344,10 @@ class Blade implements ViewInterface
 
     public function compileJson(string $expression): string
     {
-        // @TODO JSON_HEX_TAG, JSON_HEX_APOS, JSON_HEX_AMP, and JSON_HEX_QUOT
+        // @TODO
+        #$parts = explode(',', substr($expression, 1, -1));
+        #$options = isset($parts[1]) ? trim($parts[1]) : JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT;
+        #$depth = isset($parts[2]) ? trim($parts[2]) : 512;
         return sprintf('<?php echo json_encode%s ?>', $expression);
     }
 
@@ -376,11 +366,6 @@ class Blade implements ViewInterface
     public function compileUnset(string $expression): string
     {
         return sprintf('<?php unset%s; ?>', $expression);
-    }
-
-    public function compileTrans(string $expression): string
-    {
-        return sprintf('<?php _%s; ?>', $expression);
     }
 
     public function compileExtends(string $expression): string
@@ -437,7 +422,7 @@ class Blade implements ViewInterface
         return '<?php echo $__env->yieldSection(); ?>';
     }
 
-    protected function compileYield(string $expression): string
+    public function compileYield(string $expression): string
     {
         return sprintf('<?php echo $__env->yieldContent%s; ?>', $expression);
     }

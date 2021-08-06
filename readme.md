@@ -68,9 +68,11 @@ php swoole
 
 ## Todos
 
+- Implement Auth Service / Interface
+- create tinyframework-echo as a nodejs repo with a client
 - https://github.com/opis/closure/
 - Drop Swoole Support
-- Broadcasting Channels with permissions
+- Implement ServiceProviders::provides to implement lazy loading services
 
 ## Author
 

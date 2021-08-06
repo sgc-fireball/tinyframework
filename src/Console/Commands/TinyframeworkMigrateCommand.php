@@ -10,7 +10,7 @@ use TinyFramework\Console\Input\InputInterface;
 use TinyFramework\Console\Output\OutputInterface;
 use TinyFramework\Database\MigrationInstaller;
 
-class TinyframeworkMigrationCommand extends CommandAwesome
+class TinyframeworkMigrateCommand extends CommandAwesome
 {
 
     protected function configure(): InputDefinitionInterface

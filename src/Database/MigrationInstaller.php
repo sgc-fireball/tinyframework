@@ -3,9 +3,12 @@
 namespace TinyFramework\Database;
 
 use ReflectionClass;
+use TinyFramework\Console\Output\OutputInterface;
 
 class MigrationInstaller
 {
+
+    protected OutputInterface $output;
 
     protected DatabaseInterface $database;
 
@@ -13,12 +16,29 @@ class MigrationInstaller
     protected array $migrations;
 
     public function __construct(
+        OutputInterface $output,
         DatabaseInterface $database,
         array $migrations = []
     )
     {
+        $this->output = $output;
         $this->database = $database;
         $this->migrations = $migrations;
+        $this->loadAppMigration();
+    }
+
+    protected function loadAppMigration(): void
+    {
+        $folder = root_dir() . '/database/migrations';
+        if (!is_dir($folder)) {
+            return;
+        }
+        $files = glob($folder . '/*.php');
+        foreach ($files as $file) {
+            require_once $file;
+            $class = str_replace('.php', '', basename($file));
+            $this->migrations[] = container()->call($class);
+        }
     }
 
     protected function sortMigrations(): array
@@ -27,8 +47,8 @@ class MigrationInstaller
             return $class instanceof MigrationInterface;
         });
         usort($this->migrations, function ($migrationA, $migrationB) {
-            $timeA = (int)explode('_', (new ReflectionClass($migrationA))->getShortName())[1];
-            $timeB = (int)explode('_', (new ReflectionClass($migrationB))->getShortName())[1];
+            $timeA = (int)explode('_', (new ReflectionClass($migrationA))->getShortName(), 3)[1];
+            $timeB = (int)explode('_', (new ReflectionClass($migrationB))->getShortName(), 3)[1];
             return $timeA === $timeB ? 0 : ($timeA <= $timeB ? -1 : 1);
         });
         return $this->migrations;
@@ -51,12 +71,21 @@ class MigrationInstaller
     {
         $this->sortMigrations();
         $migrated = $this->getRan();
-        try {
-            $time = time();
-            foreach ($this->migrations as $migration) {
-                if (in_array($migration, $migrated)) {
-                    continue;
-                }
+        $migrated = array_map(
+            function (array $row) {
+                return $row['id'];
+            },
+            $migrated
+        );
+
+        $time = time();
+        foreach ($this->migrations as $migration) {
+            if (in_array($migration::class, $migrated)) {
+                continue;
+            }
+
+            try {
+                $this->output->writeln($migration::class);
                 $this->database->query()->transaction();
                 $migration->up();
                 $this->database->query()->table('migrations')->put([
@@ -64,10 +93,10 @@ class MigrationInstaller
                     'batch' => $time
                 ]);
                 $this->database->query()->commit();
+            } catch (\Throwable $e) {
+                $this->database->query()->rollback();
+                throw $e;
             }
-        } catch (\Throwable $e) {
-            $this->database->query()->rollback();
-            throw $e;
         }
     }
 
@@ -77,23 +106,25 @@ class MigrationInstaller
         $batch = 0;
         $migrated = $this->getRan();
         array_walk($migrated, function (array $row) use (&$batch) {
-            $batch = max($batch, $row['batch']);
+            $batch = intval(max($batch, $row['batch']));
         });
+
         $migrated = array_map(
             function (array $row) {
                 return $row['id'];
             },
             array_filter($migrated, function (array $row) use (&$batch) {
-                return $batch === $row['batch'];
+                return $batch === intval($row['batch']);
             })
         );
 
-        try {
-            foreach ($migrations as $migration) {
-                if (!in_array($migration, $migrated)) {
-                    continue;
-                }
+        foreach ($migrations as $migration) {
+            if (!in_array($migration::class, $migrated)) {
+                continue;
+            }
 
+            try {
+                $this->output->writeln($migration::class);
                 $this->database->query()->transaction();
                 $migration->down();
                 $this->database->query()
@@ -101,10 +132,10 @@ class MigrationInstaller
                     ->where('id', '=', get_class($migration))
                     ->delete();
                 $this->database->query()->commit();
+            } catch (\Throwable $e) {
+                $this->database->query()->rollback();
+                throw $e;
             }
-        } catch (\Throwable $e) {
-            $this->database->query()->rollback();
-            throw $e;
         }
     }
 

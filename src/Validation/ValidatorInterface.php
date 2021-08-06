@@ -2,6 +2,7 @@
 
 namespace TinyFramework\Validation;
 
+use TinyFramework\Http\Request;
 use TinyFramework\Validation\Rule\RuleInterface;
 
 interface ValidatorInterface
@@ -11,6 +12,6 @@ interface ValidatorInterface
 
     public function addRule(RuleInterface $rule): ValidatorInterface;
 
-    public function validate(array $attributes, array $rules): array;
+    public function validate(Request|array $attributes, array $rules): array;
 
 }

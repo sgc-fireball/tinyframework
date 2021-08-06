@@ -213,7 +213,13 @@ class Response
         if (is_null($value)) {
             return $this->headers[$key] ?? null;
         }
-        $this->headers[mb_strtolower($key)] = $value;
+        $key = mb_strtolower($key);
+        if ($key === 'set-cookie') {
+            $values = $this->headers[$key] ?? [];
+            $values[] = $value;
+            $value = $values;
+        }
+        $this->headers[$key] = $value;
         return $this;
     }
 
@@ -245,7 +251,13 @@ class Response
             $this->code
         );
         foreach ($this->headers as $key => $value) {
-            header($key . ': ' . $value, $key === 'content-type');
+            if ($key === 'set-cookie') {
+                foreach ($value as $val) {
+                    header(sprintf("%s: %s", $key, $val), $key === 'content-type');
+                }
+            } else {
+                header(sprintf("%s: %s", $key, $value), $key === 'content-type');
+            }
         }
         echo $this->content;
         flush();
@@ -256,7 +268,13 @@ class Response
     {
         $response = sprintf("%s %d %s\n", $this->protocol, $this->code, static::$codes[$this->code]);
         foreach ($this->headers as $key => $value) {
-            $response .= sprintf("%s: %s\n", $key, $value);
+            if ($key === 'set-cookie') {
+                foreach ($value as $val) {
+                    $response .= sprintf("%s: %s\n", $key, $val);
+                }
+            } else {
+                $response .= sprintf("%s: %s\n", $key, $value);
+            }
         }
         $response .= "\n" . $this->content;
         return $response;

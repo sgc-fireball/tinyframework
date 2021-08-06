@@ -14,6 +14,7 @@ return [
     'email' => 'The {attribute} must be a valid email address.',
 #    'exists' => 'The selected {attribute} is invalid.',
     'file' => 'The {attribute} must be a file.',
+    'infile' => 'The {attribute} must be an inline file.',
     'filled' => 'The {attribute} field must have a value.',
 #    'gt' => [
 #        'numeric' => 'The {attribute} must be greater than {value}.',
@@ -68,6 +69,7 @@ return [
         'lowercase' => '{attribute} is missing lower case chars.',
         'numerics' => '{attribute}s is missing numerics.',
         'symbols' => '{attribute}s is missing symbols.',
+        'pwned' => '{attribute} is insecure. For more information, please see https://haveibeenpwned.com/Passwords',
     ],
     'present' => 'The {attribute} field must be present.',
 #    'regex' => 'The {attribute} format is invalid.',

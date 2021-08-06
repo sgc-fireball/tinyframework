@@ -3,7 +3,10 @@
 namespace TinyFramework\ServiceProvider;
 
 use Psr\Log\LoggerInterface;
+use TinyFramework\Broadcast\BroadcastController;
 use TinyFramework\Broadcast\BroadcastInterface;
+use TinyFramework\Broadcast\BroadcastManager;
+use TinyFramework\Http\Router;
 
 class BroadcastServiceProvider extends ServiceProviderAwesome
 {
@@ -15,6 +18,7 @@ class BroadcastServiceProvider extends ServiceProviderAwesome
             return;
         }
         $config = $config[$config['default']] ?? [];
+        $this->container->singleton(BroadcastManager::class, fn() => (new BroadcastManager())->load());
         $this->container
             ->alias('broadcast', $config['driver'])
             ->alias(BroadcastInterface::class, $config['driver'])
@@ -22,6 +26,18 @@ class BroadcastServiceProvider extends ServiceProviderAwesome
                 $class = $config['driver'];
                 return new $class($config);
             });
+    }
+
+    public function boot(): void
+    {
+        /** @var Router $router */
+        $router = $this->container->get('router');
+        $router->group(
+            ['middleware' => config('broadcast.global.middleware') ?? []],
+            function (Router $router) {
+                $router->post('broadcast/auth', BroadcastController::class . '@auth')->name('broadcast.auth');
+            }
+        );
     }
 
 }

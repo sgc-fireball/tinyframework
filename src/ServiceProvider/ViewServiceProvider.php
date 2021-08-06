@@ -3,6 +3,7 @@
 namespace TinyFramework\ServiceProvider;
 
 use TinyFramework\Core\ContainerInterface;
+use TinyFramework\Template\Blade;
 use TinyFramework\Template\ViewInterface;
 
 class ViewServiceProvider extends ServiceProviderAwesome
@@ -23,9 +24,34 @@ class ViewServiceProvider extends ServiceProviderAwesome
             $this->container
                 ->alias($name, $class)
                 ->singleton($class, function () use ($class, $config) {
-                    return $this->container->call($class, ['config' => $config]);
+                    $engine = $this->container->call($class, ['config' => $config]);
+                    if ($engine instanceof Blade) {
+                        $this->registerBladeDirective($engine);
+                    }
+                    return $engine;
                 });
         }
+    }
+
+    private function registerBladeDirective(Blade $engine): void
+    {
+        $engine->addDirective('csrf', function (string $expression): string {
+            $token = $this->container->get('request')?->session()?->get('csrf-token') ?? '';
+            return sprintf('<input type="hidden" name="_token" value="%s">', $token);
+        });
+        $engine->addDirective('inject', function (string $expression): string {
+            [$variable, $service] = explode(',', (string)preg_replace("/[\(\)\\\"\']/", '', $expression));
+            return sprintf('<?php $%s = container("%s"); ?>', trim($variable), trim($service));
+        });
+        $engine->addDirective('dump', function (string $expression): string {
+            return sprintf('<?php dump%s ?>', $expression);
+        });
+        $engine->addDirective('dd', function (string $expression): string {
+            return sprintf('<?php dd%s; ?>', $expression);
+        });
+        $engine->addDirective('trans', function (string $expression): string {
+            return sprintf('<?php _%s; ?>', $expression);
+        });
     }
 
 }

@@ -2,6 +2,7 @@
 
 namespace TinyFramework\ServiceProvider;
 
+use TinyFramework\Console\Output\OutputInterface;
 use TinyFramework\Database\DatabaseInterface;
 use TinyFramework\Database\MigrationInstaller;
 
@@ -25,6 +26,7 @@ class DatabaseServiceProvider extends ServiceProviderAwesome
         $this->container
             ->singleton(MigrationInstaller::class, function () {
                 return new MigrationInstaller(
+                    $this->container->get(OutputInterface::class),
                     $this->container->get(DatabaseInterface::class),
                     $this->container->tagged('migration')
                 );
