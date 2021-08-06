@@ -33,7 +33,7 @@ class MigrationInstaller
         if (!is_dir($folder)) {
             return;
         }
-        $files = glob($folder . '/*.php');
+        $files = glob($folder . '/Migration_*_*.php');
         foreach ($files as $file) {
             require_once $file;
             $class = str_replace('.php', '', basename($file));

@@ -30,6 +30,8 @@ cd my-project; php console
         - Middleware
     - Providers
 - config
+- database
+  - migrations
 - public
 - resources
     - lang
