@@ -94,6 +94,9 @@ class Request
         $request->protocol = $_SERVER['HTTP_SERVER_PROTOCOL'] ?? 'HTTP/1.0';
         $request->get = $_GET ?? [];
         $request->post = $_POST ?? [];
+        if (array_key_exists('HTTP_CONTENT_TYPE', $_SERVER) && str_contains($_SERVER['HTTP_CONTENT_TYPE'], 'application/json')) {
+            $request->post = json_decode(file_get_contents('php://input'), true);
+        }
         $request->cookie = $_COOKIE ?? [];
         self::migrateFiles($_FILES ?? [], $request->files);
         foreach ($_SERVER as $key => $value) {
