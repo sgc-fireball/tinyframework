@@ -97,7 +97,7 @@ class Request
         $request->cookie = $_COOKIE ?? [];
         self::migrateFiles($_FILES ?? [], $request->files);
         foreach ($_SERVER as $key => $value) {
-            if (mb_strpos($key, 'HTTP_') !== 0) {
+            if (mb_strpos($key, 'HTTP_') === 0) {
                 if ($key === 'HTTP_AUTHORIZATION') {
                     list ($user, $pw) = explode(':', base64_decode(mb_substr($_SERVER['HTTP_AUTHORIZATION'], 6)));
                     $request->header['php_auth_user'] = $user ?? null;

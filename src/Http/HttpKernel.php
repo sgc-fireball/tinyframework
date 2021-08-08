@@ -26,7 +26,9 @@ class HttpKernel extends Kernel implements HttpKernelInterface
             $this->request = $request;
             $response = null;
             $this->container->alias('request', Request::class)->singleton(Request::class, $request);
-            if ($route = $this->container->get('router')->resolve($request)) {
+            if ($request->method() === 'OPTIONS') {
+                $response = $this->getResponseByOptionsRequest($request);
+            } else if ($route = $this->container->get('router')->resolve($request)) {
                 $response = $this->callRoute($route, $request);
             }
             if (!$response) {
@@ -41,6 +43,16 @@ class HttpKernel extends Kernel implements HttpKernelInterface
                     'exception' => $e
                 ]
             );
+        }
+        if (($origins = $request->header('Origin')) || $request->method() === 'OPTIONS') {
+            $origin = is_array($origins) && array_key_exists(0, $origins) ? $origins[0] : null;
+            if (in_array('*', config('cors.allow_origins'))) {
+                $response->header('Access-Control-Allow-Origin', '*');
+            } else if (in_array($origin, config('cors.allow_origins'))) {
+                $response->header('Access-Control-Allow-Origin', $origin);
+            } else {
+                $response->header('Access-Control-Allow-Origin', rtrim(url('/'), '/'));
+            }
         }
         return $response
             ->header('X-Request-ID', $request->id())
@@ -68,11 +80,35 @@ class HttpKernel extends Kernel implements HttpKernelInterface
         $statusCode = $e instanceof HttpException ? $e->getCode() : 500;
         $statusCode = ($statusCode < 400 || $statusCode > 599) ? 500 : $statusCode;
         $response = Response::error($statusCode);
-        /** @var Blade $view */
-        $view = $this->container->get('blade');
-        if ($view->exists('errors.' . $statusCode)) {
+        if (!$this->container->has('blade')) {
             $response = Response::new('', $statusCode);
-            $response->content($view->render('errors.' . $statusCode, compact('e', 'response')));
+        } else {
+            /** @var Blade $view */
+            $view = $this->container->get('blade');
+            if ($view->exists('errors.' . $statusCode)) {
+                $response = Response::new('', $statusCode);
+                $response->content($view->render('errors.' . $statusCode, compact('e', 'response')));
+            }
+        }
+        return $response;
+    }
+
+    private function getResponseByOptionsRequest(Request $request): Response
+    {
+        $response = Response::new(null, 200);
+        /** @var Router $router */
+        $router = $this->container->get('router');
+        $response->header('allow', implode(', ', $router->getAllowedMethodsByRequest($request)));
+
+        if ($request->header('Origin')) {
+            if ($methods = $request->header('Access-Control-Request-Method')) {
+                $response->header('Access-Control-Allow-Method', implode(', ', $methods));
+            }
+            if ($headers = $request->header('Access-Control-Request-Headers')) {
+                $response->header('Access-Control-Allow-Headers', implode(', ', $headers));
+            }
+            $response->header('Access-Control-Max-Age', (string)config('cors.max_age'));
+            $response->header('Access-Control-Allow-Credentials', to_bool(config('cors.allow_credentials')) ? 'true' : 'false');
         }
         return $response;
     }

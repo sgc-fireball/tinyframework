@@ -15,6 +15,8 @@ use TinyFramework\Helpers\Arr;
 use TinyFramework\Helpers\Htmlable;
 use TinyFramework\Helpers\Str;
 use TinyFramework\Http\Response;
+use TinyFramework\Http\Router;
+use TinyFramework\Localization\TranslatorInterface;
 use TinyFramework\Logger\LoggerInterface;
 use TinyFramework\Mail\Mailer;
 use TinyFramework\Mail\MailerInterface;
@@ -77,6 +79,7 @@ if (!function_exists('container')) {
 if (!function_exists('config')) {
     function config(?string $key = null, mixed $value = null): Config|array|string|bool|int|null
     {
+        /** @var Config $config */
         $config = container('config');
         if (is_null($key)) {
             return $config;
@@ -216,7 +219,9 @@ if (!function_exists('env')) {
      */
     function env(string $key, $default = null): mixed
     {
-        return container(DotEnvInterface::class)->get($key) ?? $default;
+        /** @var DotEnvInterface $env */
+        $env = container(DotEnvInterface::class);
+        return $env->get($key) ?? $default;
     }
 }
 
@@ -268,28 +273,36 @@ if (!function_exists('guid')) {
 if (!function_exists('trans')) {
     function trans(string $key, array $values = [], string $locale = null): string
     {
-        return container('translator')->trans($key, $values, $locale);
+        /** @var TranslatorInterface $translator */
+        $translator = container('translator');
+        return $translator->trans($key, $values, $locale);
     }
 }
 
 if (!function_exists('trans_choice')) {
     function trans_choice(string $key, int $count, array $values = [], string $locale = null): string
     {
-        return container('translator')->transChoice($key, $count, $values, $locale);
+        /** @var TranslatorInterface $translator */
+        $translator = container('translator');
+        return $translator->transChoice($key, $count, $values, $locale);
     }
 }
 
 if (!function_exists('route')) {
     function route(string $name, array $parameters = []): string
     {
-        return container('router')->path($name, $parameters);
+        /** @var Router $router */
+        $router = container('router');
+        return $router->path($name, $parameters);
     }
 }
 
 if (!function_exists('url')) {
     function url(string $path = '/', array $parameters = []): string
     {
-        return container('router')->url($path, $parameters);
+        /** @var Router $router */
+        $router = container('router');
+        return $router->url($path, $parameters);
     }
 }
 

@@ -29,6 +29,12 @@ class Router
         $this->container = $container;
     }
 
+    public function routes(): array
+    {
+        // destroy pointers
+        return array_map(fn(Route $route) => clone $route, $this->routes);
+    }
+
     public function load(): static
     {
         $router = $this;
@@ -296,6 +302,42 @@ class Router
             }
         }
         return null;
+    }
+
+    public function getAllowedMethodsByRequest(Request $request): array
+    {
+        $result = [];
+        $url = $request->url()->query([])->fragment('')->__toString();
+        /** @var Route $route */
+        foreach ($this->routes as $route) {
+            $regex = $this->translateUrl($route);
+            if (preg_match($regex, $url, $match)) {
+                $match = array_filter($match, function ($value, $key) {
+                    return !is_numeric($key);
+                }, ARRAY_FILTER_USE_BOTH);
+                foreach ($match as $name => &$value) {
+                    if ($callback = $this->bind($name)) {
+                        if ($callback instanceof Closure && $newValue = $callback($value)) {
+                            $value = $newValue;
+                            continue;
+                        }
+                        continue 2;
+                    }
+                }
+                $result = array_merge($result, $route->method());
+            }
+        }
+
+        if (!count($result)) {
+            $result = $this->fallback?->method() ?? [];
+        }
+        $result[] = 'OPTIONS';
+        if (in_array('ANY', $result)) {
+            $result = array_merge($result, ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']);
+        }
+        $results = array_unique(array_filter($result, fn($method) => $method !== 'ANY'));
+        sort($results);
+        return $results;
     }
 
     protected function translateUrl(Route $route): string
