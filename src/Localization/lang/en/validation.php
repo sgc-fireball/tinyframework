@@ -14,7 +14,7 @@ return [
     'email' => 'The {attribute} must be a valid email address.',
 #    'exists' => 'The selected {attribute} is invalid.',
     'file' => 'The {attribute} must be a file.',
-    'infile' => 'The {attribute} must be an inline file.',
+    'inlinefile' => 'The {attribute} must be an inline file.',
     'filled' => 'The {attribute} field must have a value.',
 #    'gt' => [
 #        'numeric' => 'The {attribute} must be greater than {value}.',

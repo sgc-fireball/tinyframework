@@ -14,7 +14,7 @@ class AcceptedRule extends RuleAwesome
     {
         $value = $attributes[$name] ?? null;
         $value = is_string($value) ? strtolower($value) : $value;
-        if (in_array($value, ['y', 'yes', true, 'true', 'on', 1])) {
+        if (to_bool($value)) {
             return null;
         }
         return [$this->translator->trans('validation.accepted', ['attribute' => $this->getTransName($name)])];

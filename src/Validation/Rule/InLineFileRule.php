@@ -2,21 +2,19 @@
 
 namespace TinyFramework\Validation\Rule;
 
-use TinyFramework\Http\UploadedFile;
-
-class InfileRule extends RuleAwesome
+class InLineFileRule extends RuleAwesome
 {
 
     public function getName(): string
     {
-        return 'file';
+        return 'inlinefile';
     }
 
     public function validate(array $attributes, string $name, ...$parameters): array|bool|null
     {
         $file = $attributes[$name] ?? null;
         if (!is_string($file)) {
-            return [$this->translator->trans('validation.infile', ['attribute' => $this->getTransName($name)])];
+            return [$this->translator->trans('validation.inlinefile', ['attribute' => $this->getTransName($name)])];
         }
 
         if (preg_match(
@@ -35,7 +33,7 @@ class InfileRule extends RuleAwesome
             }
         }
 
-        return [$this->translator->trans('validation.infile', ['attribute' => $this->getTransName($name)])];
+        return [$this->translator->trans('validation.inlinefile', ['attribute' => $this->getTransName($name)])];
     }
 
 }

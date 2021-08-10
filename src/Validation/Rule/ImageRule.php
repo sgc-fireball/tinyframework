@@ -18,7 +18,10 @@ class ImageRule extends RuleAwesome
         if (!($file instanceof UploadedFile)) {
             return [$this->translator->trans('validation.image', ['attribute' => $this->getTransName($name)])];
         }
-        if (strpos($file->mimetype(), 'image/') !== 0) {
+        if ($file->hasError()) {
+            return [$this->translator->trans('validation.image', ['attribute' => $this->getTransName($name)])];
+        }
+        if (!str_starts_with($file->mimetype(), 'image/')) {
             return [$this->translator->trans('validation.image', ['attribute' => $this->getTransName($name)])];
         }
         return null;

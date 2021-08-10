@@ -13,7 +13,7 @@ class NumericRule extends RuleAwesome
     public function validate(array $attributes, string $name, ...$parameters): array|bool|null
     {
         $value = $attributes[$name] ?? null;
-        if (is_numeric($value)) {
+        if (!is_string($value) && is_numeric($value)) {
             return null;
         }
         return [$this->translator->trans('validation.numeric', ['attribute' => $this->getTransName($name)])];

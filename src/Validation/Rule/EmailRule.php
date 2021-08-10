@@ -13,18 +13,25 @@ class EmailRule extends RuleAwesome
     public function validate(array $attributes, string $name, ...$parameters): array|bool|null
     {
         if (empty($parameters)) {
-            $parameters[] = 'dns';
             $parameters[] = 'rfc';
         }
         $value = $attributes[$name] ?? null;
 
-        if (empty($value)) {
+        if (!preg_match('/^.{1,}@.{1,}$/', $value)) {
             return [$this->translator->trans('validation.email', ['attribute' => $this->getTransName($name)])];
         }
 
+        list($domain, $user) = explode('@', strrev($value), 2);
+        $domain = strrev($domain);
+        $domain = idn_to_ascii($domain);
+        if (!filter_var($domain, FILTER_VALIDATE_IP) && !filter_var($domain, FILTER_VALIDATE_DOMAIN)) {
+            return [$this->translator->trans('validation.email', ['attribute' => $this->getTransName($name)])];
+        }
+        if (filter_var($domain, FILTER_VALIDATE_DOMAIN)) {
+            $domain = $domain . '.';
+        }
+
         if (in_array('dns', $parameters)) {
-            list($user, $domain) = explode('@', $value);
-            $domain = idn_to_ascii($domain);
             if (!$domain) {
                 return [$this->translator->trans('validation.email', ['attribute' => $this->getTransName($name)])];
             }

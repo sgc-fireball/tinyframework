@@ -18,6 +18,9 @@ class FileRule extends RuleAwesome
         if (!($file instanceof UploadedFile)) {
             return [$this->translator->trans('validation.file', ['attribute' => $this->getTransName($name)])];
         }
+        if ($file->hasError()) {
+            return [$this->translator->trans('validation.file', ['attribute' => $this->getTransName($name)])];
+        }
         return null;
     }
 

@@ -71,10 +71,11 @@ php swoole
 ## Todos
 
 - Implement Auth Service / Interface
-- create tinyframework-echo as a nodejs repo with a client
+- create tinyframework-echo as a nodejs repo with a ndoe server
 - https://github.com/opis/closure/
 - Drop Swoole Support
 - Implement ServiceProviders::provides to implement lazy loading services
+- extract Output Box as Console/Output/Component
 
 ## Author
 

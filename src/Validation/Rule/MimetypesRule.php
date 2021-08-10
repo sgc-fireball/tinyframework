@@ -18,6 +18,9 @@ class MimetypesRule extends RuleAwesome
         if (!($file instanceof UploadedFile)) {
             return [$this->translator->trans('validation.file', ['attribute' => $this->getTransName($name)])];
         }
+        if ($file->hasError()) {
+            return [$this->translator->trans('validation.mimetypes', ['attribute' => $this->getTransName($name), 'values' => implode(', ', $parameters)])];
+        }
         if (!in_array($file->mimetype(), $parameters)) {
             return [$this->translator->trans('validation.mimetypes', ['attribute' => $this->getTransName($name), 'values' => implode(', ', $parameters)])];
         }

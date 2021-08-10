@@ -13,7 +13,7 @@ class FloatRule extends RuleAwesome
     public function validate(array $attributes, string $name, ...$parameters): array|bool|null
     {
         $value = $attributes[$name] ?? null;
-        if (is_float($value)) {
+        if (!is_string($value) && is_float($value)) {
             return null;
         }
         return [$this->translator->trans('validation.float', ['attribute' => $this->getTransName($name)])];

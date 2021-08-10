@@ -18,7 +18,10 @@ class VideoRule extends RuleAwesome
         if (!($file instanceof UploadedFile)) {
             return [$this->translator->trans('validation.video', ['attribute' => $this->getTransName($name)])];
         }
-        if (strpos($file->mimetype(), 'video/') !== 0) {
+        if ($file->hasError()) {
+            return [$this->translator->trans('validation.video', ['attribute' => $this->getTransName($name)])];
+        }
+        if (!str_starts_with($file->mimetype(), 'video/')) {
             return [$this->translator->trans('validation.video', ['attribute' => $this->getTransName($name)])];
         }
         return null;

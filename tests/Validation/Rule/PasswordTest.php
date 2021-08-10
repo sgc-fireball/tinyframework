@@ -15,15 +15,15 @@ class PasswordTest extends ValidationTestCase
         try {
             $this->validator->addRule(new PasswordRule($this->translator));
             $this->validator->validate(
-                ['password' => 'aA0!'],
-                ['password' => 'password']
+                ['field' => 'aA0!'],
+                ['field' => 'password']
             );
         } catch (ValidationException $e) {
             $errorBag = $e->getErrorBag();
         }
         $this->assertIsArray($errorBag);
-        $this->assertArrayHasKey('password', $errorBag);
-        $this->assertEquals(1, count($errorBag['password']));
+        $this->assertArrayHasKey('field', $errorBag);
+        $this->assertEquals(1, count($errorBag['field']));
     }
 
     public function testPasswordMissingUppercase()
@@ -32,15 +32,15 @@ class PasswordTest extends ValidationTestCase
         try {
             $this->validator->addRule(new PasswordRule($this->translator));
             $this->validator->validate(
-                ['password' => 'zaffqqf0!'],
-                ['password' => 'password']
+                ['field' => 'zaffqqf0!'],
+                ['field' => 'password']
             );
         } catch (ValidationException $e) {
             $errorBag = $e->getErrorBag();
         }
         $this->assertIsArray($errorBag);
-        $this->assertArrayHasKey('password', $errorBag);
-        $this->assertEquals(1, count($errorBag['password']));
+        $this->assertArrayHasKey('field', $errorBag);
+        $this->assertEquals(1, count($errorBag['field']));
     }
 
     public function testPasswordMissingLowercase()
@@ -49,15 +49,15 @@ class PasswordTest extends ValidationTestCase
         try {
             $this->validator->addRule(new PasswordRule($this->translator));
             $this->validator->validate(
-                ['password' => 'FKFDKFW0!'],
-                ['password' => 'password']
+                ['field' => 'FKFDKFW0!'],
+                ['field' => 'password']
             );
         } catch (ValidationException $e) {
             $errorBag = $e->getErrorBag();
         }
         $this->assertIsArray($errorBag);
-        $this->assertArrayHasKey('password', $errorBag);
-        $this->assertEquals(1, count($errorBag['password']));
+        $this->assertArrayHasKey('field', $errorBag);
+        $this->assertEquals(1, count($errorBag['field']));
     }
 
     public function testPasswordMissingNumerics()
@@ -66,15 +66,15 @@ class PasswordTest extends ValidationTestCase
         try {
             $this->validator->addRule(new PasswordRule($this->translator));
             $this->validator->validate(
-                ['password' => 'FKasdKFW#!'],
-                ['password' => 'password']
+                ['field' => 'FKasdKFW#!'],
+                ['field' => 'password']
             );
         } catch (ValidationException $e) {
             $errorBag = $e->getErrorBag();
         }
         $this->assertIsArray($errorBag);
-        $this->assertArrayHasKey('password', $errorBag);
-        $this->assertEquals(1, count($errorBag['password']));
+        $this->assertArrayHasKey('field', $errorBag);
+        $this->assertEquals(1, count($errorBag['field']));
     }
 
     public function testPasswordMissingSymbols()
@@ -83,15 +83,15 @@ class PasswordTest extends ValidationTestCase
         try {
             $this->validator->addRule(new PasswordRule($this->translator));
             $this->validator->validate(
-                ['password' => 'adDKFW134'],
-                ['password' => 'password']
+                ['field' => 'adDKFW134'],
+                ['field' => 'password']
             );
         } catch (ValidationException $e) {
             $errorBag = $e->getErrorBag();
         }
         $this->assertIsArray($errorBag);
-        $this->assertArrayHasKey('password', $errorBag);
-        $this->assertEquals(1, count($errorBag['password']));
+        $this->assertArrayHasKey('field', $errorBag);
+        $this->assertEquals(1, count($errorBag['field']));
     }
 
     public function testPasswordPwned()
@@ -100,15 +100,15 @@ class PasswordTest extends ValidationTestCase
         try {
             $this->validator->addRule(new PasswordRule($this->translator));
             $this->validator->validate(
-                ['password' => 'Passw0rd!'],
-                ['password' => 'password']
+                ['field' => 'Passw0rd!'],
+                ['field' => 'password']
             );
         } catch (ValidationException $e) {
             $errorBag = $e->getErrorBag();
         }
         $this->assertIsArray($errorBag);
-        $this->assertArrayHasKey('password', $errorBag);
-        $this->assertEquals(1, count($errorBag['password']));
+        $this->assertArrayHasKey('field', $errorBag);
+        $this->assertEquals(1, count($errorBag['field']));
     }
 
 }

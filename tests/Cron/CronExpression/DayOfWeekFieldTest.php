@@ -11,13 +11,13 @@ class DayOfWeekFieldTest extends TestCase
     public function testWildcard()
     {
         $field = new DayOfWeekField('*');
-        $this->assertEquals(range(0, 6), $field->parse());
+        $this->assertEquals(range(0, 7), $field->parse());
     }
 
     public function testList()
     {
         $field = new DayOfWeekField('0,1,2,3,4');
-        $this->assertEquals(range(0, 4), $field->parse());
+        $this->assertEquals(array_merge(range(0, 4), [7]), $field->parse());
     }
 
     public function testRange()
@@ -29,7 +29,7 @@ class DayOfWeekFieldTest extends TestCase
     public function testStep()
     {
         $field = new DayOfWeekField('*/2');
-        $this->assertEquals([0, 2, 4, 6], $field->parse());
+        $this->assertEquals([0, 2, 4, 6, 7], $field->parse());
     }
 
     public function testMixed()

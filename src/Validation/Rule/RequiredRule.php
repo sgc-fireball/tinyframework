@@ -24,6 +24,9 @@ class RequiredRule extends RuleAwesome
         if ($value instanceof UploadedFile && $value->hasError()) {
             return [$this->translator->trans('validation.required', ['attribute' => $this->getTransName($name)])];
         }
+        if (is_object($value)) {
+            return null;
+        }
         return null;
     }
 

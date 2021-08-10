@@ -24,7 +24,7 @@ class DayOfWeekField extends AbstractField
     public function inExpression(int $value): bool
     {
         if (in_array($value, [0, 7])) {
-            return parent::inExpression($value) || parent::inExpression(7);
+            return parent::inExpression(0) || parent::inExpression(7);
         }
         return parent::inExpression($value);
     }
