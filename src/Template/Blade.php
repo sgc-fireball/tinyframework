@@ -22,7 +22,7 @@ class Blade implements ViewInterface
 
     private array $sectionStack = [];
 
-    private CacheInterface $cache;
+    private ?CacheInterface $cache = null;
 
     private array $vendorDirectories = [];
 
@@ -32,12 +32,12 @@ class Blade implements ViewInterface
     /** @var Closure[] */
     private array $postCompilers = [];
 
-    public function __construct(array $config, CacheInterface $cache)
+    public function __construct(array $config, CacheInterface $cache = null)
     {
         $this->config = $config;
         $this->config['cache'] = $this->config['cache'] ?? true;
         $this->config['source'] = $this->config['source'] ?? 'resources/views';
-        $this->cache = $cache->tag('template');
+        $this->cache = $this->config['cache'] ? $cache->tag('template') : null;
     }
 
     public function addDirective(string $directive, Closure $callback): static
@@ -88,7 +88,7 @@ class Blade implements ViewInterface
         return false;
     }
 
-    public function render(string $view, array $data, array $parentData = []): string
+    public function render(string $view, array $data = [], array $parentData = []): string
     {
         return $this->execute(
             $this->compileFile($view),
@@ -96,7 +96,7 @@ class Blade implements ViewInterface
         );
     }
 
-    public function renderString(string $content, array $data, array $parentData = []): string
+    public function renderString(string $content, array $data = [], array $parentData = []): string
     {
         return $this->execute(
             $this->compileString($content),
@@ -107,8 +107,8 @@ class Blade implements ViewInterface
     public function compileFile(string $view): string
     {
         $key = 'template:' . str_replace('.', ':', $view);
-        if ($this->config['cache'] && $this->cache->has($key)) {
-            return $this->cache->get($key);
+        if ($this->config['cache'] && $this->cache?->has($key)) {
+            return $this->cache?->get($key);
         }
 
         $file = null;
@@ -123,7 +123,7 @@ class Blade implements ViewInterface
         }
         $content = trim($this->compileString((string)file_get_contents($file)));
         if ($this->config['cache']) {
-            $this->cache->set($key, $content);
+            $this->cache?->set($key, $content);
         }
         return $content;
     }
@@ -198,7 +198,7 @@ class Blade implements ViewInterface
         } finally {
             $__content = (string)ob_get_clean();
         }
-        return trim($__content) . PHP_EOL;
+        return trim($__content);
     }
 
     public function getPlaceholder(string $name, string $key = null): string
@@ -348,7 +348,7 @@ class Blade implements ViewInterface
         #$parts = explode(',', substr($expression, 1, -1));
         #$options = isset($parts[1]) ? trim($parts[1]) : JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT;
         #$depth = isset($parts[2]) ? trim($parts[2]) : 512;
-        return sprintf('<?php echo json_encode%s ?>', $expression);
+        return sprintf('<?php echo json_encode%s; ?>', $expression);
     }
 
     public function compileMethod(string $expression): string
@@ -521,7 +521,9 @@ class Blade implements ViewInterface
 
     public function clear(): static
     {
-        $this->cache->clear();
+        if ($this->config['cache']) {
+            $this->cache?->clear();
+        }
         return $this;
     }
 

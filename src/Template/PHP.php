@@ -25,7 +25,7 @@ class PHP implements ViewInterface
         return file_exists($this->view2file($view));
     }
 
-    public function render(string $view, array $data, array $parentData = []): string
+    public function render(string $view, array $data = [], array $parentData = []): string
     {
         $file = $this->view2file($view);
         if (!file_exists($file)) {
@@ -52,7 +52,7 @@ class PHP implements ViewInterface
         return $content;
     }
 
-    public function renderString(string $content, array $data, array $parentData = []): string
+    public function renderString(string $content, array $data = [], array $parentData = []): string
     {
         return $this->executeString($content, array_merge($parentData, $data));
     }
