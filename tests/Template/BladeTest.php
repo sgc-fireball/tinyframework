@@ -19,7 +19,10 @@ class BladeTest extends TestCase
 
     public function setUp(): void
     {
-        $this->blade = new Blade(['cache' => false, 'source' => sys_get_temp_dir()]);
+        $this->blade = new Blade([
+            'cache' => false,
+            'source' => __DIR__ . '/views'
+        ]);
     }
 
     public function testVerbatim(): void
@@ -44,6 +47,16 @@ class BladeTest extends TestCase
         $php = $this->blade->compileString($tpl);
         $this->assertEquals('<?php echo(e( $test )); ?>', $php);
         $this->assertEquals('test', $this->blade->renderString($tpl, ['test' => 'test']));
+        $this->assertEquals('&lt;b&gt;test&lt;/b&gt;', $this->blade->renderString($tpl, ['test' => '<b>test</b>']));
+    }
+
+    public function testEchoRaw(): void
+    {
+        $tpl = '{!! $test !!}';
+        $php = $this->blade->compileString($tpl);
+        $this->assertEquals('<?php echo( $test ); ?>', $php);
+        $this->assertEquals('test', $this->blade->renderString($tpl, ['test' => 'test']));
+        $this->assertEquals('<b>test</b>', $this->blade->renderString($tpl, ['test' => '<b>test</b>']));
     }
 
     public function testPhp(): void
@@ -98,12 +111,52 @@ class BladeTest extends TestCase
         $this->assertEquals('false', $this->blade->renderString($tpl, ['test' => 0]));
     }
 
-    // Switch
-    // Case
-    // EndswitchCase
-    // Break
-    // Default
-    // Continue
+    public function testSwitchCaseDefault(): void
+    {
+        $tpl = "@switch(\$test)\n";
+        $tpl .= "@case(1) 1 @break\n";
+        $tpl .= "@case(2) 2 @break\n";
+        $tpl .= "@case(3) 3\n";
+        $tpl .= "@default 4\n";
+        $tpl .= "@endswitch\n";
+
+        $php = '<?php switch($test): ?>' . "\n";
+        $php .= '<?php case(1): ?> 1 <?php break; ?>' . "\n";
+        $php .= '<?php case(2): ?> 2 <?php break; ?>' . "\n";
+        $php .= '<?php case(3): ?> 3' . "\n";
+        $php .= '<?php default: ?>4' . "\n";
+        $php .= '<?php endswitch ?>';
+
+        $this->assertEquals($php, $this->blade->compileString($tpl));
+        $this->assertEquals('1', $this->blade->renderString($tpl, ['test' => 1]));
+        $this->assertEquals('2', $this->blade->renderString($tpl, ['test' => 2]));
+        $this->assertEquals("3\n4", $this->blade->renderString($tpl, ['test' => 3]));
+        $this->assertEquals('4', $this->blade->renderString($tpl, ['test' => 4]));
+    }
+
+    public function testBreak(): void
+    {
+        $tpl = '@while($i--) @break($i < 3) {{ $i }} @endwhile';
+        $php = $this->blade->compileString($tpl);
+        $this->assertEquals('<?php while($i--): ?> <?php if ($i < 3) { break; } ?> <?php echo(e( $i )); ?> <?php endwhile; ?>', $php);
+        $this->assertEquals('4   3', $this->blade->renderString($tpl, ['i' => 5]));
+    }
+
+    public function testContinueWithCondition(): void
+    {
+        $tpl = '@while($i--) @continue($i < 3) {{ $i }} @endwhile';
+        $php = $this->blade->compileString($tpl);
+        $this->assertEquals('<?php while($i--): ?> <?php if ($i < 3) { continue; } ?> <?php echo(e( $i )); ?> <?php endwhile; ?>', $php);
+        $this->assertEquals('4   3', $this->blade->renderString($tpl, ['i' => 5]));
+    }
+
+    public function testContinueWithoutCondition(): void
+    {
+        $tpl = '@while($i--) @continue {{ $i }} @endwhile';
+        $php = $this->blade->compileString($tpl);
+        $this->assertEquals('<?php while($i--): ?> <?php continue; ?><?php echo(e( $i )); ?> <?php endwhile; ?>', $php);
+        $this->assertEquals('', $this->blade->renderString($tpl, ['i' => 5]));
+    }
 
     public function testWhile(): void
     {
@@ -145,18 +198,151 @@ class BladeTest extends TestCase
         $this->assertEquals('<input type="hidden" name="_method" value="POST">', $php);
     }
 
-    // Include
-    // Unset
-    // Extends
-    // Content
-    // Section
-    // Endsection
-    // Stop
-    // Overwrite
-    // Prepend
-    // Append
-    // Show
-    // Yield
-    // Parent
+    public function testUnset(): void
+    {
+        $tpl = '@unset($test) @isset($test) true @endif';
+        $php = $this->blade->compileString($tpl);
+        $this->assertEquals('<?php unset($test); ?> <?php if (isset($test)): ?> true <?php endif; ?>', $php);
+        $this->assertEquals('', $this->blade->renderString($tpl, ['test' => 1]));
+    }
+
+    public function testSection(): void
+    {
+        $tpl = '@section("test") test1 @endsection @section("test") test2 @show';
+
+        $php = '<?php echo $__env->startSection("test"); ?>';
+        $php .= ' test1 ';
+        $php .= '<?php $__env->stopSection(); ?>';
+        $php .= '<?php echo $__env->startSection("test"); ?>';
+        $php .= ' test2 ';
+        $php .= '<?php echo $__env->yieldSection(); ?>';
+
+        $this->assertEquals($php, $this->blade->compileString($tpl));
+        $this->assertEquals('test1', $this->blade->renderString($tpl));
+    }
+
+    public function testOverwrite(): void
+    {
+        $tpl = '@section("test") test1 @endsection @section("test") test2 @overwrite @section("test") test3 @show';
+
+        $php = '<?php echo $__env->startSection("test"); ?>';
+        $php .= ' test1 ';
+        $php .= '<?php $__env->stopSection(); ?>';
+        $php .= '<?php echo $__env->startSection("test"); ?>';
+        $php .= ' test2 ';
+        $php .= '<?php $__env->stopSection(true); ?>';
+        $php .= '<?php echo $__env->startSection("test"); ?>';
+        $php .= ' test3 ';
+        $php .= '<?php echo $__env->yieldSection(); ?>';
+
+        $this->assertEquals($php, $this->blade->compileString($tpl));
+        $this->assertEquals('test2', $this->blade->renderString($tpl));
+    }
+
+    public function testPrepend(): void
+    {
+        $tpl = '@section("test") test1 @endsection @section("test") prepend @prepend @section("test") test2 @show';
+
+        $php = '<?php echo $__env->startSection("test"); ?>';
+        $php .= ' test1 ';
+        $php .= '<?php $__env->stopSection(); ?>';
+        $php .= '<?php echo $__env->startSection("test"); ?>';
+        $php .= ' prepend ';
+        $php .= '<?php $__env->prependSection(); ?>';
+        $php .= '<?php echo $__env->startSection("test"); ?>';
+        $php .= ' test2 ';
+        $php .= '<?php echo $__env->yieldSection(); ?>';
+
+        $this->assertEquals($php, $this->blade->compileString($tpl));
+        $this->assertEquals('prepend  test1', $this->blade->renderString($tpl));
+    }
+
+    public function testAppend(): void
+    {
+        $tpl = '@section("test") test1 @endsection @section("test") append @append @section("test") test2 @show';
+
+        $php = '<?php echo $__env->startSection("test"); ?>';
+        $php .= ' test1 ';
+        $php .= '<?php $__env->stopSection(); ?>';
+        $php .= '<?php echo $__env->startSection("test"); ?>';
+        $php .= ' append ';
+        $php .= '<?php $__env->appendSection(); ?>';
+        $php .= '<?php echo $__env->startSection("test"); ?>';
+        $php .= ' test2 ';
+        $php .= '<?php echo $__env->yieldSection(); ?>';
+
+        $this->assertEquals($php, $this->blade->compileString($tpl));
+        $this->assertEquals('test1  append', $this->blade->renderString($tpl));
+    }
+
+    public function testShow(): void
+    {
+        $tpl = '@section("test") test @show';
+
+        $php = '<?php echo $__env->startSection("test"); ?>';
+        $php .= ' test ';
+        $php .= '<?php echo $__env->yieldSection(); ?>';
+
+        $this->assertEquals($php, $this->blade->compileString($tpl));
+        $this->assertEquals('test', $this->blade->renderString($tpl));
+    }
+
+    public function testYield(): void
+    {
+        $tpl = '@section("test") test @endsection @section("test2") test2 @endsection @yield("test")';
+
+        $php = '<?php echo $__env->startSection("test"); ?>';
+        $php .= ' test ';
+        $php .= '<?php $__env->stopSection(); ?>';
+        $php .= '<?php echo $__env->startSection("test2"); ?>';
+        $php .= ' test2 ';
+        $php .= '<?php $__env->stopSection(); ?>';
+        $php .= '<?php echo $__env->yieldContent("test"); ?>';
+
+        $this->assertEquals($php, $this->blade->compileString($tpl));
+        $this->assertEquals('test', $this->blade->renderString($tpl));
+    }
+
+    public function testParent(): void
+    {
+        $tpl = '@section("test") test @parent test @append @section("test") parent @show';
+
+        $php = '<?php echo $__env->startSection("test"); ?>';
+        $php .= ' test ';
+        $php .= '##placeholder-section-testtest ';
+        $php .= '<?php $__env->appendSection(); ?>';
+        $php .= '<?php echo $__env->startSection("test"); ?>';
+        $php .= ' parent ';
+        $php .= '<?php echo $__env->yieldSection(); ?>';
+
+        $this->assertEquals($php, $this->blade->compileString($tpl));
+        $this->assertEquals('test  parent test', $this->blade->renderString($tpl));
+    }
+
+    public function testDirective(): void
+    {
+        $time = (string)microtime(true);
+        $this->blade->addDirective('time', fn(string $expression) => $time);
+        $this->assertEquals($time, $this->blade->compileString('@time'));
+        $this->assertEquals($time, $this->blade->compileString('@time()'));
+        $this->assertEquals($time, $this->blade->compileString('@time(123)'));
+    }
+
+    public function testInclude(): void
+    {
+        $this->assertEquals(
+            "test1\ntest2\ntest4\ntest2\ntest1",
+            $this->blade->render('include1', ['test' => 'test4'])
+        );
+    }
+
+    public function testExtends(): void
+    {
+        $time = time();
+        $this->assertEquals(
+            "test\ntest" . $time . "\ntest",
+            $this->blade->render('extends1', ['time' => $time])
+        );
+    }
 
 }

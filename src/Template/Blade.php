@@ -306,7 +306,7 @@ class Blade implements ViewInterface
 
     public function compileContinue(string $expression): string
     {
-        if (!empty($expression)) {
+        if (!empty($expression) && $expression !== '()') {
             return sprintf('<?php if %s { continue; } ?>', $expression);
         }
         return '<?php continue; ?>';
@@ -360,7 +360,7 @@ class Blade implements ViewInterface
     public function compileInclude(string $expression): string
     {
         $expression = mb_substr($expression, 1, -1);
-        return sprintf('<?php echo $__env->render(%s, get_defined_vars()); ?>', $expression);
+        return sprintf('<?php echo $__env->render(%s, get_defined_vars()); ?>', $expression)."\n";
     }
 
     public function compileUnset(string $expression): string
@@ -373,11 +373,6 @@ class Blade implements ViewInterface
         $expression = mb_substr($expression, 1, -1);
         $this->footer[] = sprintf('<?php echo $__env->render(%s, get_defined_vars()); ?>', $expression);
         return '';
-    }
-
-    public function compileContent(string $expression): string
-    {
-        return sprintf('<?php echo $__env->startSection%s; ?>', $expression);
     }
 
     public function compileSection(string $expression): string
