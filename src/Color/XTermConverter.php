@@ -264,6 +264,11 @@ class XTermConverter implements XTermConverterInterface
         'eeeeee' => 255
     ];
 
+    public static function getMap(): array
+    {
+        return static::$map;
+    }
+
     public function xterm2hex(int $xterm): string
     {
         $xterm = min(max(0, $xterm), 255);

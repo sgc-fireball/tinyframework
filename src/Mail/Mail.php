@@ -196,7 +196,7 @@ class Mail
         $this->attachments[] = [
             'content' => $content,
             'filename' => $filename,
-            'mimetype' => $mimeType ?? 'application/octet-stream'
+            'mimetype' => $mimeType
         ];
         return $this;
     }

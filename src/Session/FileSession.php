@@ -25,6 +25,7 @@ class FileSession extends SessionAwesome implements SessionInterface
 
     public function open(string $id = null): static
     {
+        $this->data = [];
         if (!is_null($id)) {
             $this->id = $id;
         }
@@ -35,7 +36,7 @@ class FileSession extends SessionAwesome implements SessionInterface
         if (!is_readable($file)) {
             throw new RuntimeException('Could not read session file.');
         }
-        $this->data = unserialize((string)file_get_contents($file));
+        $this->data = (array)unserialize((string)file_get_contents($file));
         return $this;
     }
 
@@ -46,6 +47,7 @@ class FileSession extends SessionAwesome implements SessionInterface
                 @unlink($file);
             }
         }
+        $this->data = [];
         return $this;
     }
 
@@ -61,6 +63,7 @@ class FileSession extends SessionAwesome implements SessionInterface
         if (file_put_contents($file, serialize($this->data)) === false) {
             throw new RuntimeException('Could not save session file. (3)');
         }
+        $this->data = [];
         return $this;
     }
 
@@ -73,6 +76,7 @@ class FileSession extends SessionAwesome implements SessionInterface
             }
             unlink($file);
         }
+        $this->data = [];
         return $this;
     }
 

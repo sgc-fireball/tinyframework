@@ -49,6 +49,7 @@ class RedisSession extends SessionAwesome implements SessionInterface
     public function close(): static
     {
         $this->redis->setex($this->getId(), $this->config['ttl'], serialize($this->data));
+        $this->data = [];
         return $this;
     }
 
@@ -57,6 +58,7 @@ class RedisSession extends SessionAwesome implements SessionInterface
         if ($this->redis->exists($this->getId())) {
             $this->redis->del($this->getId());
         }
+        $this->data = [];
         return $this;
     }
 
@@ -66,6 +68,7 @@ class RedisSession extends SessionAwesome implements SessionInterface
         if (count($deleteKeys)) {
             $this->redis->del($deleteKeys);
         }
+        $this->data = [];
         return $this;
     }
 

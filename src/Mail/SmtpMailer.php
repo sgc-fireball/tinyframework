@@ -43,6 +43,9 @@ class SmtpMailer implements MailerInterface
         }
 
         $fp = stream_socket_client($this->config['host'] . ':' . $this->config['port'], $errno, $errstr);
+        if (!$fp) {
+            throw new RuntimeException('Could not connect to ' . $this->config['host'] . ':' . $this->config['port']);
+        }
         if ($this->config['encryption'] === 'ssl') {
             stream_socket_enable_crypto($fp, true, $crypto);
         }
@@ -127,7 +130,7 @@ class SmtpMailer implements MailerInterface
         $this->write($fp, sprintf("--%s--\r\n\r\n", $alternativeBoundary), false);
 
         //$this->write($fp, sprintf("--%s\r\n", $relatedBoundary), false);
-        //$this->write($fp, "Content-Type: image/jpgeg;name=\"masthead.png\"\r\n", false);
+        //$this->write($fp, "Content-Type: image/jpeg;name=\"masthead.png\"\r\n", false);
         //$this->write($fp, "Content-Transfer-Encoding: base64\r\n", false);
         //$this->write($fp, "Content-Disposition: inline;filename=\"masthead.png\"\r\n", false);
         //$this->write($fp, "Content-ID: <masthead.png@".idn_to_ascii($this->config['local_domain']).">\r\n\r\n", false); // src=\"cid:masthead.png@".idn_to_ascii($this->config['local_domain'])."\"

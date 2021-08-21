@@ -11,9 +11,7 @@ class TranslationLoader
 
     public function __construct(array $paths = [])
     {
-        $this->paths = $paths;
-        $this->paths[] = __DIR__ . '/lang/';
-        $this->paths[] = root_dir() . '/resources/lang/';
+        $this->paths = array_merge([__DIR__ . '/lang', root_dir() . '/resources/lang'], $paths);
     }
 
     public function addPath(string $path): static
@@ -37,6 +35,7 @@ class TranslationLoader
 
     private function loadFolder(string $locale, string $path): static
     {
+        $path = rtrim($path, '/');
         if (!is_dir($path)) {
             return $this;
         }
@@ -56,7 +55,7 @@ class TranslationLoader
         }
         try {
             $module = str_replace('.php', '', basename($file));
-            $trans = require_once($file);
+            $trans = require($file);
             $trans = is_array($trans) ? $trans : [];
             $trans = array_flat($trans);
             foreach ($trans as $key => $value) {

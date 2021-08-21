@@ -497,4 +497,73 @@ class Color
         return $this->nameConverter->hex2name($this->xterm2hex($xterm));
     }
 
+
+    /**
+     * @see https://developers.meethue.com/documentation/color-conversions-rgb-xy
+     * @param int $red
+     * @param int $green
+     * @param int $blue
+     * @return array(float,float,integer)
+     */
+    public function rgb2xyb(int $red = 0, int $green = 0, int $blue = 0): array
+    {
+        // Get the RGB values from your color object and convert them to be between 0 and 1.
+        // So the RGB color (255, 0, 100) becomes (1.0, 0.0, 0.39)
+        $red /= 255;
+        $green /= 255;
+        $blue /= 255;
+
+        // Apply a gamma correction to the RGB values, which makes the color more vivid and more the like the color
+        // displayed on the screen of your device. This gamma correction is also applied to the screen of your
+        // computer or phone, thus we need this to create a similar color on the light as on screen.
+        // This is done by the following formulas:
+        $red = ($red > 0.04045) ? pow(($red + 0.055) / (1.0 + 0.055), 2.4) : ($red / 12.92);
+        $green = ($green > 0.04045) ? pow(($green + 0.055) / (1.0 + 0.055), 2.4) : ($green / 12.92);
+        $blue = ($blue > 0.04045) ? pow(($blue + 0.055) / (1.0 + 0.055), 2.4) : ($blue / 12.92);
+
+        // Convert the RGB values to XYZ using the Wide RGB D65 conversion formula The formulas used
+        $X = $red * 0.664511 + $green * 0.154324 + $blue * 0.162028;
+        $Y = $red * 0.283881 + $green * 0.668433 + $blue * 0.047685;
+        $Z = $red * 0.000088 + $green * 0.072310 + $blue * 0.986039;
+
+        // Calculate the xy values from the XYZ values
+        $x = $X + $Y + $Z;
+        $x = $x == 0 ? 0 : $X / $x;
+        $y = $X + $Y + $Z;
+        $y = $y == 0 ? 0 : $Y / $y;
+
+        // Use the Y value of XYZ as brightness The Y value indicates the brightness of the converted color.
+        return [round($x, 6), round($y, 6), min(254, max(0, round($Y * 255, 0)))];
+    }
+
+    public function xyb2rgb(float $x, float $y, int $brightness = 254): array
+    {
+        // Calculate XYZ values Convert using the following formulas
+        $z = 1.0 - $x - $y;
+        $Y = $brightness;
+        $X = ($Y / $y) * $x;
+        $Z = ($Y / $y) * $z;
+
+        // Convert to RGB using Wide RGB D65 conversion
+        $r = $X * 1.656492 - $Y * 0.354851 - $Z * 0.255038;
+        $g = -$X * 0.707196 + $Y * 1.655397 + $Z * 0.036152;
+        $b = $X * 0.051713 - $Y * 0.121364 + $Z * 1.011530;
+
+        // Apply reverse gamma correction
+        $r = $r <= 0.0031308 ? 12.92 * $r : (1.0 + 0.055) * pow($r, (1.0 / 2.4)) - 0.055;
+        $g = $g <= 0.0031308 ? 12.92 * $g : (1.0 + 0.055) * pow($g, (1.0 / 2.4)) - 0.055;
+        $b = $b <= 0.0031308 ? 12.92 * $b : (1.0 + 0.055) * pow($b, (1.0 / 2.4)) - 0.055;
+
+        if (($maxValue = max($r, $g, $b)) && $maxValue > 1) {
+            $r /= $maxValue;
+            $g /= $maxValue;
+            $b /= $maxValue;
+        }
+        $r = (int)max(0, min(255, $r * 255));
+        $g = (int)max(0, min(255, $g * 255));
+        $b = (int)max(0, min(255, $b * 255));
+
+        return [$r, $g, $b];
+    }
+
 }

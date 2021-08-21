@@ -110,11 +110,11 @@ class SignalHandler
     {
         $event = new SignalEvent($signal, self::NAMES[$signal], $info);
         self::$eventDispatcher->dispatch($event);
-        if ($event->isPropagationStopped()) {
-            return false;
-        }
         if (!self::$isTerminated) {
             self::$isTerminated = in_array($signal, [self::SIGINT, self::SIGTERM]);
+        }
+        if ($event->isPropagationStopped()) {
+            return false;
         }
         if (self::$isTerminated) {
             return true;
