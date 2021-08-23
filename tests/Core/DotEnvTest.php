@@ -31,6 +31,10 @@ class DotEnvTest extends TestCase
         $this->assertEquals('test2', $this->dotEnv->get('TEST_STRING2'));
         $this->assertEquals(1, $this->dotEnv->get('TEST_NUMBER1'));
         $this->assertEquals(1.23, $this->dotEnv->get('TEST_NUMBER2'));
+        $this->assertEquals('aaa', $this->dotEnv->get('TEST_PLACEHOLDER3'));
+        $this->assertEquals('aaa', $this->dotEnv->get('TEST_PLACEHOLDER2'));
+        $this->assertEquals('testaaatest', $this->dotEnv->get('TEST_PLACEHOLDER1'));
+        $this->assertEquals('testtest', $this->dotEnv->get('TEST_PLACEHOLDER4'));
     }
 
 }

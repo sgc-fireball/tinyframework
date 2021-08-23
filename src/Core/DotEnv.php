@@ -45,8 +45,14 @@ class DotEnv implements DotEnvInterface
                 apache_setenv($key, $value);
             }
             $value = $this->convertValue($value);
-            $_ENV[$key] = $value;
-            $_SERVER[$key] = $value;
+            $_ENV[$key] = $_SERVER[$key] = $value;
+        }
+        foreach ($_ENV as $key => $value) {
+            if (is_string($_ENV[$key])) {
+                while (preg_match('/\{(\w+)(:([^\}]+))?\}/', $_ENV[$key])) {
+                    $_ENV[$key] = $_SERVER[$key] = vnsprintf($_ENV[$key], $_ENV);
+                }
+            }
         }
         return $this;
     }
