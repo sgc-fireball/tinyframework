@@ -119,7 +119,7 @@ class HttpKernel extends Kernel implements HttpKernelInterface
         $middlewares = array_merge($this->container->get('router')->middleware(), $route->middleware());
         $onion = new Pipeline();
         foreach ($middlewares as $middleware) {
-            $onion->layers(function (Request $request, Closure $next) use ($middleware) {
+            $onion->layers(function (Request $request, Closure $next) use ($middleware): Response {
                 $parameters = [$request, $next];
                 if (mb_strpos($middleware, ',') !== false) {
                     $additionalParameters = explode(',', $middleware);
@@ -129,7 +129,7 @@ class HttpKernel extends Kernel implements HttpKernelInterface
                 return $this->container->call($middleware . '@handle', $parameters);
             });
         }
-        return $onion->call(function (Request $request) {
+        return $onion->call(function (Request $request): Response {
             $response = $this->container->call($request->route()->action(), $request->route()->parameter());
             if (!($response instanceof Response)) {
                 $response = Response::new($response);
