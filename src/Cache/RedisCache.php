@@ -64,7 +64,7 @@ class RedisCache extends CacheAwesome
         return $this->redis->exists($key) > 0;
     }
 
-    public function set(string $key, mixed $value = null, null|int|\DateTime|\DateTimeInterface $ttl = null): static
+    public function set(string $key, mixed $value = null, null|int|\DateTimeInterface|\DateInterval $ttl = null): static
     {
         $ttl = $this->calculateExpiration($ttl);
         if (is_null($ttl)) {
@@ -82,18 +82,10 @@ class RedisCache extends CacheAwesome
         return $this;
     }
 
-    protected function calculateExpiration(null|int|\DateTime|\DateTimeInterface $ttl): int|null
+    protected function calculateExpiration(null|int|\DateTimeInterface|\DateInterval $ttl): int|null
     {
-        if (is_null($ttl)) {
-            return null;
-        }
-        if ($ttl instanceof \DateTime) {
-            return max(0, (int)$ttl->format('U') - time());
-        }
-        if ($ttl instanceof \DateTimeInterface) {
-            $ttl = $ttl->getTimestamp();
-        }
-        return $ttl;
+        $ttl = parent::calculateExpiration($ttl);
+        return is_null($ttl) ? null : max(0, $ttl - time());
     }
 
     private function addKeyToTags(string $key): static

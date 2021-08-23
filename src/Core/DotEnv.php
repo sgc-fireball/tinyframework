@@ -39,14 +39,12 @@ class DotEnv implements DotEnvInterface
             if (mb_substr($value, 0, 1) === "'" && mb_substr($value, -1) === "'") {
                 $value = mb_substr($value, 1, -1);
             }
+            $value = is_string($value) && empty($value) ? 'null' : $value;
             putenv(sprintf('%s=%s', $key, $value));
             if (function_exists('apache_setenv')) {
                 apache_setenv($key, $value);
             }
-            $value = is_string($value) && empty($value) ? 'null' : $value;
-            $value = is_string($value) && mb_strtolower($value) === 'null' ? null : $value;
-            $value = is_string($value) && mb_strtolower($value) === 'true' ? true : $value;
-            $value = is_string($value) && mb_strtolower($value) === 'false' ? false : $value;
+            $value = $this->convertValue($value);
             $_ENV[$key] = $value;
             $_SERVER[$key] = $value;
         }
@@ -55,9 +53,15 @@ class DotEnv implements DotEnvInterface
 
     public function get(string $key): mixed
     {
-        $value = $_ENV[$key] ?? null;
+        return $this->convertValue($_ENV[$key] ?? null);
+    }
+
+    private function convertValue(mixed $value): mixed
+    {
+        $value = is_string($value) && empty($value) ? null : $value;
         $value = is_string($value) && mb_strlen($value) === 0 ? null : $value;
         $value = is_string($value) && mb_strtolower($value) === 'null' ? null : $value;
+        $value = is_string($value) && mb_strtolower($value) === 'empty' ? null : $value;
         $value = is_string($value) && mb_strtolower($value) === 'true' ? true : $value;
         $value = is_string($value) && mb_strtolower($value) === 'false' ? false : $value;
         return $value;

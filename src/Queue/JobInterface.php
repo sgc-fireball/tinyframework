@@ -9,7 +9,7 @@ interface JobInterface
 
     public function retryAfter(): int;
 
-    public function delay(null|int|\DateTime|\DateTimeInterface $delay = null): JobInterface|int;
+    public function delay(null|int|\DateTimeInterface|\DateInterval $delay = null): JobInterface|int;
 
     public function queue(string $queue = null): JobInterface|string;
 

@@ -15,16 +15,10 @@ interface CacheInterface
 
     public function has(string $key): bool;
 
-    /**
-     * @param string $key
-     * @param mixed $value
-     * @param null|int|\DateTime|\DateTimeInterface $ttl
-     * @return CacheInterface
-     */
-    public function set(string $key, mixed $value = null, null|int|\DateTime|\DateTimeInterface $ttl = null): CacheInterface;
+    public function set(string $key, mixed $value = null, null|int|\DateTimeInterface|\DateInterval $ttl = null): CacheInterface;
 
     public function tag(array|string $tags): CacheInterface;
 
-    public function remember(string $key, Closure $closure, null|int|\DateTime|\DateTimeInterface $ttl = null): mixed;
+    public function remember(string $key, Closure $closure, null|int|\DateTimeInterface|\DateInterval $ttl = null): mixed;
 
 }

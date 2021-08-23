@@ -105,7 +105,7 @@ class Container implements ContainerInterface
     public function decorator(string $key, string|array|callable|object $object): static
     {
         $self = $this;
-        $innerKey = uniqid('inner-' . $key . '-');
+        $innerKey = uniqid('inner-' . $key . '-', true);
         $this->instances[$innerKey] = $this->instances[$key];
         $this->instances[$key] = function () use ($self, $object, $innerKey) {
             $inner = $self->get($innerKey);

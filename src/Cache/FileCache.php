@@ -67,7 +67,7 @@ class FileCache extends CacheAwesome
         return true;
     }
 
-    public function set(string $key, mixed $value = null, null|int|\DateTime|\DateTimeInterface $ttl = null): static
+    public function set(string $key, mixed $value = null, null|int|\DateTimeInterface|\DateInterval $ttl = null): static
     {
         $file = $this->key2file($key);
         if (file_put_contents($file, serialize($value)) === false) {

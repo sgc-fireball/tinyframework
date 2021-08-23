@@ -50,12 +50,13 @@ class Mail
             return $this->header;
         }
         if (is_null($value)) {
-            throw new RuntimeException('Missing header value!');
+            return $this->header[$key] ?? [];
         }
+        $value = is_array($value) ? $value : [$value];
         if ($replace) {
             $this->header[$key] = $value;
         } else {
-            $this->header[$key] = array_merge([$this->header[$key]], (array)$value);
+            $this->header[$key] = array_merge($this->header[$key], $value);
         }
         return $this;
     }
@@ -134,7 +135,7 @@ class Mail
         if (is_null($priority)) {
             return $this->priority;
         }
-        $this->priority = min(max(0, (int)$priority), 5);
+        $this->priority = min(max(1, (int)$priority), 5);
         return $this;
     }
 

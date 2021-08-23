@@ -52,16 +52,16 @@ abstract class SessionAwesome implements SessionInterface, ArrayAccess
         return $this;
     }
 
-    protected function calculateExpiration(null|int|\DateTime|\DateTimeInterface $ttl): int|null
+    protected function calculateExpiration(null|int|\DateTimeInterface|\DateInterval $ttl): int|null
     {
         if (is_null($ttl)) {
             return null;
         }
-        if ($ttl instanceof \DateTime) {
-            return (int)$ttl->format('U');
+        if ($ttl instanceof \DateInterval) {
+            $ttl = (new \DateTime('now'))->add($ttl);
         }
         if ($ttl instanceof \DateTimeInterface) {
-            $ttl = $ttl->getTimestamp();
+            return (int)$ttl->format('U');
         }
         return time() + $ttl;
     }

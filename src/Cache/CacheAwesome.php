@@ -57,16 +57,16 @@ abstract class CacheAwesome implements CacheInterface, ArrayAccess
         return $this->has($name);
     }
 
-    protected function calculateExpiration(null|int|\DateTime|\DateTimeInterface $ttl): int|null
+    protected function calculateExpiration(null|int|\DateTimeInterface|\DateInterval $ttl): int|null
     {
         if (is_null($ttl)) {
             return null;
         }
-        if ($ttl instanceof \DateTime) {
-            return (int)$ttl->format('U');
+        if ($ttl instanceof \DateInterval) {
+            $ttl = (new \DateTime('now'))->add($ttl);
         }
         if ($ttl instanceof \DateTimeInterface) {
-            $ttl = $ttl->getTimestamp();
+            return (int)$ttl->format('U');
         }
         return time() + $ttl;
     }
@@ -81,7 +81,7 @@ abstract class CacheAwesome implements CacheInterface, ArrayAccess
         return $instance;
     }
 
-    public function remember(string $key, Closure $closure, null|int|\DateTime|\DateTimeInterface $ttl = null): mixed
+    public function remember(string $key, Closure $closure, null|int|\DateTimeInterface|\DateInterval $ttl = null): mixed
     {
         if ($this->has($key)) {
             return $this->get($key);

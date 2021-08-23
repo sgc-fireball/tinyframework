@@ -20,7 +20,7 @@ class NoCache extends CacheAwesome
         return false;
     }
 
-    public function set(string $key, mixed $value = null,null|int|\DateTime|\DateTimeInterface $ttl = null): static
+    public function set(string $key, mixed $value = null,null|int|\DateTimeInterface|\DateInterval $ttl = null): static
     {
         return $this;
     }

@@ -27,13 +27,13 @@ abstract class JobAwesome implements JobInterface
         return max(5, $this->tryCount * 60);
     }
 
-    public function delay(null|int|\DateTime|\DateTimeInterface $delay = null): static|int
+    public function delay(null|int|\DateTimeInterface|\DateInterval $delay = null): static|int
     {
         if (is_null($delay)) {
             return $this->delay;
         }
-        if ($delay instanceof \DateTime) {
-            $delay = max(0, (int)$delay->format('U') - time());
+        if ($delay instanceof \DateInterval) {
+            $delay = (new \DateTime('now'))->add($delay);
         }
         if ($delay instanceof \DateTimeInterface) {
             $delay = $delay->getTimestamp();
