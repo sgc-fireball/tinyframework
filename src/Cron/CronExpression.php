@@ -41,19 +41,19 @@ class CronExpression
     public function isDue(DateTime|\DateTimeImmutable $time = null): bool
     {
         $time ??= new DateTime();
-        if (!$this->month->inExpression(intval($time->format('m')))) {
+        if (!$this->month->inExpression(\intval($time->format('m')))) {
             return false;
         }
-        if (!$this->dow->inExpression(intval($time->format('N')))) {
+        if (!$this->dow->inExpression(\intval($time->format('N')))) {
             return false;
         }
-        if (!$this->dom->inExpression(intval($time->format('d')))) {
+        if (!$this->dom->inExpression(\intval($time->format('d')))) {
             return false;
         }
-        if (!$this->hour->inExpression(intval($time->format('H')))) {
+        if (!$this->hour->inExpression(\intval($time->format('H')))) {
             return false;
         }
-        if (!$this->minute->inExpression(intval($time->format('i')))) {
+        if (!$this->minute->inExpression(\intval($time->format('i')))) {
             return false;
         }
         return true;
@@ -67,23 +67,23 @@ class CronExpression
         }
         $next->modify('+1 minute');
         while (true) {
-            if (!$this->month->inExpression(intval($next->format('m')))) {
+            if (!$this->month->inExpression(\intval($next->format('m')))) {
                 $this->month->increment($next);
                 continue;
             }
-            if (!$this->dow->inExpression(intval($next->format('N')))) {
+            if (!$this->dow->inExpression(\intval($next->format('N')))) {
                 $this->dow->increment($next);
                 continue;
             }
-            if (!$this->dom->inExpression(intval($next->format('d')))) {
+            if (!$this->dom->inExpression(\intval($next->format('d')))) {
                 $this->dom->increment($next);
                 continue;
             }
-            if (!$this->hour->inExpression(intval($next->format('H')))) {
+            if (!$this->hour->inExpression(\intval($next->format('H')))) {
                 $this->hour->increment($next);
                 continue;
             }
-            if (!$this->minute->inExpression(intval($next->format('i')))) {
+            if (!$this->minute->inExpression(\intval($next->format('i')))) {
                 $this->minute->increment($next);
                 continue;
             }
@@ -100,23 +100,23 @@ class CronExpression
         }
         $previous->modify('-1 minute');
         while (true) {
-            if (!$this->month->inExpression(intval($previous->format('m')))) {
+            if (!$this->month->inExpression(\intval($previous->format('m')))) {
                 $this->month->decrement($previous);
                 continue;
             }
-            if (!$this->dow->inExpression(intval($previous->format('N')))) {
+            if (!$this->dow->inExpression(\intval($previous->format('N')))) {
                 $this->dow->decrement($previous);
                 continue;
             }
-            if (!$this->dom->inExpression(intval($previous->format('d')))) {
+            if (!$this->dom->inExpression(\intval($previous->format('d')))) {
                 $this->dom->decrement($previous);
                 continue;
             }
-            if (!$this->hour->inExpression(intval($previous->format('H')))) {
+            if (!$this->hour->inExpression(\intval($previous->format('H')))) {
                 $this->hour->decrement($previous);
                 continue;
             }
-            if (!$this->minute->inExpression(intval($previous->format('i')))) {
+            if (!$this->minute->inExpression(\intval($previous->format('i')))) {
                 $this->minute->decrement($previous);
                 continue;
             }

@@ -18,7 +18,7 @@ class RequiredRule extends RuleAwesome
         if (is_bool($value) || is_numeric($value)) {
             return null;
         }
-        if (is_null($value) || (is_string($value) && mb_strlen($value) === 0) || (is_array($value) && count($value) === 0)) {
+        if ($value === null || (is_string($value) && mb_strlen($value) === 0) || (is_array($value) && count($value) === 0)) {
             return [$this->translator->trans('validation.required', ['attribute' => $this->getTransName($name)])];
         }
         if ($value instanceof UploadedFile && $value->hasError()) {

@@ -7,6 +7,7 @@ use DateTimeZone;
 use mysqli;
 use RuntimeException;
 use TinyFramework\Database\DatabaseInterface;
+use TinyFramework\Helpers\DatabaseRaw;
 
 class Database implements DatabaseInterface
 {
@@ -63,11 +64,14 @@ class Database implements DatabaseInterface
 
     public function escape(mixed $value): string|float|int
     {
+        if ($value instanceof DatabaseRaw) {
+            return $value->__toString();
+        }
         if (is_array($value)) {
             return sprintf('(%s)', implode(',', array_map(function ($value) {
                 return $this->escape($value);
             }, array_values($value))));
-        } elseif (is_null($value)) {
+        } elseif ($value === null) {
             return 'NULL';
         } elseif (is_float($value) || is_int($value)) {
             return $value;
@@ -93,9 +97,10 @@ class Database implements DatabaseInterface
         $result = $this->connect()->connection->query($query);
         if ($result === false) {
             throw new RuntimeException(
-                sprintf('Error %s: %s',
+                sprintf('Error %s: %s (%s)',
                     $this->connect()->connection->errno,
-                    $this->connect()->connection->error
+                    $this->connect()->connection->error,
+                    $query
                 )
             );
         }

@@ -15,7 +15,7 @@ abstract class JobAwesome implements JobInterface
 
     public function attempts(int $attempts = null): static|int
     {
-        if (is_null($attempts)) {
+        if ($attempts === null) {
             return $this->attempts;
         }
         $this->attempts = $attempts;
@@ -29,7 +29,7 @@ abstract class JobAwesome implements JobInterface
 
     public function delay(null|int|\DateTimeInterface|\DateInterval $delay = null): static|int
     {
-        if (is_null($delay)) {
+        if ($delay === null) {
             return $this->delay;
         }
         if ($delay instanceof \DateInterval) {
@@ -44,7 +44,7 @@ abstract class JobAwesome implements JobInterface
 
     public function queue(string $queue = null): static|string
     {
-        if (is_null($queue)) {
+        if ($queue === null) {
             return $this->queue;
         }
         $this->queue = $queue;
@@ -56,8 +56,7 @@ abstract class JobAwesome implements JobInterface
         try {
             $this->tryHandle();
         } catch (\Throwable $e) {
-            /** @var int $attempts */
-            $attempts = $this->attempts();
+            $attempts = (int)$this->attempts();
             if ($this->tryCount < $attempts) {
                 $retryAfter = $this->retryAfter();
                 logger()->warning(

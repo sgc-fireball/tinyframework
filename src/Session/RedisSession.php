@@ -65,7 +65,7 @@ class RedisSession extends SessionAwesome implements SessionInterface
     public function clear(): static
     {
         $deleteKeys = $this->redis->keys('*');
-        if (count($deleteKeys)) {
+        if (\count($deleteKeys)) {
             $this->redis->del($deleteKeys);
         }
         $this->data = [];

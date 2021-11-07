@@ -9,7 +9,7 @@ class ArrayCache extends CacheAwesome
 
     public function clear(): static
     {
-        if (count($this->tags)) {
+        if (\count($this->tags)) {
             foreach ($this->tags as $tag) {
                 $keys = $this->get($tag) ?? [];
                 foreach ($keys as $key) {
@@ -33,7 +33,7 @@ class ArrayCache extends CacheAwesome
 
     public function has(string $key): bool
     {
-        if (array_key_exists($key, $this->cache)) {
+        if (\array_key_exists($key, $this->cache)) {
             if ($this->cache[$key]['ttl'] === null || $this->cache[$key]['ttl'] > time()) {
                 return true;
             }
@@ -54,7 +54,7 @@ class ArrayCache extends CacheAwesome
 
     public function forget(string $key): static
     {
-        if (array_key_exists($key, $this->cache)) {
+        if (\array_key_exists($key, $this->cache)) {
             unset($this->cache[$key]);
         }
         return $this;

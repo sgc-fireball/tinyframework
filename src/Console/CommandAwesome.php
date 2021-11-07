@@ -36,7 +36,7 @@ abstract class CommandAwesome
      */
     public function configuration(): InputDefinitionInterface
     {
-        if (is_null($this->configure)) {
+        if ($this->configure === null) {
             $this->configure = $this->configure();
         }
         return $this->configure;

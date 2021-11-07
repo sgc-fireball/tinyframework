@@ -12,17 +12,19 @@ class DatabaseServiceProvider extends ServiceProviderAwesome
     public function register(): void
     {
         $config = $this->container->get('config')->get('database');
-        if (is_null($config)) {
+        if ($config === null) {
             return;
         }
-        $config = $config[$config['default']] ?? [];
+        foreach ($config as $connection => $settings) {
+            $this->container
+                ->singleton('database.' . $connection, function () use ($settings) {
+                    $class = $settings['driver'];
+                    return new $class($settings);
+                });
+        }
         $this->container
-            ->alias('database', $config['driver'])
-            ->alias(DatabaseInterface::class, $config['driver'])
-            ->singleton($config['driver'], function () use ($config) {
-                $class = $config['driver'];
-                return new $class($config);
-            });
+            ->alias('database', 'database.' . $config['default'])
+            ->alias(DatabaseInterface::class, 'database.' . $config['default']);
         $this->container
             ->singleton(MigrationInstaller::class, function () {
                 return new MigrationInstaller(

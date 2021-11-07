@@ -4,7 +4,6 @@ namespace TinyFramework\Http;
 
 use RuntimeException;
 use TinyFramework\Session\SessionInterface;
-use Swoole\Http\Request as SwooleRequest;
 
 class Request
 {
@@ -39,45 +38,6 @@ class Request
 
     private ?string $ip = null;
 
-    public static function fromSwooleRequest(SwooleRequest $req): Request
-    {
-        /** @see https://www.swoole.co.uk/docs/modules/swoole-http-request */
-        $request = new self();
-        $request->ip = $req->server['remote_addr'];
-        $request->method = strtoupper($req->getMethod());
-        $request->url = new URL(sprintf(
-            '%s://%s%s%s',
-            to_bool($req->server['https'] ?? 'off') ? 'https' : 'http',
-            array_key_exists('remote_user', $req->server) ? $req->server['remote_user'] . '@' : '',
-            $req->header['host'] ?? 'localhost',
-            $req->server['request_uri'] ?? '/'
-        ));
-        $request->protocol = $req->server['server_protocol'] ?? 'HTTP/1.0';
-        $request->get = $req->get ?? [];
-        $request->post = $req->post ?? [];
-        $request->cookie = $req->cookie ?? [];
-        $request->files = $req->files ?? [];
-        $request->header = $req->header ?? [];
-        $request->server = $req->server ?? [];
-        $request->server['swoole'] = true;
-        if (array_key_exists('_method', $request->get)) {
-            $request->method = strtoupper($request->get['_method'] ?: $request->method);
-            unset($request->get['_method']);
-        }
-        if (array_key_exists('_method', $request->post)) {
-            $request->method = strtoupper($request->post['_method'] ?: $request->method);
-            unset($request->post['_method']);
-        }
-        if (in_array($request->method, ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'PATCH', 'PURGE', 'TRACE'], true)) {
-            return $request;
-        }
-        if (!preg_match('/^[A-Z]++$/D', $request->method)) {
-            throw new RuntimeException(sprintf('Invalid method override "%s".', $request->method));
-        }
-        $request->body = $req->rawcontent();
-        return $request;
-    }
-
     public static function fromGlobal(): Request
     {
         $request = new self();
@@ -86,7 +46,7 @@ class Request
         $request->url = new URL(sprintf(
             '%s://%s:%s:%d%s',
             to_bool($_SERVER['HTTPS'] ?? 'off') ? 'https' : 'http',
-            array_key_exists('REMOTE_USER', $_SERVER) ? $_SERVER['REMOTE_USER'] . '@' : '',
+            \array_key_exists('REMOTE_USER', $_SERVER) ? $_SERVER['REMOTE_USER'] . '@' : '',
             $_SERVER['HTTP_HOST'] ?? 'localhost',
             $_SERVER['SERVER_PORT'] ?? 80,
             $_SERVER['REQUEST_URI'] ?? '/'
@@ -94,7 +54,7 @@ class Request
         $request->protocol = $_SERVER['HTTP_SERVER_PROTOCOL'] ?? 'HTTP/1.0';
         $request->get = $_GET ?? [];
         $request->post = $_POST ?? [];
-        if (array_key_exists('HTTP_CONTENT_TYPE', $_SERVER) && str_contains($_SERVER['HTTP_CONTENT_TYPE'], 'application/json')) {
+        if (\array_key_exists('HTTP_CONTENT_TYPE', $_SERVER) && str_contains($_SERVER['HTTP_CONTENT_TYPE'], 'application/json')) {
             $request->post = json_decode(file_get_contents('php://input'), true);
         }
         $request->cookie = $_COOKIE ?? [];
@@ -115,15 +75,15 @@ class Request
                 $request->server[$key][] = $value;
             }
         }
-        if (array_key_exists('_method', $request->get)) {
+        if (\array_key_exists('_method', $request->get)) {
             $request->method = strtoupper($request->get['_method'] ?: $request->method);
             unset($request->get['_method']);
         }
-        if (array_key_exists('_method', $request->post)) {
+        if (\array_key_exists('_method', $request->post)) {
             $request->method = strtoupper($request->post['_method'] ?: $request->method);
             unset($request->post['_method']);
         }
-        if (in_array($request->method, ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'PATCH', 'PURGE', 'TRACE'], true)) {
+        if (\in_array($request->method, ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'PATCH', 'PURGE', 'TRACE'], true)) {
             return $request;
         }
         if (!preg_match('/^[A-Z]++$/D', $request->method)) {
@@ -145,16 +105,16 @@ class Request
 
     public function get(string|array|null $key = null, mixed $value = null): mixed
     {
-        if (is_null($key)) {
+        if ($key === null) {
             return $this->get;
         }
-        if (is_array($key)) {
+        if (\is_array($key)) {
             foreach ($key as $k => $value) {
                 $this->get[$k] = $value;
             }
             return $this;
         }
-        if (is_null($value)) {
+        if ($value === null) {
             return $this->get[$key] ?? null;
         }
         $this->get[$key] = $value;
@@ -163,16 +123,16 @@ class Request
 
     public function post(string|array|null $key = null, mixed $value = null): mixed
     {
-        if (is_null($key)) {
+        if ($key === null) {
             return $this->post;
         }
-        if (is_array($key)) {
+        if (\is_array($key)) {
             foreach ($key as $k => $value) {
                 $this->post[$k] = $value;
             }
             return $this;
         }
-        if (is_null($value)) {
+        if ($value === null) {
             return $this->post[$key] ?? null;
         }
         $this->post[$key] = $value;
@@ -181,16 +141,16 @@ class Request
 
     public function cookie(string|array|null $key = null, mixed $value = null): mixed
     {
-        if (is_null($key)) {
+        if ($key === null) {
             return $this->cookie;
         }
-        if (is_array($key)) {
+        if (\is_array($key)) {
             foreach ($key as $k => $value) {
                 $this->cookie[$k] = $value;
             }
             return $this;
         }
-        if (is_null($value)) {
+        if ($value === null) {
             return $this->cookie[$key] ?? null;
         }
         $this->cookie[$key] = $value;
@@ -199,16 +159,16 @@ class Request
 
     public function file(string|array|null $key = null, mixed $value = null): mixed
     {
-        if (is_null($key)) {
+        if ($key === null) {
             return $this->files;
         }
-        if (is_array($key)) {
+        if (\is_array($key)) {
             foreach ($key as $k => $value) {
                 $this->files[$k] = $value;
             }
             return $this;
         }
-        if (is_null($value)) {
+        if ($value === null) {
             return $this->files[$key] ?? null;
         }
         $this->files[$key] = $value;
@@ -217,7 +177,7 @@ class Request
 
     public function route(Route $route = null): static|Route|null
     {
-        if (is_null($route)) {
+        if ($route === null) {
             return $this->route;
         }
         $this->route = $route;
@@ -226,7 +186,7 @@ class Request
 
     public function session(SessionInterface $session = null): static|SessionInterface|null
     {
-        if (is_null($session)) {
+        if ($session === null) {
             return $this->session;
         }
         $this->session = $session;
@@ -263,7 +223,7 @@ class Request
 
     public function method(string $method = null): Request|string
     {
-        if (is_null($method)) {
+        if ($method === null) {
             return $this->method;
         }
         $request = $this->clone();
@@ -273,7 +233,7 @@ class Request
 
     public function url(URL $url = null, bool $preserveHost = false): URL|Request
     {
-        if (is_null($url)) {
+        if ($url === null) {
             return $this->url;
         }
         if ($preserveHost) {
@@ -286,7 +246,7 @@ class Request
 
     public function protocol(string $protocol = null): Request|string
     {
-        if (is_null($protocol)) {
+        if ($protocol === null) {
             return $this->protocol;
         }
         $request = $this->clone();
@@ -296,11 +256,11 @@ class Request
 
     public function header(string $key = null, mixed $value = null): Request|array|string
     {
-        if (is_null($key)) {
+        if ($key === null) {
             return $this->header;
         }
         $key = mb_strtolower(str_replace('-', '_', $key));
-        if (is_null($value)) {
+        if ($value === null) {
             return $this->header[$key] ?? [];
         }
         $request = $this->clone();
@@ -310,11 +270,11 @@ class Request
 
     public function server(string $key = null, mixed $value = null): Request|array|string
     {
-        if (is_null($key)) {
+        if ($key === null) {
             return $this->server;
         }
         $key = mb_strtolower(str_replace('-', '_', $key));
-        if (is_null($value)) {
+        if ($value === null) {
             return $this->server[$key] ?? [];
         }
         $request = $this->clone();
@@ -324,7 +284,7 @@ class Request
 
     public function body(string $body = null): Request|string|null
     {
-        if (is_null($body)) {
+        if ($body === null) {
             return $this->body;
         }
         $request = $this->clone();
@@ -334,7 +294,7 @@ class Request
 
     public function ip(string $ip = null): static|string|null
     {
-        if (is_null($ip)) {
+        if ($ip === null) {
             return $this->ip;
         }
         $this->ip = $ip;
@@ -349,11 +309,11 @@ class Request
             }
 
             if (
-                array_key_exists('name', $file)
-                && array_key_exists('type', $file)
-                && array_key_exists('size', $file)
-                && array_key_exists('tmp_name', $file)
-                && array_key_exists('error', $file)
+                \array_key_exists('name', $file)
+                && \array_key_exists('type', $file)
+                && \array_key_exists('size', $file)
+                && \array_key_exists('tmp_name', $file)
+                && \array_key_exists('error', $file)
             ) {
                 $results[$key] = new UploadedFile($file);
             } else {

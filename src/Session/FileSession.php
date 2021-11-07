@@ -26,7 +26,7 @@ class FileSession extends SessionAwesome implements SessionInterface
     public function open(string $id = null): static
     {
         $this->data = [];
-        if (!is_null($id)) {
+        if ($id !== null) {
             $this->id = $id;
         }
         $file = sprintf('%s/%s.session.tmp', $this->path, $this->getId());
@@ -43,8 +43,8 @@ class FileSession extends SessionAwesome implements SessionInterface
     public function clear(): static
     {
         foreach ((array)glob(sprintf('%s/*.session.tmp', $this->path)) as $file) {
-            if (is_string($file) && file_exists($file) && is_writable($file)) {
-                @unlink($file);
+            if (\is_string($file) && file_exists($file) && is_writable($file)) {
+                unlink($file);
             }
         }
         $this->data = [];

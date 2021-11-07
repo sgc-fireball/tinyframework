@@ -11,7 +11,7 @@ class CryptServiceProvider extends ServiceProviderAwesome
     public function register(): void
     {
         $configs = $this->container->get('config')->get('crypt');
-        if (is_null($configs)) {
+        if ($configs === null) {
             return;
         }
         $class = $configs[$configs['default']]['driver'];

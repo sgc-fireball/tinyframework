@@ -31,8 +31,8 @@ class Container implements ContainerInterface
 
     public function tag(string|array $tags, string|array $instances): static
     {
-        $tags = is_string($tags) ? [$tags] : $tags;
-        $instances = is_string($instances) ? [$instances] : $instances;
+        $tags = \is_string($tags) ? [$tags] : $tags;
+        $instances = \is_string($instances) ? [$instances] : $instances;
         foreach ($tags as $tag) {
             if (!array_key_exists($tag, $this->tags)) {
                 $this->tags[$tag] = [];
@@ -52,7 +52,7 @@ class Container implements ContainerInterface
 
     public static function instance(): Container
     {
-        if (is_null(self::$container)) {
+        if (self::$container === null) {
             self::$container = new self();
         }
         return self::$container;
@@ -61,15 +61,15 @@ class Container implements ContainerInterface
     public function has(string $key): bool
     {
         $key = $this->resolveAlias($key);
-        return array_key_exists($key, $this->instances);
+        return \array_key_exists($key, $this->instances);
     }
 
     public function get(string $key, array $parameters = []): mixed
     {
         $oKey = $key;
         $key = $this->resolveAlias($key);
-        if (empty($parameters) && array_key_exists($key, $this->instances)) {
-            if (is_callable($this->instances[$key]) || is_string($this->instances[$key])) {
+        if (empty($parameters) && \array_key_exists($key, $this->instances)) {
+            if (is_callable($this->instances[$key]) || \is_string($this->instances[$key])) {
                 $this->instances[$key] = $this->call($this->instances[$key]);
             }
             return $this->instances[$key];
@@ -82,8 +82,8 @@ class Container implements ContainerInterface
 
     public function resolveAlias(string|array|callable|object $key): string|array|callable|object
     {
-        if (is_string($key)) {
-            while (array_key_exists($key, $this->aliases)) {
+        if (\is_string($key)) {
+            while (\array_key_exists($key, $this->aliases)) {
                 $key = $this->aliases[$key];
             }
         }
@@ -121,7 +121,7 @@ class Container implements ContainerInterface
     public function call(string|array|callable|object $callable, array $parameters = []): mixed
     {
         $callable = $this->resolveAlias($callable);
-        if (is_string($callable)) {
+        if (\is_string($callable)) {
             if (function_exists($callable)) {
                 return $this->callFunction($callable, $parameters);
             }
@@ -139,10 +139,10 @@ class Container implements ContainerInterface
         if ($callable instanceof Closure) {
             return $this->callFunction($callable, $parameters);
         }
-        if (is_object($callable) && method_exists($callable, '__invoke')) {
+        if (\is_object($callable) && method_exists($callable, '__invoke')) {
             return $this->callMethod($callable, '__invoke', $parameters);
         }
-        if (is_array($callable) && method_exists($callable[0], $callable[1])) {
+        if (\is_array($callable) && method_exists($callable[0], $callable[1])) {
             return $this->callMethod($callable[0], $callable[1], $parameters);
         }
         throw new RuntimeException('Illegal reference can not be called.');
@@ -164,7 +164,7 @@ class Container implements ContainerInterface
             $reflectionMethod = $reflection->getMethod('instance');
             if ($reflectionMethod->isPublic() && $reflectionMethod->isStatic()) {
                 $arguments = $this->buildArgumentsByParameters($reflectionMethod, $parameters);
-                return call_user_func([$class, 'instance'], $arguments);
+                return \call_user_func([$class, 'instance'], $arguments);
             }
         }
 
@@ -174,7 +174,7 @@ class Container implements ContainerInterface
             $arguments = $this->buildArgumentsByParameters($reflectionMethod, $parameters);
         }
         if ($reflection->hasMethod('setContainer') && $reflection->getMethod('setContainer')->isStatic()) {
-            call_user_func([$class, 'setContainer'], $this);
+            \call_user_func([$class, 'setContainer'], $this);
         }
         $instance = $reflection->newInstanceArgs($arguments);
         if ($reflection->hasMethod('setContainer') && !$reflection->getMethod('setContainer')->isStatic()) {
@@ -202,8 +202,8 @@ class Container implements ContainerInterface
             new ReflectionMethod($class, $method),
             $parameters
         );
-        $object = is_object($class) ? $class : $this->call($class);
-        return call_user_func_array([$object, $method], $arguments);
+        $object = \is_object($class) ? $class : $this->call($class);
+        return \call_user_func_array([$object, $method], $arguments);
     }
 
     /**
@@ -218,7 +218,7 @@ class Container implements ContainerInterface
             new ReflectionFunction($function),
             $parameters
         );
-        return call_user_func_array($function, $arguments);
+        return \call_user_func_array($function, $arguments);
     }
 
     /**
@@ -237,18 +237,18 @@ class Container implements ContainerInterface
             /** @var null|\ReflectionNamedType $type */
             $type = $reflectionParameter->getType();
             if ($reflectionParameter->isVariadic()) {
-                if ($index < count($parameters)) {
-                    $values = array_slice(array_values($parameters), $index) ?? [];
+                if ($index < \count($parameters)) {
+                    $values = \array_slice(array_values($parameters), $index) ?? [];
                     $arguments = array_merge($arguments, $values);
                     break;
                 }
-            } else if (array_key_exists($reflectionParameter->name, $parameters)) {
+            } else if (\array_key_exists($reflectionParameter->name, $parameters)) {
                 $arguments[$index] = $parameters[$reflectionParameter->name];
             } elseif ($type && $this->has($type->getName())) {
                 $arguments[$index] = $this->get($type->getName());
             } elseif ($this->has($reflectionParameter->name)) {
                 $arguments[$index] = $this->get($reflectionParameter->name);
-            } elseif (array_key_exists($index, $parameters)) {
+            } elseif (\array_key_exists($index, $parameters)) {
                 $arguments[$index] = $parameters[$index];
             } else {
                 $arguments[$index] = null;

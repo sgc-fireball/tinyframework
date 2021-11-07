@@ -30,7 +30,7 @@ class URL implements \Stringable
             $this->schema = $parts['scheme'] ?? null;
             $this->user = $parts['user'] ?? null;
             $this->pass = $parts['pass'] ?? null;
-            $this->host = array_key_exists('host', $parts) && $parts['host'] ? ltrim($parts['host'], ':') : null;
+            $this->host = \array_key_exists('host', $parts) && $parts['host'] ? ltrim($parts['host'], ':') : null;
             $this->port = $parts['port'] ?? null;
             $this->path = $parts['path'] ?? '/';
             $this->query = $parts['query'] ?? null;
@@ -54,7 +54,7 @@ class URL implements \Stringable
 
     public function scheme(string $scheme = null): URL|string|null
     {
-        if (is_null($scheme)) {
+        if ($scheme === null) {
             return $this->schema;
         }
         if (!preg_match('/^[a-z]([a-z0-9+.-]+)$/', $scheme)) {
@@ -67,7 +67,7 @@ class URL implements \Stringable
 
     public function userInfo(string $user = null, string $pass = null): URL|string|null
     {
-        if (is_null($user)) {
+        if ($user === null) {
             return ($this->user . ($this->pass ? ':' . $this->pass : '')) ?: null;
         }
         $url = $this->clone();
@@ -83,7 +83,7 @@ class URL implements \Stringable
 
     public function host(string $host = null): URL|string|null
     {
-        if (is_null($host)) {
+        if ($host === null) {
             return $this->host;
         }
         if (!filter_var($host, FILTER_VALIDATE_IP) && !filter_var('info@' . $host, FILTER_VALIDATE_DOMAIN)) {
@@ -96,7 +96,7 @@ class URL implements \Stringable
 
     public function port(int $port = null): URL|int|null
     {
-        if (is_null($port)) {
+        if ($port === null) {
             return $this->port;
         }
         if ($port < 0 || $port > 65535) {
@@ -109,7 +109,7 @@ class URL implements \Stringable
 
     public function path(string $path = null): URL|string
     {
-        if (is_null($path)) {
+        if ($path === null) {
             return $this->path ?: '/';
         }
         $url = $this->clone();
@@ -119,17 +119,17 @@ class URL implements \Stringable
 
     public function query(string|array $query = null): URL|string
     {
-        if (is_null($query)) {
+        if ($query === null) {
             return $this->query;
         }
         $url = $this->clone();
-        $url->query = is_array($query) ? http_build_query($query) : $query;
+        $url->query = \is_array($query) ? http_build_query($query) : $query;
         return $url;
     }
 
     public function fragment(string $fragment = null): URL|string|null
     {
-        if (is_null($fragment)) {
+        if ($fragment === null) {
             return $this->fragment;
         }
         $url = $this->clone();

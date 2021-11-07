@@ -23,7 +23,7 @@ class TranslationLoader
     public function load(string $locale): static
     {
         // @TODO implement cache
-        if (array_key_exists($locale, $this->translations)) {
+        if (\array_key_exists($locale, $this->translations)) {
             return $this;
         }
         $this->translations[$locale] = [];
@@ -56,7 +56,7 @@ class TranslationLoader
         try {
             $module = str_replace('.php', '', basename($file));
             $trans = require($file);
-            $trans = is_array($trans) ? $trans : [];
+            $trans = \is_array($trans) ? $trans : [];
             $trans = array_flat($trans);
             foreach ($trans as $key => $value) {
                 $this->translations[$locale][$module . '.' . $key] = $value;

@@ -112,7 +112,7 @@ class Response
     public static function error(int $code = 400, array $headers = []): Response
     {
         $content = 'HTTP Status ' . $code;
-        if (array_key_exists($code, self::$codes)) {
+        if (\array_key_exists($code, self::$codes)) {
             $content = $code . ' ' . self::$codes[$code];
         }
         return self::new($content, $code, $headers);
@@ -120,14 +120,14 @@ class Response
 
     public static function redirect(string $to, int $code = 302, array $headers = []): Response
     {
-        $code = in_array($code, [301, 302]) ? $code : 302;
+        $code = \in_array($code, [301, 302]) ? $code : 302;
         return self::new('', $code, $headers)->header('location', $to);
     }
 
     public static function back(string $fallback = null, array $headers = []): Response
     {
-        /** @var Request $request */
         $request = container('request');
+        assert($request instanceof Request);
         $back = ($request->header('referer') ?? $fallback) ?? $request->url()->__toString();
         return self::redirect($back, 302, $headers);
     }
@@ -139,7 +139,7 @@ class Response
 
     public function session(SessionInterface $session = null): static|SessionInterface|null
     {
-        if (is_null($session)) {
+        if ($session === null) {
             return $this->session;
         }
         $this->session = $session;
@@ -159,9 +159,9 @@ class Response
     public function withInput(array $input = null): static
     {
         if ($this->session) {
-            if (is_null($input)) {
-                /** @var Request $request */
+            if ($input === null) {
                 $request = container('request');
+                assert($request instanceof Request);
                 $input = array_merge($request->get(), $request->post());
             }
             $this->session->set('flash_inputs', $input);
@@ -184,7 +184,7 @@ class Response
 
     public function code(int $code = null): static|int
     {
-        if (is_null($code)) {
+        if ($code === null) {
             return $this->code;
         }
         $this->code = $code;
@@ -193,7 +193,7 @@ class Response
 
     public function protocol(string $protocol = null): static|string
     {
-        if (is_null($protocol)) {
+        if ($protocol === null) {
             return $this->protocol;
         }
         $this->protocol = $protocol;
@@ -207,10 +207,10 @@ class Response
 
     public function header(string $key = null, string $value = null): static|array|null|string
     {
-        if (is_null($key)) {
+        if ($key === null) {
             return $this->headers;
         }
-        if (is_null($value)) {
+        if ($value === null) {
             return $this->headers[$key] ?? null;
         }
         $key = mb_strtolower($key);
@@ -236,7 +236,7 @@ class Response
 
     public function content(string $content = null): static|string|null
     {
-        if (is_null($content)) {
+        if ($content === null) {
             return $this->content;
         }
         $this->content = $content;

@@ -28,7 +28,7 @@ class Translator implements TranslatorInterface
     {
         $locale = $locale ?: $this->locale;
         $trans = $this->translationLoader->get($locale, $key);
-        return count($values) ? vnsprintf($trans, $values) : $trans;
+        return \count($values) ? vnsprintf($trans, $values) : $trans;
     }
 
     public function transChoice(string $key, int $count, array $values = [], string $locale = null): string
@@ -38,7 +38,7 @@ class Translator implements TranslatorInterface
         $lines = explode('|', $trans);
         foreach ($lines as $line) {
             preg_match('/^\[([\d\s,*]{1,})\]\s{0,}(.*)/s', $line, $matches);
-            if (count($matches) !== 3) {
+            if (\count($matches) !== 3) {
                 continue;
             }
             $condition = $matches[1];

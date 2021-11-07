@@ -20,12 +20,12 @@ class SessionMiddleware implements MiddlewareInterface
 
     public function handle(Request $request, Closure $next, ...$parameters): Response
     {
-        /** @var SessionInterface $session */
         $session = $this->container->get('session');
+        assert($session instanceof SessionInterface);
         $name = $this->container->get('config')->get('session.cookie');
         $session->open((string)$request->cookie($name));
-        /** @var Response $response */
         $response = $next($request->session($session));
+        assert($response instanceof Response);
         $session->close();
         if ($name) {
             $response = $response->header('Set-Cookie', sprintf('%s=%s;', $name, $session->getId()));

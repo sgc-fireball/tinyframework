@@ -3,11 +3,7 @@
 namespace TinyFramework\Http;
 
 use Closure;
-use TinyFramework\Core\Kernel;
 use TinyFramework\Core\KernelInterface;
-use TinyFramework\Core\Pipeline;
-use TinyFramework\Exception\HttpException;
-use TinyFramework\Template\Blade;
 
 interface HttpKernelInterface extends KernelInterface
 {

@@ -39,7 +39,7 @@ class DotEnv implements DotEnvInterface
             if (mb_substr($value, 0, 1) === "'" && mb_substr($value, -1) === "'") {
                 $value = mb_substr($value, 1, -1);
             }
-            $value = is_string($value) && empty($value) ? 'null' : $value;
+            $value = \is_string($value) && empty($value) ? 'null' : $value;
             putenv(sprintf('%s=%s', $key, $value));
             if (function_exists('apache_setenv')) {
                 apache_setenv($key, $value);
@@ -48,7 +48,7 @@ class DotEnv implements DotEnvInterface
             $_ENV[$key] = $_SERVER[$key] = $value;
         }
         foreach ($_ENV as $key => $value) {
-            if (is_string($_ENV[$key])) {
+            if (\is_string($_ENV[$key])) {
                 while (preg_match('/\{(\w+)(:([^\}]+))?\}/', $_ENV[$key])) {
                     $_ENV[$key] = $_SERVER[$key] = vnsprintf($_ENV[$key], $_ENV);
                 }
@@ -64,12 +64,12 @@ class DotEnv implements DotEnvInterface
 
     private function convertValue(mixed $value): mixed
     {
-        $value = is_string($value) && empty($value) ? null : $value;
-        $value = is_string($value) && mb_strlen($value) === 0 ? null : $value;
-        $value = is_string($value) && mb_strtolower($value) === 'null' ? null : $value;
-        $value = is_string($value) && mb_strtolower($value) === 'empty' ? null : $value;
-        $value = is_string($value) && mb_strtolower($value) === 'true' ? true : $value;
-        $value = is_string($value) && mb_strtolower($value) === 'false' ? false : $value;
+        $value = \is_string($value) && empty($value) ? null : $value;
+        $value = \is_string($value) && mb_strlen($value) === 0 ? null : $value;
+        $value = \is_string($value) && mb_strtolower($value) === 'null' ? null : $value;
+        $value = \is_string($value) && mb_strtolower($value) === 'empty' ? null : $value;
+        $value = \is_string($value) && mb_strtolower($value) === 'true' ? true : $value;
+        $value = \is_string($value) && mb_strtolower($value) === 'false' ? false : $value;
         return $value;
     }
 

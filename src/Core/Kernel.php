@@ -40,7 +40,10 @@ abstract class Kernel implements KernelInterface
         error_reporting(-1);
         $this->container = $container;
         $this->container->get(DotEnvInterface::class)->load('.env')->load('.env.local');
-        $this->container->alias('kernel', Kernel::class)->singleton(Kernel::class, $this);
+        $this->container
+            ->alias('kernel', get_class($this))
+            ->alias(Kernel::class, get_class($this))
+            ->singleton(get_class($this), $this);
         set_error_handler([$this, 'handleError']);
         set_exception_handler([$this, 'handleExceptionVoid']);
         register_shutdown_function([$this, 'handleShutdown']);
@@ -73,10 +76,11 @@ abstract class Kernel implements KernelInterface
             $this->serviceProviderNames[] = ConsoleServiceProvider::class;
         }
 
+        // @TODO implement a cache or composer hook!
         if (file_exists('composer.lock')) {
             if ($content = file_get_contents('composer.lock')) {
                 $composer = json_decode($content, true);
-                if (array_key_exists('packages', $composer)) {
+                if (\array_key_exists('packages', $composer)) {
                     foreach ($composer['packages'] as $package) {
                         if (!array_key_exists('extra', $package)) {
                             continue;
@@ -114,10 +118,10 @@ abstract class Kernel implements KernelInterface
 
     protected function register(): void
     {
-        /** @var string $serviceProvider */
         foreach ($this->serviceProviderNames as $serviceProvider) {
+            assert(\is_string($serviceProvider));
             $this->serviceProviders[] = $serviceProvider = (new $serviceProvider($this->container));
-            /** @var ServiceProviderInterface $serviceProvider */
+            assert($serviceProvider instanceof ServiceProviderInterface);
             $serviceProvider->register();
         }
     }
@@ -125,7 +129,7 @@ abstract class Kernel implements KernelInterface
     protected function boot(): void
     {
         foreach ($this->serviceProviders as &$serviceProvider) {
-            /** @var ServiceProviderInterface $serviceProvider */
+            assert($serviceProvider instanceof ServiceProviderInterface);
             $serviceProvider->boot();
         }
     }

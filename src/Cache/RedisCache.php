@@ -35,7 +35,7 @@ class RedisCache extends CacheAwesome
     public function clear(): static
     {
         $deleteKeys = [];
-        if (count($this->tags)) {
+        if (\count($this->tags)) {
             foreach ($this->tags as $tag) {
                 if ($this->redis->exists($tag)) {
                     $deleteKeys = array_merge($deleteKeys, $this->redis->lrange($tag, 0, -1));
@@ -45,7 +45,7 @@ class RedisCache extends CacheAwesome
         } else {
             $deleteKeys = $this->redis->keys('*');
         }
-        if (count($deleteKeys)) {
+        if (\count($deleteKeys)) {
             $this->redis->del(array_unique($deleteKeys));
         }
         return $this;
@@ -67,7 +67,7 @@ class RedisCache extends CacheAwesome
     public function set(string $key, mixed $value = null, null|int|\DateTimeInterface|\DateInterval $ttl = null): static
     {
         $ttl = $this->calculateExpiration($ttl);
-        if (is_null($ttl)) {
+        if ($ttl === null) {
             $this->redis->set($key, serialize($value));
         } else {
             $this->redis->setex($key, $ttl, serialize($value));
@@ -85,7 +85,7 @@ class RedisCache extends CacheAwesome
     protected function calculateExpiration(null|int|\DateTimeInterface|\DateInterval $ttl): int|null
     {
         $ttl = parent::calculateExpiration($ttl);
-        return is_null($ttl) ? null : max(0, $ttl - time());
+        return $ttl === null ? null : max(0, $ttl - time());
     }
 
     private function addKeyToTags(string $key): static

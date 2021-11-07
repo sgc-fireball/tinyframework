@@ -14,7 +14,7 @@ class BroadcastServiceProvider extends ServiceProviderAwesome
     public function register(): void
     {
         $config = $this->container->get('config')->get('broadcast');
-        if (is_null($config)) {
+        if ($config === null) {
             return;
         }
         $config = $config[$config['default']] ?? [];
@@ -30,8 +30,8 @@ class BroadcastServiceProvider extends ServiceProviderAwesome
 
     public function boot(): void
     {
-        /** @var Router $router */
         $router = $this->container->get('router');
+        assert($router instanceof Router);
         $router->group(
             ['middleware' => config('broadcast.global.middleware') ?? []],
             function (Router $router) {

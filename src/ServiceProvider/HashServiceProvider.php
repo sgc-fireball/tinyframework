@@ -11,7 +11,7 @@ class HashServiceProvider extends ServiceProviderAwesome
     public function register(): void
     {
         $configs = $this->container->get('config')->get('hash');
-        if (is_null($configs)) {
+        if ($configs === null) {
             return;
         }
 

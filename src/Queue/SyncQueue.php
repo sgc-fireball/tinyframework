@@ -17,7 +17,7 @@ class SyncQueue implements QueueInterface
 
     public function name(string $name = null): static|string
     {
-        if (is_null($name)) {
+        if ($name === null) {
             return 'default';
         }
         return $this;

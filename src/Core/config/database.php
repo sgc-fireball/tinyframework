@@ -4,7 +4,7 @@ return [
     'default' => env('DATABASE_DRIVER', 'mysql'),
     'mysql' => [
         'driver' => \TinyFramework\Database\MySQL\Database::class,
-        'host' => env('MYSQL_HOST', '127.0.0.1'),
+        'host' => env('MYSQL_HOST', 'localhost'),
         'port' => env('MYSQL_PORT', 3306),
         'username' => env('MYSQL_USERNAME', 'root'),
         'password' => env('MYSQL_PASSWORD', ''),

@@ -4,6 +4,7 @@ use JetBrains\PhpStorm\NoReturn;
 use JetBrains\PhpStorm\Pure;
 use TinyFramework\Cache\CacheInterface;
 use TinyFramework\Core\Config;
+use TinyFramework\Core\ConfigInterface;
 use TinyFramework\Core\Container;
 use TinyFramework\Core\DotEnvInterface;
 use TinyFramework\Crypt\CryptInterface;
@@ -18,16 +19,16 @@ use TinyFramework\Http\Response;
 use TinyFramework\Http\Router;
 use TinyFramework\Localization\TranslatorInterface;
 use TinyFramework\Logger\LoggerInterface;
-use TinyFramework\Mail\Mailer;
 use TinyFramework\Mail\MailerInterface;
 use TinyFramework\Queue\QueueInterface;
 use TinyFramework\Session\SessionInterface;
+use TinyFramework\Template\ViewInterface;
 use TinyFramework\Validation\ValidatorInterface;
 
 if (!function_exists('root_dir')) {
     #[Pure] function root_dir(): string
     {
-        if (defined('ROOT')) {
+        if (\defined('ROOT')) {
             return ROOT;
         }
         $dir = realpath(__DIR__ . '/../..');
@@ -56,7 +57,7 @@ if (!function_exists('base64url_encode')) {
 if (!function_exists('base64url_decode')) {
     #[Pure] function base64url_decode(string $data): string
     {
-        return base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '=', STR_PAD_RIGHT));
+        return base64_decode(str_pad(strtr($data, '-_', '+/'), \strlen($data) % 4, '=', STR_PAD_RIGHT));
     }
 }
 
@@ -79,12 +80,12 @@ if (!function_exists('container')) {
 if (!function_exists('config')) {
     function config(?string $key = null, mixed $value = null): Config|array|string|bool|int|null
     {
-        /** @var Config $config */
         $config = container('config');
-        if (is_null($key)) {
+        assert($config instanceof ConfigInterface);
+        if ($key === null) {
             return $config;
         }
-        if (!is_null($value)) {
+        if ($value !== null) {
             return $config->set($key, $value);
         }
         return $config->get($key);
@@ -115,8 +116,8 @@ if (!function_exists('session')) {
 if (!function_exists('event')) {
     function event(EventAwesome $event = null): EventDispatcherInterface
     {
-        /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = container('event');
+        assert($dispatcher instanceof EventDispatcherInterface);
         return $event ? $dispatcher->dispatch($event) : $dispatcher;
     }
 }
@@ -162,13 +163,13 @@ if (!function_exists('view')) {
      * @param array $data
      * @param int $code
      * @param array $headers
-     * @return \TinyFramework\Http\Response|\TinyFramework\Template\ViewInterface
+     * @return Response|ViewInterface
      */
     function view(string $file = null, array $data = [], int $code = 200, array $headers = []): mixed
     {
-        /** @var \TinyFramework\Template\ViewInterface $view */
         $view = container('view');
-        if (is_null($file)) {
+        assert($view instanceof ViewInterface);
+        if ($file === null) {
             return $view;
         }
         $response = $view->render($file, $data);
@@ -206,7 +207,7 @@ if (!function_exists('dd')) {
      */
     #[NoReturn] function dd(...$val): void
     {
-        call_user_func_array('dump', $val);
+        \call_user_func_array('dump', $val);
         running_in_console() ? exit(1) : die();
     }
 }
@@ -219,8 +220,8 @@ if (!function_exists('env')) {
      */
     function env(string $key, $default = null): mixed
     {
-        /** @var DotEnvInterface $env */
         $env = container(DotEnvInterface::class);
+        assert($env instanceof DotEnvInterface);
         return $env->get($key) ?? $default;
     }
 }
@@ -230,7 +231,7 @@ if (!function_exists('exception2text')) {
     {
         $result = sprintf(
             '%s[%d] %s in %s:%d',
-            get_class($e),
+            \get_class($e),
             $e->getCode(),
             $e->getMessage(),
             $e->getFile(),
@@ -251,10 +252,9 @@ if (!function_exists('guid')) {
     function guid(): string
     {
         if (function_exists('openssl_random_pseudo_bytes')) {
-            /** @var string $data */
-            $data = openssl_random_pseudo_bytes(16);
-            $data[6] = chr(ord($data[6]) & 0x0f | 0x40); // set version to 0100
-            $data[8] = chr(ord($data[8]) & 0x3f | 0x80); // set bits 6-7 to 10
+            $data = (string)openssl_random_pseudo_bytes(16);
+            $data[6] = \chr(\ord($data[6]) & 0x0f | 0x40); // set version to 0100
+            $data[8] = \chr(\ord($data[8]) & 0x3f | 0x80); // set bits 6-7 to 10
             return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
         }
         return sprintf('%04X%04X-%04X-%04X-%04X-%04X%04X%04X',
@@ -273,8 +273,8 @@ if (!function_exists('guid')) {
 if (!function_exists('trans')) {
     function trans(string $key, array $values = [], string $locale = null): string
     {
-        /** @var TranslatorInterface $translator */
         $translator = container('translator');
+        assert($translator instanceof TranslatorInterface);
         return $translator->trans($key, $values, $locale);
     }
 }
@@ -282,8 +282,8 @@ if (!function_exists('trans')) {
 if (!function_exists('trans_choice')) {
     function trans_choice(string $key, int $count, array $values = [], string $locale = null): string
     {
-        /** @var TranslatorInterface $translator */
         $translator = container('translator');
+        assert($translator instanceof TranslatorInterface);
         return $translator->transChoice($key, $count, $values, $locale);
     }
 }
@@ -291,8 +291,8 @@ if (!function_exists('trans_choice')) {
 if (!function_exists('route')) {
     function route(string $name, array $parameters = []): string
     {
-        /** @var Router $router */
         $router = container('router');
+        assert($router instanceof Router);
         return $router->path($name, $parameters);
     }
 }
@@ -300,8 +300,8 @@ if (!function_exists('route')) {
 if (!function_exists('url')) {
     function url(string $path = '/', array $parameters = []): string
     {
-        /** @var Router $router */
         $router = container('router');
+        assert($router instanceof Router);
         return $router->url($path, $parameters);
     }
 }
@@ -318,15 +318,15 @@ if (!function_exists('asset_version')) {
     {
         $filepath = str_contains($path, '?') ? substr($path, 0, strpos($path, '?')) : $path;
         $filepath = public_dir() . DIRECTORY_SEPARATOR . ltrim($filepath, '/');
-        return !file_exists($filepath) ? $path : url($path, ['_' => filemtime($filepath)]);
+        return !file_exists($filepath) ? $path : url($path, ['_' => base_convert((string)filemtime($filepath), 10, 36)]);
     }
 }
 
 if (!function_exists('to_bool')) {
     #[Pure] function to_bool(mixed $mixed): bool
     {
-        $mixed = is_string($mixed) && in_array(mb_strtolower($mixed), ['y', 'yes', 'true', 'on']) ? true : $mixed;
-        $mixed = is_string($mixed) && in_array(mb_strtolower($mixed), ['n', 'no', 'false', 'off', 'null']) ? false : $mixed;
+        $mixed = \is_string($mixed) && \in_array(mb_strtolower($mixed), ['y', 'yes', 'true', 'on']) ? true : $mixed;
+        $mixed = \is_string($mixed) && \in_array(mb_strtolower($mixed), ['n', 'no', 'false', 'off', 'null']) ? false : $mixed;
         return (bool)$mixed;
     }
 }
@@ -335,7 +335,7 @@ if (!function_exists('e')) {
     function e(Htmlable|string $content): string
     {
         if ($content instanceof Htmlable) {
-            return (string)$content;
+            return (string)$content->html();
         }
         return htmlspecialchars($content, ENT_QUOTES, "UTF-8", true);
     }
@@ -353,8 +353,8 @@ if (!function_exists('password')) {
         if (empty($chars)) {
             throw new RuntimeException('Please allow minimum one of the following sets: lowerChars, upperChars, numbers, symbols.');
         }
-        $counts = strlen($chars) - 1;
-        while (strlen($password) < $length) {
+        $counts = \strlen($chars) - 1;
+        while (\strlen($password) < $length) {
             $chars = str_shuffle($chars);
             $password .= substr($chars, mt_rand(0, $counts), 1);
         }
@@ -419,7 +419,7 @@ if (!function_exists('array_flat')) {
     {
         $result = [];
         foreach ($messages as $key => $value) {
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 foreach (array_flat($value) as $k => $v) {
                     $result[$key . '.' . $k] = $v;
                 }
@@ -454,18 +454,18 @@ if (!function_exists('data_get')) {
     function data_get(mixed $target, mixed $key, string $delimiter = '.'): mixed
     {
         // exact match
-        if (is_array($target) && array_key_exists($key, $target)) {
+        if (\is_array($target) && \array_key_exists($key, $target)) {
             return $target[$key];
-        } elseif (is_object($target) && property_exists($target, $key)) {
+        } elseif (\is_object($target) && property_exists($target, $key)) {
             return $target[$key];
         }
 
         // deep search
-        $keys = is_array($key) ? $key : explode($delimiter, $key);
+        $keys = \is_array($key) ? $key : explode($delimiter, $key);
         foreach ($keys as $key) {
-            if (is_array($target) && array_key_exists($key, $target)) {
+            if (\is_array($target) && \array_key_exists($key, $target)) {
                 $target = &$target[$key];
-            } elseif (is_object($target) && property_exists($target, $key)) {
+            } elseif (\is_object($target) && property_exists($target, $key)) {
                 $target = &$target[$key];
             } else {
                 return null;
@@ -486,5 +486,13 @@ if (!function_exists('str')) {
     function str(string $str): Str
     {
         return Str::factory($str);
+    }
+}
+
+if (!function_exists('class_basename')) {
+    function class_basename($class): string
+    {
+        $class = \is_object($class) ? \get_class($class) : $class;
+        return basename(str_replace('\\', '/', $class));
     }
 }

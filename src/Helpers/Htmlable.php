@@ -5,9 +5,9 @@ namespace TinyFramework\Helpers;
 class Htmlable extends Str
 {
 
-    public function html(string $value = null): static
+    public function html(string $value = null): static|string
     {
-        if (!is_null($value)) {
+        if ($value !== null) {
             $this->value = $value;
         }
         return $this;

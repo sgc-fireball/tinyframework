@@ -44,7 +44,7 @@ class InputDefinition implements InputDefinitionInterface
 
     public function name(string $name = null): static|string
     {
-        if (is_null($name)) {
+        if ($name === null) {
             return $this->name;
         }
         $this->name = $name;
@@ -53,7 +53,7 @@ class InputDefinition implements InputDefinitionInterface
 
     public function description(string $description = null): static|string|null
     {
-        if (is_null($description)) {
+        if ($description === null) {
             return $this->description;
         }
         $this->description = $description;
@@ -62,7 +62,7 @@ class InputDefinition implements InputDefinitionInterface
 
     public function option(Option|string $option = null): static|Option|array|null
     {
-        if (is_null($option)) {
+        if ($option === null) {
             return $this->options;
         }
         if (is_string($option)) {
@@ -71,7 +71,7 @@ class InputDefinition implements InputDefinitionInterface
             }
             return null;
         }
-        /** @var Option $option */
+        assert($option instanceof Option);
         $this->options[$option->long()] = $option;
         if ($option->short()) {
             $this->options[$option->short()] = $option;
@@ -81,7 +81,7 @@ class InputDefinition implements InputDefinitionInterface
 
     public function argument(Argument|string|int $argument = null): static|Argument|array|null
     {
-        if (is_null($argument)) {
+        if ($argument === null) {
             return $this->arguments;
         }
         if (is_string($argument)) {

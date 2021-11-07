@@ -13,14 +13,14 @@ class AES256CBC implements CryptInterface
 
     public function __construct(string $key = null)
     {
-        if (!is_null($key)) {
+        if ($key !== null) {
             $this->key($key);
         }
     }
 
     public function key(string $key = null): static|string
     {
-        if (is_null($key)) {
+        if ($key === null) {
             return $this->key;
         }
         if (mb_strlen($key, '8bit') !== 32) {
@@ -32,13 +32,14 @@ class AES256CBC implements CryptInterface
 
     public function encrypt(string $plaintext, string $key = null): string
     {
-        if (is_null($key)) {
+        if ($key === null) {
             $key = $this->key;
         }
         if (mb_strlen($key, '8bit') !== 32) {
             throw new CryptException('Invalid AES256CBC key length.');
         }
-        $iv = openssl_random_pseudo_bytes(32);
+        $length = openssl_cipher_iv_length($this->cipher);
+        $iv = openssl_random_pseudo_bytes($length);
         $encrypted = openssl_encrypt($plaintext, $this->cipher, $key, OPENSSL_RAW_DATA, $iv);
         $mac = hash('sha256', $iv . $encrypted);
         $iv = bin2hex($iv);
@@ -48,7 +49,7 @@ class AES256CBC implements CryptInterface
 
     public function decrypt(string $encrypted, string $key = null): string
     {
-        if (is_null($key)) {
+        if ($key === null) {
             $key = $this->key;
         }
         if (mb_strlen($key, '8bit') !== 32) {
@@ -56,9 +57,10 @@ class AES256CBC implements CryptInterface
         }
 
         $encrypted = base64_decode($encrypted);
-        $iv = hex2bin(substr($encrypted, 0, 64));
-        $mac = substr($encrypted, 64, 64);
-        $encrypted = hex2bin(substr($encrypted, 128));
+        $length = openssl_cipher_iv_length($this->cipher);
+        $iv = hex2bin(substr($encrypted, 0, $length * 2));
+        $mac = substr($encrypted, $length * 2, 64);
+        $encrypted = hex2bin(substr($encrypted, $length * 2 + 64));
         if (!hash_equals(hash('sha256', $iv . $encrypted), $mac)) {
             throw new CryptException('Invalid AES256CBC mac.');
         }

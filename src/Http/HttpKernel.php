@@ -3,7 +3,6 @@
 namespace TinyFramework\Http;
 
 use Closure;
-use TinyFramework\Console\Output\OutputInterface;
 use TinyFramework\Core\Kernel;
 use TinyFramework\Core\Pipeline;
 use TinyFramework\Exception\HttpException;
@@ -28,7 +27,7 @@ class HttpKernel extends Kernel implements HttpKernelInterface
             $this->container->alias('request', Request::class)->singleton(Request::class, $request);
             if ($request->method() === 'OPTIONS') {
                 $response = $this->getResponseByOptionsRequest($request);
-            } else if ($route = $this->container->get('router')->resolve($request)) {
+            } elseif ($route = $this->container->get('router')->resolve($request)) {
                 $response = $this->callRoute($route, $request);
             }
             if (!$response) {
@@ -40,15 +39,15 @@ class HttpKernel extends Kernel implements HttpKernelInterface
                 [
                     'request_id' => $request->id(),
                     'response_id' => $response->id(),
-                    'exception' => $e
+                    'exception' => $e,
                 ]
             );
         }
         if (($origins = $request->header('Origin')) || $request->method() === 'OPTIONS') {
-            $origin = is_array($origins) && array_key_exists(0, $origins) ? $origins[0] : null;
-            if (in_array('*', config('cors.allow_origins'))) {
+            $origin = \is_array($origins) && \array_key_exists(0, $origins) ? $origins[0] : null;
+            if (\in_array('*', config('cors.allow_origins'))) {
                 $response->header('Access-Control-Allow-Origin', '*');
-            } else if (in_array($origin, config('cors.allow_origins'))) {
+            } elseif (\in_array($origin, config('cors.allow_origins'))) {
                 $response->header('Access-Control-Allow-Origin', $origin);
             } else {
                 $response->header('Access-Control-Allow-Origin', rtrim(url('/'), '/'));
@@ -83,8 +82,8 @@ class HttpKernel extends Kernel implements HttpKernelInterface
         if (!$this->container->has('blade')) {
             $response = Response::new('', $statusCode);
         } else {
-            /** @var Blade $view */
             $view = $this->container->get('blade');
+            assert($view instanceof Blade);
             if ($view->exists('errors.' . $statusCode)) {
                 $response = Response::new('', $statusCode);
                 $response->content($view->render('errors.' . $statusCode, compact('e', 'response')));
@@ -96,8 +95,8 @@ class HttpKernel extends Kernel implements HttpKernelInterface
     private function getResponseByOptionsRequest(Request $request): Response
     {
         $response = Response::new(null, 200);
-        /** @var Router $router */
         $router = $this->container->get('router');
+        assert($router instanceof Router);
         $response->header('allow', implode(', ', $router->getAllowedMethodsByRequest($request)));
 
         if ($request->header('Origin')) {
@@ -116,7 +115,7 @@ class HttpKernel extends Kernel implements HttpKernelInterface
     private function callRoute(Route $route, Request $request): Response
     {
         $request->route($route);
-        $middlewares = array_merge($this->container->get('router')->middleware(), $route->middleware());
+        $middlewares = $route->middleware();
         $onion = new Pipeline();
         foreach ($middlewares as $middleware) {
             $onion->layers(function (Request $request, Closure $next) use ($middleware): Response {

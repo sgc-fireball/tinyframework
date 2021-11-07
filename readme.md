@@ -31,7 +31,7 @@ cd my-project; php console
     - Providers
 - config
 - database
-  - migrations
+    - migrations
 - public
 - resources
     - lang
@@ -70,8 +70,12 @@ php swoole
 
 ## Todos
 
+- https://php.watch/articles/php-zend-engine-special-inlined-functions
+- Implement Model Relations
+- Implement Casts into Models
 - Implement Auth Service / Interface
 - create tinyframework-echo as a nodejs repo with a ndoe server
+- URL Signer
 - https://github.com/opis/closure/
 - Drop Swoole Support
 - Implement ServiceProviders::provides to implement lazy loading services

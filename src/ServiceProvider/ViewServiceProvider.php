@@ -2,7 +2,6 @@
 
 namespace TinyFramework\ServiceProvider;
 
-use TinyFramework\Core\ContainerInterface;
 use TinyFramework\Template\Blade;
 use TinyFramework\Template\ViewInterface;
 
@@ -12,7 +11,7 @@ class ViewServiceProvider extends ServiceProviderAwesome
     public function register(): void
     {
         $configs = $this->container->get('config')->get('view');
-        if (is_null($configs)) {
+        if ($configs === null) {
             return;
         }
         $this->container->alias('view', $configs['default'])->alias(ViewInterface::class, $configs['default']);

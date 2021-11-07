@@ -59,7 +59,7 @@ abstract class CacheAwesome implements CacheInterface, ArrayAccess
 
     protected function calculateExpiration(null|int|\DateTimeInterface|\DateInterval $ttl): int|null
     {
-        if (is_null($ttl)) {
+        if ($ttl === null) {
             return null;
         }
         if ($ttl instanceof \DateInterval) {
@@ -73,11 +73,11 @@ abstract class CacheAwesome implements CacheInterface, ArrayAccess
 
     public function tag(array|string $tags): CacheAwesome
     {
-        $class = get_class($this);
+        $class = \get_class($this);
         $instance = new $class($this->config);
         $instance->tags = array_map(function (string $tag) {
             return 'tag:' . $tag;
-        }, is_array($tags) ? $tags : [$tags]);
+        }, \is_array($tags) ? $tags : [$tags]);
         return $instance;
     }
 

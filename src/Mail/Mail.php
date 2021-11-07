@@ -46,13 +46,13 @@ class Mail
 
     public function header(string $key = null, array|string $value = null, bool $replace = true): static|array
     {
-        if (is_null($key)) {
+        if ($key === null) {
             return $this->header;
         }
-        if (is_null($value)) {
+        if ($value === null) {
             return $this->header[$key] ?? [];
         }
-        $value = is_array($value) ? $value : [$value];
+        $value = \is_array($value) ? $value : [$value];
         if ($replace) {
             $this->header[$key] = $value;
         } else {
@@ -63,7 +63,7 @@ class Mail
 
     public function sender(string $email = null): static|string|null
     {
-        if (is_null($email)) {
+        if ($email === null) {
             return $this->sender;
         }
         $this->sender = $email;
@@ -72,7 +72,7 @@ class Mail
 
     public function returnPath(string $email = null): static|string|null
     {
-        if (is_null($email)) {
+        if ($email === null) {
             return $this->returnPath;
         }
         $this->returnPath = $email;
@@ -81,7 +81,7 @@ class Mail
 
     public function replyTo(string $email = null): static|string|null
     {
-        if (is_null($email)) {
+        if ($email === null) {
             return $this->replyTo;
         }
         $this->replyTo = $email;
@@ -90,13 +90,13 @@ class Mail
 
     public function from(string $email = null, string $name = null): static|array
     {
-        if (is_null($email)) {
+        if ($email === null) {
             return $this->from;
         }
-        if (is_null($this->sender)) {
+        if ($this->sender === null) {
             $this->sender = $email;
         }
-        if (is_null($this->returnPath)) {
+        if ($this->returnPath === null) {
             $this->returnPath = $email;
         }
         $this->from = ['email' => $email, 'name' => $name ?? $email];
@@ -105,7 +105,7 @@ class Mail
 
     public function to(string $email = null, string $name = null): static|array
     {
-        if (is_null($email)) {
+        if ($email === null) {
             return $this->to;
         }
         $this->to[] = ['email' => $email, 'name' => $name ?? $email];
@@ -114,7 +114,7 @@ class Mail
 
     public function cc(string $email = null, string $name = null): static|array
     {
-        if (is_null($email)) {
+        if ($email === null) {
             return $this->cc;
         }
         $this->cc[] = ['email' => $email, 'name' => $name ?? $email];
@@ -123,7 +123,7 @@ class Mail
 
     public function bcc(string $email = null, string $name = null): static|array
     {
-        if (is_null($email)) {
+        if ($email === null) {
             return $this->bcc;
         }
         $this->bcc[] = ['email' => $email, 'name' => $name ?? $email];
@@ -132,7 +132,7 @@ class Mail
 
     public function priority(int $priority = null): static|int
     {
-        if (is_null($priority)) {
+        if ($priority === null) {
             return $this->priority;
         }
         $this->priority = min(max(1, (int)$priority), 5);
@@ -141,7 +141,7 @@ class Mail
 
     public function subject(string $subject = null): static|string|null
     {
-        if (is_null($subject)) {
+        if ($subject === null) {
             return $this->subject;
         }
         $this->subject = $subject;
@@ -150,8 +150,8 @@ class Mail
 
     public function text(string $text = null): static|string|null
     {
-        if (is_null($text)) {
-            if (is_null($this->text)) {
+        if ($text === null) {
+            if ($this->text === null) {
                 $text = str_replace(["\r", "\n"], '', (string)$this->html);
                 $text = str_replace(['<br>', '<br/>', '<br />'], "\n", $text);
                 return strip_tags($text);
@@ -164,8 +164,8 @@ class Mail
 
     public function html(string $html = null): static|string|null
     {
-        if (is_null($html)) {
-            if (is_null($this->html)) {
+        if ($html === null) {
+            if ($this->html === null) {
                 return nl2br((string)$this->text);
             }
             return $this->html;

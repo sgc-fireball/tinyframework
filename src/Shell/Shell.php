@@ -31,7 +31,7 @@ class Shell
         $this->readline->readHistory();
         while (true) {
             $line = $this->readline->prompt('$');
-            if (in_array($line, ['exit', 'quit', 'bye', 'cya', 'die'])) {
+            if (\in_array($line, ['exit', 'quit', 'bye', 'cya', 'die'])) {
                 break;
             }
             if (empty($line)) {
@@ -43,7 +43,7 @@ class Shell
             } catch (\Throwable $e) {
                 $this->output->error(sprintf(
                     "%s[%d]\n%s\nin %s:%d",
-                    get_class($e),
+                    \get_class($e),
                     $e->getCode(),
                     $e->getMessage(),
                     str_replace(root_dir() . '/', '', $e->getFile()),
@@ -52,7 +52,7 @@ class Shell
                 if ($this->output->verbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
                     $this->output->write("\n");
                     foreach ($e->getTrace() as $index => $trace) {
-                        if (array_key_exists('class', $trace)) {
+                        if (\array_key_exists('class', $trace)) {
                             $call = $trace['class'] . $trace['type'] . $trace['function'];
                         } else {
                             $call = $trace['function'];
@@ -112,7 +112,7 @@ class Shell
                 restore_error_handler();
             }
         };
-        $closure->bindTo($this, get_class($this));
+        $closure->bindTo($this, \get_class($this));
         $closure();
     }
 

@@ -24,10 +24,10 @@ class BroadcastManager
 
     public function pattern(string $name = null, string $regex = null): static|array|string
     {
-        if (!is_null($name) && is_null($regex)) {
-            return array_key_exists($name, $this->pattern) ? $this->pattern[$name] : $this->pattern['default'];
+        if ($name !== null && $regex === null) {
+            return \array_key_exists($name, $this->pattern) ? $this->pattern[$name] : $this->pattern['default'];
         }
-        if (is_null($name)) {
+        if ($name === null) {
             return $this->pattern;
         }
         $this->pattern[$name] = $regex;
@@ -36,8 +36,8 @@ class BroadcastManager
 
     public function bind(string $name, Closure $closure = null): static|callable|null
     {
-        if (is_null($closure)) {
-            if (array_key_exists($name, $this->bindings)) {
+        if ($closure === null) {
+            if (\array_key_exists($name, $this->bindings)) {
                 return $this->bindings[$name];
             }
             return null;

@@ -11,7 +11,7 @@ class LoggerServiceProvider extends ServiceProviderAwesome
     public function register(): void
     {
         $config = $this->container->get('config')->get('logger');
-        if (is_null($config)) {
+        if ($config === null) {
             return;
         }
         $config = $config[$config['default']] ?? [];

@@ -42,11 +42,11 @@ class Config implements ConfigInterface
     private function merge(array $output = [], array $input = []): array
     {
         $keys = array_keys($input);
-        $numeric = array_key_exists(0, $keys) && $keys[0] === 0;
+        $numeric = \array_key_exists(0, $keys) && $keys[0] === 0;
         foreach ($input as $key => $value) {
             if ($numeric) {
                 $output[] = $value;
-            } else if (array_key_exists($key, $output) && is_array($output[$key]) && is_array($input[$key])) {
+            } else if (\array_key_exists($key, $output) && \is_array($output[$key]) && \is_array($input[$key])) {
                 $output[$key] = $this->merge($output[$key], $value);
             } else {
                 $output[$key] = $value;
@@ -57,7 +57,7 @@ class Config implements ConfigInterface
 
     public function get(string $key = null): mixed
     {
-        if (is_null($key)) {
+        if ($key === null) {
             return $this->config;
         }
         if (mb_strpos($key, '.') !== false) {
@@ -71,7 +71,7 @@ class Config implements ConfigInterface
             }
             return $config;
         }
-        return array_key_exists($key, $this->config) ? $this->config[$key] : null;
+        return \array_key_exists($key, $this->config) ? $this->config[$key] : null;
     }
 
     public function set(string $key, mixed $value): static

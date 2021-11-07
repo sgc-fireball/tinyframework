@@ -11,6 +11,6 @@ interface EventDispatcherInterface
 
     public function dispatch(EventInterface $event): EventDispatcherInterface;
 
-    public function getListenersForEvent(object $event): iterable;
+    public function getListenersForEvent(EventInterface|string $event): iterable;
 
 }

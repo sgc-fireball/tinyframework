@@ -11,7 +11,6 @@ use TinyFramework\Console\Output\Output;
 use TinyFramework\Console\Output\OutputInterface;
 use TinyFramework\Core\Kernel;
 use TinyFramework\Event\EventDispatcherInterface;
-use TinyFramework\Http\Response;
 use TinyFramework\System\SignalHandler;
 
 class ConsoleKernel extends Kernel implements ConsoleKernelInterface
@@ -98,9 +97,9 @@ EOF;
     private function tryHandle(): int
     {
         $argv = $this->input->argv();
-        $command = array_key_exists(0, $argv) ? $argv[0] : null;
+        $command = \array_key_exists(0, $argv) ? $argv[0] : null;
         $inputDefinition = $this->input->inputDefinition();
-        if (array_key_exists($command, $this->commands)) {
+        if (\array_key_exists($command, $this->commands)) {
             $inputDefinition = $this->commands[$command]->configuration();
         }
         $this->input->inputDefinition($inputDefinition);
@@ -131,7 +130,7 @@ EOF;
             return $this->commandUsage($inputDefinition);
         }
 
-        if (array_key_exists($command, $this->commands)) {
+        if (\array_key_exists($command, $this->commands)) {
             return $this->commands[$command]->run($this->input, $this->output);
         }
         if ($command) {

@@ -4,19 +4,39 @@ namespace TinyFramework\Database\MySQL;
 
 use TinyFramework\Database\QueryAwesome;
 use TinyFramework\Database\DatabaseInterface;
+use TinyFramework\Helpers\DatabaseRaw;
 
 class Query extends QueryAwesome
 {
 
-    /** @var Database */
     protected DatabaseInterface $driver;
 
     private function compileSelect(array $fields): string
     {
-        $query = trim(implode(', ', array_map(function (string $field) {
+        $query = trim(implode(', ', array_map(function (DatabaseRaw|string $field): string {
+            if ($field instanceof DatabaseRaw) {
+                return $field->__toString();
+            }
             return '`' . $field . '`';
         }, $fields)), ', ');
         return $query ?: '*';
+    }
+
+    private function compileJoins(array $joins): string
+    {
+        $query = '';
+        foreach ($joins as $join) {
+            $query .= sprintf(
+                ' %s JOIN `%s` ON (`%s`.`%s` = `%s`.`%s`)',
+                strtoupper($join['type'] ?? 'LEFT'),
+                $join['tableB'],
+                $join['tableA'],
+                $join['fieldA'],
+                $join['tableB'],
+                $join['fieldB']
+            );
+        }
+        return trim($query);
     }
 
     private function compileWhere(array $wheres, bool $withWhere = false): string
@@ -29,10 +49,11 @@ class Query extends QueryAwesome
                     $where['operation'] = $where['operation'] === '!=' ? 'IS NOT' : $where['operation'];
                     $where['operation'] = $where['operation'] === '<>' ? 'IS NOT' : $where['operation'];
                 }
+                $field = $where['field'] instanceof DatabaseRaw ? $where['field']->__toString() : '`' . $where['field'] . '`';
                 $query .= sprintf(
                     ' %s %s %s %s',
                     $query ? $where['boolean'] : '',
-                    '`' . $where['field'] . '`',
+                    $field,
                     $where['operation'],
                     $this->driver->escape($where['value'])
                 );
@@ -86,9 +107,10 @@ class Query extends QueryAwesome
     public function toSql(): string
     {
         return rtrim(sprintf(
-            'SELECT %s FROM `%s` %s %s %s %s %s',
+            'SELECT %s FROM `%s` %s %s %s %s %s %s',
             $this->compileSelect($this->select),
             $this->table,
+            $this->compileJoins($this->joins),
             $this->compileWhere($this->wheres, true),
             $this->compileGroup($this->groups),
             $this->compileOrder($this->orders),

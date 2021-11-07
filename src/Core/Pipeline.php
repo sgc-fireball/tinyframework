@@ -11,7 +11,7 @@ class Pipeline implements PipelineInterface
 
     public function __construct(Closure|array|null $layers = null)
     {
-        if (!is_null($layers)) {
+        if ($layers !== null) {
             $this->layers($layers);
         }
     }
@@ -21,7 +21,7 @@ class Pipeline implements PipelineInterface
         if ($layers instanceof Closure) {
             $layers = [$layers];
         }
-        if (is_array($layers)) {
+        if (\is_array($layers)) {
             foreach ($layers as $layer) {
                 if ($layer instanceof Closure) {
                     $this->layers[] = $layer;

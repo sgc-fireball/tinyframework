@@ -4,7 +4,7 @@ namespace TinyFramework\Mail;
 
 use InvalidArgumentException;
 
-class MailerAwesome implements MailerInterface
+abstract class MailerAwesome implements MailerInterface
 {
 
     protected function encodeAddress(string $address): string

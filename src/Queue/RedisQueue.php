@@ -8,7 +8,6 @@ use RuntimeException;
 class RedisQueue implements QueueInterface
 {
 
-    /** @var Redis */
     private Redis $redis;
 
     private array $config = [];
@@ -36,7 +35,7 @@ class RedisQueue implements QueueInterface
 
     public function name(string $name = null): RedisQueue|string
     {
-        if (is_null($name)) {
+        if ($name === null) {
             return $this->config['name'];
         }
         $config = $this->config;
@@ -75,7 +74,7 @@ class RedisQueue implements QueueInterface
         if (!is_array($result)) {
             return null;
         }
-        if (count($result) < 2) {
+        if (\count($result) < 2) {
             return null;
         }
         if ($result[1]) {
@@ -89,7 +88,7 @@ class RedisQueue implements QueueInterface
         // @TODO optimize to Redis LUA script
         $queue = $this->config['name'] . ':delayed';
         $jobs = $this->redis->zRangeByScore($queue, '0', (string)time());
-        if (is_array($jobs)) {
+        if (\is_array($jobs)) {
             foreach ($jobs as $job) {
                 if ($this->redis->zrem($queue, $job)) {
                     $this->repush(unserialize($job));

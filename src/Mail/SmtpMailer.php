@@ -38,7 +38,7 @@ class SmtpMailer extends MailerAwesome implements MailerInterface
         }
 
         $crypto = STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT;
-        if (defined('STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT')) {
+        if (\defined('STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT')) {
             $crypto = STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT | STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT;
         }
 
@@ -56,7 +56,7 @@ class SmtpMailer extends MailerAwesome implements MailerInterface
         }
         $this->write($fp, sprintf("HELO %s\r\n", idn_to_ascii($this->config['local_domain'])));
 
-        if (strlen((string)$this->config['username']) && strlen((string)$this->config['password'])) {
+        if (\strlen((string)$this->config['username']) && \strlen((string)$this->config['password'])) {
             if (!in_array($this->config['encryption'], ['ssl', 'tls'])) {
                 throw new RuntimeException('Does not support login without encryption!');
             }
@@ -98,7 +98,7 @@ class SmtpMailer extends MailerAwesome implements MailerInterface
             $this->write($fp, sprintf("X-Priority: %d\r\n", $mail->priority()), false);
         }
         foreach ($mail->header() as $key => $values) {
-            if (is_array($values)) {
+            if (\is_array($values)) {
                 foreach ($values as $value) {
                     $this->write($fp, sprintf("%s: %s\r\n", $key, $value), false);
                 }
@@ -140,7 +140,7 @@ class SmtpMailer extends MailerAwesome implements MailerInterface
         $this->write($fp, sprintf("--%s--\r\n\r\n", $relatedBoundary), false);
 
         foreach ($mail->attachments() as $attachment) {
-            if (array_key_exists('content', $attachment) || (array_key_exists('path', $attachment) && file_exists($attachment['path']))) {
+            if (\array_key_exists('content', $attachment) || (\array_key_exists('path', $attachment) && file_exists($attachment['path']))) {
                 $this->write($fp, sprintf("--%s\r\n", $mixedBoundary), false);
                 $this->write($fp, sprintf(
                     "Content-Type: %s; name=\"%s\"\r\n",

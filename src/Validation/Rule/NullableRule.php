@@ -13,7 +13,7 @@ class NullableRule extends RuleAwesome
     public function validate(array $attributes, string $name, ...$parameters): array|bool|null
     {
         $value = $attributes[$name] ?? null;
-        if (is_null($value)) {
+        if ($value === null) {
             return true;
         }
         return null;

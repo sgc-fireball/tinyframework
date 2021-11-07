@@ -3,7 +3,6 @@
 namespace TinyFramework\Template;
 
 use Closure;
-use Illuminate\Contracts\View\View;
 use InvalidArgumentException;
 use RuntimeException;
 use TinyFramework\Cache\CacheInterface;
@@ -49,7 +48,7 @@ class Blade implements ViewInterface
     public function addNamespaceDirectory(string $namespace, string $dir): static
     {
         if (!is_dir($dir) || !is_readable($dir)) {
-            throw new \RuntimeException('Folder does not exists or is not readable: ' . $dir);
+            throw new RuntimeException('Folder does not exists or is not readable: ' . $dir);
         }
         $this->vendorDirectories[$namespace] = $dir;
         return $this;
@@ -59,10 +58,10 @@ class Blade implements ViewInterface
     {
         $namespace = null;
         if (str_contains($view, '@')) {
-            list($namespace, $view) = explode('@', $view, 2);
+            [$namespace, $view] = explode('@', $view, 2);
         }
         $view = ltrim(str_replace('.', '/', $view), '/');
-        if (is_null($namespace)) {
+        if ($namespace === null) {
             $directories = [
                 sprintf('%s/%s.blade.php', $this->config['source'], $view),
                 sprintf('%s/%s.blade.php', __DIR__ . '/views', $view),
@@ -71,7 +70,7 @@ class Blade implements ViewInterface
             $directories = [
                 sprintf('%s/vendor/%s/%s.blade.php', $this->config['source'], $namespace, $view),
             ];
-            if (array_key_exists($namespace, $this->vendorDirectories)) {
+            if (\array_key_exists($namespace, $this->vendorDirectories)) {
                 $directories[] = sprintf('%s/%s.blade.php', $this->vendorDirectories[$namespace], $view);
             }
         }
@@ -118,7 +117,7 @@ class Blade implements ViewInterface
                 break;
             }
         }
-        if (is_null($file) || !file_exists($file) || !is_readable($file)) {
+        if ($file === null || !file_exists($file) || !is_readable($file)) {
             throw new InvalidArgumentException('View does not exists or unreadable: ' . $view);
         }
         $content = trim($this->compileString((string)file_get_contents($file)));
@@ -131,7 +130,7 @@ class Blade implements ViewInterface
     public function compileString(string $content): string
     {
         foreach ($this->preCompilers as $compiler) {
-            $content = call_user_func($compiler, $content);
+            $content = \call_user_func($compiler, $content);
         }
 
         $this->footer = [];
@@ -148,12 +147,12 @@ class Blade implements ViewInterface
         );
 
         $content = $this->restorePlaceholder($content);
-        if (count($this->footer)) {
+        if (\count($this->footer)) {
             $content = ltrim($content, PHP_EOL) . PHP_EOL . implode(PHP_EOL, array_reverse($this->footer));
         }
 
         foreach ($this->postCompilers as $compiler) {
-            $content = call_user_func($compiler, $content);
+            $content = \call_user_func($compiler, $content);
         }
 
         return trim($content);
@@ -165,9 +164,9 @@ class Blade implements ViewInterface
             return $match[0];
         }
         $match[1] = mb_strtolower($match[1]);
-        if (array_key_exists($match[1], $this->directive)) {
+        if (\array_key_exists($match[1], $this->directive)) {
             return $this->directive[$match[1]]($match[3] ?? '');
-        } else if (method_exists($this, $method = 'compile' . ucfirst($match[1]))) {
+        } elseif (method_exists($this, $method = 'compile' . ucfirst($match[1]))) {
             return $this->$method($match[3] ?? '');
         }
         throw new RuntimeException('Unknown blade command: ' . $match[1]);
@@ -203,7 +202,7 @@ class Blade implements ViewInterface
 
     public function getPlaceholder(string $name, string $key = null): string
     {
-        return sprintf('##placeholder-%s-%s', $name, $key ?? uniqid(''));
+        return sprintf('##placeholder-%s-%s', $name, $key ?? uniqid());
     }
 
     public function compileVerbatim(string $content): string
@@ -217,7 +216,7 @@ class Blade implements ViewInterface
 
     public function restorePlaceholder(string $content): string
     {
-        if (count($this->placeholder)) {
+        if (\count($this->placeholder)) {
             $content = str_replace(array_keys($this->placeholder), array_values($this->placeholder), $content);
         }
         return $content;
@@ -239,6 +238,11 @@ class Blade implements ViewInterface
         return (string)preg_replace_callback('/(?<!@)@php(.*?)@endphp/s', function ($matches) {
             return sprintf('<?php %s ?>', $matches[1]);
         }, $content);
+    }
+
+    public function compileProps(string $expression): string
+    {
+        return sprintf('<?php extract%s; ?>', $expression);
     }
 
     public function compileClass(string $expression): string
@@ -360,7 +364,7 @@ class Blade implements ViewInterface
     public function compileInclude(string $expression): string
     {
         $expression = mb_substr($expression, 1, -1);
-        return sprintf('<?php echo $__env->render(%s, get_defined_vars()); ?>', $expression)."\n";
+        return sprintf('<?php echo $__env->render(%s, get_defined_vars()); ?>', $expression) . "\n";
     }
 
     public function compileUnset(string $expression): string
@@ -445,7 +449,7 @@ class Blade implements ViewInterface
     public function extendSection(string $section, string $content = null): string
     {
         $id = $this->getPlaceholder('section', $section);
-        if (array_key_exists($id, $this->placeholder)) {
+        if (\array_key_exists($id, $this->placeholder)) {
             $content = (string)str_replace($id, (string)$content, $this->placeholder[$id]);
         }
         $this->placeholder[$id] = $content;
@@ -459,7 +463,7 @@ class Blade implements ViewInterface
         }
         $section = array_pop($this->sectionStack);
         if ($overwrite) {
-            $this->placeholder[$this->getPlaceholder('section', $section)] = ob_get_clean();
+            $this->placeholder[$this->getPlaceholder('section', $section)] = (string)ob_get_clean();
         } else {
             $this->extendSection($section, (string)ob_get_clean());
         }
@@ -473,7 +477,7 @@ class Blade implements ViewInterface
         }
         $section = array_pop($this->sectionStack);
         $id = $this->getPlaceholder('section', $section);
-        if (array_key_exists($id, $this->placeholder)) {
+        if (\array_key_exists($id, $this->placeholder)) {
             $this->placeholder[$id] = (string)ob_get_clean() . $this->placeholder[$id];
         } else {
             $this->placeholder[$id] = (string)ob_get_clean();
@@ -488,10 +492,10 @@ class Blade implements ViewInterface
         }
         $section = array_pop($this->sectionStack);
         $id = $this->getPlaceholder('section', $section);
-        if (array_key_exists($id, $this->placeholder)) {
-            $this->placeholder[$id] = $this->placeholder[$id] . ob_get_clean();
+        if (\array_key_exists($id, $this->placeholder)) {
+            $this->placeholder[$id] = $this->placeholder[$id] . (string)ob_get_clean();
         } else {
-            $this->placeholder[$id] = ob_get_clean();
+            $this->placeholder[$id] = (string)ob_get_clean();
         }
         return $section;
     }
@@ -508,7 +512,7 @@ class Blade implements ViewInterface
     {
         $sectionContent = e($sectionContent);
         $id = $this->getPlaceholder('section', $section);
-        if (array_key_exists($id, $this->placeholder)) {
+        if (\array_key_exists($id, $this->placeholder)) {
             $sectionContent = $this->placeholder[$id];
         }
         return trim(str_replace($id, '', $sectionContent));

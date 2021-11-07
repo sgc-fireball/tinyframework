@@ -52,12 +52,6 @@ class Hook
         if (!is_executable('./console')) {
             chmod('./console', 0700);
         }
-
-        copy(__DIR__ . '/../Files/swoole.php', './swoole');
-        if (!is_executable('./swoole')) {
-            chmod('./swoole', 0700);
-        }
-
         copy(__DIR__ . '/../Files/index.php', 'public/index.php');
     }
 

@@ -3,6 +3,9 @@
 namespace TinyFramework\Session;
 
 use ArrayAccess;
+use DateInterval;
+use DateTime;
+use DateTimeInterface;
 
 abstract class SessionAwesome implements SessionInterface, ArrayAccess
 {
@@ -23,12 +26,12 @@ abstract class SessionAwesome implements SessionInterface, ArrayAccess
 
     public function has(string $key): bool
     {
-        return array_key_exists($key, $this->data);
+        return \array_key_exists($key, $this->data);
     }
 
     public function get(string $key): mixed
     {
-        if (array_key_exists($key, $this->data)) {
+        if (\array_key_exists($key, $this->data)) {
             return $this->data[$key];
         }
         return null;
@@ -36,7 +39,7 @@ abstract class SessionAwesome implements SessionInterface, ArrayAccess
 
     public function set(string $key, mixed $value): static
     {
-        if ($value === null && array_key_exists($key, $this->data)) {
+        if ($value === null && \array_key_exists($key, $this->data)) {
             unset($this->data[$key]);
         } else {
             $this->data[$key] = $value;
@@ -46,21 +49,21 @@ abstract class SessionAwesome implements SessionInterface, ArrayAccess
 
     public function forget(string $key): static
     {
-        if (array_key_exists($key, $this->data)) {
+        if (\array_key_exists($key, $this->data)) {
             unset($this->data[$key]);
         }
         return $this;
     }
 
-    protected function calculateExpiration(null|int|\DateTimeInterface|\DateInterval $ttl): int|null
+    protected function calculateExpiration(null|int|DateTimeInterface|DateInterval $ttl): int|null
     {
-        if (is_null($ttl)) {
+        if ($ttl === null) {
             return null;
         }
-        if ($ttl instanceof \DateInterval) {
-            $ttl = (new \DateTime('now'))->add($ttl);
+        if ($ttl instanceof DateInterval) {
+            $ttl = (new DateTime('now'))->add($ttl);
         }
-        if ($ttl instanceof \DateTimeInterface) {
+        if ($ttl instanceof DateTimeInterface) {
             return (int)$ttl->format('U');
         }
         return time() + $ttl;

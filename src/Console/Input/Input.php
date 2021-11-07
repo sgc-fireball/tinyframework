@@ -27,7 +27,7 @@ class Input implements InputInterface
 
     public function argv(array $argv = null): array|static
     {
-        if (!is_null($argv)) {
+        if ($argv !== null) {
             $this->argv = $argv;
             return $this;
         }
@@ -36,7 +36,7 @@ class Input implements InputInterface
 
     public function inputDefinition(InputDefinitionInterface $inputDefinition = null): static|InputDefinitionInterface
     {
-        if (!is_null($inputDefinition)) {
+        if ($inputDefinition !== null) {
             $this->inputDefinition = $inputDefinition;
             return $this;
         }
@@ -57,7 +57,7 @@ class Input implements InputInterface
 
     public function interaction(bool $interaction = null): bool|static
     {
-        if (is_null($interaction)) {
+        if ($interaction === null) {
             return $this->interaction;
         }
         $this->interaction = $interaction;
@@ -75,7 +75,7 @@ class Input implements InputInterface
             } else if (mb_strpos($token, '-') === 0) {
                 $this->parseShortOption($token);
             } else {
-                if (is_null($command)) {
+                if ($command === null) {
                     $command = $token;
                 } else {
                     $this->parseArgument($argumentPosition, $token);
@@ -129,10 +129,10 @@ class Input implements InputInterface
         if ($option->hasValue()) {
             if ($option->isArray()) {
                 $values = $option->value() ?? [];
-                $values[] = !is_null($value) ? $value : array_shift($this->tokens);
+                $values[] = $value !== null ? $value : array_shift($this->tokens);
                 $option->value($values);
             } else {
-                $option->value(!is_null($value) ? $value : array_shift($this->tokens));
+                $option->value($value !== null ? $value : array_shift($this->tokens));
             }
         } else {
             $option->value($option->value() + 1);
@@ -142,7 +142,7 @@ class Input implements InputInterface
     private function parseArgument(int $position, string $token): void
     {
         $argument = $this->inputDefinition->argument($position);
-        if (is_null($argument)) {
+        if ($argument === null) {
             throw new InvalidArgumentException('Too many arguments');
         }
         $argument->value($token);

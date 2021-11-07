@@ -3,23 +3,30 @@
 namespace TinyFramework\Database;
 
 use Closure;
+use TinyFramework\Helpers\DatabaseRaw;
 
 interface QueryInterface
 {
 
+    // @TODO with
+
+    public function raw(string $str): DatabaseRaw;
+
     public function select(array $fields = []): QueryInterface;
 
-    public function table(string $table): QueryInterface;
+    public function table(string $table = null): QueryInterface|string|null;
 
-    public function class(string $class): QueryInterface;
+    public function class(string $class = null): QueryInterface|string|null;
 
-    public function where(string|Closure $field, string $operation = null, mixed $value = null): QueryInterface;
+    public function leftJoin(string $tableA, string $fieldA, string $tableB, string $fieldB): QueryInterface;
+
+    public function where(string|DatabaseRaw|Closure $field, string $operation = null, mixed $value = null): QueryInterface;
 
     public function whereNull(string $field): QueryInterface;
 
     public function whereNotNull(string $field): QueryInterface;
 
-    public function orWhere(string|Closure $field, string $operation, mixed $value): QueryInterface;
+    public function orWhere(string|DatabaseRaw|Closure $field, string $operation, mixed $value): QueryInterface;
 
     public function orWhereNull(string $field, string $operation, mixed $value): QueryInterface;
 

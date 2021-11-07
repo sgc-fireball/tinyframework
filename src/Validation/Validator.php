@@ -45,12 +45,12 @@ class Validator implements ValidatorInterface
             if ($errors = $this->validateField($attributes, $field, $fieldRules)) {
                 $errorBag[$field] = $errors;
             } else {
-                if (array_key_exists($field, $attributes)) {
+                if (\array_key_exists($field, $attributes)) {
                     $values[$field] = $attributes[$field];
                 }
             }
         }
-        if (count($errorBag)) {
+        if (\count($errorBag)) {
             $exception = new ValidationException('Invalid data given.');
             $exception->setErrorBag($errorBag);
             throw $exception;
@@ -61,7 +61,7 @@ class Validator implements ValidatorInterface
     private function validateField(array $attributes, string $name, string|array $rules): array|null
     {
         $errorBag = [];
-        $rules = is_array($rules) ? $rules : explode('|', $rules);
+        $rules = \is_array($rules) ? $rules : explode('|', $rules);
         foreach ($rules as $rule) {
             $parameters = [];
             if (str_contains($rule, ':')) {
@@ -74,15 +74,15 @@ class Validator implements ValidatorInterface
 
             array_unshift($parameters, $name); // prepend name
             array_unshift($parameters, $attributes); // prepend attributes
-            $response = call_user_func_array([$this->rules[$rule], 'validate'], $parameters);
-            if (is_array($response)) {
+            $response = \call_user_func_array([$this->rules[$rule], 'validate'], $parameters);
+            if (\is_array($response)) {
                 $errorBag = array_merge($errorBag, $response);
                 $errorBag = array_unique($errorBag);
             } elseif ($response) {
                 break;
             }
         }
-        return count($errorBag) ? $errorBag : null;
+        return \count($errorBag) ? $errorBag : null;
     }
 
 }

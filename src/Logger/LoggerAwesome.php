@@ -53,9 +53,9 @@ abstract class LoggerAwesome implements LoggerInterface
             throw new InvalidArgumentException('Invalid level.');
         }
         foreach ($context as $key => $value) {
-            $value = is_object($value) && method_exists($value, '__toString') ? $value->__toString() : $value;
-            $value = is_bool($value) ? ($value ? 'TRUE' : 'FALSE') : $value;
-            $value = is_null($value) ? 'NULL' : $value;
+            $value = \is_object($value) && method_exists($value, '__toString') ? $value->__toString() : $value;
+            $value = \is_bool($value) ? ($value ? 'TRUE' : 'FALSE') : $value;
+            $value = $value === null ? 'NULL' : $value;
             $context[$key] = (string)$value;
         }
         return vnsprintf($message, $context);

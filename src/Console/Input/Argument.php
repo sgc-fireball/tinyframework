@@ -56,7 +56,7 @@ class Argument
 
     public function value(mixed $value = null): mixed
     {
-        if (is_null($value)) {
+        if ($value === null) {
             return $this->value;
         }
         $this->value = $value;

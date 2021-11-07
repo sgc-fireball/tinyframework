@@ -113,7 +113,7 @@ class Output implements OutputInterface
 
     public function ansi(bool $ansi = null): static|bool
     {
-        if (is_null($ansi)) {
+        if ($ansi === null) {
             return $this->ansi;
         }
         $this->ansi = $ansi;
@@ -122,7 +122,7 @@ class Output implements OutputInterface
 
     public function quiet(bool $quiet = null): static|bool
     {
-        if (is_null($quiet)) {
+        if ($quiet === null) {
             return $this->verbosity === -1;
         }
         $this->verbosity = -1;
@@ -131,7 +131,7 @@ class Output implements OutputInterface
 
     public function verbosity(int $verbosity = null): static|int
     {
-        if (is_null($verbosity)) {
+        if ($verbosity === null) {
             return max(-1, min($this->verbosity, 3));
         }
         $this->verbosity = $verbosity;
@@ -157,7 +157,7 @@ class Output implements OutputInterface
                         [$command, $value] = explode(':', $command);
                     }
                     $xterm = $this->color->name2xterm($value);
-                    $xterm = is_null($xterm) && preg_match('/^#[a-z0-9]{6}$/', $value) ? $this->color->hex2xterm($value) : $xterm;
+                    $xterm = $xterm === null && preg_match('/^#[a-z0-9]{6}$/', $value) ? $this->color->hex2xterm($value) : $xterm;
                     if ($xterm) {
                         if ($command === 'bg') {
                             $replace = $end ? "\e[49m" : sprintf("\e[48;5;%dm", $xterm);

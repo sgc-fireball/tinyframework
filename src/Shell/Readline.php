@@ -80,8 +80,8 @@ class Readline
         }
         $history = array_reverse(readline_list_history());
         $history = array_reverse(array_unique($history, SORT_STRING));
-        if (array_key_exists('HISTSIZE', $_SERVER)) {
-            $history = array_slice($history, count($history) - $_SERVER['HISTSIZE']);
+        if (\array_key_exists('HISTSIZE', $_SERVER)) {
+            $history = \array_slice($history, \count($history) - $_SERVER['HISTSIZE']);
         }
         $content = "_HiStOrY_V2_\n" . implode("\n", $history);
         $content = str_replace("\\", "\\\\", $content);
@@ -97,8 +97,8 @@ class Readline
     {
         $info = (array)readline_info();
         $matches = [];
-        /** @var TabCompletionInterface $matcher */
         foreach ($this->matchers as $matcher) {
+            assert($matcher instanceof TabCompletionInterface);
             $matches = array_merge(
                 $matches,
                 array_values($matcher->getMatches($info, $input, $index))

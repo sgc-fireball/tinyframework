@@ -30,7 +30,7 @@ class FileCache extends CacheAwesome
 
     public function clear(): static
     {
-        if (count($this->tags)) {
+        if (\count($this->tags)) {
             foreach ($this->tags as $tag) {
                 $keys = $this->get($tag) ?? [];
                 foreach ($keys as $key => $item) {

@@ -42,7 +42,7 @@ class Router
         foreach ($files as $file) {
             $file = sprintf('routes/%s.php', $file);
             if (file_exists($file)) {
-                require_once $file;
+                require_once($file);
             }
         }
         return $this;
@@ -50,10 +50,10 @@ class Router
 
     public function pattern(string $name = null, string $regex = null): static|array|string
     {
-        if (!is_null($name) && is_null($regex)) {
-            return array_key_exists($name, $this->pattern) ? $this->pattern[$name] : $this->pattern['default'];
+        if ($name !== null && $regex === null) {
+            return \array_key_exists($name, $this->pattern) ? $this->pattern[$name] : $this->pattern['default'];
         }
-        if (is_null($name)) {
+        if ($name === null) {
             return $this->pattern;
         }
         $this->pattern[$name] = $regex;
@@ -62,8 +62,8 @@ class Router
 
     public function bind(string $name, Closure $closure = null): static|callable|null
     {
-        if (is_null($closure)) {
-            if (array_key_exists($name, $this->bindings)) {
+        if ($closure === null) {
+            if (\array_key_exists($name, $this->bindings)) {
                 return $this->bindings[$name];
             }
             return null;
@@ -74,11 +74,14 @@ class Router
 
     public function middleware(array|string|null $middleware = null): static|array
     {
-        if (is_null($middleware)) {
+        if ($middleware === null) {
             return $this->middleware;
         }
-        $middleware = is_array($middleware) ? $middleware : [$middleware];
+        $middleware = \is_array($middleware) ? $middleware : [$middleware];
         foreach ($middleware as $m) {
+            if (in_array($m, $this->middleware)) {
+                continue;
+            }
             $this->middleware[] = $m;
         }
         return $this;
@@ -90,13 +93,13 @@ class Router
         $router = new Router($this->container);
         $router->middleware($options['middleware'] ?? []);
         $inner($router);
-        /** @var Route $route */
         foreach ($router->routes as $route) {
+            assert($route instanceof Route);
             $route->url($options['prefix'] . $route->url());
-            if (array_key_exists('scheme', $options)) {
+            if (\array_key_exists('scheme', $options)) {
                 $route->scheme($options['scheme']);
             }
-            if (array_key_exists('domain', $options)) {
+            if (\array_key_exists('domain', $options)) {
                 $route->domain($options['domain']);
             }
             $route->middleware(array_merge($router->middleware, $route->middleware()));
@@ -218,37 +221,37 @@ class Router
         $options['names']['delete'] = $options['names']['delete'] ?? ($name . '.delete');
 
         $list = [];
-        if (in_array('index', $methods)) {
+        if (\in_array('index', $methods)) {
             $this->routes[] = $list['index'] = $this->get(
                 $options['url'],
                 $class . '@index'
             )->name($options['names']['index']);
         }
-        if (in_array('create', $methods)) {
+        if (\in_array('create', $methods)) {
             $this->routes[] = $list['create'] = $this->get(
                 $options['url'] . '/create',
                 $class . '@create'
             )->name($options['names']['create']);
         }
-        if (in_array('store', $methods)) {
+        if (\in_array('store', $methods)) {
             $this->routes[] = $list['store'] = $this->post(
                 $options['url'],
                 $class . '@store'
             )->name($options['names']['store']);
         }
-        if (in_array('show', $methods)) {
+        if (\in_array('show', $methods)) {
             $this->routes[] = $list['show'] = $this->get(
                 $options['url'] . '/{' . $options['parameter'] . '}',
                 $class . '@show'
             )->name($options['names']['show']);
         }
-        if (in_array('edit', $methods)) {
+        if (\in_array('edit', $methods)) {
             $this->routes[] = $list['edit'] = $this->get(
                 $options['url'] . '/{' . $options['parameter'] . '}/edit',
                 $class . '@edit'
             )->name($options['names']['edit']);
         }
-        if (in_array('update', $methods)) {
+        if (\in_array('update', $methods)) {
             $this->routes[] = $list['update'] = $this->put(
                 $options['url'] . '/{' . $options['parameter'] . '}',
                 $class . '@update'
@@ -258,7 +261,7 @@ class Router
                 $class . '@update'
             );
         }
-        if (in_array('delete', $methods)) {
+        if (\in_array('delete', $methods)) {
             $this->routes[] = $list['delete'] = $this->delete(
                 $options['url'] . '/{' . $options['parameter'] . '}',
                 $class . '@delete'
@@ -276,9 +279,9 @@ class Router
     {
         $url = $request->url()->query([])->fragment('')->__toString();
 
-        /** @var Route $route */
         $routes = array_merge($this->routes, $this->fallback ? [$this->fallback] : []);
         foreach ($routes as $route) {
+            assert($route instanceof Route);
             $allowedMethods = $route->method();
             if (!in_array($request->method(), $allowedMethods) && !in_array('ANY', $allowedMethods)) {
                 continue;
@@ -308,8 +311,8 @@ class Router
     {
         $result = [];
         $url = $request->url()->query([])->fragment('')->__toString();
-        /** @var Route $route */
         foreach ($this->routes as $route) {
+            assert($route instanceof Route);
             $regex = $this->translateUrl($route);
             if (preg_match($regex, $url, $match)) {
                 $match = array_filter($match, function ($value, $key) {
@@ -332,7 +335,7 @@ class Router
             $result = $this->fallback?->method() ?? [];
         }
         $result[] = 'OPTIONS';
-        if (in_array('ANY', $result)) {
+        if (\in_array('ANY', $result)) {
             $result = array_merge($result, ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']);
         }
         $results = array_unique(array_filter($result, fn($method) => $method !== 'ANY'));
@@ -364,8 +367,8 @@ class Router
 
     public function path(string $name, array $parameters = []): string
     {
-        /** @var Route $route */
         foreach ($this->routes as $route) {
+            assert($route instanceof Route);
             if ($name !== $route->name()) {
                 continue;
             }
@@ -375,9 +378,9 @@ class Router
                     continue;
                 }
                 $value = $parameters[$key];
-                $value = is_object($value) && method_exists($value, '__toString') ? $value->__toString() : $value;
-                $value = is_bool($value) ? ($value ? 'TRUE' : 'FALSE') : $value;
-                $value = is_null($value) ? 'NULL' : $value;
+                $value = \is_object($value) && method_exists($value, '__toString') ? $value->__toString() : $value;
+                $value = \is_bool($value) ? ($value ? 'TRUE' : 'FALSE') : $value;
+                $value = $value === null ? 'NULL' : $value;
                 $url = str_replace('{' . $key . '}', (string)$value, $url);
                 unset($parameters[$key]);
             }
@@ -402,7 +405,7 @@ class Router
         $url .= mb_strpos($url, '?') === false ? '?' : '&';
         $url .= http_build_query($parameters);
         if ($request = $this->container->get('request')) {
-            /** @var Request $request */
+            assert($request instanceof Request);
             return (new URL($url))
                 ->scheme($request->url()->scheme())
                 ->host($request->url()->host())

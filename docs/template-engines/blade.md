@@ -104,6 +104,12 @@ $view->compileString('<b>{{ $key }}</b>'); // php code
 @endphp
 ```
 
+### Props
+```blade
+@props(['time' => time()])
+Time: {{ $time }}
+```
+
 ### if-then-else
 
 ```blade

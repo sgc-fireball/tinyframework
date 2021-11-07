@@ -4,7 +4,6 @@ namespace TinyFramework\ServiceProvider;
 
 use TinyFramework\Core\Config;
 use TinyFramework\Core\ConfigInterface;
-use TinyFramework\Core\ContainerInterface;
 
 class ConfigServiceProvider extends ServiceProviderAwesome
 {

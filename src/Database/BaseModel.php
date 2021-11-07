@@ -4,9 +4,16 @@ namespace TinyFramework\Database;
 
 use ArrayAccess;
 use JsonSerializable;
+use TinyFramework\Database\Relations\BelongsToMany;
+use TinyFramework\Database\Relations\BelongsToOne;
+use TinyFramework\Database\Relations\HasMany;
+use TinyFramework\Database\Relations\HasOne;
+use TinyFramework\Database\Relations\Relation;
 
 class BaseModel implements JsonSerializable, ArrayAccess
 {
+
+    protected string $connection;
 
     protected string $table;
 
@@ -14,14 +21,24 @@ class BaseModel implements JsonSerializable, ArrayAccess
 
     protected array $fillable = [];
 
+    // @TODO protected array $casts = []
+
     protected array $attributes = [];
 
     protected array $originals = [];
 
+    protected array $relations = [];
+
     public function __construct(array $attributes = [])
     {
-        $this->table = $this->table ?? mb_strtolower(basename(str_replace('\\', '/', get_class($this))));
+        $this->connection ??= config('database.default');
+        $this->table ??= mb_strtolower(basename(str_replace('\\', '/', \get_class($this))));
         $this->originals = $this->attributes = $attributes;
+    }
+
+    public function getConnection(): DatabaseInterface
+    {
+        return container('database.' . $this->connection);
     }
 
     public function getTable(): string
@@ -32,7 +49,7 @@ class BaseModel implements JsonSerializable, ArrayAccess
     public function fill(array $attributes = [], bool $force = false): static
     {
         foreach ($attributes as $key => $value) {
-            if (in_array($key, $this->fillable) || $force) {
+            if (\in_array($key, $this->fillable) || $force) {
                 $this->attributes[$key] = $value;
             }
         }
@@ -55,12 +72,34 @@ class BaseModel implements JsonSerializable, ArrayAccess
 
     public function __get(string $name): mixed
     {
+        if (method_exists($this, $name)) {
+            $methodReflection = new \ReflectionMethod($this, $name);
+            $reflectionType = $methodReflection->getReturnType();
+            if (!$reflectionType) {
+                return null;
+            }
+            if (!is_subclass_of((string)$reflectionType, Relation::class)) {
+                return null;
+            }
+            if (\array_key_exists($name, $this->relations)) {
+                return $this->relations[$name];
+            }
+            /** @var HasOne|HasMany|BelongsToOne|BelongsToMany $relation */
+            $relation = $this->{$name}();
+            assert($relation instanceof Relation);
+            return $relation->load();
+        }
+        $method = (string)str($name)->camelCase()->ucfirst()->prefix('get')->postfix('Attribute');
+        if (method_exists($this, $method)) {
+            return $this->{$method}();
+        }
+        // @TODO \array_key_exists($this->casts[$name])
         return $this->attributes[$name] ?? null;
     }
 
     public function __isset(string $name): bool
     {
-        return array_key_exists($name, $this->attributes);
+        return \array_key_exists($name, $this->attributes);
     }
 
     public function __set(string $name, mixed $value): void
@@ -75,12 +114,12 @@ class BaseModel implements JsonSerializable, ArrayAccess
 
     public function offsetExists(mixed $offset): bool
     {
-        return array_key_exists((string)$offset, $this->attributes);
+        return \array_key_exists((string)$offset, $this->attributes);
     }
 
     public function offsetGet(mixed $offset): mixed
     {
-        return $this->attributes[(string) $offset] ?? null;
+        return $this->attributes[(string)$offset] ?? null;
     }
 
     public function offsetSet(mixed $offset, mixed $value): void
@@ -90,7 +129,7 @@ class BaseModel implements JsonSerializable, ArrayAccess
 
     public function offsetUnset(mixed $offset): void
     {
-        $this->attributes[(string) $offset] = null;
+        $this->attributes[(string)$offset] = null;
     }
 
     public function isDirty(): bool
@@ -112,15 +151,18 @@ class BaseModel implements JsonSerializable, ArrayAccess
     public static function query(): QueryInterface
     {
         $class = static::class;
-        /** @var DatabaseInterface $database */
-        $database = container('database');
-        return $database->query()->table((new $class())->getTable())->class($class);
+        $model = new $class();
+        return $model
+            ->getConnection()
+            ->query()
+            ->table($model->getTable())
+            ->class($class);
     }
 
     public function save(): static
     {
         if (!array_key_exists('id', $this->attributes) || empty($this->attributes['id'])) {
-            if ($this->primaryType === 'string') {
+            if ($this->primaryType === 'uuid') {
                 $this->attributes['id'] = guid();
             }
         }
@@ -134,11 +176,109 @@ class BaseModel implements JsonSerializable, ArrayAccess
 
     public function delete(): static
     {
-        if (array_key_exists('id', $this->attributes) && !empty($this->attributes['id'])) {
+        if (\array_key_exists('id', $this->attributes) && !empty($this->attributes['id'])) {
             $this::query()->where('id', '=', $this->attributes['id'])->delete();
         }
         $this->originals = [];
         return $this;
+    }
+
+    public function setRelation(string $field, BaseModel|array|null $value = null): static
+    {
+        $this->relations[$field] = $value;
+        return $this;
+    }
+
+    public function getRelation(string $field): BaseModel|array|null
+    {
+        return $this->relations[$field] ?? null;
+    }
+
+    protected function hasOne(
+        string $class,
+        string $foreignKey = null,
+        string $localKey = null
+    ): HasOne
+    {
+        [$one, $caller] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+        return new HasOne(
+            $this->getRelatedQuery($class),
+            $this,
+            $foreignKey ?: str(class_basename($this))->snakeCase() . '_id',
+            $localKey ?: 'id',
+            $caller['function']
+        );
+    }
+
+    protected function hasMany(
+        string $class,
+        string $foreignKey = null,
+        string $localKey = null
+    ): HasMany
+    {
+        [$one, $caller] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+        return new HasMany(
+            $this->getRelatedQuery($class),
+            $this,
+            $foreignKey ?? str(class_basename($this))->snakeCase() . '_id',
+            $localKey ?? 'id',
+            $caller['function']
+        );
+    }
+
+    protected function belongsToOne(
+        string $class,
+        string $foreignKey = 'id',
+        string $ownerKey = null
+    ): BelongsToOne
+    {
+        [$one, $caller] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+        $ownerKey ??= str(class_basename($class))->snakeCase() . '_id';
+        return new BelongsToOne(
+            $this->getRelatedQuery($class),
+            $this,
+            $foreignKey,
+            $ownerKey,
+            $caller['function']
+        );
+    }
+
+    protected function belongsToMany(
+        string $class,
+        string $table = null,
+        string $foreignPivotKey = null,
+        string $relatedPivotKey = null,
+        string $parentKey = 'id',
+        string $relatedKey = 'id'
+    ): BelongsToMany
+    {
+        $tableA = $this->getTable();
+        $tableB = (new $class())->getTable();
+        $table ??= $tableA < $tableB ? $tableA . '_2_' . $tableB : $tableB . '_2_' . $tableA;
+        [$one, $caller] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+        return new BelongsToMany(
+            $this->getRelatedQuery($class),
+            $this,
+            $table,
+            $foreignPivotKey ?: $tableA . '_id',
+            $relatedPivotKey ?: $tableB . '_id',
+            $parentKey,
+            $relatedKey,
+            $caller['function']
+        );
+    }
+
+    protected function getRelatedQuery(string $class): QueryInterface
+    {
+        if (!(is_subclass_of($class, BaseModel::class))) {
+            throw new \RuntimeException($class . ' must be an instance of ' . BaseModel::class);
+        }
+        $model = new $class();
+        return $model
+            ->getConnection()
+            ->query()
+            ->table($model->getTable())
+            ->class($class);
     }
 
 }

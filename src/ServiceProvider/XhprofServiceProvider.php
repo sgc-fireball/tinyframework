@@ -4,7 +4,6 @@ namespace TinyFramework\ServiceProvider;
 
 use TinyFramework\Core\ConfigInterface;
 use TinyFramework\Core\KernelInterface;
-use TinyFramework\Http\HttpKernel;
 use TinyFramework\Http\Request;
 use TinyFramework\Http\Response;
 
@@ -17,8 +16,8 @@ class XhprofServiceProvider extends ServiceProviderAwesome
             return;
         }
 
-        /** @var ConfigInterface $config */
         $config = $this->container->get('config');
+        assert($config instanceof ConfigInterface);
         if (!$config->get('xhprof.enable')) {
             return;
         }
@@ -32,11 +31,11 @@ class XhprofServiceProvider extends ServiceProviderAwesome
         $dir = $config->get('xhprof.dir');
         $expire = time() - $config->get('xhprof.expire') ?? 60 * 60 * 24 * 7; // 7 days default
 
-        if (function_exists('tideways_xhprof_enable')) {
-            tideways_xhprof_enable(
-                TIDEWAYS_XHPROF_FLAGS_NO_BUILTINS | TIDEWAYS_XHPROF_FLAGS_MEMORY | TIDEWAYS_XHPROF_FLAGS_CPU | TIDEWAYS_XHPROF_FLAGS_MEMORY_ALLOC
+        if (function_exists('\\tideways_xhprof_enable')) {
+            \tideways_xhprof_enable(
+                \TIDEWAYS_XHPROF_FLAGS_NO_BUILTINS | \TIDEWAYS_XHPROF_FLAGS_MEMORY | \TIDEWAYS_XHPROF_FLAGS_CPU | \TIDEWAYS_XHPROF_FLAGS_MEMORY_ALLOC
             );
-        } elseif (function_exists('xhprof_enable')) {
+        } elseif (function_exists('\\xhprof_enable')) {
             xhprof_enable(
                 XHPROF_FLAGS_NO_BUILTINS | XHPROF_FLAGS_CPU | XHPROF_FLAGS_MEMORY,
                 [
@@ -55,19 +54,19 @@ class XhprofServiceProvider extends ServiceProviderAwesome
             return;
         }
 
-        /** @var HttpKernel $kernel */
         $kernel = $this->container->get('kernel');
+        assert($kernel instanceof KernelInterface);
         if (!$kernel->runningInConsole()) {
             $kernel->terminateRequestCallback(function (Request $request, Response $response) use ($dir, $expire) {
-                if (function_exists('tideways_xhprof_disable')) {
-                    $data = tideways_xhprof_disable();
-                } elseif (function_exists('xhprof_disable')) {
+                if (function_exists('\\tideways_xhprof_disable')) {
+                    $data = \tideways_xhprof_disable();
+                } elseif (function_exists('\\xhprof_disable')) {
                     $data = xhprof_disable();
                 } else {
                     return;
                 }
 
-                if (strpos($request->url()->path(), '/__xhprof') === 0) {
+                if (str_starts_with($request->url()->path(), '/__xhprof')) {
                     return;
                 }
 
@@ -107,7 +106,7 @@ class XhprofServiceProvider extends ServiceProviderAwesome
                 ];
                 $file = $request->id() . '-' . $response->id() . '.xhprof';
                 file_put_contents($dir . '/' . $file, json_encode($data, JSON_PRETTY_PRINT));
-                chmod($dir . '/' . $file, 0640);
+                chmod($dir . '/' . $file, 0600);
                 tmpreaper($dir, $expire);
             });
         }

@@ -34,6 +34,7 @@ class MigrationInstaller
             return;
         }
         $files = glob($folder . '/Migration_*_*.php');
+        sort($files);
         foreach ($files as $file) {
             require_once $file;
             $class = str_replace('.php', '', basename($file));
@@ -80,7 +81,7 @@ class MigrationInstaller
 
         $time = time();
         foreach ($this->migrations as $migration) {
-            if (in_array($migration::class, $migrated)) {
+            if (\in_array($migration::class, $migrated)) {
                 continue;
             }
 
@@ -89,8 +90,8 @@ class MigrationInstaller
                 $this->database->query()->transaction();
                 $migration->up();
                 $this->database->query()->table('migrations')->put([
-                    'id' => get_class($migration),
-                    'batch' => $time
+                    'id' => \get_class($migration),
+                    'batch' => $time,
                 ]);
                 $this->database->query()->commit();
             } catch (\Throwable $e) {
@@ -106,7 +107,7 @@ class MigrationInstaller
         $batch = 0;
         $migrated = $this->getRan();
         array_walk($migrated, function (array $row) use (&$batch) {
-            $batch = intval(max($batch, $row['batch']));
+            $batch = \intval(max($batch, $row['batch']));
         });
 
         $migrated = array_map(
@@ -114,7 +115,7 @@ class MigrationInstaller
                 return $row['id'];
             },
             array_filter($migrated, function (array $row) use (&$batch) {
-                return $batch === intval($row['batch']);
+                return $batch === \intval($row['batch']);
             })
         );
 
@@ -129,7 +130,7 @@ class MigrationInstaller
                 $migration->down();
                 $this->database->query()
                     ->table('migrations')
-                    ->where('id', '=', get_class($migration))
+                    ->where('id', '=', \get_class($migration))
                     ->delete();
                 $this->database->query()->commit();
             } catch (\Throwable $e) {
