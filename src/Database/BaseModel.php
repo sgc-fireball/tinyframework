@@ -9,6 +9,7 @@ use TinyFramework\Database\Relations\BelongsToOne;
 use TinyFramework\Database\Relations\HasMany;
 use TinyFramework\Database\Relations\HasOne;
 use TinyFramework\Database\Relations\Relation;
+use TinyFramework\Helpers\Str;
 
 class BaseModel implements JsonSerializable, ArrayAccess
 {
@@ -89,7 +90,7 @@ class BaseModel implements JsonSerializable, ArrayAccess
             assert($relation instanceof Relation);
             return $relation->load();
         }
-        $method = (string)str($name)->camelCase()->ucfirst()->prefix('get')->postfix('Attribute');
+        $method = Str::factory($name)->camelCase()->ucfirst()->prefix('get')->postfix('Attribute')->string();
         if (method_exists($this, $method)) {
             return $this->{$method}();
         }
@@ -204,7 +205,7 @@ class BaseModel implements JsonSerializable, ArrayAccess
         return new HasOne(
             $this->getRelatedQuery($class),
             $this,
-            $foreignKey ?: str(class_basename($this))->snakeCase() . '_id',
+            $foreignKey ?: Str::factory(class_basename($this))->snakeCase() . '_id',
             $localKey ?: 'id',
             $caller['function']
         );
@@ -220,7 +221,7 @@ class BaseModel implements JsonSerializable, ArrayAccess
         return new HasMany(
             $this->getRelatedQuery($class),
             $this,
-            $foreignKey ?? str(class_basename($this))->snakeCase() . '_id',
+            $foreignKey ?? Str::factory(class_basename($this))->snakeCase() . '_id',
             $localKey ?? 'id',
             $caller['function']
         );
@@ -233,7 +234,7 @@ class BaseModel implements JsonSerializable, ArrayAccess
     ): BelongsToOne
     {
         [$one, $caller] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
-        $ownerKey ??= str(class_basename($class))->snakeCase() . '_id';
+        $ownerKey ??= Str::factory(class_basename($class))->snakeCase() . '_id';
         return new BelongsToOne(
             $this->getRelatedQuery($class),
             $this,

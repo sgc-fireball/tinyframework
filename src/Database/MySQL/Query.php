@@ -9,6 +9,7 @@ use TinyFramework\Helpers\DatabaseRaw;
 class Query extends QueryAwesome
 {
 
+    /** @var Database */
     protected DatabaseInterface $driver;
 
     private function compileSelect(array $fields): string

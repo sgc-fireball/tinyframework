@@ -21,13 +21,16 @@ class HttpKernel extends Kernel implements HttpKernelInterface
 
     public function handle(Request $request): Response
     {
+        $this->stopWatch->start('5-router', 'kernel');
         try {
             $this->request = $request;
             $response = null;
             $this->container->alias('request', Request::class)->singleton(Request::class, $request);
             if ($request->method() === 'OPTIONS') {
+                $this->stopWatch->stop('5-router');
                 $response = $this->getResponseByOptionsRequest($request);
             } elseif ($route = $this->container->get('router')->resolve($request)) {
+                $this->stopWatch->stop('5-router');
                 $response = $this->callRoute($route, $request);
             }
             if (!$response) {
@@ -53,19 +56,29 @@ class HttpKernel extends Kernel implements HttpKernelInterface
                 $response->header('Access-Control-Allow-Origin', rtrim(url('/'), '/'));
             }
         }
+
+        $stopWatchEvents = $this->stopWatch->section('main')->events();
+        $events = [];
+        foreach ($stopWatchEvents as $name => $stopWatchEvent) {
+            $events[] = sprintf(
+                '%s;desc="%s";dur=%.2f',
+                $name,
+                $name,
+                $stopWatchEvent->duration() * 1000
+            );
+        }
+        $events[] = sprintf('total;desc="total";dur=%.2f', $this->stopWatch->duration() * 1000);
+
         return $response
-            ->header('X-Request-ID', $request->id())
             ->header('X-Response-ID', $response->id())
-            ->header('X-Response-Duration', round(microtime(true) - TINYFRAMEWORK_START, 4) . ' sec.');
+            ->header('Server-Timing', implode(',', $events));
     }
 
     public function handleException(\Throwable $e): int
     {
         $response = $this->throwableToResponse($e);
         $response
-            ->header('X-Request-ID', $this->request ? $this->request->id() : '')
             ->header('X-Response-ID', $response->id())
-            ->header('X-Response-Duration', round(microtime(true) - TINYFRAMEWORK_START, 4) . ' sec.')
             ->send();
         if ($this->request) {
             $this->terminateRequest($this->request, $response);
@@ -107,7 +120,8 @@ class HttpKernel extends Kernel implements HttpKernelInterface
                 $response->header('Access-Control-Allow-Headers', implode(', ', $headers));
             }
             $response->header('Access-Control-Max-Age', (string)config('cors.max_age'));
-            $response->header('Access-Control-Allow-Credentials', to_bool(config('cors.allow_credentials')) ? 'true' : 'false');
+            $response->header('Access-Control-Allow-Credentials',
+                to_bool(config('cors.allow_credentials')) ? 'true' : 'false');
         }
         return $response;
     }
@@ -117,6 +131,7 @@ class HttpKernel extends Kernel implements HttpKernelInterface
         $request->route($route);
         $middlewares = $route->middleware();
         $onion = new Pipeline();
+        $this->stopWatch->start('6-middleware', 'kernel');
         foreach ($middlewares as $middleware) {
             $onion->layers(function (Request $request, Closure $next) use ($middleware): Response {
                 $parameters = [$request, $next];
@@ -128,13 +143,17 @@ class HttpKernel extends Kernel implements HttpKernelInterface
                 return $this->container->call($middleware . '@handle', $parameters);
             });
         }
-        return $onion->call(function (Request $request): Response {
+        $this->stopWatch->stop('6-middleware');
+        $this->stopWatch->start('7-controller', 'kernel');
+        $response = $onion->call(function (Request $request): Response {
             $response = $this->container->call($request->route()->action(), $request->route()->parameter());
             if (!($response instanceof Response)) {
                 $response = Response::new($response);
             }
             return $response;
         }, $request);
+        $this->stopWatch->stop('7-controller');
+        return $response;
     }
 
     public function terminateRequest(Request $request, Response $response): static

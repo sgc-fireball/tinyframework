@@ -2,6 +2,8 @@
 
 namespace TinyFramework\Localization;
 
+use TinyFramework\Helpers\Arr;
+
 class TranslationLoader
 {
 
@@ -53,14 +55,17 @@ class TranslationLoader
         if (!is_file($file)) {
             return $this;
         }
+        if (!is_readable($file)) {
+            return $this;
+        }
         try {
             $module = str_replace('.php', '', basename($file));
             $trans = require($file);
-            $trans = \is_array($trans) ? $trans : [];
-            $trans = array_flat($trans);
-            foreach ($trans as $key => $value) {
-                $this->translations[$locale][$module . '.' . $key] = $value;
-            }
+            Arr::factory([$module => \is_array($trans) ? $trans : []])
+                ->flat('.')
+                ->each(function ($key, $value) use ($locale, $module) {
+                    $this->translations[$locale][$key] = $value;
+                });
         } catch (\Throwable $e) {
 
         }

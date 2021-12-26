@@ -57,29 +57,18 @@ cd my-project; php console
 
 3. Uninstall!!!! xdebug
 
-4. Use PHP OpCache But be case, and disable caching files under /storage/. Watch
+4. Use PHP OpCache. But be case, and disable caching files under /storage/. Watch
    here [TinyFramework Opcache](https://github.com/sgc-fireball/tinyframework-opcache)
-
-### Swoole Server
-
-You can use theses server with and/or without an reverse nginx proxy.
-
-```bash
-php swoole
-```
 
 ## Todos
 
-- https://php.watch/articles/php-zend-engine-special-inlined-functions
 - Implement Model Relations
 - Implement Casts into Models
 - Implement Auth Service / Interface
-- create tinyframework-echo as a nodejs repo with a ndoe server
+- create tinyframework-echo as a nodejs repo with a node server
 - URL Signer
 - https://github.com/opis/closure/
-- Drop Swoole Support
 - Implement ServiceProviders::provides to implement lazy loading services
-- extract Output Box as Console/Output/Component
 
 ## Author
 

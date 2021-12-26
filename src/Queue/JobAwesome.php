@@ -32,6 +32,9 @@ abstract class JobAwesome implements JobInterface
         if ($delay === null) {
             return $this->delay;
         }
+        if (is_int($delay)) {
+            $delay = time() + $delay;
+        }
         if ($delay instanceof \DateInterval) {
             $delay = (new \DateTime('now'))->add($delay);
         }
@@ -66,7 +69,7 @@ abstract class JobAwesome implements JobInterface
                         'try' => $this->tryCount,
                         'attempts' => $attempts,
                         'retryAfter' => $retryAfter,
-                        'exception' => exception2text($e)
+                        'exception' => exception2text($e),
                     ]
                 );
                 $this->tryCount++;
@@ -79,7 +82,7 @@ abstract class JobAwesome implements JobInterface
                     'class' => static::class,
                     'try' => $this->tryCount,
                     'attempts' => $this->attempts,
-                    'exception' => exception2text($e)
+                    'exception' => exception2text($e),
                 ]
             );
         }

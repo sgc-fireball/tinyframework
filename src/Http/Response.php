@@ -7,6 +7,11 @@ use TinyFramework\Session\SessionInterface;
 class Response
 {
 
+    public static array $multiLineHeader = [
+        'set-cookie',
+        'server-timing',
+    ];
+
     public static array $codes = [
         100 => 'Continue',
         101 => 'Switching Protocols',
@@ -71,7 +76,7 @@ class Response
         508 => 'Loop Detected',
         510 => 'Not Extended',
         511 => 'Network Authentication Required',
-        599 => 'Maintenance Mode'
+        599 => 'Maintenance Mode',
     ];
 
     private int $code = 200;
@@ -214,7 +219,7 @@ class Response
             return $this->headers[$key] ?? null;
         }
         $key = mb_strtolower($key);
-        if ($key === 'set-cookie') {
+        if (in_array($key, self::$multiLineHeader)) {
             $values = $this->headers[$key] ?? [];
             $values[] = $value;
             $value = $values;
@@ -251,12 +256,12 @@ class Response
             $this->code
         );
         foreach ($this->headers as $key => $value) {
-            if ($key === 'set-cookie') {
+            if (in_array($key, self::$multiLineHeader) && is_array($value)) {
                 foreach ($value as $val) {
-                    header(sprintf("%s: %s", $key, $val), $key === 'content-type');
+                    header(sprintf('%s: %s', $key, $val), $key === 'content-type');
                 }
             } else {
-                header(sprintf("%s: %s", $key, $value), $key === 'content-type');
+                header(sprintf('%s: %s', $key, $value), $key === 'content-type');
             }
         }
         echo $this->content;
@@ -268,7 +273,7 @@ class Response
     {
         $response = sprintf("%s %d %s\n", $this->protocol, $this->code, static::$codes[$this->code]);
         foreach ($this->headers as $key => $value) {
-            if ($key === 'set-cookie') {
+            if (in_array($key, self::$multiLineHeader) && is_array($value)) {
                 foreach ($value as $val) {
                     $response .= sprintf("%s: %s\n", $key, $val);
                 }

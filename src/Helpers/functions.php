@@ -1,7 +1,5 @@
 <?php declare(strict_types=1);
 
-use JetBrains\PhpStorm\NoReturn;
-use JetBrains\PhpStorm\Pure;
 use TinyFramework\Cache\CacheInterface;
 use TinyFramework\Core\Config;
 use TinyFramework\Core\ConfigInterface;
@@ -26,7 +24,7 @@ use TinyFramework\Template\ViewInterface;
 use TinyFramework\Validation\ValidatorInterface;
 
 if (!function_exists('root_dir')) {
-    #[Pure] function root_dir(): string
+    function root_dir(): string
     {
         if (\defined('ROOT')) {
             return ROOT;
@@ -41,21 +39,21 @@ if (!function_exists('root_dir')) {
 }
 
 if (!function_exists('public_dir')) {
-    #[Pure] function public_dir(): string
+    function public_dir(): string
     {
         return root_dir() . DIRECTORY_SEPARATOR . 'public';
     }
 }
 
 if (!function_exists('base64url_encode')) {
-    #[Pure] function base64url_encode(string $data): string
+    function base64url_encode(string $data): string
     {
         return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
     }
 }
 
 if (!function_exists('base64url_decode')) {
-    #[Pure] function base64url_decode(string $data): string
+    function base64url_decode(string $data): string
     {
         return base64_decode(str_pad(strtr($data, '-_', '+/'), \strlen($data) % 4, '=', STR_PAD_RIGHT));
     }
@@ -179,7 +177,7 @@ if (!function_exists('view')) {
 }
 
 if (!function_exists('running_in_console')) {
-    #[Pure] function running_in_console(): bool
+    function running_in_console(): bool
     {
         return PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg';
     }
@@ -205,7 +203,7 @@ if (!function_exists('dd')) {
      * @param mixed ...$val
      * @return void
      */
-    #[NoReturn] function dd(...$val): void
+    function dd(...$val): void
     {
         \call_user_func_array('dump', $val);
         running_in_console() ? exit(1) : die();
@@ -253,6 +251,12 @@ if (!function_exists('guid')) {
     {
         if (function_exists('openssl_random_pseudo_bytes')) {
             $data = (string)openssl_random_pseudo_bytes(16);
+            $data[6] = \chr(\ord($data[6]) & 0x0f | 0x40); // set version to 0100
+            $data[8] = \chr(\ord($data[8]) & 0x3f | 0x80); // set bits 6-7 to 10
+            return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+        }
+        if (function_exists('random_bytes')) {
+            $data = (string)random_bytes(16);
             $data[6] = \chr(\ord($data[6]) & 0x0f | 0x40); // set version to 0100
             $data[8] = \chr(\ord($data[8]) & 0x3f | 0x80); // set bits 6-7 to 10
             return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
@@ -318,15 +322,20 @@ if (!function_exists('asset_version')) {
     {
         $filepath = str_contains($path, '?') ? substr($path, 0, strpos($path, '?')) : $path;
         $filepath = public_dir() . DIRECTORY_SEPARATOR . ltrim($filepath, '/');
-        return !file_exists($filepath) ? $path : url($path, ['_' => base_convert((string)filemtime($filepath), 10, 36)]);
+        return !file_exists($filepath) ? $path : url($path,
+            ['_' => base_convert((string)filemtime($filepath), 10, 36)]);
     }
 }
 
 if (!function_exists('to_bool')) {
-    #[Pure] function to_bool(mixed $mixed): bool
+    function to_bool(mixed $mixed): bool
     {
-        $mixed = \is_string($mixed) && \in_array(mb_strtolower($mixed), ['y', 'yes', 'true', 'on']) ? true : $mixed;
-        $mixed = \is_string($mixed) && \in_array(mb_strtolower($mixed), ['n', 'no', 'false', 'off', 'null']) ? false : $mixed;
+        $mixed = \is_string($mixed) && \in_array(mb_strtolower($mixed), ['y', 'yes', 'true', 'on'])
+            ? true
+            : $mixed;
+        $mixed = \is_string($mixed) && \in_array(mb_strtolower($mixed), ['n', 'no', 'false', 'off', 'null'])
+            ? false
+            : $mixed;
         return (bool)$mixed;
     }
 }
@@ -342,14 +351,27 @@ if (!function_exists('e')) {
 }
 
 if (!function_exists('password')) {
-    function password(int $length = 16, bool $lowerChars = true, bool $upperChars = true, bool $numbers = true, bool $symbols = true): string
-    {
+    function password(
+        int $length = 16,
+        bool $lowerChars = true,
+        bool $upperChars = true,
+        bool $numbers = true,
+        bool $symbols = true
+    ): string {
         $password = '';
         $chars = '';
-        if ($lowerChars) $chars .= 'abcdefghkmnpqrstwxyz';
-        if ($upperChars) $chars .= 'ABCDEFGHKMNPQRSTWXYZ';
-        if ($numbers) $chars .= '2345689';
-        if ($symbols) $chars .= ';#$*-/<=>?@^_|~';
+        if ($lowerChars) {
+            $chars .= 'abcdefghkmnpqrstwxyz';
+        }
+        if ($upperChars) {
+            $chars .= 'ABCDEFGHKMNPQRSTWXYZ';
+        }
+        if ($numbers) {
+            $chars .= '2345689';
+        }
+        if ($symbols) {
+            $chars .= ';#$*-/<=>?@^_|~';
+        }
         if (empty($chars)) {
             throw new RuntimeException('Please allow minimum one of the following sets: lowerChars, upperChars, numbers, symbols.');
         }
@@ -387,18 +409,24 @@ if (!function_exists('size_format')) {
             $byte /= $step['size'];
             $type = $step['type'];
         }
-        return sprintf('%.' . $precision . 'f %s', $byte, $type);
+        return sprintf('%.' . abs($precision) . 'f %s', $byte, $type);
     }
 }
 
 if (!function_exists('time_format')) {
-    #[Pure] function time_format(float|int $seconds): string
+    function time_format(float|int $seconds): string
     {
-        if ($seconds <= 1) return '1 sec';
-        if ($seconds <= 60) return sprintf('%d secs', $seconds);
+        if ($seconds <= 1) {
+            return '1 sec';
+        }
+        if ($seconds <= 60) {
+            return sprintf('%d secs', $seconds);
+        }
         $minutes = $seconds / 60;
         $seconds = $seconds % 60;
-        if ($minutes <= 60) return sprintf('%dm%ds', $minutes, $seconds);
+        if ($minutes <= 60) {
+            return sprintf('%dm%ds', $minutes, $seconds);
+        }
         $hours = $minutes / 60;
         $minutes = $minutes % 60;
         return sprintf('%dh%dm', $hours, $minutes);
@@ -414,23 +442,6 @@ if (!function_exists('vnsprintf')) {
     }
 }
 
-if (!function_exists('array_flat')) {
-    function array_flat(array $messages): array
-    {
-        $result = [];
-        foreach ($messages as $key => $value) {
-            if (\is_array($value)) {
-                foreach (array_flat($value) as $k => $v) {
-                    $result[$key . '.' . $k] = $v;
-                }
-            } else {
-                $result[$key] = $value;
-            }
-        }
-        return $result;
-    }
-}
-
 if (!function_exists('tmpreaper')) {
     function tmpreaper(string $folder, int $expire): void
     {
@@ -438,9 +449,6 @@ if (!function_exists('tmpreaper')) {
             return;
         }
         $folder = rtrim(realpath($folder), '/');
-        if (strpos($folder, root_dir()) !== 0) {
-            throw new RuntimeException('Clear path\'s outside of root_dir is forbidden!');
-        }
         $fileSystemIterator = new FilesystemIterator($folder);
         foreach ($fileSystemIterator as $file) {
             if ($file->getCTime() < $expire) {
@@ -472,20 +480,6 @@ if (!function_exists('data_get')) {
             }
         }
         return $target;
-    }
-}
-
-if (!function_exists('arr')) {
-    function arr(array $arr): Arr
-    {
-        return Arr::factory($arr);
-    }
-}
-
-if (!function_exists('str')) {
-    function str(string $str): Str
-    {
-        return Str::factory($str);
     }
 }
 

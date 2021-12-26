@@ -3,6 +3,7 @@
 namespace TinyFramework\Core;
 
 use Closure;
+use ReflectionNamedType;
 use RuntimeException;
 use ReflectionClass;
 use ReflectionMethod;
@@ -74,10 +75,10 @@ class Container implements ContainerInterface
             }
             return $this->instances[$key];
         }
-        if (class_exists($key)) {
+        if (class_exists($key) || is_callable($key) || function_exists($key) || $key instanceof Closure) {
             return $this->call($key, $parameters);
         }
-        throw new RuntimeException('Could not resolve ' . $oKey);
+        throw new RuntimeException('Could not resolve or call ' . $oKey);
     }
 
     public function resolveAlias(string|array|callable|object $key): string|array|callable|object
@@ -129,7 +130,7 @@ class Container implements ContainerInterface
                 return $this->callConstruct($callable, $parameters);
             }
             if (mb_strpos($callable, '@') !== false) {
-                list ($class, $method) = explode('@', $callable, 2);
+                [$class, $method] = explode('@', $callable, 2);
                 if (!class_exists($class)) {
                     throw new RuntimeException('Could not found class ' . $class);
                 }
@@ -226,15 +227,17 @@ class Container implements ContainerInterface
      * @param array $parameters
      * @return array
      */
-    private function buildArgumentsByParameters(ReflectionFunction|ReflectionMethod $reflection, array $parameters = []): array
-    {
+    private function buildArgumentsByParameters(
+        ReflectionFunction|ReflectionMethod $reflection,
+        array $parameters = []
+    ): array {
         $arguments = [];
         /**
          * @var int $index
          * @var \ReflectionParameter $reflectionParameter
          */
         foreach ($reflection->getParameters() as $index => $reflectionParameter) {
-            /** @var null|\ReflectionNamedType $type */
+            /** @var null|ReflectionNamedType $type */
             $type = $reflectionParameter->getType();
             if ($reflectionParameter->isVariadic()) {
                 if ($index < \count($parameters)) {
@@ -242,7 +245,7 @@ class Container implements ContainerInterface
                     $arguments = array_merge($arguments, $values);
                     break;
                 }
-            } else if (\array_key_exists($reflectionParameter->name, $parameters)) {
+            } elseif (\array_key_exists($reflectionParameter->name, $parameters)) {
                 $arguments[$index] = $parameters[$reflectionParameter->name];
             } elseif ($type && $this->has($type->getName())) {
                 $arguments[$index] = $this->get($type->getName());

@@ -22,6 +22,7 @@ use TinyFramework\ServiceProvider\LoggerServiceProvider;
 use TinyFramework\ServiceProvider\RouterServiceProvider;
 use TinyFramework\ServiceProvider\SessionServiceProvider;
 use TinyFramework\ServiceProvider\XhprofServiceProvider;
+use TinyFramework\StopWatch\StopWatch;
 
 abstract class Kernel implements KernelInterface
 {
@@ -34,12 +35,35 @@ abstract class Kernel implements KernelInterface
     /** @var ServiceProviderInterface[] */
     protected array $serviceProviders = [];
 
+    protected StopWatch $stopWatch;
+
     public function __construct(ContainerInterface $container)
     {
+        if (!defined('TINYFRAMEWORK_START')) {
+            define('TINYFRAMEWORK_START', microtime(true));
+        }
+        if (!defined('TINYFRAMEWORK_START_AUTOLOAD')) {
+            define('TINYFRAMEWORK_START_AUTOLOAD', microtime(true));
+        }
+
         ini_set('display_errors', 'Off');
         error_reporting(-1);
         $this->container = $container;
-        $this->container->get(DotEnvInterface::class)->load('.env')->load('.env.local');
+        $this->stopWatch = $this->container
+            ->alias('stopwatch', StopWatch::class)
+            ->singleton(StopWatch::class, StopWatch::class)
+            ->get(StopWatch::class);
+        $this->stopWatch->section('main')
+            ->addEventPeriod('0-fastcgi', 'system', $_SERVER['REQUEST_TIME_FLOAT'], TINYFRAMEWORK_START)
+            ->addEventPeriod('1-autoload', 'composer', TINYFRAMEWORK_START, TINYFRAMEWORK_START_AUTOLOAD)
+            ->addEventPeriod('2-kernel.start', 'kernel', TINYFRAMEWORK_START_AUTOLOAD, microtime(true));
+
+        $this->stopWatch->start('3-kernel.register', 'kernel');
+        $this->container
+            ->alias('dotenv', DotEnvInterface::class)
+            ->singleton(DotEnvInterface::class, DotEnv::class)
+            ->get(DotEnvInterface::class)
+            ->load('.env')->load('.env.local');
         $this->container
             ->alias('kernel', get_class($this))
             ->alias(Kernel::class, get_class($this))
@@ -49,7 +73,11 @@ abstract class Kernel implements KernelInterface
         register_shutdown_function([$this, 'handleShutdown']);
         $this->findServiceProviders();
         $this->register();
+        $this->stopWatch->stop('3-kernel.register');
+
+        $this->stopWatch->start('4-kernel.boot', 'kernel');
         $this->boot();
+        $this->stopWatch->stop('4-kernel.boot');
     }
 
     protected function findServiceProviders(): void
@@ -120,9 +148,12 @@ abstract class Kernel implements KernelInterface
     {
         foreach ($this->serviceProviderNames as $serviceProvider) {
             assert(\is_string($serviceProvider));
+            #$name = sprintf('3.%02d-%s',$index,class_basename($serviceProvider));
+            #$this->stopWatch->start($name, 'kernel');
             $this->serviceProviders[] = $serviceProvider = (new $serviceProvider($this->container));
             assert($serviceProvider instanceof ServiceProviderInterface);
             $serviceProvider->register();
+            #$this->stopWatch->stop($name);
         }
     }
 
@@ -130,7 +161,10 @@ abstract class Kernel implements KernelInterface
     {
         foreach ($this->serviceProviders as &$serviceProvider) {
             assert($serviceProvider instanceof ServiceProviderInterface);
+            #$name = sprintf('4.%02d-%s',$index,class_basename($serviceProvider));
+            #$this->stopWatch->start($name, 'kernel');
             $serviceProvider->boot();
+            #$this->stopWatch->stop($name);
         }
     }
 

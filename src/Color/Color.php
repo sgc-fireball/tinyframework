@@ -30,16 +30,12 @@ class Color
 
         if ($delta == 0) {
             $hue = 0;
+        } elseif ($max == $red) {
+            $hue = (($green - $blue) / $delta) % 6;
+        } elseif ($max == $green) {
+            $hue = ($blue - $red) / $delta + 2;
         } else {
-            if ($max == $red) {
-                $hue = (($green - $blue) / $delta) % 6;
-            } else {
-                if ($max == $green) {
-                    $hue = ($blue - $red) / $delta + 2;
-                } else {
-                    $hue = ($red - $green) / $delta + 4;
-                }
-            }
+            $hue = ($red - $green) / $delta + 4;
         }
 
         $hue *= 60;
