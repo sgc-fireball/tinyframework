@@ -20,5 +20,5 @@ if (function_exists('pcntl_async_signals')) {
 }
 
 $container = Container::instance();
-$kernel = $container->get(ConsoleKernel::class);
+$kernel = $container->call(ConsoleKernel::class);
 exit($container->call([$kernel, 'handle']));

@@ -71,7 +71,10 @@ if (!function_exists('container')) {
         if ($key === null) {
             return $container;
         }
-        return $container->get($key, $parameters);
+        if (!empty($parameters)) {
+            return $container->call($key, $parameters);
+        }
+        return $container->get($key);
     }
 }
 

@@ -19,8 +19,7 @@ class BelongsToMany extends Relation
         private string $parentKey,
         private string $relatedKey,
         private string $relationName
-    )
-    {
+    ) {
     }
 
     /**
@@ -28,10 +27,13 @@ class BelongsToMany extends Relation
      */
     public function load(): array
     {
+        // SELECT tableB.* FROM tableB
+        // LEFT JOIN tableA2tableB ON tableA2tableB.table_a_id = tableA.id
         $query = $this->query
             ->select([$this->query->raw(sprintf('`%s`.%s', $this->query->table(), '*'))])
             ->leftJoin($this->query->table(), 'id', $this->table, $this->relatedPivotKey)
-            ->where($this->query->raw(sprintf('`%s`.`%s`', $this->table, $this->foreignPivotKey)), '=', $this->model->id);
+            ->where($this->query->raw(sprintf('`%s`.`%s`', $this->table, $this->foreignPivotKey)), '=',
+                $this->model->id);
         $models = $query->get();
         $this->model->setRelation($this->relationName, $models);
         return $models;

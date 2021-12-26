@@ -63,7 +63,7 @@ class TranslationLoader
             $trans = require($file);
             Arr::factory([$module => \is_array($trans) ? $trans : []])
                 ->flat('.')
-                ->each(function ($key, $value) use ($locale, $module) {
+                ->each(function ($value, $key) use ($locale, $module) {
                     $this->translations[$locale][$key] = $value;
                 });
         } catch (\Throwable $e) {

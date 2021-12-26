@@ -65,18 +65,18 @@ class Container implements ContainerInterface
         return \array_key_exists($key, $this->instances);
     }
 
-    public function get(string $key, array $parameters = []): mixed
+    public function get(string $key): mixed
     {
         $oKey = $key;
         $key = $this->resolveAlias($key);
-        if (empty($parameters) && \array_key_exists($key, $this->instances)) {
+        if (\array_key_exists($key, $this->instances)) {
             if (is_callable($this->instances[$key]) || \is_string($this->instances[$key])) {
                 $this->instances[$key] = $this->call($this->instances[$key]);
             }
             return $this->instances[$key];
         }
         if (class_exists($key) || is_callable($key) || function_exists($key) || $key instanceof Closure) {
-            return $this->call($key, $parameters);
+            return $this->call($key, []);
         }
         throw new RuntimeException('Could not resolve or call ' . $oKey);
     }

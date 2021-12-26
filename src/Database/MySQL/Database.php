@@ -37,9 +37,22 @@ class Database implements DatabaseInterface
     public function connect(): static
     {
         if (!$this->connection) {
-            $this->connection = new mysqli($this->config['host'], $this->config['username'], $this->config['password'], $this->config['database'], $this->config['port']);
-            $this->connection->query(sprintf("SET NAMES %s COLLATE %s", $this->config['charset'], $this->config['collation']));
-            $this->connection->query(sprintf('SET time_zone = "%s";', (new DateTime('now', new DateTimeZone($this->config['timezone'])))->format('P')));
+            $this->connection = new mysqli(
+                $this->config['host'],
+                $this->config['username'],
+                $this->config['password'],
+                $this->config['database'],
+                $this->config['port']
+            );
+            $this->connection->query(sprintf(
+                "SET NAMES %s COLLATE %s",
+                $this->config['charset'],
+                $this->config['collation']
+            ));
+            $this->connection->query(sprintf(
+                'SET time_zone = "%s";',
+                (new DateTime('now', new DateTimeZone($this->config['timezone'])))->format('P')
+            ));
             $this->connection->query('SET SESSION sql_mode = "STRICT_TRANS_TABLES"');
         }
         return $this;
@@ -55,9 +68,7 @@ class Database implements DatabaseInterface
      */
     public function disconnect(): static
     {
-        if ($this->connection) {
-            $this->connection->close();
-        }
+        $this->connection?->close();
         $this->connection = null;
         return $this;
     }
@@ -76,15 +87,42 @@ class Database implements DatabaseInterface
         } elseif (is_float($value) || is_int($value)) {
             return $value;
         } elseif (is_bool($value)) {
-            return $value === true ? 'TRUE' : 'FALSE';
+            return $value ? 'TRUE' : 'FALSE';
         } elseif (is_object($value)) {
-            if (method_exists($value, 'toString')) return $this->escape($value->toString());
-            if (method_exists($value, '__toString')) return $this->escape($value->__toString());
-            if (method_exists($value, 'toArray')) return $this->escape($value->toArray());
-            if (method_exists($value, '__toArray')) return $this->escape($value->__toArray());
-            return $this->escape(serialize($value));
+            if (method_exists($value, 'toString')) {
+                return $this->escape($value->toString());
+            } elseif (method_exists($value, '__toString')) {
+                return $this->escape($value->__toString());
+            } elseif (method_exists($value, 'toArray')) {
+                return $this->escape($value->toArray());
+            } elseif (method_exists($value, '__toArray')) {
+                return $this->escape($value->__toArray());
+            } elseif (method_exists($value, 'jsonSerializable')) {
+                return $this->escape(json_encode($value));
+            } else {
+                return $this->escape(serialize($value));
+            }
         }
-        return '"' . $this->connect()->connection->real_escape_string($value) . '"';
+
+        /**
+         * @link https://github.com/abreksa4/mysql-escape-string-polyfill/blob/master/src/functions.php
+         * @link https://dev.mysql.com/doc/refman/8.0/en/string-literals.html#character-escape-sequences
+         */
+        $value = strtr($value, [
+            "\0" => "\\0",
+            "\n" => "\\n",
+            "\r" => "\\r",
+            "\t" => "\\t",
+            chr(26) => "\\Z",
+            chr(8) => "\\b",
+            '"' => '\"',
+            "'" => "\'",
+            '_' => '\_',
+            '%' => '\%',
+            '\\' => '\\\\',
+        ]);
+        return '"' . $value . '"';
+        #return '"' . $this->connect()->connection->real_escape_string($value) . '"';
     }
 
     public function query(): Query
@@ -121,7 +159,7 @@ class Database implements DatabaseInterface
             'CREATE TABLE IF NOT EXISTS `migrations` (',
             '`id` varchar(255) NOT NULL,',
             '`batch` int(11) unsigned NOT NULL,',
-            'PRIMARY KEY (`migration`)',
+            'PRIMARY KEY (`id`)',
             ')',
         ]));
         return $this;

@@ -90,13 +90,13 @@ class BelongsToManyTest extends FeatureTestCase
         $this->assertIsArray($modelA->belongsToManyModelB);
         $this->assertCount(1, $modelA->belongsToManyModelB);
         $this->assertEquals($modelB->id, $modelA->belongsToManyModelB[0]->id);
-        $this->assertCount(1, $modelA->belongsToManyModelB->belongsToManyModelA);
+        $this->assertCount(1, $modelA->belongsToManyModelB[0]->belongsToManyModelA);
         $this->assertEquals($modelA->id, $modelA->belongsToManyModelB[0]->belongsToManyModelA[0]->id);
 
         $this->assertIsArray($modelB->belongsToManyModelA);
         $this->assertCount(1, $modelB->belongsToManyModelA);
         $this->assertEquals($modelA->id, $modelB->belongsToManyModelA[0]->id);
-        $this->assertCount(1, $modelB->belongsToManyModelA->belongsToManyModelB);
+        $this->assertCount(1, $modelB->belongsToManyModelA[0]->belongsToManyModelB);
         $this->assertEquals($modelB->id, $modelB->belongsToManyModelA[0]->belongsToManyModelB[0]->id);
     }
 

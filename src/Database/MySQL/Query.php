@@ -27,14 +27,9 @@ class Query extends QueryAwesome
     {
         $query = '';
         foreach ($joins as $join) {
-            $query .= sprintf(
-                ' %s JOIN `%s` ON (`%s`.`%s` = `%s`.`%s`)',
-                strtoupper($join['type'] ?? 'LEFT'),
-                $join['tableB'],
-                $join['tableA'],
-                $join['fieldA'],
-                $join['tableB'],
-                $join['fieldB']
+            $query .= vnsprintf(
+                ' {type} JOIN `{tableB}` ON (`{tableB}`.`{fieldB}` = `{tableA}`.`{fieldA}`)',
+                array_merge($join, ['type' => strtoupper($join['type'] ?? 'LEFT')])
             );
         }
         return trim($query);
@@ -50,7 +45,9 @@ class Query extends QueryAwesome
                     $where['operation'] = $where['operation'] === '!=' ? 'IS NOT' : $where['operation'];
                     $where['operation'] = $where['operation'] === '<>' ? 'IS NOT' : $where['operation'];
                 }
-                $field = $where['field'] instanceof DatabaseRaw ? $where['field']->__toString() : '`' . $where['field'] . '`';
+                $field = $where['field'] instanceof DatabaseRaw
+                    ? $where['field']->__toString()
+                    : '`' . str_replace('`', '', $where['field']) . '`';
                 $query .= sprintf(
                     ' %s %s %s %s',
                     $query ? $where['boolean'] : '',
@@ -73,7 +70,10 @@ class Query extends QueryAwesome
     {
         $query = '';
         foreach ($groups as $field) {
-            $query .= '`' . $field . '`,';
+            $field = $field instanceof DatabaseRaw
+                ? $field->__toString()
+                : '`' . str_replace('`', '', $field) . '`';
+            $query .= $field . ', ';
         }
         return $query ? 'GROUP BY ' . rtrim($query, ', ') : '';
     }
@@ -82,7 +82,10 @@ class Query extends QueryAwesome
     {
         $query = '';
         foreach ($orders as $order) {
-            $query .= '`' . $order['field'] . '` ' . $order['order'] . ', ';
+            $order['field'] = $order['field'] instanceof DatabaseRaw
+                ? $order['field']->__toString()
+                : '`' . str_replace('`', '', $order['field']) . '`';
+            $query .= $order['field'] . ' ' . $order['order'] . ', ';
         }
         return $query ? 'ORDER BY ' . rtrim($query, ', ') : '';
     }
@@ -101,22 +104,28 @@ class Query extends QueryAwesome
     {
         $self = $this;
         return trim(implode(', ', array_map(function ($value, $key) use ($self) {
-            return sprintf('`%s` = %s', $key, $self->driver->escape($value));
+            return sprintf(
+                '`%s` = %s',
+                str_replace('`', '', $key),
+                $self->driver->escape($value)
+            );
         }, array_values($fields), array_keys($fields))), ' ,');
     }
 
     public function toSql(): string
     {
-        return rtrim(sprintf(
-            'SELECT %s FROM `%s` %s %s %s %s %s %s',
-            $this->compileSelect($this->select),
-            $this->table,
-            $this->compileJoins($this->joins),
-            $this->compileWhere($this->wheres, true),
-            $this->compileGroup($this->groups),
-            $this->compileOrder($this->orders),
-            $this->compileLimit($this->limit),
-            $this->compileOffset($this->offset)
+        return rtrim(vnsprintf(
+            'SELECT {field} FROM {table} {join} {where} {group} {order} {limit} {offset}',
+            [
+                'field' => $this->compileSelect($this->select),
+                'table' => $this->table,
+                'join' => $this->compileJoins($this->joins),
+                'where' => $this->compileWhere($this->wheres, true),
+                'group' => $this->compileGroup($this->groups),
+                'order' => $this->compileOrder($this->orders),
+                'limit' => $this->compileLimit($this->limit),
+                'offset' => $this->compileOffset($this->offset),
+            ]
         ));
     }
 
@@ -128,22 +137,26 @@ class Query extends QueryAwesome
     public function put(array $fields = []): array
     {
         if (array_key_exists('id', $fields) && $fields['id']) {
-            $this->driver->execute(sprintf(
-                'INSERT INTO `%s` SET %s ON DUPLICATE KEY UPDATE %s',
-                $this->table,
-                $this->compileFieldSet($fields),
-                $this->compileFieldSet(array_filter($fields, function ($value, $key) {
-                    return $key !== 'id';
-                }, ARRAY_FILTER_USE_BOTH))
-            ));
+            $query = vnsprintf(
+                'INSERT INTO `{table}` SET {fields1} ON DUPLICATE KEY UPDATE {fields2}',
+                [
+                    'table' => $this->table,
+                    'fields1' => $this->compileFieldSet($fields),
+                    'fields2' => $this->compileFieldSet(array_filter($fields, function ($value, $key) {
+                        return $key !== 'id';
+                    }, ARRAY_FILTER_USE_BOTH)),
+                ]
+            );
+            $this->driver->execute($query);
         } else {
-            $this->driver->execute(sprintf(
-                'INSERT INTO `%s` SET %s',
-                $this->table,
-                $this->compileFieldSet(array_filter($fields, function ($value, $key) {
-                    return $key !== 'id';
-                }, ARRAY_FILTER_USE_BOTH))
-            ));
+            $query = vnsprintf(
+                'INSERT INTO `{table}` SET {fields}',
+                [
+                    'table' => $this->table,
+                    'fields' => $this->compileFieldSet($fields),
+                ]
+            );
+            $this->driver->execute($query);
             $fields['id'] = $this->driver->getLastInsertId();
         }
         return $fields;
@@ -151,24 +164,51 @@ class Query extends QueryAwesome
 
     public function delete(): bool
     {
-        return (bool)$this->driver->execute(rtrim(sprintf(
-            'DELETE FROM `%s` %s %s %s %s',
-            $this->table,
-            $this->compileWhere($this->wheres, true),
-            $this->compileOrder($this->orders),
-            $this->compileLimit($this->limit),
-            $this->compileOffset($this->offset)
-        )));
+        $query = rtrim(vnsprintf(
+            'DELETE FROM {table} {where} {order} {limit} {offset}',
+            [
+                'table' => $this->table,
+                'where' => $this->compileWhere($this->wheres, true),
+                'order' => $this->compileOrder($this->orders),
+                'limit' => $this->compileLimit($this->limit),
+                'offset' => $this->compileOffset($this->offset),
+            ]
+        ));
+        return (bool)$this->driver->execute($query);
     }
 
     public function count(): int
     {
-        return (int)$this->driver->execute(rtrim(sprintf(
-            'SELECT COUNT(1) AS `c` FROM `%s` %s %s',
-            $this->table,
-            $this->compileWhere($this->wheres, true),
-            $this->compileGroup($this->groups)
-        )))[0]['c'];
+        $query = (clone $this)->select([new DatabaseRaw('COUNT(1) AS `result`')])->toSql();
+        return (int)$this->driver->execute($query)[0]['result'];
+    }
+
+    public function sum(string $field): float
+    {
+        $field = str_replace('`', '', $field);
+        $query = (clone $this)->select([new DatabaseRaw('SUM(`' . $field . '`) AS `result`')])->toSql();
+        return (float)$this->driver->execute($query)[0]['result'];
+    }
+
+    public function avg(string $field): float
+    {
+        $field = str_replace('`', '', $field);
+        $query = (clone $this)->select([new DatabaseRaw('AVG(`' . $field . '`) AS `result`')])->toSql();
+        return (float)$this->driver->execute($query)[0]['result'];
+    }
+
+    public function min(string $field): float
+    {
+        $field = str_replace('`', '', $field);
+        $query = (clone $this)->select([new DatabaseRaw('MIN(`' . $field . '`) AS `result`')])->toSql();
+        return (float)$this->driver->execute($query)[0]['result'];
+    }
+
+    public function max(string $field): float
+    {
+        $field = str_replace('`', '', $field);
+        $query = (clone $this)->select([new DatabaseRaw('MAX(`' . $field . '`) AS `result`')])->toSql();
+        return (float)$this->driver->execute($query)[0]['result'];
     }
 
     public function transaction(): void
