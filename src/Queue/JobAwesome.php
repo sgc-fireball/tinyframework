@@ -5,13 +5,27 @@ namespace TinyFramework\Queue;
 abstract class JobAwesome implements JobInterface
 {
 
-    private int $tryCount = 1;
+    protected int $tryCount = 1;
 
     protected int $attempts = 1; // times
 
     protected int $delay = 0; // seconds
 
     protected string $queue = 'default';
+
+    protected array $metadata = [];
+
+    /**
+     * @return static|mixed
+     */
+    public function metadata(string $name, mixed $value = null)/*: static|mixed*/
+    {
+        if ($value === null) {
+            return $this->metadata[$name] ?? null;
+        }
+        $this->metadata[$name] = $value;
+        return $this;
+    }
 
     public function attempts(int $attempts = null): static|int
     {
@@ -30,18 +44,15 @@ abstract class JobAwesome implements JobInterface
     public function delay(null|int|\DateTimeInterface|\DateInterval $delay = null): static|int
     {
         if ($delay === null) {
-            return $this->delay;
-        }
-        if (is_int($delay)) {
-            $delay = time() + $delay;
+            return $this->delay; // return seconds
         }
         if ($delay instanceof \DateInterval) {
-            $delay = (new \DateTime('now'))->add($delay);
+            $delay = (new \DateTime('now'))->add($delay)->getTimestamp() - time(); // into seconds
         }
         if ($delay instanceof \DateTimeInterface) {
-            $delay = $delay->getTimestamp();
+            $delay = $delay->getTimestamp() - time();
         }
-        $this->delay = (int)$delay;
+        $this->delay = (int)max(0, (int)$delay);
         return $this;
     }
 

@@ -107,4 +107,14 @@ class RedisQueue implements QueueInterface
         return (int)$this->redis->llen($this->config['name']);
     }
 
+    public function ack(JobInterface $job): QueueInterface
+    {
+        return $this;
+    }
+
+    public function nack(JobInterface $job): QueueInterface
+    {
+        return $this;
+    }
+
 }

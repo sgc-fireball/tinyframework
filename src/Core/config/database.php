@@ -11,6 +11,6 @@ return [
         'database' => env('MYSQL_DATABASE', 'tinyframework'),
         'charset' => env('MYSQL_CHARSET', 'utf8mb4'),
         'collation' => env('MYSQL_COLLATION', 'utf8mb4_general_ci'),
-        'timezone' => env('MYSQL_TIMEZONE', env('APP_TIMEZONE', 'UTC'))
-    ]
+        'timezone' => env('MYSQL_TIMEZONE', env('APP_TIMEZONE', 'UTC')),
+    ],
 ];

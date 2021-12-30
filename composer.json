@@ -34,6 +34,9 @@
     "phpstan/phpstan": "^0.12",
     "phpunit/phpunit": "^9.5.4"
   },
+  "suggest": {
+    "ext-amqp": "To use AMQP (RabbitMQ) Queues instanceof Sync or Redis Queues."
+  },
   "scripts": {
     "post-install-cmd": [
       "TinyFramework\\Composer\\Hook::postInstallCommand"

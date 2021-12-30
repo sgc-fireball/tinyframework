@@ -5,6 +5,8 @@ namespace TinyFramework\Queue;
 interface JobInterface
 {
 
+    public function metadata(string $name, mixed $value = null)/*: JobInterface|mixed*/;
+
     public function attempts(int $attempts = null): JobInterface|int;
 
     public function retryAfter(): int;

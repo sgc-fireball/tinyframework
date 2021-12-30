@@ -5,6 +5,7 @@ namespace TinyFramework\Console\Commands;
 use TinyFramework\Console\CommandAwesome;
 use TinyFramework\Console\Input\InputDefinitionInterface;
 use TinyFramework\Console\Input\InputInterface;
+use TinyFramework\Console\Input\Option;
 use TinyFramework\Console\Output\OutputInterface;
 use TinyFramework\Logger\LoggerInterface;
 use TinyFramework\Queue\JobInterface;
@@ -18,7 +19,8 @@ class TinyframeworkQueueWorkerCommand extends CommandAwesome
     protected function configure(): InputDefinitionInterface
     {
         return parent::configure()
-            ->description('Start processing jobs on the queue as a daemon.');
+            ->description('Start processing jobs on the queue as a daemon.')
+            ->option(new Option('queue', null, Option::VALUE_OPTIONAL, 'Queue name', 'default'));
     }
 
     public function run(InputInterface $input, OutputInterface $output): int
@@ -26,7 +28,7 @@ class TinyframeworkQueueWorkerCommand extends CommandAwesome
         parent::run($input, $output);
 
         /** @var QueueInterface $queue */
-        $queue = $this->container->get('queue');
+        $queue = $this->container->get('queue')->name($this->input->option('queue')->value());
         if ($queue instanceof SyncQueue) {
             return 0;
         }
@@ -40,8 +42,10 @@ class TinyframeworkQueueWorkerCommand extends CommandAwesome
                 try {
                     $this->output->write(sprintf('[<yellow>....</yellow>] %s', get_class($job)));
                     $job->handle();
+                    $queue->ack($job);
                     $this->output->write("\r[<green>DONE</green>]\n");
                 } catch (\Throwable $e) {
+                    $queue->nack($job);
                     $this->output->write("\r[<red>FAIL</red>]\n");
                     $this->output->error($e->getMessage());
                     $logger->error(exception2text($e));

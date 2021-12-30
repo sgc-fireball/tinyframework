@@ -32,7 +32,7 @@ class DotEnv implements DotEnvInterface
             if (mb_strpos($line, '=') < 1) {
                 continue;
             }
-            list($key, $value) = explode('=', $line, 2);
+            [$key, $value] = explode('=', $line, 2);
             if (mb_substr($value, 0, 1) === '"' && mb_substr($value, -1) === '"') {
                 $value = mb_substr($value, 1, -1);
             }
@@ -59,7 +59,7 @@ class DotEnv implements DotEnvInterface
 
     public function get(string $key): mixed
     {
-        return $this->convertValue($_ENV[$key] ?? null);
+        return $this->convertValue($_ENV[$key] ?? $_SERVER[$key] ?? null);
     }
 
     private function convertValue(mixed $value): mixed

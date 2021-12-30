@@ -13,4 +13,8 @@ interface QueueInterface
 
     public function pop(int $timeout = 1): JobInterface|null;
 
+    public function ack(JobInterface $job): QueueInterface;
+
+    public function nack(JobInterface $job): QueueInterface;
+
 }

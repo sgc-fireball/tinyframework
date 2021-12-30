@@ -34,7 +34,7 @@ class HttpKernel extends Kernel implements HttpKernelInterface
                 $response = $this->callRoute($route, $request);
             }
             if (!$response) {
-                throw new HttpException('Page not found! ' . $request->url(), 404);
+                throw new HttpException('Page not found!', 404);
             }
         } catch (\Throwable $e) {
             $response = $this->throwableToResponse($e);
@@ -152,6 +152,9 @@ class HttpKernel extends Kernel implements HttpKernelInterface
             }
             return $response;
         }, $request);
+        if ($request->method() === 'HEAD') {
+            $response->content('');
+        }
         $this->stopWatch->stop('7-controller');
         return $response;
     }

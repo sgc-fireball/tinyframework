@@ -33,4 +33,14 @@ class SyncQueue implements QueueInterface
         return 0;
     }
 
+    public function ack(JobInterface $job): QueueInterface
+    {
+        return $this;
+    }
+
+    public function nack(JobInterface $job): QueueInterface
+    {
+        return $this;
+    }
+
 }

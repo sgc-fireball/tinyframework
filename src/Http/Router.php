@@ -21,7 +21,7 @@ class Router
     private array $bindings = [];
 
     private array $middleware = [
-        MaintenanceMiddleware::class
+        MaintenanceMiddleware::class,
     ];
 
     public function __construct(ContainerInterface $container)
@@ -277,30 +277,14 @@ class Router
 
     public function resolve(Request $request): ?Route
     {
-        $url = $request->url()->query([])->fragment('')->__toString();
-
-        $routes = array_merge($this->routes, $this->fallback ? [$this->fallback] : []);
+        $routes = $this->getPossibleRoutesByUrl($request);
         foreach ($routes as $route) {
-            assert($route instanceof Route);
             $allowedMethods = $route->method();
-            if (!in_array($request->method(), $allowedMethods) && !in_array('ANY', $allowedMethods)) {
-                continue;
-            }
-            $regex = $this->translateUrl($route);
-            if (preg_match($regex, $url, $match)) {
-                $match = array_filter($match, function ($value, $key) {
-                    return !is_numeric($key);
-                }, ARRAY_FILTER_USE_BOTH);
-                foreach ($match as $name => &$value) {
-                    if ($callback = $this->bind($name)) {
-                        if ($callback instanceof Closure && $newValue = $callback($value)) {
-                            $value = $newValue;
-                            continue;
-                        }
-                        continue 2;
-                    }
-                }
-                $route->parameter($match);
+            if (in_array($request->method(), $allowedMethods)) {
+                return $route;
+            } elseif ($request->method() === 'HEAD' && in_array('GET', $allowedMethods)) {
+                return $route;
+            } elseif (in_array('ANY', $allowedMethods)) {
                 return $route;
             }
         }
@@ -309,7 +293,29 @@ class Router
 
     public function getAllowedMethodsByRequest(Request $request): array
     {
+        $routes = $this->getPossibleRoutesByUrl($request);
         $result = [];
+        foreach ($routes as $route) {
+            $result = array_merge($result, $route->method());
+        }
+        $result[] = 'OPTIONS';
+        if (\in_array('ANY', $result)) {
+            $result = array_merge($result, ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']);
+        }
+        if (\in_array('GET', $result)) {
+            $result[] = 'HEAD';
+        }
+        $results = array_unique(array_filter($result, fn($method) => $method !== 'ANY'));
+        sort($results);
+        return $results;
+    }
+
+    /**
+     * @return Route[]
+     */
+    private function getPossibleRoutesByUrl(Request $request): array
+    {
+        $routes = [];
         $url = $request->url()->query([])->fragment('')->__toString();
         foreach ($this->routes as $route) {
             assert($route instanceof Route);
@@ -327,20 +333,14 @@ class Router
                         continue 2;
                     }
                 }
-                $result = array_merge($result, $route->method());
+                $route->parameter($match);
+                $routes[] = $route;
             }
         }
-
-        if (!count($result)) {
-            $result = $this->fallback?->method() ?? [];
+        if ($this->fallback) {
+            $routes[] = $this->fallback;
         }
-        $result[] = 'OPTIONS';
-        if (\in_array('ANY', $result)) {
-            $result = array_merge($result, ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']);
-        }
-        $results = array_unique(array_filter($result, fn($method) => $method !== 'ANY'));
-        sort($results);
-        return $results;
+        return $routes;
     }
 
     protected function translateUrl(Route $route): string
