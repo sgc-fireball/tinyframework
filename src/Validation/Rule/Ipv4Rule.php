@@ -4,7 +4,6 @@ namespace TinyFramework\Validation\Rule;
 
 class Ipv4Rule extends RuleAwesome
 {
-
     public function getName(): string
     {
         return 'ipv4';
@@ -18,5 +17,4 @@ class Ipv4Rule extends RuleAwesome
         }
         return [$this->translator->trans('validation.ipv4', ['attribute' => $this->getTransName($name)])];
     }
-
 }

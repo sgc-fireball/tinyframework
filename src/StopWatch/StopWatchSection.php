@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\StopWatch;
 
 class StopWatchSection
 {
-
     private float $origin;
 
     private string $id;
@@ -64,5 +65,4 @@ class StopWatchSection
         }
         return $this;
     }
-
 }

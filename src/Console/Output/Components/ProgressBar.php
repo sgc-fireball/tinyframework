@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Console\Output\Components;
 
@@ -7,7 +9,6 @@ use TinyFramework\Console\Output\OutputInterface;
 
 class ProgressBar
 {
-
     private OutputInterface $output;
 
     private float $startTime = 0;
@@ -61,9 +62,9 @@ class ProgressBar
         $this->format('normal' . $postfix);
         if ($output->verbosity() === OutputInterface::VERBOSITY_VERBOSE) {
             $this->format('verbose' . $postfix);
-        } else if ($output->verbosity() === OutputInterface::VERBOSITY_VERY_VERBOSE) {
+        } elseif ($output->verbosity() === OutputInterface::VERBOSITY_VERY_VERBOSE) {
             $this->format('very_verbose' . $postfix);
-        } else if ($output->verbosity() === OutputInterface::VERBOSITY_DEBUG) {
+        } elseif ($output->verbosity() === OutputInterface::VERBOSITY_DEBUG) {
             $this->format('debug' . $postfix);
         }
     }
@@ -172,5 +173,4 @@ class ProgressBar
         $this->output->write(vnsprintf($message, $placeholder));
         return $this;
     }
-
 }

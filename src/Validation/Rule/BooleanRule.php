@@ -4,7 +4,6 @@ namespace TinyFramework\Validation\Rule;
 
 class BooleanRule extends RuleAwesome
 {
-
     public function getName(): string
     {
         return 'boolean';
@@ -19,5 +18,4 @@ class BooleanRule extends RuleAwesome
         }
         return [$this->translator->trans('validation.boolean', ['attribute' => $this->getTransName($name)])];
     }
-
 }

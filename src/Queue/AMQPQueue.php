@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Queue;
 
@@ -9,8 +11,7 @@ use AMQPExchange;
 
 class AMQPQueue implements QueueInterface
 {
-
-    static private ?AMQPConnection $connection = null;
+    private static ?AMQPConnection $connection = null;
 
     private ?AMQPChannel $channel = null;
 
@@ -175,7 +176,6 @@ class AMQPQueue implements QueueInterface
         }
         return $this->queues[$name];
     }
-
 }
 
 // @link https://github.com/symfony/amqp-messenger/blob/5.4/Transport/Connection.php

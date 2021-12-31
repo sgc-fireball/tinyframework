@@ -4,7 +4,6 @@ namespace TinyFramework\Validation\Rule;
 
 class FloatRule extends RuleAwesome
 {
-
     public function getName(): string
     {
         return 'float';
@@ -18,5 +17,4 @@ class FloatRule extends RuleAwesome
         }
         return [$this->translator->trans('validation.float', ['attribute' => $this->getTransName($name)])];
     }
-
 }

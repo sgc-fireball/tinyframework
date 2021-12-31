@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Color;
 
 class XTermConverter implements XTermConverterInterface
 {
-
     private static array $map = [
         '000000' => 0,
         '800000' => 1,
@@ -311,5 +312,4 @@ class XTermConverter implements XTermConverterInterface
         }
         return $result;
     }
-
 }

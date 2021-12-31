@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Session;
 
@@ -7,7 +9,6 @@ use RuntimeException;
 
 class RedisSession extends SessionAwesome implements SessionInterface
 {
-
     private Redis $redis;
 
     private array $config = [];
@@ -71,5 +72,4 @@ class RedisSession extends SessionAwesome implements SessionInterface
         $this->data = [];
         return $this;
     }
-
 }

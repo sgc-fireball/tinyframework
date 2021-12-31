@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Shell;
 
@@ -6,7 +8,6 @@ use TinyFramework\Shell\TabCompletion\TabCompletionInterface;
 
 class Readline
 {
-
     private string $prompt;
 
     private string $historyFile;
@@ -114,5 +115,4 @@ class Readline
         }
         $this->saveHistory();
     }
-
 }

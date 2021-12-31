@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Helpers;
 
@@ -7,7 +9,6 @@ namespace TinyFramework\Helpers;
  */
 class Arr implements \ArrayAccess, \Iterator
 {
-
     protected array $items = [];
 
     public static function factory(array $items = []): Arr
@@ -749,7 +750,7 @@ class Arr implements \ArrayAccess, \Iterator
         if ($key === null) {
             $this->items[] = $value;
         } else {
-            $this->items = $this->items + [$key => $value];
+            $this->items[$key] = $value;
         }
         return $this;
     }
@@ -930,5 +931,4 @@ class Arr implements \ArrayAccess, \Iterator
         $this->items = $result;
         return $this;
     }
-
 }

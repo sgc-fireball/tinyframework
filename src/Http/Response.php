@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Http;
 
@@ -6,7 +8,6 @@ use TinyFramework\Session\SessionInterface;
 
 class Response
 {
-
     public static array $multiLineHeader = [
         'set-cookie',
         'server-timing',
@@ -101,7 +102,7 @@ class Response
 
     public static function new(?string $content = '', int $code = 200, array $headers = []): Response
     {
-        return (new Response)->code($code)->content($content ?? '')->headers($headers);
+        return (new Response())->code($code)->content($content ?? '')->headers($headers);
     }
 
     public static function view(string $file, array $data = [], int $code = 200, array $headers = []): Response
@@ -284,5 +285,4 @@ class Response
         $response .= "\n" . $this->content;
         return $response;
     }
-
 }

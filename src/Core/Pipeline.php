@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Core;
 
@@ -6,7 +8,6 @@ use Closure;
 
 class Pipeline implements PipelineInterface
 {
-
     private array $layers = [];
 
     public function __construct(Closure|array|null $layers = null)
@@ -51,5 +52,4 @@ class Pipeline implements PipelineInterface
         );
         return $chain($parameter);
     }
-
 }

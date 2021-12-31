@@ -1,14 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Database\MySQL;
 
-use TinyFramework\Database\QueryAwesome;
 use TinyFramework\Database\DatabaseInterface;
+use TinyFramework\Database\QueryAwesome;
 use TinyFramework\Helpers\DatabaseRaw;
 
 class Query extends QueryAwesome
 {
-
     /** @var Database */
     protected DatabaseInterface $driver;
 
@@ -225,5 +226,4 @@ class Query extends QueryAwesome
     {
         $this->driver->execute('ROLLBACK');
     }
-
 }

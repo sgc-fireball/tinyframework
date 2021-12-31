@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Console\Output;
 
@@ -6,12 +8,11 @@ use TinyFramework\Color\Color;
 
 interface OutputInterface
 {
-
-    const VERBOSITY_QUIET = -1;
-    const VERBOSITY_NORMAL = 0;
-    const VERBOSITY_VERBOSE = 1;
-    const VERBOSITY_VERY_VERBOSE = 2;
-    const VERBOSITY_DEBUG = 3;
+    public const VERBOSITY_QUIET = -1;
+    public const VERBOSITY_NORMAL = 0;
+    public const VERBOSITY_VERBOSE = 1;
+    public const VERBOSITY_VERY_VERBOSE = 2;
+    public const VERBOSITY_DEBUG = 3;
 
     public function __construct(Color $color = null);
 
@@ -38,5 +39,4 @@ interface OutputInterface
     public function width(): int;
 
     public function height(): int;
-
 }

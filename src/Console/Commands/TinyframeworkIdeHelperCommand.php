@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Console\Commands;
 
@@ -10,7 +12,6 @@ use TinyFramework\Http\Request;
 
 class TinyframeworkIdeHelperCommand extends CommandAwesome
 {
-
     protected function configure(): InputDefinitionInterface
     {
         return parent::configure()
@@ -90,5 +91,4 @@ class TinyframeworkIdeHelperCommand extends CommandAwesome
         $content[] = '';
         file_put_contents(root_dir() . '/.phpstorm.meta.php', implode("\n", $content));
     }
-
 }

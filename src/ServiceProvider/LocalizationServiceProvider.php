@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\ServiceProvider;
 
@@ -8,7 +10,6 @@ use TinyFramework\Localization\TranslatorInterface;
 
 class LocalizationServiceProvider extends ServiceProviderAwesome
 {
-
     public function register(): void
     {
         $this->container
@@ -24,5 +25,4 @@ class LocalizationServiceProvider extends ServiceProviderAwesome
                 return new Translator($this->container->get(TranslationLoader::class), $config['locale']);
             });
     }
-
 }

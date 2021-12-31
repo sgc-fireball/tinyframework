@@ -6,7 +6,6 @@ use TinyFramework\Http\UploadedFile;
 
 class ImageRule extends RuleAwesome
 {
-
     public function getName(): string
     {
         return 'image';
@@ -26,5 +25,4 @@ class ImageRule extends RuleAwesome
         }
         return null;
     }
-
 }

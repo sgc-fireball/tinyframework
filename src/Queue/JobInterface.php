@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Queue;
 
 interface JobInterface
 {
-
     public function metadata(string $name, mixed $value = null): mixed;
 
     public function attempts(int $attempts = null): JobInterface|int;
@@ -16,5 +17,4 @@ interface JobInterface
     public function queue(string $queue = null): JobInterface|string;
 
     public function handle(): void;
-
 }

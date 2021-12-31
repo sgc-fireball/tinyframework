@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\Validation\Rule;
 
@@ -8,7 +10,6 @@ use TinyFramework\Validation\ValidationException;
 
 class TimezoneTest extends ValidationTestCase
 {
-
     public function timezoneProvider(): array
     {
         return [
@@ -53,5 +54,4 @@ class TimezoneTest extends ValidationTestCase
             $this->assertFalse($valid);
         }
     }
-
 }

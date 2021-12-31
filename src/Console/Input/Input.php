@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Console\Input;
 
@@ -6,7 +8,6 @@ use InvalidArgumentException;
 
 class Input implements InputInterface
 {
-
     private array $argv = [];
 
     private array $tokens = [];
@@ -72,7 +73,7 @@ class Input implements InputInterface
         while (null !== $token = array_shift($this->tokens)) {
             if (mb_strpos($token, '--') === 0) {
                 $this->parseLongOption($token);
-            } else if (mb_strpos($token, '-') === 0) {
+            } elseif (mb_strpos($token, '-') === 0) {
                 $this->parseShortOption($token);
             } else {
                 if ($command === null) {
@@ -147,5 +148,4 @@ class Input implements InputInterface
         }
         $argument->value($token);
     }
-
 }

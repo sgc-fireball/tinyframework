@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\Validation\Rule;
 
@@ -8,7 +10,6 @@ use TinyFramework\Validation\ValidationException;
 
 class IntegerTest extends ValidationTestCase
 {
-
     public function integerProvider(): array
     {
         return [
@@ -47,5 +48,4 @@ class IntegerTest extends ValidationTestCase
             $this->assertFalse($valid);
         }
     }
-
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\Cron\CronExpression;
 
@@ -7,7 +9,6 @@ use TinyFramework\Cron\CronExpression\DayOfWeekField;
 
 class DayOfWeekFieldTest extends TestCase
 {
-
     public function testWildcard()
     {
         $field = new DayOfWeekField('*');
@@ -37,5 +38,4 @@ class DayOfWeekFieldTest extends TestCase
         $field = new DayOfWeekField('1,3-5/4');
         $this->assertEquals([1, 4], $field->parse());
     }
-
 }

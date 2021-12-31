@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\ServiceProvider;
 
@@ -9,7 +11,6 @@ use TinyFramework\Queue\QueueInterface;
 
 class QueueServiceProvider extends ServiceProviderAwesome
 {
-
     public function register(): void
     {
         $config = $this->container->get('config')->get('queue');
@@ -25,5 +26,4 @@ class QueueServiceProvider extends ServiceProviderAwesome
                 return new $class($config);
             });
     }
-
 }

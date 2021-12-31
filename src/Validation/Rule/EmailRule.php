@@ -4,7 +4,6 @@ namespace TinyFramework\Validation\Rule;
 
 class EmailRule extends RuleAwesome
 {
-
     public function getName(): string
     {
         return 'email';
@@ -47,5 +46,4 @@ class EmailRule extends RuleAwesome
         }
         return null;
     }
-
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Console\Commands;
 
@@ -11,7 +13,6 @@ use TinyFramework\Console\Output\OutputInterface;
 
 class TinyframeworkDownCommand extends CommandAwesome
 {
-
     protected function configure(): InputDefinitionInterface
     {
         return parent::configure()
@@ -28,5 +29,4 @@ class TinyframeworkDownCommand extends CommandAwesome
         $this->output->writeln('<gold>Application is now in maintenance mode.</gold>');
         return 0;
     }
-
 }

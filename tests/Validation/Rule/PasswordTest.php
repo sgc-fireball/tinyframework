@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\Validation\Rule;
 
@@ -8,7 +10,6 @@ use TinyFramework\Validation\ValidationException;
 
 class PasswordTest extends ValidationTestCase
 {
-
     public function testPasswordToShort()
     {
         $errorBag = null;
@@ -110,5 +111,4 @@ class PasswordTest extends ValidationTestCase
         $this->assertArrayHasKey('field', $errorBag);
         $this->assertEquals(1, count($errorBag['field']));
     }
-
 }

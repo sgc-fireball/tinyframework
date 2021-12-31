@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Database;
 
@@ -8,7 +10,6 @@ use TinyFramework\Helpers\DatabaseRaw;
 
 abstract class QueryAwesome implements QueryInterface
 {
-
     protected array $select = [];
 
     protected string $table;
@@ -307,9 +308,8 @@ abstract class QueryAwesome implements QueryInterface
     {
         $class = \is_object($model) ? \get_class($model) : (string)$model;
         $this->class($class);
-        $model = $model instanceof BaseModel ? $model : (new $this->class);
+        $model = $model instanceof BaseModel ? $model : (new $this->class());
         $this->table($model->getTable());
         return $this;
     }
-
 }

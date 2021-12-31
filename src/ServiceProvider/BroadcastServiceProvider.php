@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\ServiceProvider;
 
@@ -10,7 +12,6 @@ use TinyFramework\Http\Router;
 
 class BroadcastServiceProvider extends ServiceProviderAwesome
 {
-
     public function register(): void
     {
         $config = $this->container->get('config')->get('broadcast');
@@ -18,7 +19,7 @@ class BroadcastServiceProvider extends ServiceProviderAwesome
             return;
         }
         $config = $config[$config['default']] ?? [];
-        $this->container->singleton(BroadcastManager::class, fn() => (new BroadcastManager())->load());
+        $this->container->singleton(BroadcastManager::class, fn () => (new BroadcastManager())->load());
         $this->container
             ->alias('broadcast', $config['driver'])
             ->alias(BroadcastInterface::class, $config['driver'])
@@ -39,5 +40,4 @@ class BroadcastServiceProvider extends ServiceProviderAwesome
             }
         );
     }
-
 }

@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\StopWatch;
 
 class StopWatchPeriod
 {
-
     private float $start;
     private float $end;
 
@@ -28,5 +29,4 @@ class StopWatchPeriod
     {
         return $this->end - $this->start;
     }
-
 }

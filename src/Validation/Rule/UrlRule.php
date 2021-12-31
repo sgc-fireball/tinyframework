@@ -4,7 +4,6 @@ namespace TinyFramework\Validation\Rule;
 
 class UrlRule extends RuleAwesome
 {
-
     public function getName(): string
     {
         return 'url';
@@ -32,5 +31,4 @@ class UrlRule extends RuleAwesome
         }
         return [$this->translator->trans('validation.url', ['attribute' => $this->getTransName($name)])];
     }
-
 }

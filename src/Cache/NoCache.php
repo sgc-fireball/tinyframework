@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Cache;
 
 class NoCache extends CacheAwesome
 {
-
     public function clear(): CacheInterface
     {
         return $this;
@@ -20,7 +21,7 @@ class NoCache extends CacheAwesome
         return false;
     }
 
-    public function set(string $key, mixed $value = null,null|int|\DateTimeInterface|\DateInterval $ttl = null): static
+    public function set(string $key, mixed $value = null, null|int|\DateTimeInterface|\DateInterval $ttl = null): static
     {
         return $this;
     }
@@ -29,5 +30,4 @@ class NoCache extends CacheAwesome
     {
         return $this;
     }
-
 }

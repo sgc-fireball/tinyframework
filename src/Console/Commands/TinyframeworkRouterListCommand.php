@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Console\Commands;
 
@@ -14,7 +16,6 @@ use TinyFramework\Template\ViewInterface;
 
 class TinyframeworkRouterListCommand extends CommandAwesome
 {
-
     protected function configure(): InputDefinitionInterface
     {
         return parent::configure()
@@ -49,7 +50,7 @@ class TinyframeworkRouterListCommand extends CommandAwesome
                     implode(
                         ', ',
                         array_map(
-                            fn($class) => class_basename($class),
+                            fn ($class) => class_basename($class),
                             $route->middleware()
                         )
                     ),
@@ -58,10 +59,9 @@ class TinyframeworkRouterListCommand extends CommandAwesome
             }
             $list[] = $item;
         }
-        usort($list, fn($a, $b) => ($a[1] < $b[1]) ? -1 : 1);
+        usort($list, fn ($a, $b) => ($a[1] < $b[1]) ? -1 : 1);
         $table->rows($list);
         $table->render();
         return 0;
     }
-
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\Color;
 
@@ -6,7 +8,6 @@ use TinyFramework\Color\XTermConverter;
 
 class XTermConverterTest extends \PHPUnit\Framework\TestCase
 {
-
     private ?XTermConverter $converter = null;
 
     protected function setUp(): void
@@ -79,5 +80,4 @@ class XTermConverterTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertEquals($hex, $this->converter->xterm2hex($xterm));
     }
-
 }

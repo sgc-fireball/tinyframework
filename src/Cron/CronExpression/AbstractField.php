@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Cron\CronExpression;
 
@@ -7,7 +9,6 @@ use RuntimeException;
 
 abstract class AbstractField
 {
-
     protected int $minValue = 0;
 
     protected int $maxValue = 0;
@@ -37,7 +38,7 @@ abstract class AbstractField
             if ($expression === '*') {
                 $this->values = range($this->minValue, $this->maxValue);
                 continue;
-            } else if (preg_match('/^(\d+)-(\d+)$/', $expression, $matches)) {
+            } elseif (preg_match('/^(\d+)-(\d+)$/', $expression, $matches)) {
                 if ($this->minValue <= intval($matches[1]) && intval($matches[1]) <= $this->maxValue) {
                     if ($this->minValue <= intval($matches[2]) && intval($matches[2]) <= $this->maxValue) {
                         if ($matches[1] <= $matches[2]) {
@@ -46,18 +47,21 @@ abstract class AbstractField
                         }
                     }
                 }
-            } else if (preg_match('/^\*\/(\d+)$/', $expression, $matches)) {
+            } elseif (preg_match('/^\*\/(\d+)$/', $expression, $matches)) {
                 if ($this->minValue <= intval($matches[1]) && intval($matches[1]) <= $this->maxValue) {
                     if ($this->minValue === 0) {
                         $this->values = array_merge($this->values, [0]);
                     }
-                    $this->values = array_merge($this->values, array_filter(
+                    $this->values = array_merge(
+                        $this->values,
+                        array_filter(
                             range($this->minValue, $this->maxValue),
-                            fn(int $i) => $i % ($matches[1]) === 0)
+                            fn (int $i) => $i % ($matches[1]) === 0
+                        )
                     );
                     continue;
                 }
-            } else if (preg_match('/^(\d+)-(\d+)\/(\d+)$/', $expression, $matches)) {
+            } elseif (preg_match('/^(\d+)-(\d+)\/(\d+)$/', $expression, $matches)) {
                 if ($this->minValue <= intval($matches[1]) && intval($matches[1]) <= $this->maxValue) {
                     if ($this->minValue <= intval($matches[2]) && intval($matches[2]) <= $this->maxValue) {
                         if ($matches[1] <= $matches[2]) {
@@ -65,12 +69,14 @@ abstract class AbstractField
                                 if (intval($matches[1]) === 0) {
                                     $this->values = array_merge($this->values, [0]);
                                 }
-                                $this->values = array_merge($this->values, array_filter(
+                                $this->values = array_merge(
+                                    $this->values,
+                                    array_filter(
                                         range(intval($matches[1]), intval($matches[2])),
-                                        fn(int $i) => $i % ($matches[3]) === 0)
+                                        fn (int $i) => $i % ($matches[3]) === 0
+                                    )
                                 );
                                 continue;
-
                             }
                         }
                     }
@@ -109,5 +115,4 @@ abstract class AbstractField
     abstract public function increment(DateTime $time): DateTime;
 
     abstract public function decrement(DateTime $time): DateTime;
-
 }

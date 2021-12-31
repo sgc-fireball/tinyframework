@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\Validation\Rule;
 
@@ -9,7 +11,6 @@ use TinyFramework\Validation\ValidationException;
 
 class VideoTest extends ValidationTestCase
 {
-
     public function videoProvider(): array
     {
         return [
@@ -58,5 +59,4 @@ class VideoTest extends ValidationTestCase
             $this->assertFalse($valid);
         }
     }
-
 }

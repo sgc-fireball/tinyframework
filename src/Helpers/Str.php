@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Helpers;
 
@@ -9,7 +11,6 @@ use TinyFramework\Http\URL;
  */
 class Str implements \Stringable
 {
-
     protected string $value = '';
 
     public static function factory(string $value = ''): Str
@@ -88,7 +89,9 @@ class Str implements \Stringable
 
     public function camelCase(string $language = null): static
     {
-        $this->value = \str_replace(' ', '',
+        $this->value = \str_replace(
+            ' ',
+            '',
             \lcfirst(\ucwords(\str_replace(['-', '_'], ' ', (string)$this->kebabCase($language))))
         );
         return $this;
@@ -538,5 +541,4 @@ class Str implements \Stringable
         $this->value = $start . str_repeat(mb_substr($character, 0, 1), mb_strlen($segment)) . $end;
         return $this;
     }
-
 }

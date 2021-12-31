@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\ServiceProvider;
 
@@ -9,7 +11,6 @@ use TinyFramework\Http\Response;
 
 class XhprofServiceProvider extends ServiceProviderAwesome
 {
-
     public function register(): void
     {
         if (!extension_loaded('tideways_xhprof') && !extension_loaded('xhprof')) {
@@ -111,5 +112,4 @@ class XhprofServiceProvider extends ServiceProviderAwesome
             });
         }
     }
-
 }

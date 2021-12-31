@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\ServiceProvider;
 
@@ -7,7 +9,6 @@ use TinyFramework\Session\SessionInterface;
 
 class SessionServiceProvider extends ServiceProviderAwesome
 {
-
     public function register(): void
     {
         $globalConfig = $this->container->get('config')->get('session');
@@ -23,5 +24,4 @@ class SessionServiceProvider extends ServiceProviderAwesome
                 return new $class($config);
             });
     }
-
 }

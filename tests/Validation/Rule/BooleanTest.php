@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\Validation\Rule;
 
@@ -8,7 +10,6 @@ use TinyFramework\Validation\ValidationException;
 
 class BooleanTest extends ValidationTestCase
 {
-
     public function booleanProvider(): array
     {
         return [
@@ -57,5 +58,4 @@ class BooleanTest extends ValidationTestCase
             $this->assertFalse($valid);
         }
     }
-
 }

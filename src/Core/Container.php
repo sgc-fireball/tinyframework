@@ -1,20 +1,21 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Core;
 
 use Closure;
+use ReflectionClass;
+use ReflectionFunction;
+use ReflectionMethod;
 use ReflectionNamedType;
 use RuntimeException;
-use ReflectionClass;
-use ReflectionMethod;
-use ReflectionFunction;
 
 require_once(__DIR__ . "/../Helpers/functions.php");
 
 class Container implements ContainerInterface
 {
-
-    static private ?Container $container = null;
+    private static ?Container $container = null;
 
     private array $aliases = [];
 
@@ -259,5 +260,4 @@ class Container implements ContainerInterface
         }
         return $arguments;
     }
-
 }

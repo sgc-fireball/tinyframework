@@ -7,7 +7,6 @@ use TinyFramework\Http\Response;
 
 class BroadcastController
 {
-
     public function __construct(protected BroadcastManager $broadcastManager)
     {
     }
@@ -25,5 +24,4 @@ class BroadcastController
         }
         return Response::new(null, 403);
     }
-
 }

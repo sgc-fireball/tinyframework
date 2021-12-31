@@ -1,13 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Composer;
 
-use Composer\Script\Event;
 use Composer\Installer\PackageEvent;
+use Composer\Script\Event;
 
 class Hook
 {
-
     public static function postInstallCommand(Event $event): void
     {
         self::postUpdateCommand($event);
@@ -54,5 +55,4 @@ class Hook
         }
         copy(__DIR__ . '/../Files/index.php', 'public/index.php');
     }
-
 }

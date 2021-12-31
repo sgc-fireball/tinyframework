@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\Feature;
 
@@ -11,7 +13,6 @@ use TinyFramework\Core\TestKernel;
 
 class FeatureTestCase extends TestCase
 {
-
     protected ?Container $container;
 
     protected ?KernelInterface $kernel;
@@ -29,5 +30,4 @@ class FeatureTestCase extends TestCase
         gc_collect_cycles();
         parent::tearDown();
     }
-
 }

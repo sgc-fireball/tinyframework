@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\Cron\CronExpression;
 
@@ -7,7 +9,6 @@ use TinyFramework\Cron\CronExpression\DayOfMonthField;
 
 class DayOfMonthFieldTest extends TestCase
 {
-
     public function testWildcard()
     {
         $field = new DayOfMonthField('*');
@@ -37,5 +38,4 @@ class DayOfMonthFieldTest extends TestCase
         $field = new DayOfMonthField('1,6-12/2');
         $this->assertEquals([1, 6, 8, 10, 12], $field->parse());
     }
-
 }

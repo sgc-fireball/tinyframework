@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Mail;
 
@@ -7,7 +9,6 @@ use RuntimeException;
 
 class SmtpMailer extends MailerAwesome implements MailerInterface
 {
-
     private array $config = [
         'host' => 'localhost',
         'port' => 25,
@@ -144,7 +145,8 @@ class SmtpMailer extends MailerAwesome implements MailerInterface
                 $this->write($fp, sprintf("--%s\r\n", $mixedBoundary), false);
                 $this->write($fp, sprintf(
                     "Content-Type: %s; name=\"%s\"\r\n",
-                    $attachment['mimetype'] ?? 'application/octet-stream', $attachment['filename']
+                    $attachment['mimetype'] ?? 'application/octet-stream',
+                    $attachment['filename']
                 ), false);
                 $this->write($fp, "Content-Transfer-Encoding: base64\r\n", false);
                 $this->write($fp, sprintf(
@@ -164,7 +166,7 @@ class SmtpMailer extends MailerAwesome implements MailerInterface
 
         $this->write($fp, sprintf("--%s--\r\n\r\n", $mixedBoundary), false);
 
-        $this->write($fp, ".\r\n",);
+        $this->write($fp, ".\r\n", );
         $this->write($fp, "QUIT\r\n", false);
         fclose($fp);
 
@@ -205,5 +207,4 @@ class SmtpMailer extends MailerAwesome implements MailerInterface
         }
         return $result;
     }
-
 }

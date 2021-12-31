@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Core;
 
 class DotEnv implements DotEnvInterface
 {
-
     private static ?DotEnv $instance = null;
 
     private function __construct()
@@ -72,5 +73,4 @@ class DotEnv implements DotEnvInterface
         $value = \is_string($value) && mb_strtolower($value) === 'false' ? false : $value;
         return $value;
     }
-
 }

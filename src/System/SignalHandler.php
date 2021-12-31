@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\System;
 
@@ -6,41 +8,40 @@ use TinyFramework\Event\EventDispatcherInterface;
 
 class SignalHandler
 {
+    public const SIGNULL = 0;
+    public const SIGHUP = 1;
+    public const SIGINT = 2;
+    public const SIGQUIT = 3;
+    public const SIGILL = 4;
+    public const SIGTRAP = 5;
+    public const SIGABRT = 6;
+    public const SIGBUS = 7;
+    public const SIGFPE = 8;
+    public const SIGKILL = 9;
+    public const SIGUSR1 = 10;
+    public const SIGSEGV = 11;
+    public const SIGUSR2 = 12;
+    public const SIGPIPE = 13;
+    public const SIGALRM = 14;
+    public const SIGTERM = 15;
+    public const SIGSTKFLT = 16;
+    public const SIGCHLD = 17;
+    public const SIGCONT = 18;
+    public const SIGSTOP = 19;
+    public const SIGTSTP = 20;
+    public const SIGTTIN = 21;
+    public const SIGTTOU = 22;
+    public const SIGURG = 23;
+    public const SIGXCPU = 24;
+    public const SIGXFSZ = 25;
+    public const SIGVTALRM = 26;
+    public const SIGPROF = 27;
+    public const SIGWINCH = 28;
+    public const SIGIO = 29;
+    public const SIGPWR = 30;
+    public const SIGUNUSED = 31;
 
-    const SIGNULL = 0;
-    const SIGHUP = 1;
-    const SIGINT = 2;
-    const SIGQUIT = 3;
-    const SIGILL = 4;
-    const SIGTRAP = 5;
-    const SIGABRT = 6;
-    const SIGBUS = 7;
-    const SIGFPE = 8;
-    const SIGKILL = 9;
-    const SIGUSR1 = 10;
-    const SIGSEGV = 11;
-    const SIGUSR2 = 12;
-    const SIGPIPE = 13;
-    const SIGALRM = 14;
-    const SIGTERM = 15;
-    const SIGSTKFLT = 16;
-    const SIGCHLD = 17;
-    const SIGCONT = 18;
-    const SIGSTOP = 19;
-    const SIGTSTP = 20;
-    const SIGTTIN = 21;
-    const SIGTTOU = 22;
-    const SIGURG = 23;
-    const SIGXCPU = 24;
-    const SIGXFSZ = 25;
-    const SIGVTALRM = 26;
-    const SIGPROF = 27;
-    const SIGWINCH = 28;
-    const SIGIO = 29;
-    const SIGPWR = 30;
-    const SIGUNUSED = 31;
-
-    const NAMES = [
+    public const NAMES = [
         0 => 'SIGNULL',
         1 => 'SIGHUP',
         2 => 'SIGINT',
@@ -126,5 +127,4 @@ class SignalHandler
     {
         return self::$isTerminated;
     }
-
 }

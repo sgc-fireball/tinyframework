@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Cron;
 
@@ -11,7 +13,6 @@ use TinyFramework\Cron\CronExpression\MonthField;
 
 class CronExpression
 {
-
     private MinuteField $minute;
 
     private HourField $hour;
@@ -124,5 +125,4 @@ class CronExpression
         }
         return $previous;
     }
-
 }

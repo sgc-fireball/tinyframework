@@ -4,7 +4,6 @@ namespace TinyFramework\Validation\Rule;
 
 class FilledRule extends RuleAwesome
 {
-
     public function getName(): string
     {
         return 'filled';
@@ -24,5 +23,4 @@ class FilledRule extends RuleAwesome
         }
         return null;
     }
-
 }

@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\StopWatch;
 
 class StopWatch
 {
-
     /** @var StopWatchSection[] */
     private array $sections = [];
 
@@ -72,5 +73,4 @@ class StopWatch
     {
         return microtime(true) - $this->origin();
     }
-
 }

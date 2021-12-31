@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\Validation\Rule;
 
@@ -9,7 +11,6 @@ use TinyFramework\Validation\ValidationException;
 
 class ImageTest extends ValidationTestCase
 {
-
     public function imageProvider(): array
     {
         return [
@@ -58,5 +59,4 @@ class ImageTest extends ValidationTestCase
             $this->assertFalse($valid);
         }
     }
-
 }

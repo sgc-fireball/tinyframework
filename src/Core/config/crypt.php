@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 $key = env('APP_SECRET', null);
 $key = $key ? base64_decode($key) : null;

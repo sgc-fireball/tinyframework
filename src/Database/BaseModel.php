@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Database;
 
@@ -13,7 +15,6 @@ use TinyFramework\Helpers\Str;
 
 class BaseModel implements JsonSerializable, ArrayAccess
 {
-
     protected string $connection;
 
     protected string $table;
@@ -277,5 +278,4 @@ class BaseModel implements JsonSerializable, ArrayAccess
             ->table($model->getTable())
             ->class($class);
     }
-
 }

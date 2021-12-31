@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\ServiceProvider;
 
@@ -8,7 +10,6 @@ use TinyFramework\Event\EventDispatcherInterface;
 
 class EventServiceProvider extends ServiceProviderAwesome
 {
-
     public function register(): void
     {
         $this->container
@@ -18,5 +19,4 @@ class EventServiceProvider extends ServiceProviderAwesome
                 return new EventDispatcher();
             });
     }
-
 }

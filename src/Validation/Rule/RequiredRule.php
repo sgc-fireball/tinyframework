@@ -6,7 +6,6 @@ use TinyFramework\Http\UploadedFile;
 
 class RequiredRule extends RuleAwesome
 {
-
     public function getName(): string
     {
         return 'required';
@@ -29,5 +28,4 @@ class RequiredRule extends RuleAwesome
         }
         return null;
     }
-
 }

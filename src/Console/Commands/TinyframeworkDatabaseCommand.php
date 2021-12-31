@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Console\Commands;
 
@@ -10,7 +12,6 @@ use TinyFramework\Console\Output\OutputInterface;
 
 class TinyframeworkDatabaseCommand extends CommandAwesome
 {
-
     protected function configure(): InputDefinitionInterface
     {
         $connections = implode(
@@ -70,5 +71,4 @@ class TinyframeworkDatabaseCommand extends CommandAwesome
         ]);
         return 0;
     }
-
 }

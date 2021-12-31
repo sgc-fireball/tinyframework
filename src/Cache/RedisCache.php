@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Cache;
 
@@ -7,7 +9,6 @@ use RuntimeException;
 
 class RedisCache extends CacheAwesome
 {
-
     /** @var Redis */
     private Redis $redis;
 
@@ -102,5 +103,4 @@ class RedisCache extends CacheAwesome
         }
         return $this;
     }
-
 }

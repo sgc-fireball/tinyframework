@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\Template;
 
@@ -14,7 +16,6 @@ use TinyFramework\Validation\ValidatorInterface;
 
 class BladeTest extends TestCase
 {
-
     protected Blade $blade;
 
     public function setUp(): void
@@ -322,7 +323,7 @@ class BladeTest extends TestCase
     public function testDirective(): void
     {
         $time = (string)microtime(true);
-        $this->blade->addDirective('time', fn(string $expression) => $time);
+        $this->blade->addDirective('time', fn (string $expression) => $time);
         $this->assertEquals($time, $this->blade->compileString('@time'));
         $this->assertEquals($time, $this->blade->compileString('@time()'));
         $this->assertEquals($time, $this->blade->compileString('@time(123)'));
@@ -344,5 +345,4 @@ class BladeTest extends TestCase
             $this->blade->render('extends1', ['time' => $time])
         );
     }
-
 }

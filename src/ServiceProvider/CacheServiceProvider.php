@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\ServiceProvider;
 
@@ -8,7 +10,6 @@ use TinyFramework\Core\ContainerInterface;
 
 class CacheServiceProvider extends ServiceProviderAwesome
 {
-
     public function register(): void
     {
         $config = $this->container->get('config')->get('cache');
@@ -27,5 +28,4 @@ class CacheServiceProvider extends ServiceProviderAwesome
                 return new $class($config);
             });
     }
-
 }

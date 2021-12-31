@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Session;
 
@@ -9,7 +11,6 @@ use DateTimeInterface;
 
 abstract class SessionAwesome implements SessionInterface, ArrayAccess
 {
-
     protected ?string $id = null;
 
     protected array $data = [];
@@ -108,5 +109,4 @@ abstract class SessionAwesome implements SessionInterface, ArrayAccess
     {
         $this->set($name, null);
     }
-
 }

@@ -4,7 +4,6 @@ namespace TinyFramework\Core;
 
 class TestKernel extends Kernel
 {
-
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -21,5 +20,4 @@ class TestKernel extends Kernel
         // need to defined!
         throw $e;
     }
-
 }

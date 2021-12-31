@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Console;
 
@@ -12,7 +14,6 @@ use TinyFramework\System\SignalHandler;
 
 abstract class CommandAwesome
 {
-
     private ?InputDefinitionInterface $configure = null;
     protected ?InputInterface $input;
     protected ?OutputInterface $output;
@@ -62,5 +63,4 @@ abstract class CommandAwesome
     {
         return SignalHandler::isTerminated();
     }
-
 }

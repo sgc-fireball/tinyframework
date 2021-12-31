@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Queue;
 
@@ -7,7 +9,6 @@ use RuntimeException;
 
 class RedisQueue implements QueueInterface
 {
-
     private Redis $redis;
 
     private array $config = [];
@@ -110,5 +111,4 @@ class RedisQueue implements QueueInterface
     {
         return $this;
     }
-
 }

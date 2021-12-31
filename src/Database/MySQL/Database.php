@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Database\MySQL;
 
@@ -11,7 +13,6 @@ use TinyFramework\Helpers\DatabaseRaw;
 
 class Database implements DatabaseInterface
 {
-
     protected array $config = [
         'host' => '127.0.0.1',
         'port' => 3306,
@@ -135,7 +136,8 @@ class Database implements DatabaseInterface
         $result = $this->connect()->connection->query($query);
         if ($result === false) {
             throw new RuntimeException(
-                sprintf('Error %s: %s (%s)',
+                sprintf(
+                    'Error %s: %s (%s)',
                     $this->connect()->connection->errno,
                     $this->connect()->connection->error,
                     $query
@@ -164,5 +166,4 @@ class Database implements DatabaseInterface
         ]));
         return $this;
     }
-
 }

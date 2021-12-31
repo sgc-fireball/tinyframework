@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Http;
 
@@ -6,7 +8,6 @@ use Closure;
 
 class Route
 {
-
     private array $method = [];
 
     private string $scheme = 'https?';
@@ -92,7 +93,7 @@ class Route
             }
             $class = $middleware;
             if (mb_strpos($middleware, ',') !== false) {
-                list($class,) = explode(',', $middleware, 2);
+                list($class, ) = explode(',', $middleware, 2);
             }
             if (!class_exists($class)) {
                 throw new \RuntimeException('Invalid middleware found: ' . $class);
@@ -129,5 +130,4 @@ class Route
         $this->parameter[$key] = $value;
         return $this;
     }
-
 }

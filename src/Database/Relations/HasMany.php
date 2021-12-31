@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Database\Relations;
 
@@ -8,15 +10,13 @@ use TinyFramework\Database\QueryInterface;
 // me 1:m childs
 class HasMany extends Relation
 {
-
     public function __construct(
         private QueryInterface $query,
         private BaseModel $model,
         private string $foreignKey,
         private string $localKey,
         private string $relation
-    )
-    {
+    ) {
     }
 
     /**
@@ -30,5 +30,4 @@ class HasMany extends Relation
         $this->model->setRelation($this->relation, $models);
         return $models;
     }
-
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\Session;
 
@@ -6,10 +8,8 @@ use PHPUnit\Framework\TestCase;
 use TinyFramework\Session\FileSession;
 use TinyFramework\Session\SessionInterface;
 
-
 class FileSessionTest extends TestCase
 {
-
     private ?SessionInterface $handler;
 
     public function setUp(): void
@@ -45,5 +45,4 @@ class FileSessionTest extends TestCase
         $this->handler->open($guid);
         $this->assertFalse($this->handler->has('test'));
     }
-
 }

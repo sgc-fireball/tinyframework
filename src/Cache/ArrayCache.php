@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Cache;
 
 class ArrayCache extends CacheAwesome
 {
-
     private array $cache = [];
 
     public function clear(): static
@@ -42,7 +43,7 @@ class ArrayCache extends CacheAwesome
         return false;
     }
 
-    public function set(string $key, mixed $value = null,null|int|\DateTimeInterface|\DateInterval $ttl = null): static
+    public function set(string $key, mixed $value = null, null|int|\DateTimeInterface|\DateInterval $ttl = null): static
     {
         $this->cache[$key] = [
             'value' => serialize($value),
@@ -70,6 +71,4 @@ class ArrayCache extends CacheAwesome
         }
         return $this;
     }
-
-
 }

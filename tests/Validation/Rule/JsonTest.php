@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\Validation\Rule;
 
@@ -8,7 +10,6 @@ use TinyFramework\Validation\ValidationException;
 
 class JsonTest extends ValidationTestCase
 {
-
     public function jsonProvider(): array
     {
         return [
@@ -48,5 +49,4 @@ class JsonTest extends ValidationTestCase
             $this->assertFalse($valid, var_export($value, true));
         }
     }
-
 }

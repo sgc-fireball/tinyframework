@@ -6,7 +6,6 @@ use TinyFramework\Http\UploadedFile;
 
 class MinRule extends RuleAwesome
 {
-
     public function getName(): string
     {
         return 'min';
@@ -37,5 +36,4 @@ class MinRule extends RuleAwesome
 
         return null;
     }
-
 }

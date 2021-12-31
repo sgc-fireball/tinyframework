@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 $timezone = env('APP_TIMEZONE', 'UTC');
 date_default_timezone_set($timezone);

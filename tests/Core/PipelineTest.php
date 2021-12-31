@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\Core;
 
@@ -9,7 +11,6 @@ use TinyFramework\Core\Pipeline;
 
 class PipelineTest extends TestCase
 {
-
     public function testCall(): void
     {
         $test = 0;
@@ -23,7 +24,7 @@ class PipelineTest extends TestCase
     public function testOneLayer(): void
     {
         $test = 0;
-        $assertEquals = fn($expected, $actual) => $this->assertEquals($expected, $actual);
+        $assertEquals = fn ($expected, $actual) => $this->assertEquals($expected, $actual);
         $assertEquals(0, $test);
         $pipeline = new Pipeline();
         $pipeline->layers(function ($parameters, $next) use (&$test, $assertEquals) {
@@ -47,7 +48,7 @@ class PipelineTest extends TestCase
     public function testTwoLayer(): void
     {
         $test = 0;
-        $assertEquals = fn($expected, $actual) => $this->assertEquals($expected, $actual);
+        $assertEquals = fn ($expected, $actual) => $this->assertEquals($expected, $actual);
         $assertEquals(0, $test);
         $pipeline = new Pipeline();
         $pipeline->layers(function ($parameters, $next) use (&$test, $assertEquals) {
@@ -92,7 +93,7 @@ class PipelineTest extends TestCase
 
     public function testParameter(): void
     {
-        $check = fn($parameter) => $this->assertEquals(1234, $parameter);
+        $check = fn ($parameter) => $this->assertEquals(1234, $parameter);
         $pipeline = new Pipeline();
         $pipeline->layers(function ($parameters, $next) use ($check) {
             $check($parameters);
@@ -120,5 +121,4 @@ class PipelineTest extends TestCase
         }, 1);
         $this->assertEquals(10, $result);
     }
-
 }

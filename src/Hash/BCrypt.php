@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Hash;
 
 class BCrypt implements HashInterface
 {
-
     private string $algorithm = PASSWORD_BCRYPT;
 
     private int $cost;
@@ -23,5 +24,4 @@ class BCrypt implements HashInterface
     {
         return password_verify($plaintext, $hash);
     }
-
 }

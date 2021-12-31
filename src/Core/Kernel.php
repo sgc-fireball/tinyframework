@@ -1,32 +1,33 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Core;
 
 use ErrorException;
 use RuntimeException;
 use TinyFramework\ServiceProvider\BroadcastServiceProvider;
-use TinyFramework\ServiceProvider\ConsoleServiceProvider;
-use TinyFramework\ServiceProvider\CryptServiceProvider;
-use TinyFramework\ServiceProvider\HashServiceProvider;
-use TinyFramework\ServiceProvider\MailServiceProvider;
-use TinyFramework\ServiceProvider\LocalizationServiceProvider;
-use TinyFramework\ServiceProvider\ValidationServiceProvider;
-use TinyFramework\ServiceProvider\ViewServiceProvider;
-use TinyFramework\ServiceProvider\QueueServiceProvider;
-use TinyFramework\ServiceProvider\ServiceProviderInterface;
 use TinyFramework\ServiceProvider\CacheServiceProvider;
 use TinyFramework\ServiceProvider\ConfigServiceProvider;
+use TinyFramework\ServiceProvider\ConsoleServiceProvider;
+use TinyFramework\ServiceProvider\CryptServiceProvider;
 use TinyFramework\ServiceProvider\DatabaseServiceProvider;
 use TinyFramework\ServiceProvider\EventServiceProvider;
+use TinyFramework\ServiceProvider\HashServiceProvider;
+use TinyFramework\ServiceProvider\LocalizationServiceProvider;
 use TinyFramework\ServiceProvider\LoggerServiceProvider;
+use TinyFramework\ServiceProvider\MailServiceProvider;
+use TinyFramework\ServiceProvider\QueueServiceProvider;
 use TinyFramework\ServiceProvider\RouterServiceProvider;
+use TinyFramework\ServiceProvider\ServiceProviderInterface;
 use TinyFramework\ServiceProvider\SessionServiceProvider;
+use TinyFramework\ServiceProvider\ValidationServiceProvider;
+use TinyFramework\ServiceProvider\ViewServiceProvider;
 use TinyFramework\ServiceProvider\XhprofServiceProvider;
 use TinyFramework\StopWatch\StopWatch;
 
 abstract class Kernel implements KernelInterface
 {
-
     protected ContainerInterface $container;
 
     /** @var string[] */
@@ -206,5 +207,4 @@ abstract class Kernel implements KernelInterface
         }
         $this->handleException(new RuntimeException($error['message'], 0));
     }
-
 }

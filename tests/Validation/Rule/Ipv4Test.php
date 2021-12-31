@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\Validation\Rule;
 
@@ -8,7 +10,6 @@ use TinyFramework\Validation\ValidationException;
 
 class Ipv4Test extends ValidationTestCase
 {
-
     public function ipv4Provider(): array
     {
         return [
@@ -49,5 +50,4 @@ class Ipv4Test extends ValidationTestCase
             $this->assertFalse($valid);
         }
     }
-
 }

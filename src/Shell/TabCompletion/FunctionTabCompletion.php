@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Shell\TabCompletion;
 
@@ -6,7 +8,6 @@ use TinyFramework\Shell\Context;
 
 class FunctionTabCompletion implements TabCompletionInterface
 {
-
     public function setContext(?Context $context = null): static
     {
         return $this;
@@ -37,5 +38,4 @@ class FunctionTabCompletion implements TabCompletionInterface
         }
         return $functions;
     }
-
 }

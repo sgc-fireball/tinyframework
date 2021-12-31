@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\Validation\Rule;
 
@@ -8,7 +10,6 @@ use TinyFramework\Validation\ValidationException;
 
 class FloatTest extends ValidationTestCase
 {
-
     public function floatProvider(): array
     {
         return [
@@ -42,5 +43,4 @@ class FloatTest extends ValidationTestCase
             $this->assertFalse($valid);
         }
     }
-
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Core;
 
@@ -6,7 +8,6 @@ use RuntimeException;
 
 class Config implements ConfigInterface
 {
-
     private array $config = [];
 
     public function __construct(array $config)
@@ -46,7 +47,7 @@ class Config implements ConfigInterface
         foreach ($input as $key => $value) {
             if ($numeric) {
                 $output[] = $value;
-            } else if (\array_key_exists($key, $output) && \is_array($output[$key]) && \is_array($input[$key])) {
+            } elseif (\array_key_exists($key, $output) && \is_array($output[$key]) && \is_array($input[$key])) {
                 $output[$key] = $this->merge($output[$key], $value);
             } else {
                 $output[$key] = $value;
@@ -88,5 +89,4 @@ class Config implements ConfigInterface
         $config[$lkey] = $value;
         return $this;
     }
-
 }

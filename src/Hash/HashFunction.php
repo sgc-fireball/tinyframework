@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Hash;
 
 class HashFunction implements HashInterface
 {
-
     private string $algorithm;
 
     public function __construct(string $algorithm)
@@ -21,5 +22,4 @@ class HashFunction implements HashInterface
     {
         return hash_equals($hash, $this->hash($plaintext));
     }
-
 }

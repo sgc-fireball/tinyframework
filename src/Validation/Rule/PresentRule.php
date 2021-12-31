@@ -4,7 +4,6 @@ namespace TinyFramework\Validation\Rule;
 
 class PresentRule extends RuleAwesome
 {
-
     public function getName(): string
     {
         return 'present';
@@ -17,5 +16,4 @@ class PresentRule extends RuleAwesome
         }
         return null;
     }
-
 }

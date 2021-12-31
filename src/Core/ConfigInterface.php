@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Core;
 
 interface ConfigInterface
 {
-
     public function __construct(array $config);
 
     public function load(string $name, string $file): ConfigInterface;
@@ -12,5 +13,4 @@ interface ConfigInterface
     public function get(string $key = null): mixed;
 
     public function set(string $key, mixed $value): ConfigInterface;
-
 }

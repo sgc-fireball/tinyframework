@@ -4,7 +4,6 @@ namespace TinyFramework\Validation\Rule;
 
 class NotInRule extends RuleAwesome
 {
-
     public function getName(): string
     {
         return 'not_in';
@@ -18,5 +17,4 @@ class NotInRule extends RuleAwesome
         }
         return null;
     }
-
 }

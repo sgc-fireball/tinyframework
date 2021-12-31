@@ -4,7 +4,6 @@ namespace TinyFramework\Validation\Rule;
 
 class ArrayRule extends RuleAwesome
 {
-
     public function getName(): string
     {
         return 'array';
@@ -18,5 +17,4 @@ class ArrayRule extends RuleAwesome
         }
         return [$this->translator->trans('validation.array', ['attribute' => $this->getTransName($name)])];
     }
-
 }

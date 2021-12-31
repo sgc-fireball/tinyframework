@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\Validation\Rule;
 
@@ -8,7 +10,6 @@ use TinyFramework\Validation\ValidationException;
 
 class PresentTest extends ValidationTestCase
 {
-
     public function testPresentMissing(): void
     {
         try {
@@ -36,5 +37,4 @@ class PresentTest extends ValidationTestCase
             $this->assertFalse(true);
         }
     }
-
 }

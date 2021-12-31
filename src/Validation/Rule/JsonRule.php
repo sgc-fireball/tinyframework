@@ -4,7 +4,6 @@ namespace TinyFramework\Validation\Rule;
 
 class JsonRule extends RuleAwesome
 {
-
     public function getName(): string
     {
         return 'json';
@@ -20,5 +19,4 @@ class JsonRule extends RuleAwesome
         }
         return null;
     }
-
 }

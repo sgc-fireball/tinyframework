@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Http;
 
@@ -9,7 +11,6 @@ use TinyFramework\Http\Middleware\MaintenanceMiddleware;
 
 class Router
 {
-
     protected ContainerInterface $container;
 
     private array $routes = [];
@@ -32,7 +33,7 @@ class Router
     public function routes(): array
     {
         // destroy pointers
-        return array_map(fn(Route $route) => clone $route, $this->routes);
+        return array_map(fn (Route $route) => clone $route, $this->routes);
     }
 
     public function load(): static
@@ -305,7 +306,7 @@ class Router
         if (\in_array('GET', $result)) {
             $result[] = 'HEAD';
         }
-        $results = array_unique(array_filter($result, fn($method) => $method !== 'ANY'));
+        $results = array_unique(array_filter($result, fn ($method) => $method !== 'ANY'));
         sort($results);
         return $results;
     }
@@ -414,5 +415,4 @@ class Router
         }
         return rtrim($url, '?&');
     }
-
 }

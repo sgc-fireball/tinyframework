@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Database;
 
@@ -7,7 +9,6 @@ use TinyFramework\Helpers\DatabaseRaw;
 
 interface QueryInterface
 {
-
     // @TODO with
 
     public function raw(string $str): DatabaseRaw;
@@ -65,5 +66,4 @@ interface QueryInterface
     public function commit(): void;
 
     public function rollback(): void;
-
 }

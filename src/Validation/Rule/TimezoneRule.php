@@ -6,7 +6,6 @@ use DateTimeZone;
 
 class TimezoneRule extends RuleAwesome
 {
-
     public function getName(): string
     {
         return 'timezone';
@@ -30,5 +29,4 @@ class TimezoneRule extends RuleAwesome
         }
         return [$this->translator->trans('validation.timezone', ['attribute' => $this->getTransName($name)])];
     }
-
 }

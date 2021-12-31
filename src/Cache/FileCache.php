@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Cache;
 
@@ -6,7 +8,6 @@ use RuntimeException;
 
 class FileCache extends CacheAwesome
 {
-
     private string $path;
 
     public function __construct(array $config = [])
@@ -103,5 +104,4 @@ class FileCache extends CacheAwesome
         }
         return $this;
     }
-
 }

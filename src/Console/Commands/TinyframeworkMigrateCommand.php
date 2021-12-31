@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Console\Commands;
 
@@ -12,7 +14,6 @@ use TinyFramework\Database\MigrationInstaller;
 
 class TinyframeworkMigrateCommand extends CommandAwesome
 {
-
     protected function configure(): InputDefinitionInterface
     {
         return parent::configure()
@@ -33,5 +34,4 @@ class TinyframeworkMigrateCommand extends CommandAwesome
         }
         return 0;
     }
-
 }

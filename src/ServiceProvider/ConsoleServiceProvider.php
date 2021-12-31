@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\ServiceProvider;
 
@@ -16,7 +18,6 @@ use TinyFramework\System\SignalHandler;
 
 class ConsoleServiceProvider extends ServiceProviderAwesome
 {
-
     public function register(): void
     {
         $this->container->tag('shell:tab:completion', [
@@ -38,5 +39,4 @@ class ConsoleServiceProvider extends ServiceProviderAwesome
             );
         });
     }
-
 }

@@ -6,7 +6,6 @@ use TinyFramework\Http\UploadedFile;
 
 class MaxRule extends RuleAwesome
 {
-
     public function getName(): string
     {
         return 'max';
@@ -32,9 +31,8 @@ class MaxRule extends RuleAwesome
         }
 
         if ($max < $count) {
-            return [$this->translator->trans('validation.max'.$type, ['attribute' => $this->getTransName($name), 'max' => $max])];
+            return [$this->translator->trans('validation.max' . $type, ['attribute' => $this->getTransName($name), 'max' => $max])];
         }
         return null;
     }
-
 }

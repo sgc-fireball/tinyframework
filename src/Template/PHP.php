@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Template;
 
@@ -6,7 +8,6 @@ use InvalidArgumentException;
 
 class PHP implements ViewInterface
 {
-
     private array $config;
 
     public function __construct(array $config)
@@ -77,5 +78,4 @@ class PHP implements ViewInterface
     {
         return $this;
     }
-
 }

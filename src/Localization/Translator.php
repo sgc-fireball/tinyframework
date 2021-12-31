@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Localization;
 
 class Translator implements TranslatorInterface
 {
-
     private string $locale = 'en';
 
     private TranslationLoader $translationLoader;
@@ -61,5 +62,4 @@ class Translator implements TranslatorInterface
         }
         return $key;
     }
-
 }

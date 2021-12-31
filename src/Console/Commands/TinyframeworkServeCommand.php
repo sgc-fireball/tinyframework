@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Console\Commands;
 
@@ -12,7 +14,6 @@ use TinyFramework\Shell\TabCompletion\TinyFrameworkMatcher;
 
 class TinyframeworkServeCommand extends CommandAwesome
 {
-
     protected function configure(): InputDefinitionInterface
     {
         return parent::configure()
@@ -31,5 +32,4 @@ class TinyframeworkServeCommand extends CommandAwesome
         passthru(sprintf('%s -S %s:%d -f %s', $cmd, $host, $port, $root));
         return 0;
     }
-
 }

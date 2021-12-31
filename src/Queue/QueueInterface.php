@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Queue;
 
 interface QueueInterface
 {
-
     public function name(string $name = null): QueueInterface|string;
 
     public function count(): int;
@@ -16,5 +17,4 @@ interface QueueInterface
     public function ack(JobInterface $job): QueueInterface;
 
     public function nack(JobInterface $job): QueueInterface;
-
 }

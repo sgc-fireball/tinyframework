@@ -1,12 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Console\Input;
 
 class Argument
 {
-
-    const VALUE_REQUIRED = 1;
-    const VALUE_OPTIONAL = 2;
+    public const VALUE_REQUIRED = 1;
+    public const VALUE_OPTIONAL = 2;
 
     private int $mode = 2;
 
@@ -21,8 +22,7 @@ class Argument
         int $mode = null,
         string $description = '',
         mixed $default = null
-    ): Argument
-    {
+    ): Argument {
         return new Argument($name, $mode, $description, $default);
     }
 
@@ -31,8 +31,7 @@ class Argument
         int $mode = null,
         string $description = '',
         mixed $default = null
-    )
-    {
+    ) {
         $this->name = $name;
         $this->mode = $mode === null ? self::VALUE_OPTIONAL : $mode;
         $this->description = $description;
@@ -67,5 +66,4 @@ class Argument
     {
         return $this->description;
     }
-
 }

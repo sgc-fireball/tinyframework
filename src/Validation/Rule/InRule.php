@@ -4,7 +4,6 @@ namespace TinyFramework\Validation\Rule;
 
 class InRule extends RuleAwesome
 {
-
     public function getName(): string
     {
         return 'in';
@@ -21,5 +20,4 @@ class InRule extends RuleAwesome
         }
         return null;
     }
-
 }

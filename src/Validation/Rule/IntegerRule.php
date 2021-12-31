@@ -4,7 +4,6 @@ namespace TinyFramework\Validation\Rule;
 
 class IntegerRule extends RuleAwesome
 {
-
     public function getName(): string
     {
         return 'integer';
@@ -18,5 +17,4 @@ class IntegerRule extends RuleAwesome
         }
         return [$this->translator->trans('validation.integer', ['attribute' => $this->getTransName($name)])];
     }
-
 }

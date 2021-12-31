@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\ServiceProvider;
 
@@ -7,7 +9,6 @@ use TinyFramework\Mail\MailerInterface;
 
 class MailServiceProvider extends ServiceProviderAwesome
 {
-
     public function register(): void
     {
         $globalConfig = $this->container->get('config')->get('mail');
@@ -24,5 +25,4 @@ class MailServiceProvider extends ServiceProviderAwesome
                 return new $class($config);
             });
     }
-
 }

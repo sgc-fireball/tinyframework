@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\Core;
 
@@ -8,7 +10,6 @@ use TinyFramework\Core\DotEnv;
 
 class DotEnvTest extends TestCase
 {
-
     private ?DotEnv $dotEnv;
 
     public function setUp(): void
@@ -36,5 +37,4 @@ class DotEnvTest extends TestCase
         $this->assertEquals('testaaatest', $this->dotEnv->get('TEST_PLACEHOLDER1'));
         $this->assertEquals('testtest', $this->dotEnv->get('TEST_PLACEHOLDER4'));
     }
-
 }

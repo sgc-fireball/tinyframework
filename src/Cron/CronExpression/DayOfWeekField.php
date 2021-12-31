@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Cron\CronExpression;
 
@@ -6,7 +8,6 @@ use DateTime;
 
 class DayOfWeekField extends AbstractField
 {
-
     protected int $minValue = 0;
 
     protected int $maxValue = 7;
@@ -41,5 +42,4 @@ class DayOfWeekField extends AbstractField
         $list = array_unique($list);
         return $list;
     }
-
 }

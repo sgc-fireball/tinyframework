@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Color;
 
 class Color
 {
-
     private XTermConverterInterface $xtermConverter;
 
     private NameConverterInterface $nameConverter;
@@ -560,5 +561,4 @@ class Color
 
         return [$r, $g, $b];
     }
-
 }

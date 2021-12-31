@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Localization;
 
@@ -6,7 +8,6 @@ use TinyFramework\Helpers\Arr;
 
 class TranslationLoader
 {
-
     private array $paths;
 
     private array $translations = [];
@@ -67,7 +68,6 @@ class TranslationLoader
                     $this->translations[$locale][$key] = $value;
                 });
         } catch (\Throwable $e) {
-
         }
         return $this;
     }
@@ -76,5 +76,4 @@ class TranslationLoader
     {
         return $this->load($locale)->translations[$locale][$key] ?? $key;
     }
-
 }

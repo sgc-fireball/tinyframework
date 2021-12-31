@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Console\Input;
 
 interface InputInterface
 {
-
     public function __construct(array $argv = null, InputDefinitionInterface $inputDefinition = null);
 
     public function argv(array $argv = null): array|InputInterface;
@@ -18,5 +19,4 @@ interface InputInterface
     public function argument(string $name): ?Argument;
 
     public function interaction(bool $interaction = null): bool|InputInterface;
-
 }

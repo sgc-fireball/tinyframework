@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\Validation\Rule;
 
@@ -9,7 +11,6 @@ use TinyFramework\Validation\ValidationException;
 
 class SometimesTest extends ValidationTestCase
 {
-
     public function testSometimesMissing(): void
     {
         try {
@@ -38,5 +39,4 @@ class SometimesTest extends ValidationTestCase
             $this->assertFalse(true, 'Invalid');
         }
     }
-
 }

@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Session;
 
 interface SessionInterface
 {
-
     public function getId(): string;
 
     public function open(?string $id): SessionInterface;
@@ -22,5 +23,4 @@ interface SessionInterface
     public function forget(string $key): SessionInterface;
 
     public function clear(): SessionInterface;
-
 }

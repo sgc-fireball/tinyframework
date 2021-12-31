@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Cache;
 
@@ -6,7 +8,6 @@ use Closure;
 
 interface CacheInterface
 {
-
     public function clear(): CacheInterface;
 
     public function forget(string $key): CacheInterface;
@@ -20,5 +21,4 @@ interface CacheInterface
     public function tag(array|string $tags): CacheInterface;
 
     public function remember(string $key, Closure $closure, null|int|\DateTimeInterface|\DateInterval $ttl = null): mixed;
-
 }

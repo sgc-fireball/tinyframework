@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\Validation\Rule;
 
@@ -8,7 +10,6 @@ use TinyFramework\Validation\ValidationException;
 
 class UrlTest extends ValidationTestCase
 {
-
     public function urlProvider(): array
     {
         return [
@@ -51,5 +52,4 @@ class UrlTest extends ValidationTestCase
             $this->assertFalse($valid, var_export($value, true));
         }
     }
-
 }

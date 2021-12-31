@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Validation;
 
 class ValidationException extends \RuntimeException
 {
-
     private array $errorBag = [];
 
     public function setErrorBag(array $errorBag): static
@@ -17,5 +18,4 @@ class ValidationException extends \RuntimeException
     {
         return $this->errorBag;
     }
-
 }

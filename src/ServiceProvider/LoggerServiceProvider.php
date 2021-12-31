@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\ServiceProvider;
 
@@ -7,7 +9,6 @@ use TinyFramework\Logger\LoggerInterface;
 
 class LoggerServiceProvider extends ServiceProviderAwesome
 {
-
     public function register(): void
     {
         $config = $this->container->get('config')->get('logger');
@@ -23,5 +24,4 @@ class LoggerServiceProvider extends ServiceProviderAwesome
                 return new $class($config);
             });
     }
-
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Console;
 
@@ -15,7 +17,6 @@ use TinyFramework\System\SignalHandler;
 
 class ConsoleKernel extends Kernel implements ConsoleKernelInterface
 {
-
     /** @var CommandAwesome[] */
     private array $commands;
 
@@ -251,5 +252,4 @@ EOF;
         }
         return 1;
     }
-
 }

@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Core;
 
 interface KernelInterface
 {
-
     public function __construct(ContainerInterface $container);
 
     public function runningInConsole(): bool;
@@ -14,5 +15,4 @@ interface KernelInterface
     public function handleException(\Throwable $e): int;
 
     public function handleShutdown(): void;
-
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Cache;
 
@@ -7,7 +9,6 @@ use Closure;
 
 abstract class CacheAwesome implements CacheInterface, ArrayAccess
 {
-
     protected array $config;
 
     protected array $tags = [];
@@ -90,5 +91,4 @@ abstract class CacheAwesome implements CacheInterface, ArrayAccess
         $this->set($key, $data, $ttl);
         return $data;
     }
-
 }

@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\StopWatch;
 
 class StopWatchEvent
 {
-
     private float $origin;
 
     private string $category;
@@ -97,5 +98,4 @@ class StopWatchEvent
         $this->periods[] = new StopWatchPeriod($start - $this->origin, $end - $this->origin);
         return $this;
     }
-
 }

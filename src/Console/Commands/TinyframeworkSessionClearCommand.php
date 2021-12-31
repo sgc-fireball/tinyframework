@@ -1,7 +1,8 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Console\Commands;
-
 
 use TinyFramework\Console\CommandAwesome;
 use TinyFramework\Console\Input\InputDefinitionInterface;
@@ -11,7 +12,6 @@ use TinyFramework\Session\SessionInterface;
 
 class TinyframeworkSessionClearCommand extends CommandAwesome
 {
-
     protected function configure(): InputDefinitionInterface
     {
         return parent::configure()
@@ -28,5 +28,4 @@ class TinyframeworkSessionClearCommand extends CommandAwesome
         $this->output->write("\r[<green>DONE</green>]\n");
         return 0;
     }
-
 }

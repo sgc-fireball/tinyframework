@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Shell;
 
@@ -7,7 +9,6 @@ use TinyFramework\Console\Output\OutputInterface;
 
 class Shell
 {
-
     private OutputInterface $output;
 
     private Context $context;
@@ -130,5 +131,4 @@ class Shell
     {
         throw new RuntimeException($errstr, $errno);
     }
-
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Validation;
 
@@ -8,7 +10,6 @@ use TinyFramework\Validation\Rule\RuleInterface;
 
 class Validator implements ValidatorInterface
 {
-
     /** @var RuleInterface[] */
     private array $rules = [];
 
@@ -76,5 +77,4 @@ class Validator implements ValidatorInterface
         }
         return \count($errorBag) ? $errorBag : null;
     }
-
 }

@@ -4,7 +4,6 @@ namespace TinyFramework\Validation\Rule;
 
 class InLineFileRule extends RuleAwesome
 {
-
     public function getName(): string
     {
         return 'inlinefile';
@@ -35,5 +34,4 @@ class InLineFileRule extends RuleAwesome
 
         return [$this->translator->trans('validation.inlinefile', ['attribute' => $this->getTransName($name)])];
     }
-
 }

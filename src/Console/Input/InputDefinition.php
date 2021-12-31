@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Console\Input;
 
 class InputDefinition implements InputDefinitionInterface
 {
-
     private ?string $name = null;
 
     private ?string $description = null;
@@ -19,8 +20,8 @@ class InputDefinition implements InputDefinitionInterface
         string $name,
         string $description = null,
         array $options = [],
-        array $arguments = []): InputDefinitionInterface
-    {
+        array $arguments = []
+    ): InputDefinitionInterface {
         $n = (new self())->name($name);
         $n->description($description);
         array_map(function ($option) use ($n) {
@@ -97,5 +98,4 @@ class InputDefinition implements InputDefinitionInterface
         $this->arguments[$argument->name()] = $argument;
         return $this;
     }
-
 }

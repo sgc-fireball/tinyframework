@@ -6,7 +6,6 @@ use TinyFramework\Http\UploadedFile;
 
 class BetweenRule extends RuleAwesome
 {
-
     public function getName(): string
     {
         return 'between';
@@ -41,5 +40,4 @@ class BetweenRule extends RuleAwesome
         }
         return null;
     }
-
 }

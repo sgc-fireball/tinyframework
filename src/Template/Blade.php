@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Template;
 
@@ -10,7 +12,6 @@ use TinyFramework\StopWatch\StopWatch;
 
 class Blade implements ViewInterface
 {
-
     private array $config;
 
     private array $placeholder = [];
@@ -147,7 +148,7 @@ class Blade implements ViewInterface
 
         $content = (string)preg_replace_callback(
             '/\B@(@?\w+(?:::\w+)?)([ \t]*)(\( ( (?>[^()]+) | (?3) )* \))?/x',
-            fn($match) => $this->compileStatement($match),
+            fn ($match) => $this->compileStatement($match),
             $content
         );
 
@@ -534,5 +535,4 @@ class Blade implements ViewInterface
         }
         return $this;
     }
-
 }

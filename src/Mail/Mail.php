@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Mail;
 
@@ -6,12 +8,11 @@ use RuntimeException;
 
 class Mail
 {
-
-    const PRIORITY_HIGHEST = 1;
-    const PRIORITY_HIGH = 2;
-    const PRIORITY_NORMAL = 3;
-    const PRIORITY_LOW = 4;
-    const PRIORITY_LOWEST = 5;
+    public const PRIORITY_HIGHEST = 1;
+    public const PRIORITY_HIGH = 2;
+    public const PRIORITY_NORMAL = 3;
+    public const PRIORITY_LOW = 4;
+    public const PRIORITY_LOWEST = 5;
 
     private array $header = [];
 
@@ -201,5 +202,4 @@ class Mail
         ];
         return $this;
     }
-
 }

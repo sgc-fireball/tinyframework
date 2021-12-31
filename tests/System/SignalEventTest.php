@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\System;
 
@@ -7,7 +9,6 @@ use TinyFramework\System\SignalEvent;
 
 class SignalEventTest extends TestCase
 {
-
     public function testEvent(): void
     {
         $event = new SignalEvent(
@@ -19,5 +20,4 @@ class SignalEventTest extends TestCase
         $this->assertEquals($name, $name);
         $this->assertEquals($info, $event->info());
     }
-
 }

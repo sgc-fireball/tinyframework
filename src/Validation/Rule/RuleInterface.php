@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Validation\Rule;
 
 interface RuleInterface
 {
-
     public function getName(): string;
 
     /**
@@ -18,5 +19,4 @@ interface RuleInterface
      * bool(false)|null = next check
      */
     public function validate(array $attributes, string $name, ...$parameters): array|bool|null;
-
 }

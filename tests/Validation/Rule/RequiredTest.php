@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\Validation\Rule;
 
@@ -9,7 +11,6 @@ use TinyFramework\Validation\ValidationException;
 
 class RequiredTest extends ValidationTestCase
 {
-
     public function requiredProvider(): array
     {
         return [
@@ -61,5 +62,4 @@ class RequiredTest extends ValidationTestCase
             $this->assertFalse($valid, var_export($value, true));
         }
     }
-
 }

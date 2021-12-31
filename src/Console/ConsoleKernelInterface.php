@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Console;
 
@@ -8,7 +10,5 @@ use TinyFramework\Core\KernelInterface;
 
 interface ConsoleKernelInterface extends KernelInterface
 {
-
     public function handle(InputInterface $input, OutputInterface $output): int;
-
 }

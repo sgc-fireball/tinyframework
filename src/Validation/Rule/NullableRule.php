@@ -4,7 +4,6 @@ namespace TinyFramework\Validation\Rule;
 
 class NullableRule extends RuleAwesome
 {
-
     public function getName(): string
     {
         return 'nullable';
@@ -18,5 +17,4 @@ class NullableRule extends RuleAwesome
         }
         return null;
     }
-
 }

@@ -6,7 +6,6 @@ use TinyFramework\Localization\TranslatorInterface;
 
 abstract class RuleAwesome implements RuleInterface
 {
-
     public function __construct(protected TranslatorInterface $translator)
     {
     }
@@ -20,5 +19,4 @@ abstract class RuleAwesome implements RuleInterface
         }
         return $trans;
     }
-
 }

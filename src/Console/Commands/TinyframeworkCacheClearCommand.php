@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Console\Commands;
 
@@ -10,7 +12,6 @@ use TinyFramework\Console\Output\OutputInterface;
 
 class TinyframeworkCacheClearCommand extends CommandAwesome
 {
-
     protected function configure(): InputDefinitionInterface
     {
         return parent::configure()
@@ -27,5 +28,4 @@ class TinyframeworkCacheClearCommand extends CommandAwesome
         $this->output->write("\r[<green>DONE</green>]\n");
         return 0;
     }
-
 }

@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Event;
 
 class EventDispatcher implements EventDispatcherInterface
 {
-
     private array $listeners = [];
 
     public function addListener(string $eventName, callable $listener, int $priority = 0): static
@@ -71,5 +72,4 @@ class EventDispatcher implements EventDispatcherInterface
             throw new \InvalidArgumentException('Invalid argument $' . $field . ' must be an existing class name and must be implement the EventInterface.');
         }
     }
-
 }

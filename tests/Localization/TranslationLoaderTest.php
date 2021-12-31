@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\Localization;
 
@@ -9,7 +11,6 @@ use TinyFramework\Localization\TranslationLoader;
 
 class TranslationLoaderTest extends TestCase
 {
-
     public function testLoader()
     {
         $locale = 'en';
@@ -20,5 +21,4 @@ class TranslationLoaderTest extends TestCase
         $this->assertEquals('test5', $translation->get($locale, 'test.test4.test5'));
         $this->assertEquals('test.unknown', $translation->get($locale, 'test.unknown'));
     }
-
 }

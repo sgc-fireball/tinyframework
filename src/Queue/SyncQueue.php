@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Queue;
 
 class SyncQueue implements QueueInterface
 {
-
     public function push(JobInterface $job): static
     {
         try {
@@ -42,5 +43,4 @@ class SyncQueue implements QueueInterface
     {
         return $this;
     }
-
 }

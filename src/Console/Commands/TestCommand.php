@@ -1,17 +1,18 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Console\Commands;
 
 use TinyFramework\Console\CommandAwesome;
-use TinyFramework\Console\Output\Components\ProgressBar;
 use TinyFramework\Console\Input\InputDefinitionInterface;
 use TinyFramework\Console\Input\InputInterface;
+use TinyFramework\Console\Output\Components\ProgressBar;
 use TinyFramework\Console\Output\Components\Table;
 use TinyFramework\Console\Output\OutputInterface;
 
 class TestCommand extends CommandAwesome
 {
-
     protected function configure(): InputDefinitionInterface
     {
         return parent::configure()
@@ -90,5 +91,4 @@ class TestCommand extends CommandAwesome
             $progressBar->stop();
         }
     }
-
 }

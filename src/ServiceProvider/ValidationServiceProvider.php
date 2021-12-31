@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\ServiceProvider;
 
@@ -41,7 +43,6 @@ use TinyFramework\Validation\ValidatorInterface;
 
 class ValidationServiceProvider extends ServiceProviderAwesome
 {
-
     public function register(): void
     {
         $this->container->tag(['validators'], [
@@ -86,5 +87,4 @@ class ValidationServiceProvider extends ServiceProviderAwesome
                 return $validator;
             });
     }
-
 }

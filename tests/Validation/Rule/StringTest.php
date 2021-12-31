@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\Validation\Rule;
 
@@ -8,7 +10,6 @@ use TinyFramework\Validation\ValidationException;
 
 class StringTest extends ValidationTestCase
 {
-
     public function stringProvider(): array
     {
         return [
@@ -28,13 +29,13 @@ class StringTest extends ValidationTestCase
             ['1', true],
             ['1.5', true],
             ['1,5', true],
-            [new class implements \Stringable {
+            [new class() implements \Stringable {
                 public function __toString()
                 {
                     return 'ok';
                 }
             }, true],
-            [new class {
+            [new class() {
                 public function __toString()
                 {
                     return 'ok';
@@ -62,5 +63,4 @@ class StringTest extends ValidationTestCase
             $this->assertFalse($valid);
         }
     }
-
 }

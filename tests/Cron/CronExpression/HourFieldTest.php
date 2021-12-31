@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\Cron\CronExpression;
 
@@ -7,7 +9,6 @@ use TinyFramework\Cron\CronExpression\HourField;
 
 class HourFieldTest extends TestCase
 {
-
     public function testWildcard()
     {
         $field = new HourField('*');
@@ -37,5 +38,4 @@ class HourFieldTest extends TestCase
         $field = new HourField('1,6-12/2');
         $this->assertEquals([1, 6, 8, 10, 12], $field->parse());
     }
-
 }

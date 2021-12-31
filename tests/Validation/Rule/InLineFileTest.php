@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\Validation\Rule;
 
@@ -9,7 +11,6 @@ use TinyFramework\Validation\ValidationException;
 
 class InLineFileTest extends ValidationTestCase
 {
-
     public function inLineFileProvider(): array
     {
         return [
@@ -42,5 +43,4 @@ class InLineFileTest extends ValidationTestCase
             $this->assertFalse($valid);
         }
     }
-
 }

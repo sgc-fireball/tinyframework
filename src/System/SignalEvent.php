@@ -1,13 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\System;
 
-use TinyFramework\Event\EventInterface;
 use TinyFramework\Event\EventAwesome;
+use TinyFramework\Event\EventInterface;
 
 class SignalEvent extends EventAwesome implements EventInterface
 {
-
     private int $signal;
     private string $name;
     private array $info;
@@ -33,5 +34,4 @@ class SignalEvent extends EventAwesome implements EventInterface
     {
         return $this->info;
     }
-
 }

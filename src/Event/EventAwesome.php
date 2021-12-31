@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Event;
 
 abstract class EventAwesome implements EventInterface
 {
-
     protected bool $propagationStopped = false;
 
     final public function stopPropagation(): static
@@ -17,5 +18,4 @@ abstract class EventAwesome implements EventInterface
     {
         return $this->propagationStopped;
     }
-
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\System;
 
@@ -9,7 +11,6 @@ use TinyFramework\System\SignalHandler;
 
 class SignalHandleTest extends TestCase
 {
-
     public function testSigHup(): void
     {
         if (!function_exists('posix_kill') || !function_exists('posix_getpid')) {
@@ -42,5 +43,4 @@ class SignalHandleTest extends TestCase
         posix_kill(posix_getpid(), SignalHandler::SIGTERM);
         $this->assertTrue(SignalHandler::isTerminated());
     }
-
 }

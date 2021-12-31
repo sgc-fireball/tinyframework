@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Color;
 
 class NameConverter implements NameConverterInterface
 {
-
     private array $map = [
         'INDIANRED' => 'CD5C5C',
         'LIGHTCORAL' => 'F08080',
@@ -177,5 +178,4 @@ class NameConverter implements NameConverterInterface
         }
         return $result;
     }
-
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Http\Middleware;
 
@@ -9,7 +11,6 @@ use TinyFramework\Http\Response;
 
 class MaintenanceMiddleware implements MiddlewareInterface
 {
-
     public function handle(Request $request, Closure $next, mixed ...$parameters): Response
     {
         if ($config = inMaintenanceMode()) {
@@ -23,5 +24,4 @@ class MaintenanceMiddleware implements MiddlewareInterface
         }
         return $next($request);
     }
-
 }

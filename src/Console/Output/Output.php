@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Console\Output;
 
@@ -6,7 +8,6 @@ use TinyFramework\Color\Color;
 
 class Output implements OutputInterface
 {
-
     private Color $color;
 
     private bool $ansi;
@@ -161,11 +162,10 @@ class Output implements OutputInterface
                     if ($xterm) {
                         if ($command === 'bg') {
                             $replace = $end ? "\e[49m" : sprintf("\e[48;5;%dm", $xterm);
-                        } else if ($command === 'fg' || $command === $value) {
+                        } elseif ($command === 'fg' || $command === $value) {
                             $replace = $end ? "\e[39m" : sprintf("\e[38;5;%dm", $xterm);
                         }
                     }
-
                 }
             }
             $text = str_replace($match, $replace, $text);
@@ -208,5 +208,4 @@ class Output implements OutputInterface
     {
         $this->box($text, '<bg:green><black>', '</black></bg:green>');
     }
-
 }

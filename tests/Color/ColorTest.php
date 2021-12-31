@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\Color;
 
@@ -6,7 +8,6 @@ use TinyFramework\Color\Color;
 
 class ColorTest extends \PHPUnit\Framework\TestCase
 {
-
     private ?Color $colorConverter;
 
     protected function setUp(): void
@@ -514,7 +515,7 @@ class ColorTest extends \PHPUnit\Framework\TestCase
      */
     public function test_rgb2xyb(int $r, int $g, int $b, float $resultX, float $resultY, int $resultBri): void
     {
-        list ($x, $y, $bri) = $this->colorConverter->rgb2xyb($r, $g, $b);
+        list($x, $y, $bri) = $this->colorConverter->rgb2xyb($r, $g, $b);
         $this->assertEquals($resultX, $x);
         $this->assertEquals($resultY, $y);
         $this->assertEquals($resultBri, $bri);
@@ -529,10 +530,9 @@ class ColorTest extends \PHPUnit\Framework\TestCase
         if ($resultR === $resultG && $resultG == $resultB) {
             $this->markTestSkipped('Could only test colors. Could not test brightness levels');
         }
-        list ($r, $g, $b) = $this->colorConverter->xyb2rgb($x, $y, $resultBri);
+        list($r, $g, $b) = $this->colorConverter->xyb2rgb($x, $y, $resultBri);
         $this->assertEquals($resultR, $r);
         $this->assertEquals($resultG, $g);
         $this->assertEquals($resultB, $b);
     }
-
 }

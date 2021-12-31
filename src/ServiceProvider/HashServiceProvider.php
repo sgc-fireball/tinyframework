@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\ServiceProvider;
 
@@ -7,7 +9,6 @@ use TinyFramework\Hash\HashInterface;
 
 class HashServiceProvider extends ServiceProviderAwesome
 {
-
     public function register(): void
     {
         $configs = $this->container->get('config')->get('hash');
@@ -32,5 +33,4 @@ class HashServiceProvider extends ServiceProviderAwesome
             ->alias('hash', $configs['default'])
             ->alias(HashInterface::class, $configs['default']);
     }
-
 }

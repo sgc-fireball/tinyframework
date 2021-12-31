@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Http\Middleware;
 
@@ -10,7 +12,6 @@ use TinyFramework\Session\SessionInterface;
 
 class SessionMiddleware implements MiddlewareInterface
 {
-
     private ContainerInterface $container;
 
     public function __construct(ContainerInterface $container)
@@ -32,5 +33,4 @@ class SessionMiddleware implements MiddlewareInterface
         }
         return $response;
     }
-
 }

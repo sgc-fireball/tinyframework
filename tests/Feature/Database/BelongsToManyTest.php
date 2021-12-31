@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\Feature\Database;
 
@@ -9,7 +11,6 @@ use TinyFramework\Tests\Feature\FeatureTestCase;
 
 class BelongsToManyModelA extends BaseModel
 {
-
     protected string $connection = 'mysql';
     protected string $table = 'test_model_a';
     protected array $fillable = ['id', 'name'];
@@ -18,12 +19,10 @@ class BelongsToManyModelA extends BaseModel
     {
         return $this->belongsToMany(BelongsToManyModelB::class);
     }
-
 }
 
 class BelongsToManyModelB extends BaseModel
 {
-
     protected string $connection = 'mysql';
     protected string $table = 'test_model_b';
     protected array $fillable = ['id', 'name'];
@@ -32,12 +31,10 @@ class BelongsToManyModelB extends BaseModel
     {
         return $this->belongsToMany(BelongsToManyModelA::class);
     }
-
 }
 
 class BelongsToManyTest extends FeatureTestCase
 {
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -99,5 +96,4 @@ class BelongsToManyTest extends FeatureTestCase
         $this->assertCount(1, $modelB->belongsToManyModelA[0]->belongsToManyModelB);
         $this->assertEquals($modelB->id, $modelB->belongsToManyModelA[0]->belongsToManyModelB[0]->id);
     }
-
 }

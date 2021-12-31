@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Crypt;
 
@@ -6,7 +8,6 @@ use TinyFramework\Exception\CryptException;
 
 class AES256CBC implements CryptInterface
 {
-
     private string $cipher = 'aes-256-cbc-hmac-sha256';
 
     private string $key;
@@ -66,5 +67,4 @@ class AES256CBC implements CryptInterface
         }
         return openssl_decrypt($encrypted, $this->cipher, $key, OPENSSL_RAW_DATA, $iv);
     }
-
 }

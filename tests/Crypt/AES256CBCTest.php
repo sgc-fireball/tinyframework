@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\Crypt;
 
@@ -7,7 +9,6 @@ use TinyFramework\Crypt\AES256CBC;
 
 class AES256CBCTest extends TestCase
 {
-
     private ?string $key;
 
     public function setUp(): void
@@ -25,5 +26,4 @@ class AES256CBCTest extends TestCase
         $result = $crypt->decrypt($ciphertext);
         $this->assertEquals($plaintext, $result);
     }
-
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Cron\CronExpression;
 
@@ -6,7 +8,6 @@ use DateTime;
 
 class MinuteField extends AbstractField
 {
-
     protected int $minValue = 0;
 
     protected int $maxValue = 59;
@@ -20,5 +21,4 @@ class MinuteField extends AbstractField
     {
         return $time->modify('-1 minute');
     }
-
 }

@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Database;
 
 interface DatabaseInterface
 {
-
     public function __construct(array $config = []);
 
     public function connect(): DatabaseInterface;
@@ -20,5 +21,4 @@ interface DatabaseInterface
     public function execute(string $query): array|bool;
 
     public function createMigrationTable(): DatabaseInterface;
-
 }

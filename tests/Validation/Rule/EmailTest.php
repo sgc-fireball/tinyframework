@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\Validation\Rule;
 
@@ -10,7 +12,6 @@ use TinyFramework\Validation\ValidationException;
 
 class EmailTest extends ValidationTestCase
 {
-
     public function emailProvider(): array
     {
         return [
@@ -48,5 +49,4 @@ class EmailTest extends ValidationTestCase
             $this->assertFalse($valid);
         }
     }
-
 }

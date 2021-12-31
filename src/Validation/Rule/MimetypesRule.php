@@ -6,7 +6,6 @@ use TinyFramework\Http\UploadedFile;
 
 class MimetypesRule extends RuleAwesome
 {
-
     public function getName(): string
     {
         return 'mimetypes';
@@ -26,5 +25,4 @@ class MimetypesRule extends RuleAwesome
         }
         return null;
     }
-
 }

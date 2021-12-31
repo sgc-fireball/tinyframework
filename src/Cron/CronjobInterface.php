@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Cron;
 
 interface CronjobInterface
 {
-
     public function expression(): string;
 
     public function handle(): void;
@@ -13,5 +14,4 @@ interface CronjobInterface
     // @TODO withoutOverlapping
     // @TODO onFailure(callback)
     // @TODO onSuccess(callback)
-
 }

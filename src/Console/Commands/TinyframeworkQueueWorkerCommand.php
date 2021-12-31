@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Console\Commands;
 
@@ -15,7 +17,6 @@ use TinyFramework\System\SignalHandler;
 
 class TinyframeworkQueueWorkerCommand extends CommandAwesome
 {
-
     protected function configure(): InputDefinitionInterface
     {
         return parent::configure()
@@ -67,5 +68,4 @@ class TinyframeworkQueueWorkerCommand extends CommandAwesome
         }
         return 0;
     }
-
 }

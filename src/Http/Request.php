@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Http;
 
@@ -7,7 +9,6 @@ use TinyFramework\Session\SessionInterface;
 
 class Request
 {
-
     private string $id;
 
     private string $method = 'GET';
@@ -62,7 +63,7 @@ class Request
         foreach ($_SERVER as $key => $value) {
             if (mb_strpos($key, 'HTTP_') === 0) {
                 if ($key === 'HTTP_AUTHORIZATION') {
-                    list ($user, $pw) = explode(':', base64_decode(mb_substr($_SERVER['HTTP_AUTHORIZATION'], 6)));
+                    list($user, $pw) = explode(':', base64_decode(mb_substr($_SERVER['HTTP_AUTHORIZATION'], 6)));
                     $request->header['php_auth_user'] = $user ?? null;
                     $request->header['php_auth_pass'] = $pw ?? null;
                 }
@@ -322,5 +323,4 @@ class Request
             }
         }
     }
-
 }

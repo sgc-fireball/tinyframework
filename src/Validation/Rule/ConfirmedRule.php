@@ -4,7 +4,6 @@ namespace TinyFramework\Validation\Rule;
 
 class ConfirmedRule extends RuleAwesome
 {
-
     public function getName(): string
     {
         return 'confirmed';
@@ -19,5 +18,4 @@ class ConfirmedRule extends RuleAwesome
         }
         return [$this->translator->trans('validation.confirmed', ['attribute' => $this->getTransName($name)])];
     }
-
 }

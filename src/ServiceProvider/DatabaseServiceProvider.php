@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\ServiceProvider;
 
@@ -8,7 +10,6 @@ use TinyFramework\Database\MigrationInstaller;
 
 class DatabaseServiceProvider extends ServiceProviderAwesome
 {
-
     public function register(): void
     {
         $config = $this->container->get('config')->get('database');
@@ -34,5 +35,4 @@ class DatabaseServiceProvider extends ServiceProviderAwesome
                 );
             });
     }
-
 }

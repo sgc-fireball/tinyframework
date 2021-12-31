@@ -4,7 +4,6 @@ namespace TinyFramework\Queue;
 
 class TestJob extends JobAwesome
 {
-
     protected string $queue = 'low';
 
     public function tryHandle(): void
@@ -12,5 +11,4 @@ class TestJob extends JobAwesome
         container('logger')->info(__CLASS__);
         sleep(1);
     }
-
 }

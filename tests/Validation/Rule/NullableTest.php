@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\Validation\Rule;
 
@@ -9,7 +11,6 @@ use TinyFramework\Validation\ValidationException;
 
 class NullableTest extends ValidationTestCase
 {
-
     public function nullableProvider(): array
     {
         return [
@@ -39,5 +40,4 @@ class NullableTest extends ValidationTestCase
             $this->assertFalse($valid);
         }
     }
-
 }

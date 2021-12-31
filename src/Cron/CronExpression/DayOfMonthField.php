@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Cron\CronExpression;
 
@@ -6,7 +8,6 @@ use DateTime;
 
 class DayOfMonthField extends AbstractField
 {
-
     protected int $minValue = 1;
 
     protected int $maxValue = 31;
@@ -20,5 +21,4 @@ class DayOfMonthField extends AbstractField
     {
         return $time->modify('-1 day')->setTime(23, 59);
     }
-
 }

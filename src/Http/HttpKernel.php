@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Http;
 
@@ -10,7 +12,6 @@ use TinyFramework\Template\Blade;
 
 class HttpKernel extends Kernel implements HttpKernelInterface
 {
-
     /** @var Closure[] */
     private array $terminateCallbacks = [];
 
@@ -38,7 +39,8 @@ class HttpKernel extends Kernel implements HttpKernelInterface
             }
         } catch (\Throwable $e) {
             $response = $this->throwableToResponse($e);
-            $this->container->get('logger')->error(exception2text($e),
+            $this->container->get('logger')->error(
+                exception2text($e),
                 [
                     'request_id' => $request->id(),
                     'response_id' => $response->id(),
@@ -120,8 +122,10 @@ class HttpKernel extends Kernel implements HttpKernelInterface
                 $response->header('Access-Control-Allow-Headers', implode(', ', $headers));
             }
             $response->header('Access-Control-Max-Age', (string)config('cors.max_age'));
-            $response->header('Access-Control-Allow-Credentials',
-                to_bool(config('cors.allow_credentials')) ? 'true' : 'false');
+            $response->header(
+                'Access-Control-Allow-Credentials',
+                to_bool(config('cors.allow_credentials')) ? 'true' : 'false'
+            );
         }
         return $response;
     }
@@ -195,5 +199,4 @@ class HttpKernel extends Kernel implements HttpKernelInterface
         $this->terminateRequestCallbacks[] = $closure;
         return $this;
     }
-
 }

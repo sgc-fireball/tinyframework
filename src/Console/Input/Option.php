@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Console\Input;
 
@@ -6,11 +8,10 @@ use InvalidArgumentException;
 
 class Option
 {
-
-    const VALUE_NONE = 1;
-    const VALUE_REQUIRED = 2;
-    const VALUE_OPTIONAL = 4;
-    const VALUE_IS_ARRAY = 8;
+    public const VALUE_NONE = 1;
+    public const VALUE_REQUIRED = 2;
+    public const VALUE_OPTIONAL = 4;
+    public const VALUE_IS_ARRAY = 8;
 
     private string $long;
 
@@ -28,8 +29,7 @@ class Option
         int $mode = null,
         string $description = '',
         mixed $default = null
-    ): Option
-    {
+    ): Option {
         return new Option($long, $short, $mode, $description, $default);
     }
 
@@ -39,8 +39,7 @@ class Option
         int $mode = null,
         string $description = '',
         mixed $default = null
-    )
-    {
+    ) {
         if (mb_strlen($long) === 1) {
             throw new InvalidArgumentException('Long option name is to short: ' . $long);
         }
@@ -55,7 +54,7 @@ class Option
         $this->value = $default;
         if (!$this->hasValue()) {
             $this->value = 0;
-        } else if ($this->isArray()) {
+        } elseif ($this->isArray()) {
             if (!is_array($this->value)) {
                 $this->value = empty($this->value) ? [] : [$this->value];
             }
@@ -105,5 +104,4 @@ class Option
     {
         return $this->description;
     }
-
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Database;
 
@@ -7,7 +9,6 @@ use TinyFramework\Console\Output\OutputInterface;
 
 class MigrationInstaller
 {
-
     protected OutputInterface $output;
 
     protected DatabaseInterface $database;
@@ -19,8 +20,7 @@ class MigrationInstaller
         OutputInterface $output,
         DatabaseInterface $database,
         array $migrations = []
-    )
-    {
+    ) {
         $this->output = $output;
         $this->database = $database;
         $this->migrations = $migrations;
@@ -149,5 +149,4 @@ class MigrationInstaller
             ->orderBy('id', 'desc')
             ->get();
     }
-
 }

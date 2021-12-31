@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\Localization;
 
@@ -10,7 +12,6 @@ use TinyFramework\Localization\Translator;
 
 class TranslatorTest extends TestCase
 {
-
     private ?Translator $translator;
 
     protected function setUp(): void
@@ -81,6 +82,4 @@ class TranslatorTest extends TestCase
     {
         $this->assertEquals('more', $this->translator->transChoice('test.numbers', 3));
     }
-
 }
-

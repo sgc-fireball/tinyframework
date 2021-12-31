@@ -6,7 +6,6 @@ use TinyFramework\Http\UploadedFile;
 
 class VideoRule extends RuleAwesome
 {
-
     public function getName(): string
     {
         return 'video';
@@ -26,5 +25,4 @@ class VideoRule extends RuleAwesome
         }
         return null;
     }
-
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Broadcast;
 
@@ -6,7 +8,6 @@ use Closure;
 
 class BroadcastManager
 {
-
     private array $channels = [];
 
     private array $pattern = ['default' => '[^\.]+'];
@@ -77,7 +78,7 @@ class BroadcastManager
                 };
             }
         }
-        return fn(string $channel, mixed $user) => false;
+        return fn (string $channel, mixed $user) => false;
     }
 
     protected function translateChannel(string $channel): string
@@ -102,5 +103,4 @@ class BroadcastManager
         $callback = $this->resolve($channel);
         return $callback($channel, $user);
     }
-
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\Validation;
 
@@ -12,7 +14,6 @@ use TinyFramework\Validation\ValidatorInterface;
 
 class ValidationTestCase extends TestCase
 {
-
     protected TranslatorInterface $translator;
 
     protected ValidatorInterface $validator;
@@ -22,5 +23,4 @@ class ValidationTestCase extends TestCase
         $this->translator = new Translator(new TranslationLoader([]), 'en');
         $this->validator = new Validator($this->translator);
     }
-
 }

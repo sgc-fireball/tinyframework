@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Console\Output\Components;
 
@@ -10,7 +12,6 @@ use TinyFramework\Console\Output\OutputInterface;
  */
 class Table
 {
-
     private OutputInterface $output;
 
     private ?string $headerTitle = null;
@@ -198,5 +199,4 @@ class Table
         }
         return $line;
     }
-
 }

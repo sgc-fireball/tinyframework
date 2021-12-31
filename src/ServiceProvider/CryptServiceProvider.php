@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\ServiceProvider;
 
@@ -7,7 +9,6 @@ use TinyFramework\Crypt\CryptInterface;
 
 class CryptServiceProvider extends ServiceProviderAwesome
 {
-
     public function register(): void
     {
         $configs = $this->container->get('config')->get('crypt');
@@ -28,5 +29,4 @@ class CryptServiceProvider extends ServiceProviderAwesome
                 });
         }
     }
-
 }

@@ -1,20 +1,21 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Console\Commands;
 
 use DateTimeImmutable;
 use DateTimeZone;
 use TinyFramework\Console\CommandAwesome;
-use TinyFramework\Cron\CronExpression;
-use TinyFramework\Cron\CronjobInterface;
 use TinyFramework\Console\Input\InputDefinitionInterface;
 use TinyFramework\Console\Input\InputInterface;
 use TinyFramework\Console\Output\OutputInterface;
+use TinyFramework\Cron\CronExpression;
+use TinyFramework\Cron\CronjobInterface;
 use TinyFramework\Logger\LoggerInterface;
 
 class TinyframeworkCronjobCommand extends CommandAwesome
 {
-
     protected function configure(): InputDefinitionInterface
     {
         return parent::configure()
@@ -70,5 +71,4 @@ class TinyframeworkCronjobCommand extends CommandAwesome
 
         return 0;
     }
-
 }

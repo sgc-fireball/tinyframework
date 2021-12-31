@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use TinyFramework\Cache\CacheInterface;
 use TinyFramework\Core\Config;
@@ -264,7 +266,8 @@ if (!function_exists('guid')) {
             $data[8] = \chr(\ord($data[8]) & 0x3f | 0x80); // set bits 6-7 to 10
             return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
         }
-        return sprintf('%04X%04X-%04X-%04X-%04X-%04X%04X%04X',
+        return sprintf(
+            '%04X%04X-%04X-%04X-%04X-%04X%04X%04X',
             mt_rand(0, 65535),
             mt_rand(0, 65535),
             mt_rand(0, 65535),
@@ -325,8 +328,10 @@ if (!function_exists('asset_version')) {
     {
         $filepath = str_contains($path, '?') ? substr($path, 0, strpos($path, '?')) : $path;
         $filepath = public_dir() . DIRECTORY_SEPARATOR . ltrim($filepath, '/');
-        return !file_exists($filepath) ? $path : url($path,
-            ['_' => base_convert((string)filemtime($filepath), 10, 36)]);
+        return !file_exists($filepath) ? $path : url(
+            $path,
+            ['_' => base_convert((string)filemtime($filepath), 10, 36)]
+        );
     }
 }
 

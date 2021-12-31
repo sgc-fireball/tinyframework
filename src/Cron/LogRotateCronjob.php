@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Cron;
 
@@ -6,7 +8,6 @@ use TinyFramework\Logger\LogRotateInterface;
 
 class LogRotateCronjob implements CronjobInterface
 {
-
     public function expression(): string
     {
         return '@daily';
@@ -19,5 +20,4 @@ class LogRotateCronjob implements CronjobInterface
             $logger->rotate();
         }
     }
-
 }

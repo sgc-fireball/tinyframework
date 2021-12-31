@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\Core;
 
@@ -8,7 +10,6 @@ use TinyFramework\Core\Config;
 
 class ConfigTest extends TestCase
 {
-
     private ?Config $config;
 
     public function setUp(): void
@@ -41,5 +42,4 @@ class ConfigTest extends TestCase
         $this->assertEquals('config1', $this->config->get('test.config1'));
         $this->assertEquals('config3', $this->config->get('test.config2.config3'));
     }
-
 }

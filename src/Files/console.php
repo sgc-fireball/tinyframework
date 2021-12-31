@@ -1,8 +1,8 @@
 #!/usr/bin/env php
 <?php declare(strict_types=1);
 
-use TinyFramework\Core\Container;
 use TinyFramework\Console\ConsoleKernel;
+use TinyFramework\Core\Container;
 
 define('TINYFRAMEWORK_START', microtime(true));
 require_once('vendor/autoload.php');

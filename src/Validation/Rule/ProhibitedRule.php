@@ -4,7 +4,6 @@ namespace TinyFramework\Validation\Rule;
 
 class ProhibitedRule extends RuleAwesome
 {
-
     public function getName(): string
     {
         return 'prohibited';
@@ -17,5 +16,4 @@ class ProhibitedRule extends RuleAwesome
         }
         return null;
     }
-
 }

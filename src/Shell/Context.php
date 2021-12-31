@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Shell;
 
 class Context
 {
-
     private array $variables = [];
 
     public function setVariable(string $key, mixed $value): static
@@ -23,5 +24,4 @@ class Context
         $this->variables = $variables;
         return $this;
     }
-
 }

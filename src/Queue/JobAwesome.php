@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Queue;
 
 abstract class JobAwesome implements JobInterface
 {
-
     protected int $tryCount = 1;
 
     protected int $attempts = 1; // times
@@ -100,5 +101,4 @@ abstract class JobAwesome implements JobInterface
     }
 
     abstract public function tryHandle(): void;
-
 }

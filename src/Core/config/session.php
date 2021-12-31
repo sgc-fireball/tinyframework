@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 return [
     'cookie' => env('SESSION_COOKIE', 'session'),

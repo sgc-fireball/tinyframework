@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Logger;
 
@@ -6,7 +8,6 @@ use InvalidArgumentException;
 
 abstract class LoggerAwesome implements LoggerInterface
 {
-
     public function emergency(string $message, array $context = []): LoggerInterface
     {
         return $this->log(LoggerInterface::EMERGENCY, $message, $context);
@@ -60,5 +61,4 @@ abstract class LoggerAwesome implements LoggerInterface
         }
         return vnsprintf($message, $context);
     }
-
 }

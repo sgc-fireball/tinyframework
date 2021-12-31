@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Broadcast;
 
@@ -7,7 +9,6 @@ use RuntimeException;
 
 class RedisBroadcast implements BroadcastInterface
 {
-
     private Redis $redis;
 
     private array $config = [];
@@ -67,5 +68,4 @@ class RedisBroadcast implements BroadcastInterface
         $this->redis->psubscribe((array)$pattern, [$this, 'onMessage']);
         return $this;
     }
-
 }

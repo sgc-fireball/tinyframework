@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\ServiceProvider;
 
@@ -7,7 +9,6 @@ use TinyFramework\Template\ViewInterface;
 
 class ViewServiceProvider extends ServiceProviderAwesome
 {
-
     public function register(): void
     {
         $configs = $this->container->get('config')->get('view');
@@ -52,5 +53,4 @@ class ViewServiceProvider extends ServiceProviderAwesome
             return sprintf('<?php _%s; ?>', $expression);
         });
     }
-
 }

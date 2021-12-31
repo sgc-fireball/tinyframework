@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Database\Relations;
 
@@ -9,7 +11,6 @@ use TinyFramework\Database\QueryInterface;
 // parent n:m me
 class BelongsToMany extends Relation
 {
-
     public function __construct(
         private QueryInterface $query,
         private BaseModel $model,
@@ -33,11 +34,13 @@ class BelongsToMany extends Relation
         $query = $this->query
             ->select([$this->query->raw(sprintf('`%s`.%s', $this->query->table(), '*'))])
             ->leftJoin($this->query->table(), 'id', $this->table, $this->relatedPivotKey)
-            ->where($this->query->raw(sprintf('`%s`.`%s`', $this->table, $this->foreignPivotKey)), '=',
-                $this->model->id);
+            ->where(
+                $this->query->raw(sprintf('`%s`.`%s`', $this->table, $this->foreignPivotKey)),
+                '=',
+                $this->model->id
+            );
         $models = $query->get();
         $this->model->setRelation($this->relationName, $models);
         return $models;
     }
-
 }

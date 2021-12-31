@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Http;
 
 class UploadedFile
 {
-
     private array $file = [
         'name' => null,
         'type' => null,
@@ -58,5 +59,4 @@ class UploadedFile
         }
         return $result;
     }
-
 }

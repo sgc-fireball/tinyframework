@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Logger;
 
@@ -6,7 +8,6 @@ use RuntimeException;
 
 class FileLogger extends LoggerAwesome implements LoggerInterface
 {
-
     private string $path;
 
     public function __construct(array $config)
@@ -26,7 +27,8 @@ class FileLogger extends LoggerAwesome implements LoggerInterface
     public function log(string $level, string $message, array $context = []): static
     {
         $message = sprintf(
-            '[%s|%s] %s', date('Y-m-d H:i:s'),
+            '[%s|%s] %s',
+            date('Y-m-d H:i:s'),
             $level,
             $this->buildMessage($level, $message, $context)
         );
@@ -38,5 +40,4 @@ class FileLogger extends LoggerAwesome implements LoggerInterface
         }
         return $this;
     }
-
 }

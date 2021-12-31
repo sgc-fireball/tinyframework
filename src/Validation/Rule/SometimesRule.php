@@ -4,7 +4,6 @@ namespace TinyFramework\Validation\Rule;
 
 class SometimesRule extends RuleAwesome
 {
-
     public function getName(): string
     {
         return 'sometimes';
@@ -17,5 +16,4 @@ class SometimesRule extends RuleAwesome
         }
         return null;
     }
-
 }

@@ -4,7 +4,6 @@ namespace TinyFramework\Validation\Rule;
 
 class PasswordRule extends RuleAwesome
 {
-
     public function getName(): string
     {
         return 'password';
@@ -38,7 +37,7 @@ class PasswordRule extends RuleAwesome
 
         if (extension_loaded('curl')) {
             $ch = curl_init(sprintf('https://api.pwnedpasswords.com/range/%s', $prefix));
-            curl_setopt_array($ch, array(
+            curl_setopt_array($ch, [
                 CURLOPT_HEADER => false,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_MAXREDIRS => 0,
@@ -46,10 +45,10 @@ class PasswordRule extends RuleAwesome
                 CURLOPT_TIMEOUT => 1000,
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => "GET",
-                CURLOPT_HTTPHEADER => array(
+                CURLOPT_HTTPHEADER => [
                     "Cache-Control: no-cache"
-                ),
-            ));
+                ],
+            ]);
             $response = curl_exec($ch);
             if ($response && curl_getinfo($ch, CURLINFO_HTTP_CODE) == 200) {
                 foreach (explode("\n", $response) as $line) {
@@ -66,5 +65,4 @@ class PasswordRule extends RuleAwesome
 
         return count($errors) ? $errors : null;
     }
-
 }

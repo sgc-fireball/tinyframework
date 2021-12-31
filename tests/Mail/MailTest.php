@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Tests\Mail;
 
@@ -7,7 +9,6 @@ use TinyFramework\Mail\Mail;
 
 class MailTest extends TestCase
 {
-
     public function testHeader(): void
     {
         $mail = Mail::create();
@@ -166,5 +167,4 @@ class MailTest extends TestCase
             'mimetype' => 'text/plain'
         ]], $mail->attachments());
     }
-
 }

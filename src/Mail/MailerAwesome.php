@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\Mail;
 
@@ -6,7 +8,6 @@ use InvalidArgumentException;
 
 abstract class MailerAwesome implements MailerInterface
 {
-
     protected function encodeAddress(string $address): string
     {
         if ($i = strrpos($address, '@')) {
@@ -38,5 +39,4 @@ abstract class MailerAwesome implements MailerInterface
     }
 
     abstract public function send(Mail $mail): bool;
-
 }

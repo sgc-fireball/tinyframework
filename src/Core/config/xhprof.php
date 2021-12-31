@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 return [
     'enable' => extension_loaded('xhprof') ? to_bool(env('XHPROF_ENABLE', false)) : false,

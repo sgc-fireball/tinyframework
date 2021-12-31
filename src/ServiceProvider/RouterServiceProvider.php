@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TinyFramework\ServiceProvider;
 
@@ -7,7 +9,6 @@ use TinyFramework\Http\Router;
 
 class RouterServiceProvider extends ServiceProviderAwesome
 {
-
     public function register(): void
     {
         $this->container
@@ -16,5 +17,4 @@ class RouterServiceProvider extends ServiceProviderAwesome
                 return (new Router($this->container))->load();
             });
     }
-
 }
