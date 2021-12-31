@@ -10,7 +10,7 @@ use AMQPExchange;
 class AMQPQueue implements QueueInterface
 {
 
-    private ?AMQPConnection $connection = null;
+    static private ?AMQPConnection $connection = null;
 
     private ?AMQPChannel $channel = null;
 
@@ -74,13 +74,12 @@ class AMQPQueue implements QueueInterface
         return $this;
     }
 
-    public function pop(int $timeout = 1): JobInterface|null
+    public function pop(): JobInterface|null
     {
         $queue = $this->connect()->getQueue($this->config['name']);
         $queue->declareQueue();
         $envelope = $queue->get(AMQP_NOPARAM);
         if ($envelope === false) {
-            sleep($timeout);
             return null;
         }
 
@@ -114,14 +113,20 @@ class AMQPQueue implements QueueInterface
 
     private function connect(): static
     {
-        if (!($this->connection instanceof AMQPConnection)) {
-            $this->connection = new AMQPConnection($this->config);
+        if (!(self::$connection instanceof AMQPConnection)) {
+            self::$connection = new AMQPConnection($this->config);
+            self::$connection->setConnectionName(implode(' ', [
+                'tinyframework/0.1', // @TODO implement a better version
+                'php/' . phpversion(),
+                'php-amqp/' . phpversion('amqp'),
+                '(' . gethostname() . '; PID:' . getmypid() . ')',
+            ]));
         }
-        if (!$this->connection->isConnected()) {
-            $this->connection->pconnect();
+        if (!self::$connection->isConnected()) {
+            self::$connection->pconnect();
         }
         if (!($this->channel instanceof AMQPChannel)) {
-            $this->channel = new AMQPChannel($this->connection);
+            $this->channel = new AMQPChannel(self::$connection);
             // @link https://github.com/symfony/amqp-messenger/blob/0755d69e70be3f35f83b1ad496be4d3c6a87558c/Transport/Connection.php#L502
             // @link https://www.rabbitmq.com/amqp-0-9-1-reference.html#basic.qos.prefetch-count
             $this->channel->setPrefetchCount(1);

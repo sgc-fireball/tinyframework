@@ -18,7 +18,7 @@ abstract class JobAwesome implements JobInterface
     /**
      * @return static|mixed
      */
-    public function metadata(string $name, mixed $value = null)/*: static|mixed*/
+    public function metadata(string $name, mixed $value = null): mixed
     {
         if ($value === null) {
             return $this->metadata[$name] ?? null;

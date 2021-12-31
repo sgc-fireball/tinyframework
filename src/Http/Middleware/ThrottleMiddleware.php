@@ -10,7 +10,7 @@ use TinyFramework\Http\Response;
 class ThrottleMiddleware implements MiddlewareInterface
 {
 
-    public function handle(Request $request, Closure $next, ...$parameters): Response
+    public function handle(Request $request, Closure $next, mixed ...$parameters): Response
     {
         $maxRequests = array_key_exists(0, $parameters) ? (int)$parameters[0] : 60;
         $timeInterval = array_key_exists(0, $parameters) ? (int)$parameters[0] : 60;

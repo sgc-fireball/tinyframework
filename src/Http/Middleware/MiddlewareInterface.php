@@ -9,6 +9,6 @@ use TinyFramework\Http\Response;
 interface MiddlewareInterface
 {
 
-    public function handle(Request $request, Closure $next, ...$parameters): Response;
+    public function handle(Request $request, Closure $next, mixed ...$parameters): Response;
 
 }

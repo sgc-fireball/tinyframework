@@ -79,7 +79,7 @@ if (!function_exists('container')) {
 }
 
 if (!function_exists('config')) {
-    function config(?string $key = null, mixed $value = null): Config|array|string|bool|int|null
+    function config(?string $key = null, mixed $value = null): ConfigInterface|array|string|bool|int|null
     {
         $config = container('config');
         assert($config instanceof ConfigInterface);
@@ -471,6 +471,7 @@ if (!function_exists('data_get')) {
             return $target[$key];
         }
 
+        assert(!empty($delimiter), 'Parameter #3 $delimiter of function explode expects non-empty-string.');
         // deep search
         $keys = \is_array($key) ? $key : explode($delimiter, $key);
         foreach ($keys as $key) {
@@ -487,9 +488,25 @@ if (!function_exists('data_get')) {
 }
 
 if (!function_exists('class_basename')) {
-    function class_basename($class): string
+    function class_basename(string|object $class): string
     {
         $class = \is_object($class) ? \get_class($class) : $class;
         return basename(str_replace('\\', '/', $class));
+    }
+}
+
+if (!function_exists('inMaintenanceMode')) {
+    function inMaintenanceMode(): array|null
+    {
+        static $config;
+        if (isset($config)) {
+            return $config;
+        }
+        $config = null;
+        $file = root_dir() . '/storage/maintenance.json';
+        if (file_exists($file)) {
+            $config = (array)json_decode(file_get_contents($file) ?? '[]', true) ?? [];
+        }
+        return $config;
     }
 }

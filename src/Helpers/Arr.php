@@ -433,7 +433,7 @@ class Arr implements \ArrayAccess, \Iterator
         return \array_product($this->items);
     }
 
-    public function push(...$values): static
+    public function push(mixed ...$values): static
     {
         foreach ($values as $value) {
             $this->items[] = $value;
@@ -656,12 +656,12 @@ class Arr implements \ArrayAccess, \Iterator
         return $this;
     }
 
-    public function sort(callable $callback = null): static
+    public function sort(int|callable $callback = null): static
     {
         if ($callback && \is_callable($callback)) {
             \uasort($this->items, $callback);
         } else {
-            \asort($this->items, $callback ?? SORT_REGULAR);
+            \asort($this->items, $callback ?: SORT_REGULAR);
         }
         return $this;
     }
@@ -796,6 +796,8 @@ class Arr implements \ArrayAccess, \Iterator
         if (\count($keys) === 0) {
             return $this;
         }
+
+        assert(!empty($delimiter), 'Parameter #2 $delimiter of function explode expects non-empty-string.');
         $items = $this->items;
         foreach ($keys as $key) {
             if (\array_key_exists($key, $items)) {
@@ -842,6 +844,7 @@ class Arr implements \ArrayAccess, \Iterator
         if (\array_key_exists($key, $this->items)) {
             return $this->items[$key];
         }
+        assert(!empty($delimiter), 'Parameter #2 $delimiter of function explode expects non-empty-string.');
         $keys = \str_contains($key, $delimiter) ? \explode($delimiter, $key) : [$key];
         $result = &$this->items;
         foreach ($keys as $key) {
@@ -861,6 +864,7 @@ class Arr implements \ArrayAccess, \Iterator
 
     public function set(string $key, mixed $value, string $delimiter = '.'): static
     {
+        assert(!empty($delimiter), 'Parameter #3 $delimiter of function explode expects non-empty-string.');
         $keys = \str_contains($key, $delimiter) ? \explode($delimiter, $key) : [$key];
         $item = &$this->items;
         foreach ($keys as $key) {
@@ -879,6 +883,7 @@ class Arr implements \ArrayAccess, \Iterator
         if (\array_key_exists($key, $this->items)) {
             return true;
         }
+        assert(!empty($delimiter), 'Parameter #2 $delimiter of function explode expects non-empty-string.');
         $keys = \str_contains($key, $delimiter) ? \explode($delimiter, $key) : [$key];
         $items = &$this->items;
         foreach ($keys as $key) {

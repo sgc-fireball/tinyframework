@@ -14,8 +14,8 @@ class StopWatchSection
 
     public function __construct(float $origin, string $id)
     {
-        $this->origin = $origin ?? microtime(true);
-        $this->id = $id ?? guid();
+        $this->origin = $origin ?: microtime(true);
+        $this->id = $id ?: guid();
     }
 
     public function origin(): float

@@ -7,11 +7,8 @@ use TinyFramework\Shell\Context;
 class FunctionTabCompletion implements TabCompletionInterface
 {
 
-    private ?Context $context = null;
-
     public function setContext(?Context $context = null): static
     {
-        $this->context = $context;
         return $this;
     }
 

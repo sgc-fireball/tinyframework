@@ -261,18 +261,18 @@ class XTermConverter implements XTermConverterInterface
         'd0d0d0' => 252,
         'dadada' => 253,
         'e4e4e4' => 254,
-        'eeeeee' => 255
+        'eeeeee' => 255,
     ];
 
     public static function getMap(): array
     {
-        return static::$map;
+        return self::$map;
     }
 
     public function xterm2hex(int $xterm): string
     {
         $xterm = min(max(0, $xterm), 255);
-        $data = array_flip(static::$map);
+        $data = array_flip(self::$map);
         if (isset($data[$xterm])) {
             return (string)$data[$xterm];
         }
@@ -286,7 +286,7 @@ class XTermConverter implements XTermConverterInterface
                 'ff00ff' => 201,
                 'ffff00' => 226,
                 'ffffff' => 231,
-                '808080' => 244
+                '808080' => 244,
             ]
         );
         return (string)$data[$xterm];
@@ -298,7 +298,7 @@ class XTermConverter implements XTermConverterInterface
         $diff = hexdec('fffffff');
         $dec = hexdec($hexIn);
         $hexIn = strtolower($hexIn);
-        foreach (static::$map as $hex => $xterm) {
+        foreach (self::$map as $hex => $xterm) {
             if ($hexIn == $hex) {
                 return $xterm;
             }

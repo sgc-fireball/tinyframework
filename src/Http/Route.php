@@ -25,8 +25,6 @@ class Route
 
     private array $pattern = ['default' => '[^\/]+'];
 
-    private array $attributes = [];
-
     public function method(string $method = null): static|array
     {
         if ($method === null) {

@@ -49,7 +49,8 @@ class Shell
                     str_replace(root_dir() . '/', '', $e->getFile()),
                     $e->getLine(),
                 ));
-                if ($this->output->verbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                $verbosity = (int)$this->output->verbosity();
+                if ($verbosity >= OutputInterface::VERBOSITY_VERBOSE) {
                     $this->output->write("\n");
                     foreach ($e->getTrace() as $index => $trace) {
                         if (\array_key_exists('class', $trace)) {

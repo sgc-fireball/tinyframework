@@ -11,7 +11,7 @@ interface QueueInterface
 
     public function push(JobInterface $job): QueueInterface;
 
-    public function pop(int $timeout = 1): JobInterface|null;
+    public function pop(): JobInterface|null;
 
     public function ack(JobInterface $job): QueueInterface;
 

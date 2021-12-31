@@ -75,13 +75,13 @@ class ValidationServiceProvider extends ServiceProviderAwesome
             StringRule::class,
             TimezoneRule::class,
             UrlRule::class,
-            VideoRule::class
+            VideoRule::class,
         ]);
         $this->container
             ->alias('validator', ValidatorInterface::class)
             ->alias(ValidatorInterface::class, Validator::class)
             ->singleton(Validator::class, function () {
-                $validator = new Validator($this->container->get(TranslatorInterface::class));
+                $validator = new Validator();
                 $validator->addRules($this->container->tagged('validators'));
                 return $validator;
             });

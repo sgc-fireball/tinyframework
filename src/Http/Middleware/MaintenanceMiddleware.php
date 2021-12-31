@@ -10,10 +10,9 @@ use TinyFramework\Http\Response;
 class MaintenanceMiddleware implements MiddlewareInterface
 {
 
-    public function handle(Request $request, Closure $next, ...$parameters): Response
+    public function handle(Request $request, Closure $next, mixed ...$parameters): Response
     {
-        if (file_exists('storage/maintenance.json')) {
-            $config = json_decode(file_get_contents('storage/maintenance.json') ?? '[]', true) ?? [];
+        if ($config = inMaintenanceMode()) {
             if (array_key_exists('whitelist', $config)) {
                 $whitelist = is_array($config['whitelist']) ? $config['whitelist'] : [$config['whitelist']];
                 if (in_array($request->ip(), $whitelist)) {

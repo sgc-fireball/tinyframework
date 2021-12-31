@@ -29,7 +29,7 @@ class XhprofServiceProvider extends ServiceProviderAwesome
         }
 
         $dir = $config->get('xhprof.dir');
-        $expire = time() - $config->get('xhprof.expire') ?? 60 * 60 * 24 * 7; // 7 days default
+        $expire = time() - $config->get('xhprof.expire'); // 7 days default
 
         if (function_exists('\\tideways_xhprof_enable')) {
             \tideways_xhprof_enable(
@@ -47,7 +47,7 @@ class XhprofServiceProvider extends ServiceProviderAwesome
                         'TinyFramework\Core\Container::call',
                         'TinyFramework\Core\Container::callFunction',
                         'TinyFramework\Core\Container::callMethod',
-                    ]
+                    ],
                 ]
             );
         } else {
@@ -56,7 +56,7 @@ class XhprofServiceProvider extends ServiceProviderAwesome
 
         $kernel = $this->container->get('kernel');
         assert($kernel instanceof KernelInterface);
-        if (!$kernel->runningInConsole()) {
+        if (!$kernel->runningInConsole() && method_exists($kernel, 'terminateRequestCallback')) {
             $kernel->terminateRequestCallback(function (Request $request, Response $response) use ($dir, $expire) {
                 if (function_exists('\\tideways_xhprof_disable')) {
                     $data = \tideways_xhprof_disable();
@@ -85,7 +85,7 @@ class XhprofServiceProvider extends ServiceProviderAwesome
                         'request_ts' => round(TINYFRAMEWORK_START),
                         'request_ts_micro' => [
                             'sec' => (int)TINYFRAMEWORK_START,
-                            'usec' => (TINYFRAMEWORK_START - (int)TINYFRAMEWORK_START) * 10000
+                            'usec' => (TINYFRAMEWORK_START - (int)TINYFRAMEWORK_START) * 10000,
                         ],
                         'request_date' => date('Y-m-d\TH:i:sP', (int)TINYFRAMEWORK_START),
                         'request_duration' => $end - TINYFRAMEWORK_START,
@@ -98,7 +98,7 @@ class XhprofServiceProvider extends ServiceProviderAwesome
                         'response_ts' => round($end),
                         'response_ts_micro' => [
                             'sec' => (int)$end,
-                            'usec' => ($end - (int)$end) * 10000
+                            'usec' => ($end - (int)$end) * 10000,
                         ],
                         'response_date' => date('Y-m-d\TH:i:sP', (int)$end),
                     ],

@@ -4,7 +4,6 @@ namespace TinyFramework\Validation;
 
 use RuntimeException;
 use TinyFramework\Http\Request;
-use TinyFramework\Localization\TranslatorInterface;
 use TinyFramework\Validation\Rule\RuleInterface;
 
 class Validator implements ValidatorInterface
@@ -12,13 +11,6 @@ class Validator implements ValidatorInterface
 
     /** @var RuleInterface[] */
     private array $rules = [];
-
-    private TranslatorInterface $translator;
-
-    public function __construct(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
-    }
 
     public function addRules(array $rules): static
     {
@@ -65,7 +57,7 @@ class Validator implements ValidatorInterface
         foreach ($rules as $rule) {
             $parameters = [];
             if (str_contains($rule, ':')) {
-                list($rule, $parameters) = explode(':', $rule, 2);
+                [$rule, $parameters] = explode(':', $rule, 2);
                 $parameters = explode(',', $parameters);
             }
             if (!array_key_exists($rule, $this->rules)) {

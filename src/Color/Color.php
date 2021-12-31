@@ -12,20 +12,19 @@ class Color
     public function __construct(
         XTermConverterInterface $xtermConverter = null,
         NameConverterInterface $nameConverter = null
-    )
-    {
+    ) {
         $this->xtermConverter = $xtermConverter ?? new XTermConverter();
         $this->nameConverter = $nameConverter ?? new NameConverter();
     }
 
     private function helpRgb2HsvHsl(int $red = 0, int $green = 0, int $blue = 0): array
     {
-        $red = min(max(0, $red), 255) / 255;
-        $green = min(max(0, $green), 255) / 255;
-        $blue = min(max(0, $blue), 255) / 255;
+        $red = (float)min(max(0, $red), 255) / 255;
+        $green = (float)min(max(0, $green), 255) / 255;
+        $blue = (float)min(max(0, $blue), 255) / 255;
 
-        $max = max($red, $green, $blue);
-        $min = min($red, $green, $blue);
+        $max = (float)max($red, $green, $blue);
+        $min = (float)min($red, $green, $blue);
         $delta = $max - $min;
 
         if ($delta == 0) {
@@ -48,7 +47,7 @@ class Color
 
     public function rgb2hsv(int $red = 0, int $green = 0, int $blue = 0): array
     {
-        list($hue, $delta, , $max) = $this->helpRgb2HsvHsl($red, $green, $blue);
+        [$hue, $delta, , $max] = $this->helpRgb2HsvHsl($red, $green, $blue);
 
         $value = $max;
         if ($value == 0) {
@@ -63,13 +62,13 @@ class Color
         return [
             round($hue, 2),
             round($saturation, 2),
-            round($value, 2)
+            round($value, 2),
         ];
     }
 
     public function rgb2hsl(int $red = 0, int $green = 0, int $blue = 0): array
     {
-        list($hue, $delta, $min, $max) = $this->helpRgb2HsvHsl($red, $green, $blue);
+        [$hue, $delta, $min, $max] = $this->helpRgb2HsvHsl($red, $green, $blue);
 
         $lightness = ($max + $min) / 2;
 
@@ -84,7 +83,7 @@ class Color
         return [
             round($hue, 2),
             round($saturation, 2),
-            round($lightness, 2)
+            round($lightness, 2),
         ];
     }
 
@@ -122,7 +121,7 @@ class Color
             min(max(0, round($cyan, 4)), 1),
             min(max(0, round($magenta, 4)), 1),
             min(max(0, round($yellow, 4)), 1),
-            min(max(0, round($key, 4)), 1)
+            min(max(0, round($key, 4)), 1),
         ];
     }
 
@@ -144,42 +143,42 @@ class Color
                     $result = [
                         $value,
                         $vb * $hue / 60 + $b,
-                        $b
+                        $b,
                     ];
                     break;
                 case 1:
                     $result = [
                         $vb * (60 - $hm) / 60 + $b,
                         $value,
-                        $b
+                        $b,
                     ];
                     break;
                 case 2:
                     $result = [
                         $b,
                         $value,
-                        $vb * $hm / 60 + $b
+                        $vb * $hm / 60 + $b,
                     ];
                     break;
                 case 3:
                     $result = [
                         $b,
                         $vb * (60 - $hm) / 60 + $b,
-                        $value
+                        $value,
                     ];
                     break;
                 case 4:
                     $result = [
                         $vb * $hm / 60 + $b,
                         $b,
-                        $value
+                        $value,
                     ];
                     break;
                 case 5:
                     $result = [
                         $value,
                         $b,
-                        $vb * (60 - $hm) / 60 + $b
+                        $vb * (60 - $hm) / 60 + $b,
                     ];
                     break;
             }
@@ -188,7 +187,7 @@ class Color
         return [
             (int)round($result[0] * 255, 0),
             (int)round($result[1] * 255, 0),
-            (int)round($result[2] * 255, 0)
+            (int)round($result[2] * 255, 0),
         ];
     }
 
@@ -239,7 +238,7 @@ class Color
         return [
             (int)round($red, 0),
             (int)round($green, 0),
-            (int)round($blue, 0)
+            (int)round($blue, 0),
         ];
     }
 
@@ -257,7 +256,7 @@ class Color
         return [
             (int)round($red, 0),
             (int)round($green, 0),
-            (int)round($blue, 0)
+            (int)round($blue, 0),
         ];
     }
 
@@ -275,90 +274,90 @@ class Color
         return [
             (int)round($red, 0),
             (int)round($green, 0),
-            (int)round($blue, 0)
+            (int)round($blue, 0),
         ];
     }
 
     public function hsl2hex(float $hue = 0.0, float $saturation = 0.0, float $lightness = 0.0): string
     {
-        list($red, $green, $blue) = $this->hsl2rgb($hue, $saturation, $lightness);
+        [$red, $green, $blue] = $this->hsl2rgb($hue, $saturation, $lightness);
 
         return $this->rgb2hex($red, $green, $blue);
     }
 
     public function hsl2cmyk(float $hue = 0.0, float $saturation = 0.0, float $lightness = 0.0): array
     {
-        list($red, $green, $blue) = $this->hsl2rgb($hue, $saturation, $lightness);
+        [$red, $green, $blue] = $this->hsl2rgb($hue, $saturation, $lightness);
 
         return $this->rgb2cmyk($red, $green, $blue);
     }
 
     public function hsl2hsv(float $hue = 0.0, float $saturation = 0.0, float $lightness = 0.0): array
     {
-        list($red, $green, $blue) = $this->hsl2rgb($hue, $saturation, $lightness);
+        [$red, $green, $blue] = $this->hsl2rgb($hue, $saturation, $lightness);
 
         return $this->rgb2hsv($red, $green, $blue);
     }
 
     public function hex2hsl(string|int $hex = '000000'): array
     {
-        list($red, $green, $blue) = $this->hex2rgb($hex);
+        [$red, $green, $blue] = $this->hex2rgb($hex);
 
         return $this->rgb2hsl($red, $green, $blue);
     }
 
     public function hex2cmyk(string|int $hex = '000000'): array
     {
-        list($red, $green, $blue) = $this->hex2rgb($hex);
+        [$red, $green, $blue] = $this->hex2rgb($hex);
 
         return $this->rgb2cmyk($red, $green, $blue);
     }
 
     public function hex2hsv(string|int $hex = '000000'): array
     {
-        list($red, $green, $blue) = $this->hex2rgb($hex);
+        [$red, $green, $blue] = $this->hex2rgb($hex);
 
         return $this->rgb2hsv($red, $green, $blue);
     }
 
     public function hsv2hex(float $hue = 0.0, float $saturation = 0.0, float $value = 0.0): string
     {
-        list($red, $green, $blue) = $this->hsv2rgb($hue, $saturation, $value);
+        [$red, $green, $blue] = $this->hsv2rgb($hue, $saturation, $value);
 
         return $this->rgb2hex($red, $green, $blue);
     }
 
     public function hsv2hsl(float $hue = 0.0, float $saturation = 0.0, float $value = 0.0): array
     {
-        list($red, $green, $blue) = $this->hsv2rgb($hue, $saturation, $value);
+        [$red, $green, $blue] = $this->hsv2rgb($hue, $saturation, $value);
 
         return $this->rgb2hsl($red, $green, $blue);
     }
 
     public function hsv2cmyk(float $hue = 0.0, float $saturation = 0.0, float $value = 0.0): array
     {
-        list($red, $green, $blue) = $this->hsv2rgb($hue, $saturation, $value);
+        [$red, $green, $blue] = $this->hsv2rgb($hue, $saturation, $value);
 
         return $this->rgb2cmyk($red, $green, $blue);
     }
 
     public function cmyk2hex(float $cyan = 0.0, float $magenta = 0.0, float $yellow = 0.0, float $key = 0.0): string
     {
-        list($red, $green, $blue) = $this->cmyk2rgb($cyan, $magenta, $yellow, $key);
+        [$red, $green, $blue] = $this->cmyk2rgb($cyan, $magenta, $yellow, $key);
 
         return $this->rgb2hex($red, $green, $blue);
     }
 
     public function cmyk2hsl(float $cyan = 0.0, float $magenta = 0.0, float $yellow = 0.0, float $key = 0.0): array
     {
-        list($red, $green, $blue) = $this->cmyk2rgb($cyan, $magenta, $yellow, $key);
+        [$red, $green, $blue] = $this->cmyk2rgb($cyan, $magenta, $yellow, $key);
 
         return $this->rgb2hsl($red, $green, $blue);
     }
 
     public function cmyk2hsv(float $cyan = 0.0, float $magenta = 0.0, float $yellow = 0.0, float $key = 0.0): array
     {
-        list($red, $green, $blue) = $this->cmyk2rgb($cyan, $magenta, $yellow, $key);
+        [$red, $green, $blue] = $this->cmyk2rgb($cyan, $magenta, $yellow, $key);
 
         return $this->rgb2hsv($red, $green, $blue);
     }

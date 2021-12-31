@@ -67,20 +67,14 @@ class RedisQueue implements QueueInterface
         return $this;
     }
 
-    public function pop(int $timeout = 1): JobInterface|null
+    public function pop(): JobInterface|null
     {
         $this->fetchDelayed();
-        $result = $this->redis->blPop([$this->config['name']], $timeout);
-        if (!is_array($result)) {
+        $result = $this->redis->lPop($this->config['name']);
+        if (!is_string($result) || empty($result)) {
             return null;
         }
-        if (\count($result) < 2) {
-            return null;
-        }
-        if ($result[1]) {
-            return unserialize($result[1]);
-        }
-        return null;
+        return unserialize($result);
     }
 
     private function fetchDelayed(): void

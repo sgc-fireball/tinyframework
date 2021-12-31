@@ -45,7 +45,7 @@ class StopWatch
     public function closeSection(StopWatchSection|string $id): self
     {
         $id = $id instanceof StopWatchSection ? $id->id() : $id;
-        if (!$this->sections[$id]) {
+        if (!array_key_exists($id, $this->sections)) {
             throw new StopWatchException(sprintf('Section "%s" is unknown.', $id));
         }
         $this->sections[$id]->stop('__section__');
@@ -63,7 +63,7 @@ class StopWatch
         return $this->sections['main']->stop($name)->start();
     }
 
-    public function stop(string $name)
+    public function stop(string $name): StopWatchEvent
     {
         return $this->sections['main']->stop($name);
     }

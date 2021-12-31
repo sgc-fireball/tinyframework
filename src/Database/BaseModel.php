@@ -199,8 +199,7 @@ class BaseModel implements JsonSerializable, ArrayAccess
         string $class,
         string $foreignKey = null,
         string $localKey = null
-    ): HasOne
-    {
+    ): HasOne {
         [$one, $caller] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
         return new HasOne(
             $this->getRelatedQuery($class),
@@ -215,8 +214,7 @@ class BaseModel implements JsonSerializable, ArrayAccess
         string $class,
         string $foreignKey = null,
         string $localKey = null
-    ): HasMany
-    {
+    ): HasMany {
         [$one, $caller] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
         return new HasMany(
             $this->getRelatedQuery($class),
@@ -231,8 +229,7 @@ class BaseModel implements JsonSerializable, ArrayAccess
         string $class,
         string $foreignKey = 'id',
         string $ownerKey = null
-    ): BelongsToOne
-    {
+    ): BelongsToOne {
         [$one, $caller] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
         $ownerKey ??= Str::factory(class_basename($class))->snakeCase() . '_id';
         return new BelongsToOne(
@@ -251,8 +248,7 @@ class BaseModel implements JsonSerializable, ArrayAccess
         string $relatedPivotKey = null,
         string $parentKey = 'id',
         string $relatedKey = 'id'
-    ): BelongsToMany
-    {
+    ): BelongsToMany {
         $tableA = $this->getTable();
         $tableB = (new $class())->getTable();
         $table ??= $tableA < $tableB ? $tableA . '_2_' . $tableB : $tableB . '_2_' . $tableA;

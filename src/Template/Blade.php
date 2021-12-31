@@ -6,6 +6,7 @@ use Closure;
 use InvalidArgumentException;
 use RuntimeException;
 use TinyFramework\Cache\CacheInterface;
+use TinyFramework\StopWatch\StopWatch;
 
 class Blade implements ViewInterface
 {
@@ -23,6 +24,8 @@ class Blade implements ViewInterface
 
     private ?CacheInterface $cache = null;
 
+    private StopWatch $stopWatch;
+
     private array $vendorDirectories = [];
 
     /** @var Closure[] */
@@ -31,11 +34,12 @@ class Blade implements ViewInterface
     /** @var Closure[] */
     private array $postCompilers = [];
 
-    public function __construct(array $config, CacheInterface $cache = null)
+    public function __construct(array $config, StopWatch $stopWatch = null, CacheInterface $cache = null)
     {
         $this->config = $config;
         $this->config['cache'] = $this->config['cache'] ?? true;
         $this->config['source'] = $this->config['source'] ?? 'resources/views';
+        $this->stopWatch = $stopWatch ?? new StopWatch();
         $this->cache = $this->config['cache'] ? $cache->tag('template') : null;
     }
 
@@ -107,7 +111,7 @@ class Blade implements ViewInterface
     {
         $key = 'template:' . str_replace('.', ':', $view);
         if ($this->config['cache'] && $this->cache?->has($key)) {
-            return $this->cache?->get($key);
+            return $this->cache->get($key);
         }
 
         $file = null;
@@ -129,6 +133,7 @@ class Blade implements ViewInterface
 
     public function compileString(string $content): string
     {
+        $this->stopWatch->start('8-blade.compile', 'blade');
         foreach ($this->preCompilers as $compiler) {
             $content = \call_user_func($compiler, $content);
         }
@@ -155,7 +160,9 @@ class Blade implements ViewInterface
             $content = \call_user_func($compiler, $content);
         }
 
-        return trim($content);
+        $content = trim($content);
+        $this->stopWatch->stop('8-blade.compile');
+        return $content;
     }
 
     private function compileStatement(array $match): string
@@ -186,6 +193,7 @@ class Blade implements ViewInterface
 
     public function execute(string $__content, array $__data = []): string
     {
+        $this->stopWatch->start('9-blade.execute', 'blade');
         $__env = $this;
         extract($__data);
         unset($__data);
@@ -195,9 +203,10 @@ class Blade implements ViewInterface
         } catch (\Throwable $e) {
             throw $e;
         } finally {
-            $__content = (string)ob_get_clean();
+            $__content = trim((string)ob_get_clean());
         }
-        return trim($__content);
+        $this->stopWatch->stop('9-blade.execute');
+        return $__content;
     }
 
     public function getPlaceholder(string $name, string $key = null): string

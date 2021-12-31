@@ -496,6 +496,7 @@ class Str implements \Stringable
 
     public function explode(string $separator, int $limit = PHP_INT_MAX): Arr
     {
+        assert(!empty($separator), 'Parameter #1 $separator of function explode expects non-empty-string.');
         return Arr::factory(\explode($separator, $this->value, $limit));
     }
 
@@ -518,6 +519,24 @@ class Str implements \Stringable
             return $this;
         }
         return $result;
+    }
+
+    public function mask(string $character = '*', int $index = null, int $length = null): static
+    {
+        assert(empty($character), 'Paramter #1 $character must not be empty!');
+        $length = $length ?: mb_strlen($this->value);
+        if ($index === null) {
+            $this->value = str_repeat($character, $length);
+            return $this;
+        }
+        $segment = mb_substr($this->value, $index, $length);
+        if ($segment === '') {
+            return $this;
+        }
+        $start = mb_substr($this->value, 0, mb_strpos($this->value, $segment, 0));
+        $end = mb_substr($this->value, mb_strpos($this->value, $segment, 0) + mb_strlen($segment));
+        $this->value = $start . str_repeat(mb_substr($character, 0, 1), mb_strlen($segment)) . $end;
+        return $this;
     }
 
 }

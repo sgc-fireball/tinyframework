@@ -18,7 +18,7 @@ class SessionMiddleware implements MiddlewareInterface
         $this->container = $container;
     }
 
-    public function handle(Request $request, Closure $next, ...$parameters): Response
+    public function handle(Request $request, Closure $next, mixed ...$parameters): Response
     {
         $session = $this->container->get('session');
         assert($session instanceof SessionInterface);

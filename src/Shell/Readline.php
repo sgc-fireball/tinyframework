@@ -52,7 +52,7 @@ class Readline
     public function prompt(string $prompt = ''): string
     {
         $prompt = trim($prompt);
-        $prompt = $prompt ?? $this->prompt;
+        $prompt = $prompt ?: $this->prompt;
         $prompt = $prompt ? $prompt . ' ' : '';
         return (string)readline($prompt);
     }

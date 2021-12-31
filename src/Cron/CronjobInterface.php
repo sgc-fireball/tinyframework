@@ -9,4 +9,9 @@ interface CronjobInterface
 
     public function handle(): void;
 
+    // @TODO onOneServer
+    // @TODO withoutOverlapping
+    // @TODO onFailure(callback)
+    // @TODO onSuccess(callback)
+
 }

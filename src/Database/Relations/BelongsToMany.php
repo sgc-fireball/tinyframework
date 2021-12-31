@@ -27,6 +27,7 @@ class BelongsToMany extends Relation
      */
     public function load(): array
     {
+        assert(!empty($this->model->id));
         // SELECT tableB.* FROM tableB
         // LEFT JOIN tableA2tableB ON tableA2tableB.table_a_id = tableA.id
         $query = $this->query

@@ -10,13 +10,13 @@ class Hook
 
     public static function postInstallCommand(Event $event): void
     {
-        static::postUpdateCommand($event);
+        self::postUpdateCommand($event);
     }
 
     public static function postUpdateCommand(Event $event): void
     {
         // require_once $event->getComposer()->getConfig()->get('vendor-dir') . '/autoload.php';
-        static::checkPublicIndex();
+        self::checkPublicIndex();
     }
 
     private static function checkPublicIndex(): void

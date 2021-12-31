@@ -20,7 +20,7 @@ class FileSession extends SessionAwesome implements SessionInterface
         if (!is_readable($this->path) || !is_writable($this->path)) {
             throw new RuntimeException('Invalid session folder permission.');
         }
-        $this->ttl = (int)$config['ttl'] ?? $this->ttl;
+        $this->ttl = (int)$config['ttl'] ?: $this->ttl;
     }
 
     public function open(string $id = null): static

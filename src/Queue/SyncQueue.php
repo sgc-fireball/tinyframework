@@ -23,7 +23,7 @@ class SyncQueue implements QueueInterface
         return $this;
     }
 
-    public function pop(int $timeout = 1): ?JobInterface
+    public function pop(): ?JobInterface
     {
         return null;
     }

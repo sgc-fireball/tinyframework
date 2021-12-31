@@ -4,15 +4,16 @@ parameters:
     checkGenericClassInNonGenericObjectType: false
     ignoreErrors:
         - '#If condition is always false.#'
-        - '#has invalid typehint type Composer\\Script\\Event#'
-        - '#Function tideways_#'
         - '#Constant TIDEWAYS_#'
-        - '#offsetExists\(\) has parameter \$offset with no typehint specified.#'
-        - '#offsetGet\(\) has no return typehint specified.#'
-        - '#offsetGet\(\) has parameter \$offset with no typehint specified.#'
-        - '#offsetSet\(\) has parameter \$offset with no typehint specified.#'
-        - '#offsetSet\(\) has parameter \$value with no typehint specified.#'
-        - '#offsetUnset\(\) has parameter \$offset with no typehint specified.#'
+        - '#Constant TINYFRAMEWORK_START not found.#'
+        - '#offsetGet\(\) has no return type specified.#'
+        - '#offsetExists\(\) has parameter \$offset with no type specified.#'
+        - '#offsetGet\(\) has parameter \$offset with no type specified.#'
+        - '#offsetSet\(\) has parameter \$offset with no type specified.#'
+        - '#offsetSet\(\) has parameter \$value with no type specified.#'
+        - '#offsetUnset\(\) has parameter \$offset with no type specified.#'
+        - '#has invalid type Composer\\Script\\Event.#'
+        - '#::current\(\) has no return type specified.#'
 
     level: 6
     paths:

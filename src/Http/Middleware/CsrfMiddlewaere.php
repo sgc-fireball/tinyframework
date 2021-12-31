@@ -9,7 +9,7 @@ use TinyFramework\Http\Response;
 class CsrfMiddlewaere implements MiddlewareInterface
 {
 
-    public function handle(Request $request, Closure $next, ...$parameters): Response
+    public function handle(Request $request, Closure $next, mixed ...$parameters): Response
     {
         if (!in_array($request->method(), ['GET', 'HEAD', 'OPTIONS'])) {
             $session = $request->session();

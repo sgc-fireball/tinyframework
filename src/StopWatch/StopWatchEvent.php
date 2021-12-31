@@ -9,7 +9,7 @@ class StopWatchEvent
 
     private string $category;
 
-    /** @var StopWatchPeriod */
+    /** @var StopWatchPeriod[] */
     private array $periods = [];
 
     /** @var float[] */
@@ -65,10 +65,10 @@ class StopWatchEvent
 
     public function startTime(): float
     {
-        if (!!$this->periods[0]) {
-            return $this->periods[0]->startTime();
+        if (array_key_exists(0, $this->periods) && $this->periods[0] instanceof StopWatchPeriod) {
+            return $this->periods[0]->start();
         }
-        if (!!$this->started[0]) {
+        if (array_key_exists(0, $this->started)) {
             return $this->started[0];
         }
         return 0;
@@ -80,7 +80,7 @@ class StopWatchEvent
             return microtime(true);
         }
         $last = count($this->periods);
-        return $last ? $this->periods[$last - 1] : 0;
+        return $last ? $this->periods[$last - 1]->end() : 0;
     }
 
     public function duration(): float
