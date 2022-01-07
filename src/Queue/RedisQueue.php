@@ -55,7 +55,7 @@ class RedisQueue implements QueueInterface
         $queue = method_exists($job, 'queue') ? $job->queue() : $this->config['name'];
         $data = serialize($job);
         $queue = $queue . ':delayed';
-        $ttl = time() + $job->delay();
+        $ttl = microtime(true) + $job->delay();
         $this->redis->zAdd($queue, $ttl, $data);
         return $this;
     }
@@ -82,7 +82,7 @@ class RedisQueue implements QueueInterface
     {
         // @TODO optimize to Redis LUA script
         $queue = $this->config['name'] . ':delayed';
-        $jobs = $this->redis->zRangeByScore($queue, '0', (string)time());
+        $jobs = $this->redis->zRangeByScore($queue, '0', (string)microtime(true));
         if (\is_array($jobs)) {
             foreach ($jobs as $job) {
                 if ($this->redis->zrem($queue, $job)) {
