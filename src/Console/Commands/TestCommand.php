@@ -27,19 +27,21 @@ class TestCommand extends CommandAwesome
 
         $this->output->writeln(trans('messages.trans.value', ['firstname' => 'Richard', 'lastname' => 'Hülsberg']));
 
-        $this->output->writeln(trans_choice('messages.trans.choice', 0));
-        $this->output->writeln(trans_choice('messages.trans.choice', 1));
-        $this->output->writeln(trans_choice('messages.trans.choice', 5));
-        $this->output->writeln(trans_choice('messages.trans.choice', 10));
-        $this->output->writeln(trans_choice('messages.trans.choice', 1000));
-        $this->output->writeln(trans_choice('messages.trans.choice', 2000));
+        $message = 'messages.trans.choice';
+        $this->output->writeln(trans_choice($message, 0));
+        $this->output->writeln(trans_choice($message, 1));
+        $this->output->writeln(trans_choice($message, 5));
+        $this->output->writeln(trans_choice($message, 10));
+        $this->output->writeln(trans_choice($message, 1000));
+        $this->output->writeln(trans_choice($message, 2000));
 
-        $this->output->writeln(trans_choice('messages.trans.choice.value', 0, ['test' => 'AAAA']));
-        $this->output->writeln(trans_choice('messages.trans.choice.value', 1, ['test' => 'AAAA']));
-        $this->output->writeln(trans_choice('messages.trans.choice.value', 5, ['test' => 'AAAA']));
-        $this->output->writeln(trans_choice('messages.trans.choice.value', 10, ['test' => 'AAAA']));
-        $this->output->writeln(trans_choice('messages.trans.choice.value', 1000, ['test' => 'AAAA']));
-        $this->output->writeln(trans_choice('messages.trans.choice.value', 2000, ['test' => 'AAAA']));
+        $message = 'messages.trans.choice.value';
+        $this->output->writeln(trans_choice($message, 0, ['test' => 'AAAA']));
+        $this->output->writeln(trans_choice($message, 1, ['test' => 'AAAA']));
+        $this->output->writeln(trans_choice($message, 5, ['test' => 'AAAA']));
+        $this->output->writeln(trans_choice($message, 10, ['test' => 'AAAA']));
+        $this->output->writeln(trans_choice($message, 1000, ['test' => 'AAAA']));
+        $this->output->writeln(trans_choice($message, 2000, ['test' => 'AAAA']));
 
         $this->testTable();
         $this->testProgressBar();

@@ -31,16 +31,13 @@ class PasswordRule extends RuleAwesome
 
         $prefix = substr($hash = strtoupper(sha1($value)), 0, 5);
         $postfix = substr($hash, 5);
-        // @TODO response = fetch(https://api.pwnedpasswords.com/range/$prefix)
-        // @TODO count = search $postfix in response ?? 0
-        // @TODO count > 0 then errors = []
-
         if (extension_loaded('curl')) {
             $ch = curl_init(sprintf('https://api.pwnedpasswords.com/range/%s', $prefix));
             curl_setopt_array($ch, [
                 CURLOPT_HEADER => false,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_MAXREDIRS => 0,
+                CURLOPT_DNS_CACHE_TIMEOUT => 1000,
                 CURLOPT_CONNECTTIMEOUT => 1000,
                 CURLOPT_TIMEOUT => 1000,
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,

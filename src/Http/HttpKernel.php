@@ -78,6 +78,7 @@ class HttpKernel extends Kernel implements HttpKernelInterface
 
     public function handleException(\Throwable $e): int
     {
+        self::$reservedMemory = null; // free 10kb ram
         $response = $this->throwableToResponse($e);
         $response
             ->header('X-Response-ID', $response->id())
@@ -120,6 +121,7 @@ class HttpKernel extends Kernel implements HttpKernelInterface
             }
             if ($headers = $request->header('Access-Control-Request-Headers')) {
                 $response->header('Access-Control-Allow-Headers', implode(', ', $headers));
+                $response->header('Access-Control-Expose-Headers', implode(', ', $headers));
             }
             $response->header('Access-Control-Max-Age', (string)config('cors.max_age'));
             $response->header(

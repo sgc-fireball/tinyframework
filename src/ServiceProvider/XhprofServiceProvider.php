@@ -24,7 +24,7 @@ class XhprofServiceProvider extends ServiceProviderAwesome
         }
 
         /** check percent rate */
-        $percent = mt_rand(1, 100);
+        $percent = random_int(1, 100);
         if ($percent > $config->get('xhprof.percent')) {
             return;
         }

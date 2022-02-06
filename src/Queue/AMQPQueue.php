@@ -139,7 +139,7 @@ class AMQPQueue implements QueueInterface
     {
         if (!$this->exchange) {
             $this->exchange = new AMQPExchange($this->connect()->channel);
-            $this->exchange->setName($this->config['prefix'] . 'exchange');
+            $this->exchange->setName($this->config['prefix'] . 'queue');
             $this->exchange->setType(\AMQP_EX_TYPE_DIRECT);
             $this->exchange->setFlags(\AMQP_DURABLE);
             $this->exchange->declareExchange();
@@ -151,7 +151,7 @@ class AMQPQueue implements QueueInterface
     {
         if (!$this->exchangeDelayed) {
             $this->exchangeDelayed = new AMQPExchange($this->connect()->channel);
-            $this->exchangeDelayed->setName($this->config['prefix'] . 'exchange:delayed');
+            $this->exchangeDelayed->setName($this->config['prefix'] . 'queue:delayed');
             $this->exchangeDelayed->setType(\AMQP_EX_TYPE_DIRECT);
             $this->exchangeDelayed->setFlags(\AMQP_DURABLE);
             $this->exchangeDelayed->declareExchange();
@@ -168,7 +168,7 @@ class AMQPQueue implements QueueInterface
             if ($delay) {
                 $queue->setArgument('x-message-ttl', $delay * 1000);
                 $queue->setArgument('x-expires', ($delay + 10) * 1000);
-                $queue->setArgument('x-dead-letter-exchange', $this->config['prefix'] . 'exchange');
+                $queue->setArgument('x-dead-letter-exchange', $this->config['prefix'] . 'queue');
                 $queue->setArgument('x-dead-letter-routing-key', $queue->getName());
                 $queue->setName($queue->getName() . ':delayed:' . $delay);
             }
@@ -177,5 +177,3 @@ class AMQPQueue implements QueueInterface
         return $this->queues[$name];
     }
 }
-
-// @link https://github.com/symfony/amqp-messenger/blob/5.4/Transport/Connection.php

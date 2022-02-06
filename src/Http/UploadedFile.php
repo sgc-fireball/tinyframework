@@ -41,7 +41,7 @@ class UploadedFile
 
     public function mimetype(): string
     {
-        return mime_content_type($this->file['tmp_name']) ?? 'application/octet-stream';
+        return mime_content_type($this->file['tmp_name']) ?: 'application/octet-stream';
     }
 
     public function hasError(): bool

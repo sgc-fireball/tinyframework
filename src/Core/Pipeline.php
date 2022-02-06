@@ -39,7 +39,7 @@ class Pipeline implements PipelineInterface
      */
     public function call(Closure $core, $parameter = null): mixed
     {
-        $chain = $arr = array_reduce(
+        $chain = array_reduce(
             array_reverse($this->layers),
             function ($next, $layer) {
                 return function ($parameter) use ($layer, $next) {

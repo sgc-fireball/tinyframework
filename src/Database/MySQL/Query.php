@@ -180,36 +180,36 @@ class Query extends QueryAwesome
 
     public function count(): int
     {
-        $query = (clone $this)->select([new DatabaseRaw('COUNT(1) AS `result`')])->toSql();
-        return (int)$this->driver->execute($query)[0]['result'];
+        $query = (clone $this)->select([new DatabaseRaw('COUNT(1) AS `count`')])->toSql();
+        return (int)$this->driver->execute($query)[0]['count'];
     }
 
     public function sum(string $field): float
     {
         $field = str_replace('`', '', $field);
-        $query = (clone $this)->select([new DatabaseRaw('SUM(`' . $field . '`) AS `result`')])->toSql();
-        return (float)$this->driver->execute($query)[0]['result'];
+        $query = (clone $this)->select([new DatabaseRaw('SUM(`' . $field . '`) AS `sum`')])->toSql();
+        return (float)$this->driver->execute($query)[0]['sum'];
     }
 
     public function avg(string $field): float
     {
         $field = str_replace('`', '', $field);
-        $query = (clone $this)->select([new DatabaseRaw('AVG(`' . $field . '`) AS `result`')])->toSql();
-        return (float)$this->driver->execute($query)[0]['result'];
+        $query = (clone $this)->select([new DatabaseRaw('AVG(`' . $field . '`) AS `avg`')])->toSql();
+        return (float)$this->driver->execute($query)[0]['avg'];
     }
 
     public function min(string $field): float
     {
         $field = str_replace('`', '', $field);
-        $query = (clone $this)->select([new DatabaseRaw('MIN(`' . $field . '`) AS `result`')])->toSql();
-        return (float)$this->driver->execute($query)[0]['result'];
+        $query = (clone $this)->select([new DatabaseRaw('MIN(`' . $field . '`) AS `min`')])->toSql();
+        return (float)$this->driver->execute($query)[0]['min'];
     }
 
     public function max(string $field): float
     {
         $field = str_replace('`', '', $field);
-        $query = (clone $this)->select([new DatabaseRaw('MAX(`' . $field . '`) AS `result`')])->toSql();
-        return (float)$this->driver->execute($query)[0]['result'];
+        $query = (clone $this)->select([new DatabaseRaw('MAX(`' . $field . '`) AS `max`')])->toSql();
+        return (float)$this->driver->execute($query)[0]['max'];
     }
 
     public function transaction(): void

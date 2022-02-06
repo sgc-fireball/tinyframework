@@ -31,7 +31,7 @@ class Shell
         #$this->output->successful('This is an successful.');
         $this->readline->readHistory();
         while (true) {
-            $line = $this->readline->prompt('$');
+            $line = $this->readline->prompt('php$');
             if (\in_array($line, ['exit', 'quit', 'bye', 'cya', 'die'])) {
                 break;
             }

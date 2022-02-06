@@ -15,7 +15,7 @@ class FileCache extends CacheAwesome
         parent::__construct($config);
         $this->path = $this->config['path'] ?? sys_get_temp_dir();
         if (!is_dir($this->path)) {
-            if (!mkdir($this->path, 0770, true)) {
+            if (!mkdir($this->path, 0750, true)) {
                 throw new RuntimeException('Could not create cache folder.');
             }
         }
@@ -73,6 +73,9 @@ class FileCache extends CacheAwesome
         $file = $this->key2file($key);
         if (file_put_contents($file, serialize($value)) === false) {
             throw new RuntimeException('Could not write cache.');
+        }
+        if (!chmod($file, 0640)) {
+            throw new RuntimeException('Could set chmod.');
         }
         if (!touch($file, $ttl ? $this->calculateExpiration($ttl) : time() + 60 * 60 * 24 * 7 * 52)) {
             throw new RuntimeException('Could set cache ttl.');

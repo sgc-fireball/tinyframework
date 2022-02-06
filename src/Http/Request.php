@@ -44,28 +44,32 @@ class Request
         $request = new self();
         $request->ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
         $request->method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
-        $request->url = new URL(sprintf(
-            '%s://%s:%s:%d%s',
-            to_bool($_SERVER['HTTPS'] ?? 'off') ? 'https' : 'http',
-            \array_key_exists('REMOTE_USER', $_SERVER) ? $_SERVER['REMOTE_USER'] . '@' : '',
-            $_SERVER['HTTP_HOST'] ?? 'localhost',
-            $_SERVER['SERVER_PORT'] ?? 80,
-            $_SERVER['REQUEST_URI'] ?? '/'
-        ));
+        $request->url = new URL(
+            sprintf(
+                '%s://%s:%s:%d%s',
+                to_bool($_SERVER['HTTPS'] ?? 'off') ? 'https' : 'http',
+                \array_key_exists('REMOTE_USER', $_SERVER) ? $_SERVER['REMOTE_USER'] . '@' : '',
+                $_SERVER['HTTP_HOST'] ?? 'localhost',
+                $_SERVER['SERVER_PORT'] ?? 80,
+                $_SERVER['REQUEST_URI'] ?? '/'
+            )
+        );
         $request->protocol = $_SERVER['HTTP_SERVER_PROTOCOL'] ?? 'HTTP/1.0';
-        $request->get = $_GET ?? [];
-        $request->post = $_POST ?? [];
-        if (\array_key_exists('HTTP_CONTENT_TYPE', $_SERVER) && str_contains($_SERVER['HTTP_CONTENT_TYPE'], 'application/json')) {
+        $request->get = $_GET ?: [];
+        $request->post = $_POST ?: [];
+        if (\array_key_exists('HTTP_CONTENT_TYPE', $_SERVER)
+            && str_contains($_SERVER['HTTP_CONTENT_TYPE'], 'application/json')
+        ) {
             $request->post = json_decode(file_get_contents('php://input'), true);
         }
-        $request->cookie = $_COOKIE ?? [];
-        self::migrateFiles($_FILES ?? [], $request->files);
+        $request->cookie = $_COOKIE ?: [];
+        self::migrateFiles($_FILES ?: [], $request->files);
         foreach ($_SERVER as $key => $value) {
             if (mb_strpos($key, 'HTTP_') === 0) {
                 if ($key === 'HTTP_AUTHORIZATION') {
-                    list($user, $pw) = explode(':', base64_decode(mb_substr($_SERVER['HTTP_AUTHORIZATION'], 6)));
-                    $request->header['php_auth_user'] = $user ?? null;
-                    $request->header['php_auth_pass'] = $pw ?? null;
+                    [$user, $pw] = explode(':', base64_decode(mb_substr($_SERVER['HTTP_AUTHORIZATION'], 6)));
+                    $request->header['php_auth_user'] = $user ?: null;
+                    $request->header['php_auth_pass'] = $pw ?: null;
                 }
                 $key = mb_strtolower(str_replace('HTTP_', '', $key));
                 $request->header[$key] = $request->header[$key] ?? [];
@@ -84,7 +88,11 @@ class Request
             $request->method = strtoupper($request->post['_method'] ?: $request->method);
             unset($request->post['_method']);
         }
-        if (\in_array($request->method, ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'PATCH', 'PURGE', 'TRACE'], true)) {
+        if (\in_array(
+            $request->method,
+            ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'PATCH', 'PURGE', 'TRACE'],
+            true
+        )) {
             return $request;
         }
         if (!preg_match('/^[A-Z]++$/D', $request->method)) {
@@ -300,6 +308,22 @@ class Request
         }
         $this->ip = $ip;
         return $this;
+    }
+
+    public function expectJson(): bool
+    {
+        $accept = explode(',', (string)$this->header('accept'));
+        return count(array_filter($accept, fn($line) => str_starts_with(trim((string)$line), 'application/json'))) >= 1;
+    }
+
+    public function wantsJson(): bool
+    {
+        return $this->expectJson();
+    }
+
+    public function isAjax(): bool
+    {
+        return $this->header('x-requested-with') === 'XMLHttpRequest';
     }
 
     private static function migrateFiles(array $files, array &$results): void

@@ -13,13 +13,14 @@ class AES256CBCTest extends TestCase
 
     public function setUp(): void
     {
-        $this->key = substr(str_shuffle(md5((string)microtime(true))), 0, 32);
+        $this->key = random_bytes(32);
+        #$this->key = substr(str_shuffle(md5((string)microtime(true))), 0, 32);
     }
 
     public function testEncryptAndDecrypt(): void
     {
         $crypt = new AES256CBC($this->key);
-        $plaintext = str_shuffle(md5((string)microtime(true)));
+        $plaintext = random_bytes(64);
         $this->assertEquals($this->key, $crypt->key());
         $ciphertext = $crypt->encrypt($plaintext);
         $this->assertNotEquals($plaintext, $ciphertext);

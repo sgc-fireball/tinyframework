@@ -12,6 +12,6 @@ interface CronjobInterface
 
     // @TODO onOneServer
     // @TODO withoutOverlapping
-    // @TODO onFailure(callback)
-    // @TODO onSuccess(callback)
+    // @TODO onFailure(): callback
+    // @TODO onSuccess(): callback
 }

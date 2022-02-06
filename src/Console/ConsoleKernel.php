@@ -11,6 +11,7 @@ use TinyFramework\Console\Input\InputInterface;
 use TinyFramework\Console\Input\Option;
 use TinyFramework\Console\Output\Output;
 use TinyFramework\Console\Output\OutputInterface;
+use TinyFramework\Core\ContainerInterface;
 use TinyFramework\Core\Kernel;
 use TinyFramework\Event\EventDispatcherInterface;
 use TinyFramework\System\SignalHandler;
@@ -24,14 +25,11 @@ class ConsoleKernel extends Kernel implements ConsoleKernelInterface
 
     private ?OutputInterface $output;
 
-    private string $header = <<<EOF
- _____ _             _____                                            _
-|_   _(_)_ __  _   _|  ___| __ __ _ _ __ ___   _____      _____  _ __| | __
-  | | | | '_ \| | | | |_ | '__/ _` | '_ ` _ \ / _ \ \ /\ / / _ \| '__| |/ /
-  | | | | | | | |_| |  _|| | | (_| | | | | | |  __/\ V  V / (_) | |  |   <
-  |_| |_|_| |_|\__, |_|  |_|  \__,_|_| |_| |_|\___| \_/\_/ \___/|_|  |_|\_\
-               |___/
-EOF;
+    public function __construct(ContainerInterface $container)
+    {
+        parent::__construct($container);
+        $this->container->alias(ConsoleKernelInterface::class, Kernel::class);
+    }
 
     protected function boot(): void
     {
@@ -44,6 +42,14 @@ EOF;
             $this->commands[$inputDefinition->name()] = $command;
         }
         $this->loadCommandsByPath(root_dir() . '/app/Commands', '\\App\\Commands\\');
+    }
+
+    /**
+     * @return CommandAwesome[]
+     */
+    public function getCommands(): array
+    {
+        return $this->commands;
     }
 
     private function loadCommandsByPath(string $path, string $namespace = '\\'): void
@@ -84,6 +90,7 @@ EOF;
 
     public function handleException(\Throwable $e): int
     {
+        self::$reservedMemory = null; // free 10kb ram
         $verbosity = (int)(isset($this->output) ? $this->output->verbosity() : 0);
         $stacktrace = isset($this->output) && $verbosity >= OutputInterface::VERBOSITY_VERBOSE;
         $message = exception2text($e, $stacktrace);
@@ -140,39 +147,21 @@ EOF;
                 return $this->{$method}();
             }
         }
-        return $this->commandList($command);
-    }
 
-    private function commandList(string $hint = null): int
-    {
-        if ($hint !== null) {
-            $this->output->writeln(sprintf("<yellow>Command %s not found. Did you mean?</yellow>", $hint));
-        } else {
-            $this->output->writeln($this->header . PHP_EOL);
-            $this->output->writeln("<yellow>Available commands:</yellow>");
-        }
-        /**
-         * @var string $key
-         * @var CommandAwesome $command
-         */
-        foreach ($this->commands as $key => $command) {
-            $configuration = $command->configuration();
-            if ($hint === null || mb_strpos($configuration->name(), $hint) !== false) {
-                $this->output->writeln(sprintf(
-                    "  <green>%s</green>%s",
-                    str_pad($configuration->name(), 32),
-                    $configuration->description()
-                ));
-            }
-        }
-        return 0;
+        $this->input->argv([
+            'list',
+            $this->input->argv()[0] ?? null
+        ]);
+        return $this->tryHandle();
     }
 
     private function commandUsage(InputDefinitionInterface $definition = null): int
     {
         if ($definition === null) {
-            return $this->commandList('usage');
+            return $this->commands['list']->run($this->input, $this->output);
+            #return $this->commandList('usage');
         }
+
         $this->output->writeln("<white>NAME</white>");
         $this->output->writeln("\t<yellow>" . $definition->name() . "</yellow>\n");
         /** @var Option[] $options */

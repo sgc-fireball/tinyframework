@@ -70,7 +70,7 @@ class Readline
     {
         $dir = dirname($this->historyFile);
         if (!is_dir($dir)) {
-            if (!mkdir($dir, 0700, true)) {
+            if (!mkdir($dir, 0750, true)) {
                 trigger_error('Could not create history dir.', E_USER_WARNING);
                 return $this;
             }

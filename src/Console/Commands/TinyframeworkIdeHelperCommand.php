@@ -69,8 +69,12 @@ class TinyframeworkIdeHelperCommand extends CommandAwesome
 
         $content = [];
         $content[] = '<?php';
+        $content[] = '';
         $content[] = '/**';
+        $content[] = ' * PhpStorm Meta file, to provide autocomplete information for PhpStorm';
+        $content[] = ' *';
         $content[] = ' * @formatter:off';
+        $content[] = ' * @author Richard Huelsberg <rh+github@hrdns.de>';
         $content[] = ' * @since ' . date('Y-m-d H:i:s');
         $content[] = ' * @link https://confluence.jetbrains.com/display/PhpStorm/PhpStorm+Advanced+Metadata';
         $content[] = ' */';
@@ -89,6 +93,9 @@ class TinyframeworkIdeHelperCommand extends CommandAwesome
         $content[] = '    ]));';
         $content[] = '}';
         $content[] = '';
-        file_put_contents(root_dir() . '/.phpstorm.meta.php', implode("\n", $content));
+
+        $file = root_dir() . '/.phpstorm.meta.php';
+        file_put_contents($file, implode("\n", $content));
+        chmod($file, 0640);
     }
 }

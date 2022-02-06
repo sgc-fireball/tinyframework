@@ -105,6 +105,10 @@ class Database implements DatabaseInterface
             }
         }
 
+        if ($this->connection) {
+            return '"' . $this->connect()->connection->real_escape_string($value) . '"';
+        }
+
         /**
          * @link https://github.com/abreksa4/mysql-escape-string-polyfill/blob/master/src/functions.php
          * @link https://dev.mysql.com/doc/refman/8.0/en/string-literals.html#character-escape-sequences
@@ -123,7 +127,6 @@ class Database implements DatabaseInterface
             '\\' => '\\\\',
         ]);
         return '"' . $value . '"';
-        #return '"' . $this->connect()->connection->real_escape_string($value) . '"';
     }
 
     public function query(): Query

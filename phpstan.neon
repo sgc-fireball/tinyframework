@@ -1,4 +1,6 @@
 parameters:
+    tmpDir: /tmp/phpstan
+    #editorUrl: 'phpstorm://open?file=%%file%%&line=%%line%%'
     checkMissingIterableValueType: false
     treatPhpDocTypesAsCertain: false
     checkGenericClassInNonGenericObjectType: false

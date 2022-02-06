@@ -20,7 +20,7 @@ class BroadcastManager
         if (file_exists(root_dir() . '/routes/channels.php')) {
             require_once(root_dir() . '/routes/channels.php');
         }
-        return $this;
+        return $manager;
     }
 
     public function pattern(string $name = null, string $regex = null): static|array|string
@@ -78,7 +78,7 @@ class BroadcastManager
                 };
             }
         }
-        return fn (string $channel, mixed $user) => false;
+        return fn(string $channel, mixed $user) => false;
     }
 
     protected function translateChannel(string $channel): string
@@ -89,8 +89,15 @@ class BroadcastManager
             return $value[1];
         }, $matches);
         foreach ($matches as $name) {
-            $pattern = sprintf('(?<%s>%s)', $name, $patterns[$name] ?? $patterns['default']);
-            $channel = str_replace('{' . $name . '}', $pattern, $channel);
+            $channel = str_replace(
+                '{' . $name . '}',
+                sprintf(
+                    '(?<%s>%s)',
+                    $name,
+                    $patterns[$name] ?? $patterns['default']
+                ),
+                $channel
+            );
         }
         $regex = '#^';
         $regex .= sprintf('(?<_url>%s)', $channel);

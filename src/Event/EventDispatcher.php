@@ -50,17 +50,17 @@ class EventDispatcher implements EventDispatcherInterface
 
     public function getListenersForEvent(EventInterface|string $event): iterable
     {
-        $listeners = [];
+        $result = [];
         $eventName = \is_string($event) ? $event : \get_class($event);
         $this->checkEventName('event', $eventName);
         if (\array_key_exists($eventName, $this->listeners)) {
-            foreach ($this->listeners[$eventName] as $priority => &$listeners) {
-                foreach ($listeners as $index => $listener) {
-                    $listeners[] = $listener;
+            foreach ($this->listeners[$eventName] as $listeners) {
+                foreach ($listeners as $listener) {
+                    $result[] = $listener;
                 }
             }
         }
-        return $listeners;
+        return $result;
     }
 
     private function checkEventName(string $field, string $eventName): void

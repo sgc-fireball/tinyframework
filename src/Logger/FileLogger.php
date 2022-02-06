@@ -13,7 +13,7 @@ class FileLogger extends LoggerAwesome implements LoggerInterface
     public function __construct(array $config)
     {
         if (!is_dir($config['path'])) {
-            if (!mkdir($config['path'], 0770, true)) {
+            if (!mkdir($config['path'], 0750, true)) {
                 throw new RuntimeException('Could not create logs folder.');
             }
         }
@@ -34,9 +34,17 @@ class FileLogger extends LoggerAwesome implements LoggerInterface
         );
 
         $file = sprintf('%s/%s.log', $this->path, date('Y-m-d'));
-        $bytes = file_put_contents($file, trim($message) . "\n", file_exists($file) ? FILE_APPEND : 0);
+        if (!file_exists($file)) {
+            if (!touch($file)) {
+                trigger_error('Could not create logfile.', E_USER_WARNING);
+            }
+            if (!chmod($file, 0640)) {
+                trigger_error('Could not set chmod on logfile.', E_USER_WARNING);
+            }
+        }
+        $bytes = file_put_contents($file, trim($message) . "\n", FILE_APPEND);
         if ($bytes === false) {
-            trigger_error('Could not write log message.', E_USER_ERROR);
+            trigger_error('Could not write log message.', E_USER_WARNING);
         }
         return $this;
     }

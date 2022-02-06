@@ -268,14 +268,14 @@ if (!function_exists('guid')) {
         }
         return sprintf(
             '%04X%04X-%04X-%04X-%04X-%04X%04X%04X',
-            mt_rand(0, 65535),
-            mt_rand(0, 65535),
-            mt_rand(0, 65535),
-            mt_rand(16384, 20479),
-            mt_rand(32768, 49151),
-            mt_rand(0, 65535),
-            mt_rand(0, 65535),
-            mt_rand(0, 65535)
+            random_int(0, 65535),
+            random_int(0, 65535),
+            random_int(0, 65535),
+            random_int(16384, 20479),
+            random_int(32768, 49151),
+            random_int(0, 65535),
+            random_int(0, 65535),
+            random_int(0, 65535)
         );
     }
 }
@@ -360,12 +360,13 @@ if (!function_exists('e')) {
 
 if (!function_exists('password')) {
     function password(
-        int $length = 16,
+        int  $length = 16,
         bool $lowerChars = true,
         bool $upperChars = true,
         bool $numbers = true,
         bool $symbols = true
-    ): string {
+    ): string
+    {
         $password = '';
         $chars = '';
         if ($lowerChars) {
@@ -386,7 +387,7 @@ if (!function_exists('password')) {
         $counts = \strlen($chars) - 1;
         while (\strlen($password) < $length) {
             $chars = str_shuffle($chars);
-            $password .= substr($chars, mt_rand(0, $counts), 1);
+            $password .= substr($chars, random_int(0, $counts), 1);
         }
         return $password;
     }
@@ -510,8 +511,28 @@ if (!function_exists('inMaintenanceMode')) {
         $config = null;
         $file = root_dir() . '/storage/maintenance.json';
         if (file_exists($file)) {
-            $config = (array)json_decode(file_get_contents($file) ?? '[]', true) ?? [];
+            $config = (array)json_decode(file_get_contents($file) ?: '[]', true) ?: [];
         }
         return $config;
+    }
+}
+
+if (!function_exists('tap')) {
+    function tap(object $object): object
+    {
+        return new class($object) {
+            private object $object;
+
+            public function __construct(object $object)
+            {
+                $this->object = $object;
+            }
+
+            public function __call(string $method, array $parameters): object
+            {
+                $this->object->{$method}(...$parameters);
+                return $this;
+            }
+        };
     }
 }

@@ -35,6 +35,8 @@ class Blade implements ViewInterface
     /** @var Closure[] */
     private array $postCompilers = [];
 
+    private array $shared = [];
+
     public function __construct(array $config, StopWatch $stopWatch = null, CacheInterface $cache = null)
     {
         $this->config = $config;
@@ -42,6 +44,18 @@ class Blade implements ViewInterface
         $this->config['source'] = $this->config['source'] ?? 'resources/views';
         $this->stopWatch = $stopWatch ?? new StopWatch();
         $this->cache = $this->config['cache'] ? $cache->tag('template') : null;
+    }
+
+    public function share(string $key, mixed $value): static
+    {
+        if ($value === null) {
+            if (array_key_exists($key, $this->shared)) {
+                unset($this->shared[$key]);
+            }
+            return $this;
+        }
+        $this->shared[$key] = $value;
+        return $this;
     }
 
     public function addDirective(string $directive, Closure $callback): static
@@ -148,7 +162,7 @@ class Blade implements ViewInterface
 
         $content = (string)preg_replace_callback(
             '/\B@(@?\w+(?:::\w+)?)([ \t]*)(\( ( (?>[^()]+) | (?3) )* \))?/x',
-            fn ($match) => $this->compileStatement($match),
+            fn($match) => $this->compileStatement($match),
             $content
         );
 
@@ -196,6 +210,7 @@ class Blade implements ViewInterface
     {
         $this->stopWatch->start('9-blade.execute', 'blade');
         $__env = $this;
+        $__data = array_merge($this->shared, $__data);
         extract($__data);
         unset($__data);
         ob_start();
@@ -227,6 +242,8 @@ class Blade implements ViewInterface
     public function restorePlaceholder(string $content): string
     {
         if (\count($this->placeholder)) {
+            // @TODO Performance Impact: replace with preg_replace_callback
+            // @link https://gist.githubusercontent.com/jeboehm/558c5f399ef8008daa244c2fa178bd6c/raw/3f7c21d74852bd546af13eb94dcf2b0bcacd1205/seo_replace_boost.patch
             $content = str_replace(array_keys($this->placeholder), array_values($this->placeholder), $content);
         }
         return $content;

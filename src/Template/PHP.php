@@ -10,10 +10,24 @@ class PHP implements ViewInterface
 {
     private array $config;
 
+    private array $shared = [];
+
     public function __construct(array $config)
     {
         $this->config = $config;
         $this->config['source'] = $this->config['source'] ?? 'resources/views';
+    }
+
+    public function share(string $key, mixed $value = null): static
+    {
+        if ($value === null) {
+            if (array_key_exists($key, $this->shared)) {
+                unset($this->shared[$key]);
+            }
+            return $this;
+        }
+        $this->shared[$key] = $value;
+        return $this;
     }
 
     private function view2file(string $view): string
@@ -38,6 +52,7 @@ class PHP implements ViewInterface
     private function executeFile(string $__template, array $__data): string
     {
         $__env = $this;
+        $__data = array_merge($this->shared, $__data);
         extract($__data);
         unset($__data);
         ob_start();

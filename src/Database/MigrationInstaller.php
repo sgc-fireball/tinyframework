@@ -50,7 +50,10 @@ class MigrationInstaller
         usort($this->migrations, function ($migrationA, $migrationB) {
             $timeA = (int)explode('_', (new ReflectionClass($migrationA))->getShortName(), 3)[1];
             $timeB = (int)explode('_', (new ReflectionClass($migrationB))->getShortName(), 3)[1];
-            return $timeA === $timeB ? 0 : ($timeA <= $timeB ? -1 : 1);
+            if ($timeA === $timeB) {
+                return 0;
+            }
+            return $timeA <= $timeB ? -1 : 1;
         });
         return $this->migrations;
     }

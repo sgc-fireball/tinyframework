@@ -43,6 +43,21 @@ cd my-project; php console
     - psych
     - sessions
 
+## Debugging
+
+Open PHPStorm Settings `PHP` / `Servers`:
+- Name: `tinyframework`
+- Host: `127.0.0.1`
+- Port: `9000`
+- Debugger: `xdebug`
+- Use Path Mapping `Yes`
+- Map it to `/app`
+
+Use our preconfigurated alias `phpx`.
+```bash
+phpx console
+```
+
 ## Performance
 
 1. Enable composer classmap authoritative.
@@ -62,6 +77,8 @@ cd my-project; php console
 
 ## Todos
 
+- Implement DateTime wrapper
+- Implement Input::choise, Input::question, Input::confirm
 - Implement Model Relations
 - Implement Casts into Models
 - Implement Auth Service / Interface
@@ -69,6 +86,12 @@ cd my-project; php console
 - URL Signer
 - https://github.com/opis/closure/
 - Implement ServiceProviders::provides to implement lazy loading services
+- Paginator with url link support
+
+## Ideas
+
+- foreach $loop and $loop->parent
+- Markdown interpretor for Str.
 
 ## Author
 

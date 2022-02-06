@@ -11,7 +11,7 @@ use TinyFramework\Core\DotEnvInterface;
 use TinyFramework\Core\KernelInterface;
 use TinyFramework\Core\TestKernel;
 
-class FeatureTestCase extends TestCase
+abstract class FeatureTestCase extends TestCase
 {
     protected ?Container $container;
 

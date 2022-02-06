@@ -6,12 +6,14 @@ namespace TinyFramework\Database;
 
 use ArrayAccess;
 use JsonSerializable;
+use TinyFramework\Cast\CastInterface;
 use TinyFramework\Database\Relations\BelongsToMany;
 use TinyFramework\Database\Relations\BelongsToOne;
 use TinyFramework\Database\Relations\HasMany;
 use TinyFramework\Database\Relations\HasOne;
 use TinyFramework\Database\Relations\Relation;
 use TinyFramework\Helpers\Str;
+use function PHPUnit\Framework\isInstanceOf;
 
 class BaseModel implements JsonSerializable, ArrayAccess
 {
@@ -21,9 +23,11 @@ class BaseModel implements JsonSerializable, ArrayAccess
 
     protected string $primaryType = 'uuid';
 
+    protected array $hidden = [];
+
     protected array $fillable = [];
 
-    // @TODO protected array $casts = []
+    protected array $casts = [];
 
     protected array $attributes = [];
 
@@ -52,7 +56,7 @@ class BaseModel implements JsonSerializable, ArrayAccess
     {
         foreach ($attributes as $key => $value) {
             if (\in_array($key, $this->fillable) || $force) {
-                $this->attributes[$key] = $value;
+                $this->__set((string)$key, $value);
             }
         }
         return $this;
@@ -69,7 +73,7 @@ class BaseModel implements JsonSerializable, ArrayAccess
 
     public function jsonSerialize(): array
     {
-        return $this->attributes;
+        return $this->toArray();
     }
 
     public function __get(string $name): mixed
@@ -95,8 +99,37 @@ class BaseModel implements JsonSerializable, ArrayAccess
         if (method_exists($this, $method)) {
             return $this->{$method}();
         }
-        // @TODO \array_key_exists($this->casts[$name])
-        return $this->attributes[$name] ?? null;
+        $value = $this->attributes[$name] ?? null;
+        if ($value === null) {
+            return null;
+        }
+        $type = strtolower($this->casts[$name] ?? '') ?: null;
+        if ($type === null) {
+            return $value;
+        }
+        if (str_starts_with($type, 'encrypted:')) {
+            $value = crypto()->decrypt($value);
+            $type = substr($type, 10);
+            if (in_array($type, ['array', 'object', 'date', 'datetime'])) {
+                $value = $value ? @unserialize($value) : null;
+            }
+        }
+        if (in_array($type, ['bool', 'boolean'])) {
+            return (bool)$value;
+        } elseif (in_array($type, ['int', 'integer', 'timestamp'])) {
+            return (int)$value;
+        } elseif (in_array($type, ['float', 'double'])) {
+            return (float)$value;
+        } elseif (str_starts_with($type, 'decimal:')) {
+            return number_format((float)$value, (int)explode(':', $type, 2)[1]);
+        } elseif ($type === 'array') {
+            return is_array($value) ? $value : null;
+        } elseif ($type === 'object') {
+            return is_object($value) ? $value : null;
+        } elseif (in_array($type, ['date', 'datetime'])) {
+            $value = $value instanceof \DateTime ? $value : null;
+        }
+        return $value;
     }
 
     public function __isset(string $name): bool
@@ -106,12 +139,95 @@ class BaseModel implements JsonSerializable, ArrayAccess
 
     public function __set(string $name, mixed $value): void
     {
+        if ($value !== null) {
+            $type = strtolower($this->casts[$name] ?? '') ?: null;
+            $encrypt = str_starts_with($type, 'encrypted:');
+            if ($encrypt) {
+                $type = substr($type, 10);
+            }
+            if (in_array($type, ['bool', 'boolean'])) {
+                $value = (bool)$value;
+            } elseif (in_array($type, ['int', 'integer'])) {
+                $value = (int)$value;
+            } elseif (in_array($type, ['float', 'double'])) {
+                $value = (float)$value;
+            } elseif (str_starts_with($type, 'decimal:')) {
+                $value = number_format((float)$value, (int)explode(':', $type, 2)[1]);
+            } elseif ($type === 'array') {
+                if (is_object($value) && method_exists($value, 'toArray')) {
+                    $value = $value->toArray();
+                } elseif (is_string($value)) {
+                    if (
+                        (str_starts_with($value, '[') && str_ends_with($value, ']')) ||
+                        (str_starts_with($value, '{') && str_ends_with($value, '}'))
+                    ) {
+                        $value = json_decode($value, true);
+                    }
+                }
+                if (!is_array($value)) {
+                    throw new \InvalidArgumentException(sprintf(
+                        'Value %for s->%s must be an array.',
+                        get_class($this),
+                        $name
+                    ));
+                }
+            } elseif ($type === 'object') {
+                if (is_string($value) && (str_starts_with($value, '{') && str_ends_with($value, '}'))) {
+                    $value = json_decode($value);
+                }
+                if (!is_object($value)) {
+                    throw new \InvalidArgumentException(sprintf(
+                        'Value for %s->%s must be an object.',
+                        get_class($this),
+                        $name
+                    ));
+                }
+            } elseif (in_array($type, ['date', 'datetime', 'timestamp'])) {
+                if (is_numeric($value)) {
+                    $value = \DateTime::createFromFormat('u', $value);
+                } elseif (is_string($value) && $value) {
+                    if ($time = strtotime((string)$value)) {
+                        $value = (new \Datetime())->setTimestamp($time);
+                    }
+                }
+                if (!($value instanceof \DateTime)) {
+                    throw new \InvalidArgumentException(sprintf(
+                        'Value for %s->%s must be an integer, a parseable strtorime value or an \DateTime object.',
+                        get_class($this),
+                        $name
+                    ));
+                }
+                if ($type === 'date') {
+                    $value->setTime(0, 0, 0);
+                } elseif ($type === 'timestamp') {
+                    $value = $value->getTimestamp();
+                }
+            }
+            if ($encrypt) {
+                if (in_array($type, ['array', 'object', 'date', 'datetime'])) {
+                    $value = serialize($value);
+                }
+                $value = crypto()->encrypt($value);
+            }
+        }
         $this->attributes[$name] = $value;
     }
 
     public function toArray(): array
     {
-        return $this->attributes;
+        $result = [];
+        foreach ($this->attributes as $key => $value) {
+            if (!in_array($key, $this->hidden)) {
+                $result[$key] = $this->__get($key);
+            }
+        }
+        foreach ($this->relations as $relation => $items) {
+            $result[$relation] = [];
+            foreach ($items as $index => $item) {
+                $result[$relation][$index] = $item->toArray();
+            }
+        }
+        return $result;
     }
 
     public function offsetExists(mixed $offset): bool
@@ -121,12 +237,12 @@ class BaseModel implements JsonSerializable, ArrayAccess
 
     public function offsetGet(mixed $offset): mixed
     {
-        return $this->attributes[(string)$offset] ?? null;
+        return $this->__get((string)$offset);
     }
 
     public function offsetSet(mixed $offset, mixed $value): void
     {
-        $this->attributes[(string)$offset] = $value;
+        $this->__set((string)$offset, $value);
     }
 
     public function offsetUnset(mixed $offset): void
@@ -200,8 +316,9 @@ class BaseModel implements JsonSerializable, ArrayAccess
         string $class,
         string $foreignKey = null,
         string $localKey = null
-    ): HasOne {
-        [$one, $caller] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+    ): HasOne
+    {
+        $caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1];
         return new HasOne(
             $this->getRelatedQuery($class),
             $this,
@@ -215,8 +332,9 @@ class BaseModel implements JsonSerializable, ArrayAccess
         string $class,
         string $foreignKey = null,
         string $localKey = null
-    ): HasMany {
-        [$one, $caller] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+    ): HasMany
+    {
+        $caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1];
         return new HasMany(
             $this->getRelatedQuery($class),
             $this,
@@ -230,8 +348,9 @@ class BaseModel implements JsonSerializable, ArrayAccess
         string $class,
         string $foreignKey = 'id',
         string $ownerKey = null
-    ): BelongsToOne {
-        [$one, $caller] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+    ): BelongsToOne
+    {
+        $caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1];
         $ownerKey ??= Str::factory(class_basename($class))->snakeCase() . '_id';
         return new BelongsToOne(
             $this->getRelatedQuery($class),
@@ -249,11 +368,12 @@ class BaseModel implements JsonSerializable, ArrayAccess
         string $relatedPivotKey = null,
         string $parentKey = 'id',
         string $relatedKey = 'id'
-    ): BelongsToMany {
+    ): BelongsToMany
+    {
         $tableA = $this->getTable();
         $tableB = (new $class())->getTable();
         $table ??= $tableA < $tableB ? $tableA . '_2_' . $tableB : $tableB . '_2_' . $tableA;
-        [$one, $caller] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+        $caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1];
         return new BelongsToMany(
             $this->getRelatedQuery($class),
             $this,

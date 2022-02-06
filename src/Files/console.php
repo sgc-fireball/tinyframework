@@ -5,6 +5,9 @@ use TinyFramework\Console\ConsoleKernel;
 use TinyFramework\Core\Container;
 
 define('TINYFRAMEWORK_START', microtime(true));
+if (file_exists('../../vendor/')) {
+    chdir('../..');
+}
 require_once('vendor/autoload.php');
 if (file_exists('vendor/composer/platform_check.php')) {
     require_once('vendor/composer/platform_check.php');

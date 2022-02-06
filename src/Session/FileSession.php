@@ -14,7 +14,7 @@ class FileSession extends SessionAwesome implements SessionInterface
     {
         $this->path = $config['path'] ?? sys_get_temp_dir();
         if (!is_dir($this->path)) {
-            if (!mkdir($this->path, 0770, true)) {
+            if (!mkdir($this->path, 0750, true)) {
                 throw new RuntimeException('Could not create session folder.');
             }
         }
@@ -63,6 +63,9 @@ class FileSession extends SessionAwesome implements SessionInterface
         }
         if (file_put_contents($file, serialize($this->data)) === false) {
             throw new RuntimeException('Could not save session file. (3)');
+        }
+        if (!chmod($file, 0600)) {
+            throw new RuntimeException('Could not set chmod on session file. (4)');
         }
         $this->data = [];
         return $this;

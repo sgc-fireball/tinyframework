@@ -17,6 +17,13 @@ class RedisBroadcast implements BroadcastInterface
 
     public function __construct(array $config = [])
     {
+        if (!\extension_loaded('redis')) {
+            throw new \RuntimeException(sprintf(
+                'You cannot use the "%s" as the "redis" extension is not installed.',
+                __CLASS__
+            ));
+        }
+
         $this->config['host'] = $config['host'] ?? '127.0.0.1';
         $this->config['port'] = (int)($config['port'] ?? 6379);
         $this->config['password'] = $config['password'] ?? null;
@@ -49,9 +56,6 @@ class RedisBroadcast implements BroadcastInterface
     }
 
     /**
-     * @param Redis $connection
-     * @param string $channel
-     * @param string $message
      * @internal
      */
     public function onMessage(Redis $connection, string $channel, string $message): void

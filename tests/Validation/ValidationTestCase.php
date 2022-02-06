@@ -12,7 +12,7 @@ use TinyFramework\Validation\Rule\PasswordRule;
 use TinyFramework\Validation\Validator;
 use TinyFramework\Validation\ValidatorInterface;
 
-class ValidationTestCase extends TestCase
+abstract class ValidationTestCase extends TestCase
 {
     protected TranslatorInterface $translator;
 

@@ -10,6 +10,7 @@ class DotEnv implements DotEnvInterface
 
     private function __construct()
     {
+        // Signalton
     }
 
     public static function instance(): DotEnv

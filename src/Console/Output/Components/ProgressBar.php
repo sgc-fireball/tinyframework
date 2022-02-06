@@ -49,7 +49,7 @@ class ProgressBar
      * memory: The current memory usage;
      * message: used to display arbitrary messages in the progress bar (as explained later).
      */
-    private static function setFormatDefinition(string $name, string $format): void
+    public static function setFormatDefinition(string $name, string $format): void
     {
         self::$formats[$name] = $format;
     }

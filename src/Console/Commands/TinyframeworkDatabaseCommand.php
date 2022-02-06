@@ -9,6 +9,7 @@ use TinyFramework\Console\Input\Argument;
 use TinyFramework\Console\Input\InputDefinitionInterface;
 use TinyFramework\Console\Input\InputInterface;
 use TinyFramework\Console\Output\OutputInterface;
+use TinyFramework\Database\MySQL\Database as MySQLDatabase;
 
 class TinyframeworkDatabaseCommand extends CommandAwesome
 {
@@ -38,9 +39,8 @@ class TinyframeworkDatabaseCommand extends CommandAwesome
             return 1;
         }
         $connection = $connections[$connection];
-        switch ($connection['driver']) {
-            case \TinyFramework\Database\MySQL\Database::class:
-                return $this->runMySQL($connection);
+        if ($connection['driver'] === MySQLDatabase::class) {
+            return $this->runMySQL($connection);
         }
         $this->output->error('Currently not supported connection: ' . $connection);
         return 2;

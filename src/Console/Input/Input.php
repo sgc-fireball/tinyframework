@@ -84,6 +84,11 @@ class Input implements InputInterface
                 }
             }
         }
+        
+        $interaction = $_SERVER['DEBIAN_FRONTEND'] ?? $_ENV['DEBIAN_FRONTEND'] ?? getenv('DEBIAN_FRONTEND');
+        if ($interaction === 'noninteractive') {
+            $this->interaction = false;
+        }
         return $command;
     }
 

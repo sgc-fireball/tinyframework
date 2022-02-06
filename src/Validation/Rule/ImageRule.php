@@ -23,6 +23,10 @@ class ImageRule extends RuleAwesome
         if (!str_starts_with($file->mimetype(), 'image/')) {
             return [$this->translator->trans('validation.image', ['attribute' => $this->getTransName($name)])];
         }
+        $extensions = ['jpg', 'jpeg', 'jpe', 'gif', 'png', 'webp', 'bmp', 'tiff', 'tif', 'eps', 'svg', 'ico', 'wbmp'];
+        if (!in_array(strtolower($file->extension()), $extensions)) {
+            return [$this->translator->trans('validation.image', ['attribute' => $this->getTransName($name)])];
+        }
         return null;
     }
 }

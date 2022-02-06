@@ -24,9 +24,8 @@ class AES256CBC implements CryptInterface
         if ($key === null) {
             return $this->key;
         }
-        if (mb_strlen($key, '8bit') !== 32) {
-            throw new CryptException('Invalid AES256CBC key length.');
-        }
+        self::checkKey($key);
+
         $this->key = $key;
         return $this;
     }
@@ -36,9 +35,8 @@ class AES256CBC implements CryptInterface
         if ($key === null) {
             $key = $this->key;
         }
-        if (mb_strlen($key, '8bit') !== 32) {
-            throw new CryptException('Invalid AES256CBC key length.');
-        }
+        self::checkKey($key);
+
         $length = openssl_cipher_iv_length($this->cipher);
         $iv = openssl_random_pseudo_bytes($length);
         $encrypted = openssl_encrypt($plaintext, $this->cipher, $key, OPENSSL_RAW_DATA, $iv);
@@ -53,9 +51,7 @@ class AES256CBC implements CryptInterface
         if ($key === null) {
             $key = $this->key;
         }
-        if (mb_strlen($key, '8bit') !== 32) {
-            throw new CryptException('Invalid AES256CBC key length.');
-        }
+        self::checkKey($key);
 
         $encrypted = base64_decode($encrypted);
         $length = openssl_cipher_iv_length($this->cipher);
@@ -67,4 +63,12 @@ class AES256CBC implements CryptInterface
         }
         return openssl_decrypt($encrypted, $this->cipher, $key, OPENSSL_RAW_DATA, $iv);
     }
+
+    private static function checkKey(string $key): void
+    {
+        if (mb_strlen($key, '8bit') !== 32) {
+            throw new CryptException('Invalid AES256CBC key length.');
+        }
+    }
+
 }

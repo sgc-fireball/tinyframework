@@ -8,15 +8,18 @@ use TinyFramework\Color\Color;
 
 class Output implements OutputInterface
 {
+    private const FOREGROUND_COLOR_RESET = "\e[39m";
+    private const BACKGROUND_COLOR_RESET = "\e[49m";
+
     private Color $color;
 
     private bool $ansi;
 
     private int $verbosity = 0;
 
-    private int $width = 80;
+    private int|null $width = null;
 
-    private int $height = 25;
+    private int|null $height = null;
 
     /**
      * foreground;background;attributes
@@ -37,39 +40,39 @@ class Output implements OutputInterface
         #'invert' => ["\e[7m", "\e[27m"],
         #'hidden' => ["\e[8m", "\e[28m"],
 
-        'black' => ["\e[30m", "\e[39m"],
-        'red' => ["\e[31m", "\e[39m"],
-        'green' => ["\e[32m", "\e[39m"],
-        'yellow' => ["\e[33m", "\e[39m"],
-        'blue' => ["\e[34m", "\e[39m"],
-        'magenta' => ["\e[35m", "\e[39m"],
-        'cyan' => ["\e[36m", "\e[39m"],
-        'lightgray' => ["\e[37m", "\e[39m"],
-        'darkgray' => ["\e[90m", "\e[39m"],
-        'lightred' => ["\e[91m", "\e[39m"],
-        'lightgreen' => ["\e[92m", "\e[39m"],
-        'lightyellow' => ["\e[93m", "\e[39m"],
-        'lightblue' => ["\e[94m", "\e[39m"],
-        'lightmagenta' => ["\e[95m", "\e[39m"],
-        'lightcyan' => ["\e[96m", "\e[39m"],
-        'white' => ["\e[97m", "\e[39m"],
+        'black' => ["\e[30m", self::FOREGROUND_COLOR_RESET],
+        'red' => ["\e[31m", self::FOREGROUND_COLOR_RESET],
+        'green' => ["\e[32m", self::FOREGROUND_COLOR_RESET],
+        'yellow' => ["\e[33m", self::FOREGROUND_COLOR_RESET],
+        'blue' => ["\e[34m", self::FOREGROUND_COLOR_RESET],
+        'magenta' => ["\e[35m", self::FOREGROUND_COLOR_RESET],
+        'cyan' => ["\e[36m", self::FOREGROUND_COLOR_RESET],
+        'lightgray' => ["\e[37m", self::FOREGROUND_COLOR_RESET],
+        'darkgray' => ["\e[90m", self::FOREGROUND_COLOR_RESET],
+        'lightred' => ["\e[91m", self::FOREGROUND_COLOR_RESET],
+        'lightgreen' => ["\e[92m", self::FOREGROUND_COLOR_RESET],
+        'lightyellow' => ["\e[93m", self::FOREGROUND_COLOR_RESET],
+        'lightblue' => ["\e[94m", self::FOREGROUND_COLOR_RESET],
+        'lightmagenta' => ["\e[95m", self::FOREGROUND_COLOR_RESET],
+        'lightcyan' => ["\e[96m", self::FOREGROUND_COLOR_RESET],
+        'white' => ["\e[97m", self::FOREGROUND_COLOR_RESET],
 
-        'bg:black' => ["\e[40m", "\e[49m"],
-        'bg:red' => ["\e[41m", "\e[49m"],
-        'bg:green' => ["\e[42m", "\e[49m"],
-        'bg:yellow' => ["\e[43m", "\e[49m"],
-        'bg:blue' => ["\e[44m", "\e[49m"],
-        'bg:magenta' => ["\e[45m", "\e[49m"],
-        'bg:cyan' => ["\e[46m", "\e[49m"],
-        'bg:lightgray' => ["\e[47m", "\e[49m"],
-        'bg:darkgray' => ["\e[100m", "\e[49m"],
-        'bg:lightred' => ["\e[101m", "\e[49m"],
-        'bg:lightgreen' => ["\e[102m", "\e[49m"],
-        'bg:lightyellow' => ["\e[103m", "\e[49m"],
-        'bg:lightblue' => ["\e[104m", "\e[49m"],
-        'bg:lightmagenta' => ["\e[105m", "\e[49m"],
-        'bg:lightcyan' => ["\e[106m", "\e[49m"],
-        'bg:white' => ["\e[107m", "\e[49m"],
+        'bg:black' => ["\e[40m", self::BACKGROUND_COLOR_RESET],
+        'bg:red' => ["\e[41m", self::BACKGROUND_COLOR_RESET],
+        'bg:green' => ["\e[42m", self::BACKGROUND_COLOR_RESET],
+        'bg:yellow' => ["\e[43m", self::BACKGROUND_COLOR_RESET],
+        'bg:blue' => ["\e[44m", self::BACKGROUND_COLOR_RESET],
+        'bg:magenta' => ["\e[45m", self::BACKGROUND_COLOR_RESET],
+        'bg:cyan' => ["\e[46m", self::BACKGROUND_COLOR_RESET],
+        'bg:lightgray' => ["\e[47m", self::BACKGROUND_COLOR_RESET],
+        'bg:darkgray' => ["\e[100m", self::BACKGROUND_COLOR_RESET],
+        'bg:lightred' => ["\e[101m", self::BACKGROUND_COLOR_RESET],
+        'bg:lightgreen' => ["\e[102m", self::BACKGROUND_COLOR_RESET],
+        'bg:lightyellow' => ["\e[103m", self::BACKGROUND_COLOR_RESET],
+        'bg:lightblue' => ["\e[104m", self::BACKGROUND_COLOR_RESET],
+        'bg:lightmagenta' => ["\e[105m", self::BACKGROUND_COLOR_RESET],
+        'bg:lightcyan' => ["\e[106m", self::BACKGROUND_COLOR_RESET],
+        'bg:white' => ["\e[107m", self::BACKGROUND_COLOR_RESET],
     ];
 
     public function __construct(Color $color = null)
@@ -87,19 +90,26 @@ class Output implements OutputInterface
 
     protected function onResize(): void
     {
-        $width = 80;
-        $height = 50;
         $command = trim(`which stty`);
-        if (is_executable($command)) {
-            list($height, $width) = explode(' ', @exec($command . ' size 2>/dev/null') ?: $width . ' ' . $height);
+        if ($command && is_executable($command)) {
+            $output = @exec($command . ' size 2>/dev/null');
+            if (preg_match('/\d+ \d+/', $output)) {
+                list($height, $width) = explode(' ', $output);
+                $this->height = (int)trim($height);
+                $this->width = (int)trim($width);
+            }
         }
-        $command = trim(`which tput`);
-        if (is_executable($command)) {
-            $width = (int)trim(shell_exec($command . ' cols'));
-            $height = (int)trim(shell_exec($command . ' lines'));
+        if ($this->width === null && $this->height === null && isset($_SERVER['TERM'])) {
+            $command = trim(`which tput`);
+            if ($command && is_executable($command)) {
+                $this->width = (int)trim(@shell_exec($command . ' cols'));
+                $this->height = (int)trim(@shell_exec($command . ' lines'));
+            }
         }
-        $this->width = $width;
-        $this->height = $height;
+        if ($this->width === null && $this->height === null) {
+            $this->width = 80;
+            $this->height = 25;
+        }
     }
 
     public function width(): int
@@ -147,8 +157,8 @@ class Output implements OutputInterface
         preg_match_all('/<(\/)?([a-zA-Z0-9#:]+)>/', $text, $matches, PREG_SET_ORDER);
         foreach ($matches as $match) {
             $replace = '';
+            list($match, $end, $command) = $match;
             if ($this->ansi) {
-                list($match, $end, $command) = $match;
                 $replace = "\e[0m";
                 if (array_key_exists($command, $this->ansiCommands)) {
                     $replace = $this->ansiCommands[$command][$end ? 1 : 0];

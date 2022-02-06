@@ -28,6 +28,9 @@ use TinyFramework\StopWatch\StopWatch;
 
 abstract class Kernel implements KernelInterface
 {
+
+    protected static ?string $reservedMemory;
+
     protected ContainerInterface $container;
 
     /** @var string[] */
@@ -47,8 +50,8 @@ abstract class Kernel implements KernelInterface
             define('TINYFRAMEWORK_START_AUTOLOAD', microtime(true));
         }
 
-        ini_set('display_errors', 'Off');
-        error_reporting(-1);
+        self::$reservedMemory = str_repeat('x', 10240); // reserve 10 kb
+
         $this->container = $container;
         $this->stopWatch = $this->container
             ->alias('stopwatch', StopWatch::class)
@@ -61,14 +64,17 @@ abstract class Kernel implements KernelInterface
 
         $this->stopWatch->start('3-kernel.register', 'kernel');
         $this->container
-            ->alias('dotenv', DotEnvInterface::class)
-            ->singleton(DotEnvInterface::class, DotEnv::class)
-            ->get(DotEnvInterface::class)
-            ->load('.env')->load('.env.local');
-        $this->container
             ->alias('kernel', get_class($this))
             ->alias(Kernel::class, get_class($this))
             ->singleton(get_class($this), $this);
+        /** @var DotEnvInterface $dotEnv */
+        $dotEnv = $this->container
+            ->alias('dotenv', DotEnvInterface::class)
+            ->singleton(DotEnvInterface::class, DotEnv::class)
+            ->get(DotEnvInterface::class);
+        $dotEnv->load('.env')->load('.env.local');
+
+        error_reporting($dotEnv->get('APP_ENV') === 'testing' ? E_ALL | E_NOTICE | E_DEPRECATED : 0);
         set_error_handler([$this, 'handleError']);
         set_exception_handler([$this, 'handleExceptionVoid']);
         register_shutdown_function([$this, 'handleShutdown']);
@@ -149,12 +155,9 @@ abstract class Kernel implements KernelInterface
     {
         foreach ($this->serviceProviderNames as $serviceProvider) {
             assert(\is_string($serviceProvider));
-            #$name = sprintf('3.%02d-%s',$index,class_basename($serviceProvider));
-            #$this->stopWatch->start($name, 'kernel');
             $this->serviceProviders[] = $serviceProvider = (new $serviceProvider($this->container));
             assert($serviceProvider instanceof ServiceProviderInterface);
             $serviceProvider->register();
-            #$this->stopWatch->stop($name);
         }
     }
 
@@ -162,10 +165,7 @@ abstract class Kernel implements KernelInterface
     {
         foreach ($this->serviceProviders as &$serviceProvider) {
             assert($serviceProvider instanceof ServiceProviderInterface);
-            #$name = sprintf('4.%02d-%s',$index,class_basename($serviceProvider));
-            #$this->stopWatch->start($name, 'kernel');
             $serviceProvider->boot();
-            #$this->stopWatch->stop($name);
         }
     }
 

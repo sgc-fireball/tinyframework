@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TinyFramework\Console\Commands;
 
+use TinyFramework\Cache\CacheInterface;
 use TinyFramework\Console\CommandAwesome;
 use TinyFramework\Console\Input\InputDefinitionInterface;
 use TinyFramework\Console\Input\InputInterface;
@@ -17,6 +18,13 @@ use TinyFramework\System\SignalHandler;
 
 class TinyframeworkQueueWorkerCommand extends CommandAwesome
 {
+    private float $started;
+
+    public function __construct()
+    {
+        $this->started = microtime(true);
+    }
+
     protected function configure(): InputDefinitionInterface
     {
         return parent::configure()
@@ -67,5 +75,16 @@ class TinyframeworkQueueWorkerCommand extends CommandAwesome
             sleep(1);
         }
         return 0;
+    }
+
+    protected function isTerminated(): bool
+    {
+        /** @var CacheInterface $cache */
+        $cache = container('cache');
+        $reset_at = $cache->get('workers.queue_stop') ?: 0;
+        if ($this->started < $reset_at) {
+            $this->output->info('Worker stopped because a restart was requested.');
+        }
+        return parent::isTerminated();
     }
 }

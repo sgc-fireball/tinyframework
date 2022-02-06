@@ -242,7 +242,7 @@ class Container implements ContainerInterface
             $type = $reflectionParameter->getType();
             if ($reflectionParameter->isVariadic()) {
                 if ($index < \count($parameters)) {
-                    $values = \array_slice(array_values($parameters), $index) ?? [];
+                    $values = \array_slice(array_values($parameters), $index) ?: [];
                     $arguments = array_merge($arguments, $values);
                     break;
                 }

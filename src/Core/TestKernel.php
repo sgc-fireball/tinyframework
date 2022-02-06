@@ -17,6 +17,7 @@ class TestKernel extends Kernel
 
     public function handleException(\Throwable $e): int
     {
+        self::$reservedMemory = null; // free 10kb ram
         // need to defined!
         throw $e;
     }

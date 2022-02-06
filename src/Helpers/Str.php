@@ -57,11 +57,15 @@ class Str implements \Stringable
         $value = $this->value;
         if (\in_array(\setlocale(LC_CTYPE, "0"), [null, 'C', 'POSIX'])) {
             if (\str_contains($value = \htmlentities($value, ENT_QUOTES, 'UTF-8'), '&')) {
-                $value = \html_entity_decode(\preg_replace(
-                    '~&([a-z]{1,2})(?:acute|cedil|circ|grave|lig|orn|ring|slash|tilde|uml);~i',
-                    '$1',
-                    $value
-                ), ENT_QUOTES, 'UTF-8');
+                $value = \html_entity_decode(
+                    \preg_replace(
+                        '~&([a-z]{1,2})(?:acute|cedil|circ|grave|lig|orn|ring|slash|tilde|uml);~i',
+                        '$1',
+                        $value
+                    ),
+                    ENT_QUOTES,
+                    'UTF-8'
+                );
             }
         } else {
             $value = \iconv('UTF-8', 'ASCII//TRANSLIT', $value);

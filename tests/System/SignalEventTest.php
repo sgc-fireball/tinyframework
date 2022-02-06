@@ -17,7 +17,7 @@ class SignalEventTest extends TestCase
             $info = ['name' => $signal]
         );
         $this->assertEquals($signal, $event->signal());
-        $this->assertEquals($name, $name);
+        $this->assertEquals($name, $event->name());
         $this->assertEquals($info, $event->info());
     }
 }

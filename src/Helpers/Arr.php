@@ -553,7 +553,9 @@ class Arr implements \ArrayAccess, \Iterator
         \sort($array);
         $length = \count($array);
         $middle = $length / 2.0;
-        return $length % 2 === 0 ? ($array[\floor($middle) - 1] + $array[\ceil($middle)]) / 2 : $array[\intval($middle)];
+        return $length % 2 === 0 ? ($array[\floor($middle) - 1] + $array[\ceil($middle)]) / 2 : $array[\intval(
+            $middle
+        )];
     }
 
     public function uDiffAssoc(array $array2, array ...$arrays): static

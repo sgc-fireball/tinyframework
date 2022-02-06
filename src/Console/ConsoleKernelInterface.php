@@ -11,4 +11,6 @@ use TinyFramework\Core\KernelInterface;
 interface ConsoleKernelInterface extends KernelInterface
 {
     public function handle(InputInterface $input, OutputInterface $output): int;
+
+    public function getCommands(): array;
 }
