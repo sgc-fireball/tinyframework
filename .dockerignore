@@ -1,0 +1,8 @@
+/.cache/
+/.config/
+/.idea/
+/.local/
+/.sonar/
+/.scannerwork/
+/vendor/
+/src/Files/storage/
