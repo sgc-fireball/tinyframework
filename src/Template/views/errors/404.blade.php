@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <title>404 Not Found</title>
+    <meta name="robots" content="noindex">
 </head>
 <body>
 <h1>404 Not Found</h1>

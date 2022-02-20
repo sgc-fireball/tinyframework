@@ -8,6 +8,7 @@ use Closure;
 use RuntimeException;
 use TinyFramework\Core\ContainerInterface;
 use TinyFramework\Http\Middleware\MaintenanceMiddleware;
+use TinyFramework\Http\Middleware\ProjectHoneyPotMiddleware;
 
 class Router
 {
@@ -23,6 +24,7 @@ class Router
 
     private array $middleware = [
         MaintenanceMiddleware::class,
+        ProjectHoneyPotMiddleware::class,
     ];
 
     public function __construct(ContainerInterface $container)
@@ -33,7 +35,7 @@ class Router
     public function routes(): array
     {
         // destroy pointers
-        return array_map(fn (Route $route) => clone $route, $this->routes);
+        return array_map(fn(Route $route) => clone $route, $this->routes);
     }
 
     public function load(): static
@@ -306,7 +308,7 @@ class Router
         if (\in_array('GET', $result)) {
             $result[] = 'HEAD';
         }
-        $results = array_unique(array_filter($result, fn ($method) => $method !== 'ANY'));
+        $results = array_unique(array_filter($result, fn($method) => $method !== 'ANY'));
         sort($results);
         return $results;
     }

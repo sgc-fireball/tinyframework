@@ -107,7 +107,10 @@ class Response
 
     public static function view(string $file, array $data = [], int $code = 200, array $headers = []): Response
     {
-        return self::new(container('view')->render($file, $data), $code, $headers);
+        $response = self::new('', $code, $headers);
+        $data['response'] = $response;
+        $response->content(container('view')->render($file, $data));
+        return $response;
     }
 
     public static function json(array $json = [], int $code = 200): Response
@@ -117,7 +120,7 @@ class Response
 
     public static function error(int $code = 400, array $headers = []): Response
     {
-        $content = 'HTTP Status ' . $code;
+        $content = $code . ' ERROR';
         if (\array_key_exists($code, self::$codes)) {
             $content = $code . ' ' . self::$codes[$code];
         }

@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <title>500 Internal Server Error</title>
+    <meta name="robots" content="noindex">
 </head>
 <body>
 <h1>500 Internal Server Error</h1>

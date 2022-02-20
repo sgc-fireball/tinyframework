@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <title>429 Too many requests</title>
+    <meta name="robots" content="noindex">
 </head>
 <body>
 <h1>429 Too many requests</h1>
