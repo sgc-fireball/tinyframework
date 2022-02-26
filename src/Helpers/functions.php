@@ -360,13 +360,12 @@ if (!function_exists('e')) {
 
 if (!function_exists('password')) {
     function password(
-        int  $length = 16,
+        int $length = 16,
         bool $lowerChars = true,
         bool $upperChars = true,
         bool $numbers = true,
         bool $symbols = true
-    ): string
-    {
+    ): string {
         $password = '';
         $chars = '';
         if ($lowerChars) {
@@ -382,7 +381,9 @@ if (!function_exists('password')) {
             $chars .= ';#$*-/<=>?@^_|~';
         }
         if (empty($chars)) {
-            throw new RuntimeException('Please allow minimum one of the following sets: lowerChars, upperChars, numbers, symbols.');
+            throw new RuntimeException(
+                'Please allow minimum one of the following sets: lowerChars, upperChars, numbers, symbols.'
+            );
         }
         $counts = \strlen($chars) - 1;
         while (\strlen($password) < $length) {
@@ -534,5 +535,19 @@ if (!function_exists('tap')) {
                 return $this;
             }
         };
+    }
+}
+
+if (!function_exists('str')) {
+    function str(string $string): Str
+    {
+        return Str::factory($string);
+    }
+}
+
+if (!function_exists('arr')) {
+    function arr(array $arr): Arr
+    {
+        return Arr::factory($arr);
     }
 }
