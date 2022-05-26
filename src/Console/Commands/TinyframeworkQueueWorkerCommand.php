@@ -84,6 +84,7 @@ class TinyframeworkQueueWorkerCommand extends CommandAwesome
         $reset_at = $cache->get('workers.queue_stop') ?: 0;
         if ($this->started < $reset_at) {
             $this->output->info('Worker stopped because a restart was requested.');
+            return true;
         }
         return parent::isTerminated();
     }
