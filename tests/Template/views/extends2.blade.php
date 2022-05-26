@@ -1,6 +1,6 @@
-test
-@section('extends')
-    test1
+test1
+@section('content')
+    test2
 @show
 
-test
+test3

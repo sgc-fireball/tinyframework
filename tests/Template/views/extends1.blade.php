@@ -1,5 +1,5 @@
 @extends('extends2')
 
-@section('extends')
-    test{{ $time }}
+@section('content')
+    test4{{ $time }}test4
 @endsection

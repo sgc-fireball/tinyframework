@@ -410,42 +410,42 @@ class Blade implements ViewInterface
     {
         $section = trim($expression, "('\")");
         $this->sectionStack[] = $section;
-        return sprintf('<?php echo $__env->startSection%s; ?>', $expression);
+        return sprintf('<?php if($__env->startSection%s): ?>', $expression);
     }
 
     public function compileEndsection(string $expression): string
     {
         array_pop($this->sectionStack);
-        return '<?php $__env->stopSection(); ?>';
+        return '<?php endif; $__env->stopSection(); ?>';
     }
 
     public function compileStop(string $expression): string
     {
         array_pop($this->sectionStack);
-        return '<?php $__env->stopSection(); ?>';
+        return '<?php endif; $__env->stopSection(); ?>';
     }
 
     public function compileOverwrite(string $expression): string
     {
         array_pop($this->sectionStack);
-        return '<?php $__env->stopSection(true); ?>';
+        return '<?php endif; $__env->stopSection(true); ?>';
     }
 
     public function compilePrepend(string $expression): string
     {
         array_pop($this->sectionStack);
-        return '<?php $__env->prependSection(); ?>';
+        return '<?php endif; $__env->prependSection(); ?>';
     }
 
     public function compileAppend(string $expression): string
     {
         array_pop($this->sectionStack);
-        return '<?php $__env->appendSection(); ?>';
+        return '<?php endif; $__env->appendSection(); ?>';
     }
 
     public function compileShow(string $expression): string
     {
-        return '<?php echo $__env->yieldSection(); ?>';
+        return '<?php endif; echo $__env->yieldSection(); ?>';
     }
 
     public function compileYield(string $expression): string
@@ -462,15 +462,28 @@ class Blade implements ViewInterface
         return $this->getPlaceholder('section', $section);
     }
 
-    public function startSection(string $section, string $content = null): void
+    public function startSection(string $section, string $content = null): bool
     {
-        if ($content === null) {
-            if (ob_start()) {
-                $this->sectionStack[] = $section;
-            }
-        } else {
+        if ($content !== null) {
             $this->extendSection($section, e($content));
+            return true;
         }
+
+        // @TODO needs to run section? ##placeholder-section-content
+        /*$id = $this->getPlaceholder('section', $section);
+        if (array_key_exists($id, $this->placeholder)) {
+            if (strpos($this->placeholder[$id], $id) === false) {
+                ob_start();
+                $this->sectionStack[] = $section;
+                return false;
+            }
+        }*/
+
+        if (ob_start()) {
+            $this->sectionStack[] = $section;
+            return true;
+        }
+        return false;
     }
 
     public function extendSection(string $section, string $content = null): string

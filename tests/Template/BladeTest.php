@@ -22,7 +22,7 @@ class BladeTest extends TestCase
     {
         $this->blade = new Blade([
             'cache' => false,
-            'source' => __DIR__ . '/views'
+            'source' => __DIR__ . '/views',
         ]);
     }
 
@@ -72,7 +72,10 @@ class BladeTest extends TestCase
     {
         $tpl = '@class(["true" => true, "false" => false])';
         $php = $this->blade->compileString($tpl);
-        $this->assertEquals('<?php echo implode(" ",array_keys(array_filter(["true" => true, "false" => false]))); ?>', $php);
+        $this->assertEquals(
+            '<?php echo implode(" ",array_keys(array_filter(["true" => true, "false" => false]))); ?>',
+            $php
+        );
         $this->assertEquals('true', $this->blade->renderString($tpl));
     }
 
@@ -139,7 +142,10 @@ class BladeTest extends TestCase
     {
         $tpl = '@while($i--) @break($i < 3) {{ $i }} @endwhile';
         $php = $this->blade->compileString($tpl);
-        $this->assertEquals('<?php while($i--): ?> <?php if ($i < 3) { break; } ?> <?php echo(e( $i )); ?> <?php endwhile; ?>', $php);
+        $this->assertEquals(
+            '<?php while($i--): ?> <?php if ($i < 3) { break; } ?> <?php echo(e( $i )); ?> <?php endwhile; ?>',
+            $php
+        );
         $this->assertEquals('4   3', $this->blade->renderString($tpl, ['i' => 5]));
     }
 
@@ -147,7 +153,10 @@ class BladeTest extends TestCase
     {
         $tpl = '@while($i--) @continue($i < 3) {{ $i }} @endwhile';
         $php = $this->blade->compileString($tpl);
-        $this->assertEquals('<?php while($i--): ?> <?php if ($i < 3) { continue; } ?> <?php echo(e( $i )); ?> <?php endwhile; ?>', $php);
+        $this->assertEquals(
+            '<?php while($i--): ?> <?php if ($i < 3) { continue; } ?> <?php echo(e( $i )); ?> <?php endwhile; ?>',
+            $php
+        );
         $this->assertEquals('4   3', $this->blade->renderString($tpl, ['i' => 5]));
     }
 
@@ -211,12 +220,12 @@ class BladeTest extends TestCase
     {
         $tpl = '@section("test") test1 @endsection @section("test") test2 @show';
 
-        $php = '<?php echo $__env->startSection("test"); ?>';
+        $php = '<?php if($__env->startSection("test")): ?>';
         $php .= ' test1 ';
-        $php .= '<?php $__env->stopSection(); ?>';
-        $php .= '<?php echo $__env->startSection("test"); ?>';
+        $php .= '<?php endif; $__env->stopSection(); ?>';
+        $php .= '<?php if($__env->startSection("test")): ?>';
         $php .= ' test2 ';
-        $php .= '<?php echo $__env->yieldSection(); ?>';
+        $php .= '<?php endif; echo $__env->yieldSection(); ?>';
 
         $this->assertEquals($php, $this->blade->compileString($tpl));
         $this->assertEquals('test1', $this->blade->renderString($tpl));
@@ -226,15 +235,15 @@ class BladeTest extends TestCase
     {
         $tpl = '@section("test") test1 @endsection @section("test") test2 @overwrite @section("test") test3 @show';
 
-        $php = '<?php echo $__env->startSection("test"); ?>';
+        $php = '<?php if($__env->startSection("test")): ?>';
         $php .= ' test1 ';
-        $php .= '<?php $__env->stopSection(); ?>';
-        $php .= '<?php echo $__env->startSection("test"); ?>';
+        $php .= '<?php endif; $__env->stopSection(); ?>';
+        $php .= '<?php if($__env->startSection("test")): ?>';
         $php .= ' test2 ';
-        $php .= '<?php $__env->stopSection(true); ?>';
-        $php .= '<?php echo $__env->startSection("test"); ?>';
+        $php .= '<?php endif; $__env->stopSection(true); ?>';
+        $php .= '<?php if($__env->startSection("test")): ?>';
         $php .= ' test3 ';
-        $php .= '<?php echo $__env->yieldSection(); ?>';
+        $php .= '<?php endif; echo $__env->yieldSection(); ?>';
 
         $this->assertEquals($php, $this->blade->compileString($tpl));
         $this->assertEquals('test2', $this->blade->renderString($tpl));
@@ -244,15 +253,15 @@ class BladeTest extends TestCase
     {
         $tpl = '@section("test") test1 @endsection @section("test") prepend @prepend @section("test") test2 @show';
 
-        $php = '<?php echo $__env->startSection("test"); ?>';
+        $php = '<?php if($__env->startSection("test")): ?>';
         $php .= ' test1 ';
-        $php .= '<?php $__env->stopSection(); ?>';
-        $php .= '<?php echo $__env->startSection("test"); ?>';
+        $php .= '<?php endif; $__env->stopSection(); ?>';
+        $php .= '<?php if($__env->startSection("test")): ?>';
         $php .= ' prepend ';
-        $php .= '<?php $__env->prependSection(); ?>';
-        $php .= '<?php echo $__env->startSection("test"); ?>';
+        $php .= '<?php endif; $__env->prependSection(); ?>';
+        $php .= '<?php if($__env->startSection("test")): ?>';
         $php .= ' test2 ';
-        $php .= '<?php echo $__env->yieldSection(); ?>';
+        $php .= '<?php endif; echo $__env->yieldSection(); ?>';
 
         $this->assertEquals($php, $this->blade->compileString($tpl));
         $this->assertEquals('prepend  test1', $this->blade->renderString($tpl));
@@ -262,15 +271,15 @@ class BladeTest extends TestCase
     {
         $tpl = '@section("test") test1 @endsection @section("test") append @append @section("test") test2 @show';
 
-        $php = '<?php echo $__env->startSection("test"); ?>';
+        $php = '<?php if($__env->startSection("test")): ?>';
         $php .= ' test1 ';
-        $php .= '<?php $__env->stopSection(); ?>';
-        $php .= '<?php echo $__env->startSection("test"); ?>';
+        $php .= '<?php endif; $__env->stopSection(); ?>';
+        $php .= '<?php if($__env->startSection("test")): ?>';
         $php .= ' append ';
-        $php .= '<?php $__env->appendSection(); ?>';
-        $php .= '<?php echo $__env->startSection("test"); ?>';
+        $php .= '<?php endif; $__env->appendSection(); ?>';
+        $php .= '<?php if($__env->startSection("test")): ?>';
         $php .= ' test2 ';
-        $php .= '<?php echo $__env->yieldSection(); ?>';
+        $php .= '<?php endif; echo $__env->yieldSection(); ?>';
 
         $this->assertEquals($php, $this->blade->compileString($tpl));
         $this->assertEquals('test1  append', $this->blade->renderString($tpl));
@@ -280,9 +289,9 @@ class BladeTest extends TestCase
     {
         $tpl = '@section("test") test @show';
 
-        $php = '<?php echo $__env->startSection("test"); ?>';
+        $php = '<?php if($__env->startSection("test")): ?>';
         $php .= ' test ';
-        $php .= '<?php echo $__env->yieldSection(); ?>';
+        $php .= '<?php endif; echo $__env->yieldSection(); ?>';
 
         $this->assertEquals($php, $this->blade->compileString($tpl));
         $this->assertEquals('test', $this->blade->renderString($tpl));
@@ -292,12 +301,12 @@ class BladeTest extends TestCase
     {
         $tpl = '@section("test") test @endsection @section("test2") test2 @endsection @yield("test")';
 
-        $php = '<?php echo $__env->startSection("test"); ?>';
+        $php = '<?php if($__env->startSection("test")): ?>';
         $php .= ' test ';
-        $php .= '<?php $__env->stopSection(); ?>';
-        $php .= '<?php echo $__env->startSection("test2"); ?>';
+        $php .= '<?php endif; $__env->stopSection(); ?>';
+        $php .= '<?php if($__env->startSection("test2")): ?>';
         $php .= ' test2 ';
-        $php .= '<?php $__env->stopSection(); ?>';
+        $php .= '<?php endif; $__env->stopSection(); ?>';
         $php .= '<?php echo $__env->yieldContent("test"); ?>';
 
         $this->assertEquals($php, $this->blade->compileString($tpl));
@@ -308,13 +317,13 @@ class BladeTest extends TestCase
     {
         $tpl = '@section("test") test @parent test @append @section("test") parent @show';
 
-        $php = '<?php echo $__env->startSection("test"); ?>';
+        $php = '<?php if($__env->startSection("test")): ?>';
         $php .= ' test ';
         $php .= '##placeholder-section-testtest ';
-        $php .= '<?php $__env->appendSection(); ?>';
-        $php .= '<?php echo $__env->startSection("test"); ?>';
+        $php .= '<?php endif; $__env->appendSection(); ?>';
+        $php .= '<?php if($__env->startSection("test")): ?>';
         $php .= ' parent ';
-        $php .= '<?php echo $__env->yieldSection(); ?>';
+        $php .= '<?php endif; echo $__env->yieldSection(); ?>';
 
         $this->assertEquals($php, $this->blade->compileString($tpl));
         $this->assertEquals('test  parent test', $this->blade->renderString($tpl));
@@ -323,7 +332,7 @@ class BladeTest extends TestCase
     public function testDirective(): void
     {
         $time = (string)microtime(true);
-        $this->blade->addDirective('time', fn (string $expression) => $time);
+        $this->blade->addDirective('time', fn(string $expression) => $time);
         $this->assertEquals($time, $this->blade->compileString('@time'));
         $this->assertEquals($time, $this->blade->compileString('@time()'));
         $this->assertEquals($time, $this->blade->compileString('@time(123)'));
@@ -340,8 +349,11 @@ class BladeTest extends TestCase
     public function testExtends(): void
     {
         $time = time();
+        #$tpl1 = $this->blade->compileFile('extends1');
+        #$tpl2 = $this->blade->compileFile('extends2');
+        #echo $tpl1."\n".$tpl2."\n\n";
         $this->assertEquals(
-            "test\ntest" . $time . "\ntest",
+            "test1\ntest4" . $time . "test4\ntest3",
             $this->blade->render('extends1', ['time' => $time])
         );
     }
