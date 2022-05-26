@@ -38,6 +38,9 @@ class EmailTest extends ValidationTestCase
      */
     public function testEmail(mixed $value, string $rule, bool $valid): void
     {
+        if (!@dns_get_record('google.de') && str_contains($rule, 'dns')) {
+            $this->markTestSkipped('Missing internet connection!');
+        }
         try {
             $this->validator->addRule(new EmailRule($this->translator));
             $this->validator->validate(

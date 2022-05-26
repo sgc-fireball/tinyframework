@@ -41,6 +41,10 @@ class UrlTest extends ValidationTestCase
      */
     public function testUrl(mixed $value, bool $valid): void
     {
+        if (!@dns_get_record('google.de')) {
+            $this->markTestSkipped('Missing internet connection!');
+        }
+
         try {
             $this->validator->addRule(new UrlRule($this->translator));
             $this->validator->validate(

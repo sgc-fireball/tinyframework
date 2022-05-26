@@ -97,6 +97,10 @@ class PasswordTest extends ValidationTestCase
 
     public function testPasswordPwned()
     {
+        if (!@dns_get_record('google.de')) {
+            $this->markTestSkipped('Missing internet connection!');
+        }
+
         $errorBag = null;
         try {
             $this->validator->addRule(new PasswordRule($this->translator));
