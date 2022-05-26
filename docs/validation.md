@@ -2,37 +2,37 @@
 
 - [Introduction](#introduction)
 - [Rules](#rules)
-  - [Accepted](#accepted)
-  - [Array](#array)
-  - [Between](#between)
-  - [Boolean](#boolean)
-  - [Confirmed](#confirmed)
-  - [Email](#email)
-  - [File](#file)
-  - [Filled](#filled)
-  - [Float](#float)
-  - [Image](#image)
-  - [In](#in)
-  - [Integer](#integer)
-  - [Ip](#ip)
-  - [Ipv4](#ipv4)
-  - [Ipv6](#ipv6)
-  - [Json](#json)
-  - [Max](#max)
-  - [Mimetypes](#mimetypes)
-  - [Min](#min)
-  - [NotIn](#notin)
-  - [Nullable](#nullable)
-  - [Numeric](#numeric)
-  - [Password](#password)
-  - [Present](#present)
-  - [Prohibited](#prohibited)
-  - [Required](#required)
-  - [Sometimes](#sometimes)
-  - [String](#string)
-  - [Timezone](#timezone)
-  - [Url](#url)
-  - [Video](#video)
+    - [Accepted](#accepted)
+    - [Array](#array)
+    - [Between](#between)
+    - [Boolean](#boolean)
+    - [Confirmed](#confirmed)
+    - [Email](#email)
+    - [File](#file)
+    - [Filled](#filled)
+    - [Float](#float)
+    - [Image](#image)
+    - [In](#in)
+    - [Integer](#integer)
+    - [Ip](#ip)
+    - [Ipv4](#ipv4)
+    - [Ipv6](#ipv6)
+    - [Json](#json)
+    - [Max](#max)
+    - [Mimetypes](#mimetypes)
+    - [Min](#min)
+    - [NotIn](#notin)
+    - [Nullable](#nullable)
+    - [Numeric](#numeric)
+    - [Password](#password)
+    - [Present](#present)
+    - [Prohibited](#prohibited)
+    - [Required](#required)
+    - [Sometimes](#sometimes)
+    - [String](#string)
+    - [Timezone](#timezone)
+    - [Url](#url)
+    - [Video](#video)
 
 ## Introduction
 
@@ -40,6 +40,19 @@
 validator()->validate(
     ['email' => 'exmaple@gmail.com'], // or $request,
     ['email' => 'required|string|email']
+);
+validator()->validate(
+    [
+        'person' => [
+            'firstname' => 'Richard',
+            'lastname' => 'Hülsberg',
+        ]
+    ],
+    [
+        'person' => 'required|array',
+        'person.firstname' => 'required|string|max:60',
+        'person.lastname' => 'required|string|max:60',
+    ]
 );
 ```
 

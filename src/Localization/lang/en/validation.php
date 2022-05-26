@@ -63,6 +63,7 @@ return [
     ],
     'not_in' => 'The selected {attribute} is invalid.',
     'numeric' => 'The {attribute} must be a number.',
+    'float' => 'The {attribute} must be a float number.',
     'password' => [
         'to_short' => '{attribute} is to short.',
         'uppercase' => '{attribute} is missing upper case chars.',
