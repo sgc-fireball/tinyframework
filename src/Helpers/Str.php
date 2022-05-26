@@ -217,6 +217,12 @@ class Str implements \Stringable
         return $this;
     }
 
+    public function wrap(Str|string $prefix, Str|string $postfix): static
+    {
+        $this->value = $prefix . $this->value . $postfix;
+        return $this;
+    }
+
     public function trim(string $characters = " \n\r\t\v\0"): static
     {
         $this->value = \trim($this->value, $characters);

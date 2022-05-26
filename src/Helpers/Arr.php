@@ -50,6 +50,11 @@ class Arr implements \ArrayAccess, \Iterator
         return $this->items;
     }
 
+    public function toArray(): array
+    {
+        return $this->items;
+    }
+
     public function __toArray(): array
     {
         return $this->items;
@@ -775,6 +780,30 @@ class Arr implements \ArrayAccess, \Iterator
             } else {
                 $results[$prepend . $key] = $value;
             }
+        }
+        $this->items = $results;
+        return $this;
+    }
+
+    public function undot(string $delimiter = '.'): static
+    {
+        $results = [];
+        foreach ($this->items as $itemKey => &$itemValue) {
+            if (str_contains($itemKey, $delimiter)) {
+                $value = &$results;
+                foreach (explode($delimiter, $itemKey) as $keyPart) {
+                    if (!array_key_exists($keyPart, $value)) {
+                        $value[$keyPart] = [];
+                    }
+                    if (!is_array($value[$keyPart])) {
+                        $value[$keyPart] = [];
+                    }
+                    $value = &$value[$keyPart];
+                }
+                $value = $itemValue;
+                continue;
+            }
+            $results[$itemKey] = &$itemValue;
         }
         $this->items = $results;
         return $this;

@@ -31,7 +31,7 @@ class MinRule extends RuleAwesome
         }
 
         if ($count < $min) {
-            return [$this->translator->trans('validation.min' . $type, ['attribute' => $this->getTransName($name), 'min' => $min])];
+            return [$this->translator->trans('validation.min.' . $type, ['attribute' => $this->getTransName($name), 'min' => $min])];
         }
 
         return null;

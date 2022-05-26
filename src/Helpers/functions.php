@@ -369,13 +369,13 @@ if (!function_exists('password')) {
         $password = '';
         $chars = '';
         if ($lowerChars) {
-            $chars .= 'abcdefghkmnpqrstwxyz';
+            $chars .= 'abcdefghkmnpqrstwxyz'; // without i,j,l,o,u,v
         }
         if ($upperChars) {
-            $chars .= 'ABCDEFGHKMNPQRSTWXYZ';
+            $chars .= 'ABCDEFGHKMNPQRSTWXYZ'; // without I,J,L,O,U,V
         }
         if ($numbers) {
-            $chars .= '2345689';
+            $chars .= '2345689'; // without 0,1
         }
         if ($symbols) {
             $chars .= ';#$*-/<=>?@^_|~';
@@ -404,22 +404,11 @@ if (!function_exists('console_size')) {
 if (!function_exists('size_format')) {
     function size_format(float $byte, int $precision = 2): string
     {
-        $steps = [
-            ['size' => 1024, 'type' => 'KB'],
-            ['size' => 1024, 'type' => 'MB'],
-            ['size' => 1024, 'type' => 'GB'],
-            ['size' => 1024, 'type' => 'TB'],
-            ['size' => 1024, 'type' => 'PB'],
-        ];
-        $type = 'B';
-        foreach ($steps as $step) {
-            if ($byte < $step['size']) {
-                break;
-            }
-            $byte /= $step['size'];
-            $type = $step['type'];
+        $unit = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+        for ($i = 0; $byte >= 1024 && $i < count($unit) - 1; $i++) {
+            $byte /= 1024;
         }
-        return sprintf('%.' . abs($precision) . 'f %s', $byte, $type);
+        return round($byte, $precision) . ' ' . $unit[$i];
     }
 }
 
@@ -478,14 +467,18 @@ if (!function_exists('data_get')) {
             return $target[$key];
         }
 
-        assert(!empty($delimiter), 'Parameter #3 $delimiter of function explode expects non-empty-string.');
+        assert(!empty($delimiter), 'Parameter #3 $delimiter of function data_get expects non-empty-string.');
         // deep search
         $keys = \is_array($key) ? $key : explode($delimiter, $key);
         foreach ($keys as $key) {
             if (\is_array($target) && \array_key_exists($key, $target)) {
                 $target = &$target[$key];
+            } elseif (\is_array($target) && $key === '*') {
+                $target = array_values($target);
             } elseif (\is_object($target) && property_exists($target, $key)) {
                 $target = &$target[$key];
+            } elseif (\is_object($target) && $key === '*') {
+                $target = array_values(get_object_vars($target));
             } else {
                 return null;
             }
