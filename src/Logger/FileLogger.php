@@ -27,10 +27,11 @@ class FileLogger extends LoggerAwesome implements LoggerInterface
     public function log(string $level, string $message, array $context = []): static
     {
         $message = sprintf(
-            '[%s|%s] %s',
+            '[%s|%s] %s %s',
             date('Y-m-d H:i:s'),
             $level,
-            $this->buildMessage($level, $message, $context)
+            $this->buildMessage($level, $message, $context),
+            json_encode($context)
         );
 
         $file = sprintf('%s/%s.log', $this->path, date('Y-m-d'));
