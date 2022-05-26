@@ -149,6 +149,7 @@ class Str implements \Stringable
 
     public function substrReplace(array|string $replace, array|int $offset, array|int|null $length = null): Arr|static
     {
+        /** @var string|array $result */
         $result = \substr_replace($this->value, $replace, $offset, $length);
         if (\is_string($result)) {
             $this->value = $result;
@@ -524,6 +525,7 @@ class Str implements \Stringable
         if ($component === -1) {
             return new URL($this->value);
         }
+        /** @var array|false|int|null|string $result */
         $result = \parse_url($this->value, $component);
         if (\is_array($result)) {
             return Arr::factory($result);

@@ -787,6 +787,9 @@ class Arr implements \ArrayAccess, \Iterator
 
     public function undot(string $delimiter = '.'): static
     {
+        if (empty($delimiter)) {
+            throw new \InvalidArgumentException('Parameter #1 $delimiter must be a non-empty-string.');
+        }
         $results = [];
         foreach ($this->items as $itemKey => &$itemValue) {
             if (str_contains($itemKey, $delimiter)) {
@@ -898,6 +901,7 @@ class Arr implements \ArrayAccess, \Iterator
     {
         assert(!empty($delimiter), 'Parameter #3 $delimiter of function explode expects non-empty-string.');
         $keys = \str_contains($key, $delimiter) ? \explode($delimiter, $key) : [$key];
+        /** @var mixed $item */
         $item = &$this->items;
         foreach ($keys as $key) {
             $item = \is_array($item) ? $item : [];

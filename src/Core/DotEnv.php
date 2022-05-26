@@ -66,6 +66,7 @@ class DotEnv implements DotEnvInterface
 
     private function convertValue(mixed $value): mixed
     {
+        /** @var null|string|bool|int|float $value */
         $value = \is_string($value) && empty($value) ? null : $value;
         $value = \is_string($value) && mb_strlen($value) === 0 ? null : $value;
         $value = \is_string($value) && mb_strtolower($value) === 'null' ? null : $value;
