@@ -58,7 +58,10 @@ class Request
         $request->get = $_GET ?: [];
         $request->post = $_POST ?: [];
         if (\array_key_exists('HTTP_CONTENT_TYPE', $_SERVER)
-            && str_contains($_SERVER['HTTP_CONTENT_TYPE'], 'application/json')
+            && (
+                str_contains($_SERVER['HTTP_CONTENT_TYPE'], 'application/json')
+                || str_contains($_SERVER['HTTP_CONTENT_TYPE'], 'application/csp-report')
+            )
         ) {
             $request->post = json_decode(file_get_contents('php://input'), true);
         }
