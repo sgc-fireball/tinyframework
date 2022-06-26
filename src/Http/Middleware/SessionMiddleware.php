@@ -24,12 +24,23 @@ class SessionMiddleware implements MiddlewareInterface
         $session = $this->container->get('session');
         assert($session instanceof SessionInterface);
         $name = $this->container->get('config')->get('session.cookie');
-        $session->open((string)$request->cookie($name));
-        $response = $next($request->session($session));
-        assert($response instanceof Response);
-        $session->close();
         if ($name) {
-            $response = $response->header('Set-Cookie', sprintf('%s=%s;', $name, $session->getId()));
+            $session->open((string)$request->cookie($name));
+            $response = $next($request->session($session));
+            assert($response instanceof Response);
+            $session->close();
+            $response->cookie(
+                $name,
+                $session->getId(),
+                0,
+                '',
+                $request->url()->host(),
+                ($request->server('https')[0] ?? 'off') === 'on',
+                true
+            );
+        } else {
+            $response = $next($request);
+            assert($response instanceof Response);
         }
         return $response;
     }
