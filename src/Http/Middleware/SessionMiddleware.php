@@ -35,7 +35,7 @@ class SessionMiddleware implements MiddlewareInterface
                 0,
                 '',
                 $request->url()->host(),
-                ($request->server('https')[0] ?? 'off') === 'on',
+                to_bool($request->server('https')[0] ?? false),
                 true
             );
         } else {
