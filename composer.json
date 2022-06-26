@@ -89,5 +89,10 @@
     "ecs": "Running easy coding standard.",
     "sonar-scanner": "Running sonar-qube scanner.",
     "serve": "Starting php internal webserver."
+  },
+  "config": {
+    "allow-plugins": {
+      "phpstan/extension-installer": true
+    }
   }
 }

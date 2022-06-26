@@ -46,6 +46,7 @@ cd my-project; php console
 ## Debugging
 
 Open PHPStorm Settings `PHP` / `Servers`:
+
 - Name: `tinyframework`
 - Host: `127.0.0.1`
 - Port: `9000`
@@ -54,6 +55,7 @@ Open PHPStorm Settings `PHP` / `Servers`:
 - Map it to `/app`
 
 Use our preconfigurated alias `phpx`.
+
 ```bash
 phpx console
 ```

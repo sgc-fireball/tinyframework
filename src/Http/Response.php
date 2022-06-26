@@ -214,6 +214,34 @@ class Response
         return $this->header('content-type', $type);
     }
 
+    public function cookie(
+        string $name,
+        string $value = "",
+        int $expires = 0,
+        string $path = "",
+        string $domain = "",
+        bool $secure = false,
+        bool $httponly = false
+    ): static {
+        $line = sprintf('%s=%s', urlencode($name), urlencode($value));
+        if ($httponly) {
+            $line .= '; HttpOnly';
+        }
+        if ($expires) {
+            $line .= '; expires=' . urlencode(date('r', time() + $expires));
+        }
+        if ($path) {
+            $line .= '; path=' . urlencode($path);
+        }
+        if ($domain) {
+            $line .= '; domain=' . urlencode($domain);
+        }
+        if ($secure) {
+            $line .= '; Secure';
+        }
+        return $this->header('Set-Cookie', $line);
+    }
+
     public function header(string $key = null, string $value = null): static|array|null|string
     {
         if ($key === null) {

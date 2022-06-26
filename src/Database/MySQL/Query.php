@@ -15,13 +15,19 @@ class Query extends QueryAwesome
 
     private function compileSelect(array $fields): string
     {
-        $query = trim(implode(', ', array_map(function (DatabaseRaw|string $field): string {
-            if ($field instanceof DatabaseRaw) {
-                return $field->__toString();
-            }
-            return '`' . $field . '`';
-        }, $fields)), ', ');
-        return $query ?: '*';
+        $query = trim(
+            implode(
+                ', ',
+                array_map(function (DatabaseRaw|string $field): string {
+                    if ($field instanceof DatabaseRaw) {
+                        return $field->__toString();
+                    }
+                    return '`' . $this->table . '`.`' . $field . '`';
+                }, $fields)
+            ),
+            ', '
+        );
+        return $query ?: '`' . $this->table . '`.*';
     }
 
     private function compileJoins(array $joins): string
@@ -30,7 +36,7 @@ class Query extends QueryAwesome
         foreach ($joins as $join) {
             $query .= vnsprintf(
                 ' {type} JOIN `{tableB}` ON (`{tableB}`.`{fieldB}` = `{tableA}`.`{fieldA}`)',
-                array_merge($join, ['type' => strtoupper($join['type'] ?? 'LEFT')])
+                array_merge($join, ['type' => strtoupper($join['type'] ?? 'INNER')])
             );
         }
         return trim($query);
@@ -104,30 +110,38 @@ class Query extends QueryAwesome
     private function compileFieldSet(array $fields = []): string
     {
         $self = $this;
-        return trim(implode(', ', array_map(function ($value, $key) use ($self) {
-            return sprintf(
-                '`%s` = %s',
-                str_replace('`', '', $key),
-                $self->driver->escape($value)
-            );
-        }, array_values($fields), array_keys($fields))), ' ,');
+        return trim(
+            implode(
+                ', ',
+                array_map(function ($value, $key) use ($self) {
+                    return sprintf(
+                        '`%s` = %s',
+                        str_replace('`', '', $key),
+                        $self->driver->escape($value)
+                    );
+                }, array_values($fields), array_keys($fields))
+            ),
+            ' ,'
+        );
     }
 
     public function toSql(): string
     {
-        return rtrim(vnsprintf(
-            'SELECT {field} FROM {table} {join} {where} {group} {order} {limit} {offset}',
-            [
-                'field' => $this->compileSelect($this->select),
-                'table' => $this->table,
-                'join' => $this->compileJoins($this->joins),
-                'where' => $this->compileWhere($this->wheres, true),
-                'group' => $this->compileGroup($this->groups),
-                'order' => $this->compileOrder($this->orders),
-                'limit' => $this->compileLimit($this->limit),
-                'offset' => $this->compileOffset($this->offset),
-            ]
-        ));
+        return rtrim(
+            vnsprintf(
+                'SELECT {field} FROM {table} {join} {where} {group} {order} {limit} {offset}',
+                [
+                    'field' => $this->compileSelect($this->select),
+                    'table' => $this->table,
+                    'join' => $this->compileJoins($this->joins),
+                    'where' => $this->compileWhere($this->wheres, true),
+                    'group' => $this->compileGroup($this->groups),
+                    'order' => $this->compileOrder($this->orders),
+                    'limit' => $this->compileLimit($this->limit),
+                    'offset' => $this->compileOffset($this->offset),
+                ]
+            )
+        );
     }
 
     public function load(): array
@@ -143,9 +157,11 @@ class Query extends QueryAwesome
                 [
                     'table' => $this->table,
                     'fields1' => $this->compileFieldSet($fields),
-                    'fields2' => $this->compileFieldSet(array_filter($fields, function ($value, $key) {
-                        return $key !== 'id';
-                    }, ARRAY_FILTER_USE_BOTH)),
+                    'fields2' => $this->compileFieldSet(
+                        array_filter($fields, function ($value, $key) {
+                            return $key !== 'id';
+                        }, ARRAY_FILTER_USE_BOTH)
+                    ),
                 ]
             );
             $this->driver->execute($query);
@@ -165,16 +181,18 @@ class Query extends QueryAwesome
 
     public function delete(): bool
     {
-        $query = rtrim(vnsprintf(
-            'DELETE FROM {table} {where} {order} {limit} {offset}',
-            [
-                'table' => $this->table,
-                'where' => $this->compileWhere($this->wheres, true),
-                'order' => $this->compileOrder($this->orders),
-                'limit' => $this->compileLimit($this->limit),
-                'offset' => $this->compileOffset($this->offset),
-            ]
-        ));
+        $query = rtrim(
+            vnsprintf(
+                'DELETE FROM {table} {where} {order} {limit} {offset}',
+                [
+                    'table' => $this->table,
+                    'where' => $this->compileWhere($this->wheres, true),
+                    'order' => $this->compileOrder($this->orders),
+                    'limit' => $this->compileLimit($this->limit),
+                    'offset' => $this->compileOffset($this->offset),
+                ]
+            )
+        );
         return (bool)$this->driver->execute($query);
     }
 

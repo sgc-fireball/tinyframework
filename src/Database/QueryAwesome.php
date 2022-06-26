@@ -72,10 +72,10 @@ abstract class QueryAwesome implements QueryInterface
         return $this;
     }
 
-    public function leftJoin(string $tableA, string $fieldA, string $tableB, string $fieldB): QueryInterface
+    public function innerJoin(string $tableA, string $fieldA, string $tableB, string $fieldB): QueryInterface
     {
         $this->joins[] = [
-            'type' => 'LEFT', // <none>, inner, outer, left, right
+            'type' => 'INNER',
             'tableA' => $tableA,
             'fieldA' => $fieldA,
             'tableB' => $tableB,
@@ -84,8 +84,48 @@ abstract class QueryAwesome implements QueryInterface
         return $this;
     }
 
-    public function where(string|DatabaseRaw|Closure $field, string $operation = null, mixed $value = null): QueryInterface
+
+    public function outerJoin(string $tableA, string $fieldA, string $tableB, string $fieldB): QueryInterface
     {
+        $this->joins[] = [
+            'type' => 'OUTER',
+            'tableA' => $tableA,
+            'fieldA' => $fieldA,
+            'tableB' => $tableB,
+            'fieldB' => $fieldB,
+        ];
+        return $this;
+    }
+
+    public function rightJoin(string $tableA, string $fieldA, string $tableB, string $fieldB): QueryInterface
+    {
+        $this->joins[] = [
+            'type' => 'RIGHT',
+            'tableA' => $tableA,
+            'fieldA' => $fieldA,
+            'tableB' => $tableB,
+            'fieldB' => $fieldB,
+        ];
+        return $this;
+    }
+
+    public function leftJoin(string $tableA, string $fieldA, string $tableB, string $fieldB): QueryInterface
+    {
+        $this->joins[] = [
+            'type' => 'LEFT',
+            'tableA' => $tableA,
+            'fieldA' => $fieldA,
+            'tableB' => $tableB,
+            'fieldB' => $fieldB,
+        ];
+        return $this;
+    }
+
+    public function where(
+        string|DatabaseRaw|Closure $field,
+        string $operation = null,
+        mixed $value = null
+    ): QueryInterface {
         if ($field instanceof Closure) {
             return $this->whereNested($field);
         }
