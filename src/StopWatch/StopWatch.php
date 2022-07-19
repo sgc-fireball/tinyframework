@@ -73,4 +73,19 @@ class StopWatch
     {
         return microtime(true) - $this->origin();
     }
+
+    public function track(string $name, \Closure $closure, string $category = 'default'): void
+    {
+        $this->start($name, $category);
+        $closure();
+        $this->stop($name);
+    }
+
+    public function trackSection(string $id, \Closure $closure): void
+    {
+        $this->openSection($id);
+        $closure();
+        $this->closeSection($id);
+    }
+
 }
