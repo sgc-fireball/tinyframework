@@ -161,7 +161,6 @@ class Request
         $request->cookie = $swoole->cookie ?? [];
         self::migrateFiles($swoole->files ?: [], $request->files);
         $request->attributes = ['swoole_fd' => $swoole->fd];
-
         foreach ($swoole->header as $key => $value) {
             $key = mb_strtolower(str_replace('-', '_', $key));
             $request->header[$key] = [$value];
@@ -171,7 +170,6 @@ class Request
             $request->server[$key] = [$value];
         }
         $request->body = $swoole->rawContent() ?? null;
-        $request->method = $swoole->getMethod();
         if (\array_key_exists('_method', $request->get)) {
             $request->method = strtoupper($request->get['_method'] ?: $request->method);
             unset($request->get['_method']);
@@ -182,7 +180,7 @@ class Request
         }
         if (\in_array(
             $request->method,
-            ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'PATCH', 'PURGE', 'TRACE'],
+            ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'PATCH', 'PURGE', 'TRACE', 'WEBSOCKET'],
             true
         )) {
             return self::compileTrustedProxies($request);
@@ -444,6 +442,16 @@ class Request
         }
         $request = $this->clone();
         $request->body = $body;
+        return $request;
+    }
+
+    public function json(mixed $json = null): Request|array|null
+    {
+        if ($json === null) {
+            return json_decode($this->body, true);
+        }
+        $request = $this->clone();
+        $request->body = json_encode($json);
         return $request;
     }
 

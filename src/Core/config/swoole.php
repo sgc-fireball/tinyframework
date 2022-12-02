@@ -10,7 +10,7 @@ defined('SWOOLE_LOG_ROTATION_DAILY') ?: define('SWOOLE_LOG_ROTATION_DAILY', 2);
 $cpus = max(1, (int)shell_exec('egrep ^processor /proc/cpuinfo  | wc -l'));
 
 return [
-    'host' => env('SWOOLE_HOST','127.0.0.1'),
+    'host' => env('SWOOLE_HOST', '127.0.0.1'),
     'port' => (int)env('SWOOLE_PORT', 9501),
     'mode' => SWOOLE_PROCESS,
     'sock_type' => SWOOLE_SOCK_TCP,
@@ -20,9 +20,10 @@ return [
          * @link https://openswoole.com/docs/modules/swoole-server/configuration
          */
         'daemonize' => 0,
+        'chroot' => ROOT,
         'worker_num' => env('SWOOLE_WORKER_NUM', $cpus),
         'backlog' => env('SWOOLE_BACKLOG', 128),
-        'chroot' => ROOT,
+        'enable_coroutine' => true,
 
         // Task worker
         'task_worker_num' => env('SWOOLE_TASK_WORKER_NUM', $cpus),
@@ -36,15 +37,14 @@ return [
 
         // Protocol
         'open_http_protocol' => true,
-
-        // Websocket
-        'open_websocket_ping_frame' => true,
+        'open_http2_protocol' => false, // buggy!!!
+        'open_websocket_protocol' => true,
 
         // Static Files
         'document_root' => ROOT . '/public',
         'enable_static_handler' => true,
         'static_handler_locations' => [ROOT . '/public'],
-        'http_index_files' => ['index.html', 'index.txt'],
+        'http_index_files' => [],
 
         // Compression
         'http_compression' => false,

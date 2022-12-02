@@ -12,7 +12,7 @@ class Route
 
     private string $scheme = 'https?';
 
-    private string $domain = '.*';
+    private string $domain = '[^:/]+';
 
     private string $url = '/';
 

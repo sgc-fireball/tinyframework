@@ -41,7 +41,7 @@ class Router
     public function load(): static
     {
         $router = $this;
-        $files = ['config', 'api', 'web'];
+        $files = ['config', 'api', 'web', 'websocket'];
         foreach ($files as $file) {
             $file = sprintf('routes/%s.php', $file);
             if (file_exists($file)) {
@@ -134,7 +134,11 @@ class Router
 
     public function websocket(string $url, Closure|array|string $action): Route
     {
-        $route = (new Route())->scheme('wss?')->method('ANY')->url($url)->action($action);
+        $route = (new Route())
+            ->scheme('wss?')
+            ->method('WEBSOCKET')
+            ->url($url)
+            ->action($action);
         $this->routes[] = $route;
         return $route;
     }
@@ -365,6 +369,7 @@ class Router
         $regex .= sprintf('(?<_scheme>%s)', $route->scheme());
         $regex .= '://';
         $regex .= sprintf('(?<_domain>%s)', $route->domain());
+        $regex .= sprintf('(:(?<_port>\d+))?');
         $regex .= '/';
         $regex .= sprintf('(?<_url>%s)', $url);
         $regex .= '$#i';

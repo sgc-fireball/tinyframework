@@ -77,6 +77,9 @@ class SwooleServer
         $this->server->on('Close', function (BaseServer $server, int $fd): void {
             $this->onConnectionClose($server, $fd);
         });
+        $this->server->on('Disconnect', function (BaseServer $server, int $fd): void {
+            $this->onConnectionDisconnect($server, $fd);
+        });
         $this->server->on("Shutdown", function (BaseServer $server): void {
             $this->onShutdown($server);
         });
@@ -94,11 +97,6 @@ class SwooleServer
                 date('Y-m-d H:i:s'),
             )
         );
-        /*$server->tick(BaseServer::PING_DELAY_MS, function () use ($server) {
-            foreach ($server->connections as $id) {
-                $server->push($id, 'ping', WEBSOCKET_OPCODE_PING);
-            }
-        });*/
     }
 
     private function onShutdown(BaseServer $server)
@@ -154,9 +152,8 @@ class SwooleServer
 
     private function onWebsocketOpen(BaseServer $server, SwooleRequest $req): void
     {
-        $req->header['request_method'] = 'CONNECT';
-        $req->header['scheme'] = 'ws';
-
+        $req->server['request_method'] = 'WEBSOCKET';
+        $req->header['scheme'] = preg_replace('/^http/', 'ws', $req->header['scheme']);
         $request = Request::fromSwoole($req, $server);
         $route = $this->container->get('router')->resolve($request);
         if (!$route) {
@@ -172,7 +169,6 @@ class SwooleServer
             );
             return;
         }
-
         $this->output->writeln(
             sprintf(
                 '<yellow>[%s]</yellow> Websocket[%d] Connection from %s on %s',
@@ -187,7 +183,7 @@ class SwooleServer
 
     private function onWebsocketMessage(BaseServer $server, SwooleWebsocketFrame $frame): void
     {
-        $request = $this->websockets[$frame->fd]->method('POST')->body($frame->data);
+        $request = $this->websockets[$frame->fd]->method('WEBSOCKET')->body($frame->data);
         $this->output->writeln(
             sprintf(
                 '<yellow>[%s]</yellow> Websocket[%d] ip:%s url:%s size:%d',
@@ -205,14 +201,16 @@ class SwooleServer
     {
         if (array_key_exists($fd, $this->websockets)) {
             unset($this->websockets[$fd]);
+            $server->close($fd);
         }
-        /*$this->output->writeln(
-            sprintf(
-                '<yellow>[%s]</yellow> Websocket[%d] Close connection.',
-                date('Y-m-d H:i:s'),
-                $fd
-            )
-        );*/
+    }
+
+    private function onConnectionDisconnect(BaseServer $server, int $fd): void
+    {
+        if (array_key_exists($fd, $this->websockets)) {
+            unset($this->websockets[$fd]);
+            $server->close($fd);
+        }
     }
 
     private function onWorkerStart(BaseServer $server, int $workerId): void
