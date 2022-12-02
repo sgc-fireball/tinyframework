@@ -9,12 +9,18 @@ class StopWatch
     /** @var StopWatchSection[] */
     private array $sections = [];
 
-    public function __construct()
+    public function __construct(float $start = null)
     {
-        $start = microtime(true);
-        $start = defined('TINYFRAMEWORK_START') ? TINYFRAMEWORK_START : $start;
-        $start = array_key_exists('REQUEST_TIME_FLOAT', $_SERVER) ? $_SERVER['REQUEST_TIME_FLOAT'] : $start;
-        $this->sections['main'] = new StopWatchSection($start, 'main');
+        $this->reset($start);
+    }
+
+    public function reset(float $start = null): static
+    {
+        $start = is_null($start) && defined('TINYFRAMEWORK_START') ? TINYFRAMEWORK_START : $start;
+        $start = is_null($start) && array_key_exists('REQUEST_TIME_FLOAT', $_SERVER) ? $_SERVER['REQUEST_TIME_FLOAT'] : $start;
+        $start = is_null($start) ? microtime(true) : $start;
+        $this->sections = ['main' => new StopWatchSection($start, 'main')];
+        return $this;
     }
 
     public function origin(): float

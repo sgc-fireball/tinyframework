@@ -23,7 +23,8 @@ class SignalHandleTest extends TestCase
             $called = true;
         });
 
-        SignalHandler::init($eventDispatcher);
+        (new \ReflectionClass(SignalHandler::class))->getProperty('eventDispatcher')->setValue($eventDispatcher);
+        pcntl_async_signals(true);
         SignalHandler::catchSignal(SignalHandler::SIGHUP);
         $this->assertFalse($called);
         posix_kill(posix_getpid(), SignalHandler::SIGHUP);
@@ -37,7 +38,8 @@ class SignalHandleTest extends TestCase
         }
 
         $eventDispatcher = new EventDispatcher();
-        SignalHandler::init($eventDispatcher);
+        (new \ReflectionClass(SignalHandler::class))->getProperty('eventDispatcher')->setValue($eventDispatcher);
+        pcntl_async_signals(true);
         SignalHandler::catchSignal(SignalHandler::SIGTERM);
         $this->assertFalse(SignalHandler::isTerminated());
         posix_kill(posix_getpid(), SignalHandler::SIGTERM);

@@ -7,7 +7,7 @@ namespace TinyFramework\Helpers;
 /**
  * @see https://www.php.net/manual/de/ref.array.php
  */
-class Arr implements \ArrayAccess, \Iterator
+class Arr implements \ArrayAccess, \Iterator, \Countable
 {
     protected array $items = [];
 
@@ -170,16 +170,16 @@ class Arr implements \ArrayAccess, \Iterator
 
     public function diffAssoc(array $array2, array ...$arrays): static
     {
-        \array_unshift($arrays, $this->items);
         \array_unshift($arrays, $array2);
+        \array_unshift($arrays, $this->items);
         $this->items = (array)\call_user_func_array('array_diff_assoc', $arrays);
         return $this;
     }
 
     public function diffUAssoc(array $array2, array ...$arrays): static
     {
-        \array_unshift($arrays, $this->items);
         \array_unshift($arrays, $array2);
+        \array_unshift($arrays, $this->items);
         if (!\is_callable($arrays[\array_key_last($arrays)])) {
             throw new \RuntimeException('The last value must be a callable');
         }
@@ -189,16 +189,16 @@ class Arr implements \ArrayAccess, \Iterator
 
     public function diffKey(array $array2, array ...$arrays): static
     {
-        \array_unshift($arrays, $this->items);
         \array_unshift($arrays, $array2);
+        \array_unshift($arrays, $this->items);
         $this->items = (array)\call_user_func_array('\\array_diff_key', $arrays);
         return $this;
     }
 
     public function diffUKey(array $array2, array ...$arrays): static
     {
-        \array_unshift($arrays, $this->items);
         \array_unshift($arrays, $array2);
+        \array_unshift($arrays, $this->items);
         if (!\is_callable($arrays[\array_key_last($arrays)])) {
             throw new \RuntimeException('The last value must be a callable');
         }
@@ -208,8 +208,8 @@ class Arr implements \ArrayAccess, \Iterator
 
     public function diff(array $array2, array ...$arrays): static
     {
-        \array_unshift($arrays, $this->items);
         \array_unshift($arrays, $array2);
+        \array_unshift($arrays, $this->items);
         $this->items = (array)\call_user_func_array('\\array_diff', $arrays);
         return $this;
     }
@@ -272,7 +272,7 @@ class Arr implements \ArrayAccess, \Iterator
         return null;
     }
 
-    public function flip(callable $callback): static
+    public function flip(): static
     {
         $this->items = \array_flip($this->items);
         return $this;
@@ -280,16 +280,16 @@ class Arr implements \ArrayAccess, \Iterator
 
     public function intersectAssoc(array $array2, array ...$arrays): static
     {
-        \array_unshift($arrays, $this->items);
         \array_unshift($arrays, $array2);
+        \array_unshift($arrays, $this->items);
         $this->items = \call_user_func_array('\\array_intersect_assoc', $arrays);
         return $this;
     }
 
     public function intersectUAssoc(array $array2, array ...$arrays): static
     {
-        \array_unshift($arrays, $this->items);
         \array_unshift($arrays, $array2);
+        \array_unshift($arrays, $this->items);
         if (!\is_callable($arrays[\array_key_last($arrays)])) {
             throw new \RuntimeException('The last value must be a callable');
         }
@@ -299,16 +299,16 @@ class Arr implements \ArrayAccess, \Iterator
 
     public function intersectByKeys(array $array2, array ...$arrays): static
     {
-        \array_unshift($arrays, $this->items);
         \array_unshift($arrays, $array2);
+        \array_unshift($arrays, $this->items);
         $this->items = \call_user_func_array('\\array_intersect_key', $arrays);
         return $this;
     }
 
     public function intersectUKey(array $array2, array ...$arrays): static
     {
-        \array_unshift($arrays, $this->items);
         \array_unshift($arrays, $array2);
+        \array_unshift($arrays, $this->items);
         if (!\is_callable($arrays[\array_key_last($arrays)])) {
             throw new \RuntimeException('The last value must be a callable');
         }
@@ -318,8 +318,8 @@ class Arr implements \ArrayAccess, \Iterator
 
     public function intersect(array $array2, array ...$arrays): static
     {
-        \array_unshift($arrays, $this->items);
         \array_unshift($arrays, $array2);
+        \array_unshift($arrays, $this->items);
         $this->items = \call_user_func_array('\\array_intersect', $arrays);
         return $this;
     }
@@ -391,16 +391,16 @@ class Arr implements \ArrayAccess, \Iterator
 
     public function mergeRecursive(array $array2, array ...$arrays): static
     {
-        \array_unshift($arrays, $this->items);
         \array_unshift($arrays, $array2);
+        \array_unshift($arrays, $this->items);
         $this->items = \call_user_func_array('\\array_merge_recursive', $arrays);
         return $this;
     }
 
     public function merge(array $array2, array ...$arrays): static
     {
-        \array_unshift($arrays, $this->items);
         \array_unshift($arrays, $array2);
+        \array_unshift($arrays, $this->items);
         $this->items = \call_user_func_array('\\array_merge', $arrays);
         return $this;
     }
@@ -410,10 +410,13 @@ class Arr implements \ArrayAccess, \Iterator
         mixed $array1_sort_flags = SORT_REGULAR,
         array ...$arrays
     ): static {
-        \array_unshift($arrays, $this->items);
-        \array_unshift($arrays, $array1_sort_order);
         \array_unshift($arrays, $array1_sort_flags);
-        $this->items = \call_user_func_array('\\array_multisort', $arrays);
+        \array_unshift($arrays, $array1_sort_order);
+        \array_unshift($arrays, $this->items);
+        $result = \call_user_func_array('\\array_multisort', $arrays);
+        if (is_array($result)) {
+            $this->items = $result;
+        }
         return $this;
     }
 
@@ -455,7 +458,7 @@ class Arr implements \ArrayAccess, \Iterator
         return $this;
     }
 
-    public function random(int $num = 1): mixed
+    public function random(int $num = 1): Str|Arr|int
     {
         $result = \array_rand($this->items, $num);
         if (\is_string($result)) {
@@ -463,7 +466,7 @@ class Arr implements \ArrayAccess, \Iterator
         } elseif (\is_array($result)) {
             return new self($result);
         }
-        return $result;
+        return (int)$result;
     }
 
     public function reduce(callable $callback, mixed $initial = null): mixed
@@ -478,7 +481,7 @@ class Arr implements \ArrayAccess, \Iterator
         return $result;
     }
 
-    public function replaceRecurisve(array ...$replacements): static
+    public function replaceRecursive(array ...$replacements): static
     {
         \array_unshift($replacements, $this->items);
         $this->items = \call_user_func_array('\\array_replace_recursive', $replacements);
@@ -492,7 +495,7 @@ class Arr implements \ArrayAccess, \Iterator
         return $this;
     }
 
-    public function reserve(bool $preserve_keys = false): static
+    public function reverse(bool $preserve_keys = false): static
     {
         $this->items = \array_reverse($this->items, $preserve_keys);
         return $this;
@@ -558,15 +561,15 @@ class Arr implements \ArrayAccess, \Iterator
         \sort($array);
         $length = \count($array);
         $middle = $length / 2.0;
-        return $length % 2 === 0 ? ($array[\floor($middle) - 1] + $array[\ceil($middle)]) / 2 : $array[\intval(
-            $middle
-        )];
+        return $length % 2 === 0
+            ? ($array[\floor($middle) - 1] + $array[\ceil($middle)]) / 2
+            : $array[\intval($middle)];
     }
 
     public function uDiffAssoc(array $array2, array ...$arrays): static
     {
-        \array_unshift($arrays, $this->items);
         \array_unshift($arrays, $array2);
+        \array_unshift($arrays, $this->items);
         if (!\is_callable($arrays[\array_key_last($arrays)])) {
             throw new \RuntimeException('The last value must be a callable');
         }
@@ -576,8 +579,8 @@ class Arr implements \ArrayAccess, \Iterator
 
     public function uDiffUAssoc(array $array2, array ...$arrays): static
     {
-        \array_unshift($arrays, $this->items);
         \array_unshift($arrays, $array2);
+        \array_unshift($arrays, $this->items);
         if (!\is_callable($arrays[\array_key_last($arrays)])) {
             throw new \RuntimeException('The last value must be a callable');
         }
@@ -590,8 +593,8 @@ class Arr implements \ArrayAccess, \Iterator
 
     public function uDiff(array $array2, array ...$arrays): static
     {
-        \array_unshift($arrays, $this->items);
         \array_unshift($arrays, $array2);
+        \array_unshift($arrays, $this->items);
         if (!\is_callable($arrays[\array_key_last($arrays)])) {
             throw new \RuntimeException('The last value must be a callable');
         }
@@ -601,8 +604,8 @@ class Arr implements \ArrayAccess, \Iterator
 
     public function uIntersectAssoc(array $array2, array ...$arrays): static
     {
-        \array_unshift($arrays, $this->items);
         \array_unshift($arrays, $array2);
+        \array_unshift($arrays, $this->items);
         if (!\is_callable($arrays[\array_key_last($arrays)])) {
             throw new \RuntimeException('The last value must be a callable');
         }
@@ -612,8 +615,8 @@ class Arr implements \ArrayAccess, \Iterator
 
     public function uIntersectUAssoc(array $array2, array ...$arrays): static
     {
-        \array_unshift($arrays, $this->items);
         \array_unshift($arrays, $array2);
+        \array_unshift($arrays, $this->items);
         if (!\is_callable($arrays[\array_key_last($arrays)])) {
             throw new \RuntimeException('The last value must be a callable');
         }
@@ -626,8 +629,8 @@ class Arr implements \ArrayAccess, \Iterator
 
     public function uIntersect(array $array2, array ...$arrays): static
     {
-        \array_unshift($arrays, $this->items);
         \array_unshift($arrays, $array2);
+        \array_unshift($arrays, $this->items);
         if (!\is_callable($arrays[\array_key_last($arrays)])) {
             throw new \RuntimeException('The last value must be a callable');
         }
@@ -688,6 +691,32 @@ class Arr implements \ArrayAccess, \Iterator
     public function inArray(mixed $needle, bool $strict = false): bool
     {
         return \in_array($needle, $this->items, $strict);
+    }
+
+    /**
+     * @alias inArray
+     */
+    public function contains(mixed $needle, bool $strict = false): bool
+    {
+        return $this->inArray($needle, $strict);
+    }
+
+    public function containsOne(array $needles, bool $strict = false): bool
+    {
+        if (count($needles) === 0) {
+            return true;
+        }
+        foreach ($needles as $needle) {
+            if ($this->inArray($needle, $strict)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function containsAll(array $needles, bool $strict = false): bool
+    {
+        return !$this->containsOne($needles, $strict);
     }
 
     public function sortKeys(int $sort_flags = SORT_REGULAR, bool $descending = false): static
@@ -932,8 +961,9 @@ class Arr implements \ArrayAccess, \Iterator
         return true;
     }
 
-    public function union(array $items): static
+    public function union(array|Arr $items): static
     {
+        $items = $items instanceof Arr ? $items->toArray() : $items;
         $this->items = $this->items + $items;
         return $this;
     }
@@ -956,11 +986,11 @@ class Arr implements \ArrayAccess, \Iterator
     {
         $result = [];
         foreach ($this->items as $item) {
-            $value = \data_get($item, $value, $delimiter);
+            $val = \data_get($item, $value, $delimiter);
             if ($key === null) {
-                $result[] = $value;
+                $result[] = $val;
             } else {
-                $result[\data_get($item, $key, $delimiter)] = $value;
+                $result[\data_get($item, $key, $delimiter)] = $val;
             }
         }
         $this->items = $result;

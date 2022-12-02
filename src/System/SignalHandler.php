@@ -78,10 +78,13 @@ class SignalHandler
 
     private static bool $isTerminated = false;
 
-    private static EventDispatcherInterface $eventDispatcher;
+    private static ?EventDispatcherInterface $eventDispatcher = null;
 
     public static function init(EventDispatcherInterface $eventDispatcher): void
     {
+        if (self::$eventDispatcher !== null) {
+            throw new \RuntimeException('Only one call of SignalHandler::init is allowed.');
+        }
         pcntl_async_signals(true);
         self::$eventDispatcher = $eventDispatcher;
     }
@@ -110,7 +113,9 @@ class SignalHandler
     public static function signal(int $signal, array $info = []): bool
     {
         $event = new SignalEvent($signal, self::NAMES[$signal], $info);
-        self::$eventDispatcher->dispatch($event);
+        if (self::$eventDispatcher) {
+            self::$eventDispatcher->dispatch($event);
+        }
         if (!self::$isTerminated) {
             self::$isTerminated = \in_array($signal, [self::SIGINT, self::SIGTERM]);
         }

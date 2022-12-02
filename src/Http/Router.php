@@ -132,6 +132,13 @@ class Router
         return $route;
     }
 
+    public function websocket(string $url, Closure|array|string $action): Route
+    {
+        $route = (new Route())->scheme('wss?')->method('ANY')->url($url)->action($action);
+        $this->routes[] = $route;
+        return $route;
+    }
+
     public function post(string $url, Closure|array|string $action): Route
     {
         $route = (new Route())->method('POST')->url($url)->action($action);
@@ -259,10 +266,6 @@ class Router
                 $options['url'] . '/{' . $options['parameter'] . '}',
                 $class . '@update'
             )->name($options['names']['update']);
-            $this->routes[] = $list['update'] = $this->patch(
-                $options['url'] . '/{' . $options['parameter'] . '}',
-                $class . '@update'
-            );
         }
         if (\in_array('delete', $methods)) {
             $this->routes[] = $list['delete'] = $this->delete(

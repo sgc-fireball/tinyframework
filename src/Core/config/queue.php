@@ -25,4 +25,7 @@ return [
         'password' => env('AMQP_PASSWORD', 'guest'),
         'prefix' => env('AMQP_QUEUE_PREFIX', 'tinyframework:queue:'),
     ],
+    'swoole' => [
+        'driver' => \TinyFramework\Queue\SwooleQueue::class,
+    ]
 ];

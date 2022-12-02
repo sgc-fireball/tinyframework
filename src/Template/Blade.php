@@ -73,7 +73,27 @@ class Blade implements ViewInterface
         return $this;
     }
 
-    private function view2file(string $view): array
+    private function view2file(string $view): ?string
+    {
+        $key = 'view2file:' . str_replace('.', ':', $view);
+        if ($this->config['cache'] && $this->cache?->has($key)) {
+            return $this->cache->get($key);
+        }
+        foreach ($this->view2files($view) as $file) {
+            if (file_exists($file) && is_readable($file)) {
+                if ($this->config['cache']) {
+                    $this->cache->set($key, $file);
+                }
+                return $file;
+            }
+        }
+        if ($this->config['cache']) {
+            $this->cache->set($key, null);
+        }
+        return null;
+    }
+
+    private function view2files(string $view): array
     {
         $namespace = null;
         if (str_contains($view, '@')) {
@@ -98,15 +118,25 @@ class Blade implements ViewInterface
 
     public function exists(string $view): bool
     {
-        foreach ($this->view2file($view) as $file) {
-            if (file_exists($file)) {
-                return true;
-            }
-        }
-        return false;
+        return (bool)$this->view2file($view);
     }
 
     public function render(string $view, array $data = [], array $parentData = []): string
+    {
+        $this->stopWatch->start('blade.render', 'blade');
+        $this->placeholder = [];
+        $content = $this->execute(
+            $this->compileFile($view),
+            array_merge($parentData, $data)
+        );
+        $this->stopWatch->stop('blade.render');
+        return $content;
+    }
+
+    /**
+     * @internal
+     */
+    public function __internalRender(string $view, array $data = [], array $parentData = []): string
     {
         return $this->execute(
             $this->compileFile($view),
@@ -129,14 +159,8 @@ class Blade implements ViewInterface
             return $this->cache->get($key);
         }
 
-        $file = null;
-        foreach ($this->view2file($view) as $tpl) {
-            if (file_exists($tpl)) {
-                $file = $tpl;
-                break;
-            }
-        }
-        if ($file === null || !file_exists($file) || !is_readable($file)) {
+        $file = $this->view2file($view);
+        if (!$file) {
             throw new InvalidArgumentException('View does not exists or unreadable: ' . $view);
         }
         $content = trim($this->compileString((string)file_get_contents($file)));
@@ -148,7 +172,7 @@ class Blade implements ViewInterface
 
     public function compileString(string $content): string
     {
-        $this->stopWatch->start('8-blade.compile', 'blade');
+        $this->stopWatch->start('blade.compile', 'blade');
         foreach ($this->preCompilers as $compiler) {
             $content = \call_user_func($compiler, $content);
         }
@@ -176,7 +200,7 @@ class Blade implements ViewInterface
         }
 
         $content = trim($content);
-        $this->stopWatch->stop('8-blade.compile');
+        $this->stopWatch->stop('blade.compile');
         return $content;
     }
 
@@ -208,7 +232,7 @@ class Blade implements ViewInterface
 
     public function execute(string $__content, array $__data = []): string
     {
-        $this->stopWatch->start('9-blade.execute', 'blade');
+        $this->stopWatch->start('blade.execute', 'blade');
         $__env = $this;
         $__data = array_merge($this->shared, $__data);
         extract($__data);
@@ -221,8 +245,14 @@ class Blade implements ViewInterface
         } finally {
             $__content = trim((string)ob_get_clean());
         }
-        $this->stopWatch->stop('9-blade.execute');
+        $this->stopWatch->stop('blade.execute');
         return $__content;
+    }
+
+    public function resetPlaceholder(): self
+    {
+        $this->placeholder = [];
+        return $this;
     }
 
     public function getPlaceholder(string $name, string $key = null): string
@@ -391,7 +421,7 @@ class Blade implements ViewInterface
     public function compileInclude(string $expression): string
     {
         $expression = mb_substr($expression, 1, -1);
-        return sprintf('<?php echo $__env->render(%s, get_defined_vars()); ?>', $expression) . "\n";
+        return sprintf('<?php echo $__env->__internalRender(%s, get_defined_vars()); ?>', $expression) . "\n";
     }
 
     public function compileUnset(string $expression): string
@@ -402,7 +432,7 @@ class Blade implements ViewInterface
     public function compileExtends(string $expression): string
     {
         $expression = mb_substr($expression, 1, -1);
-        $this->footer[] = sprintf('<?php echo $__env->render(%s, get_defined_vars()); ?>', $expression);
+        $this->footer[] = sprintf('<?php echo $__env->__internalRender(%s, get_defined_vars()); ?>', $expression);
         return '';
     }
 

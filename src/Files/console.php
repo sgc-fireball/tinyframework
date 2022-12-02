@@ -1,5 +1,7 @@
 #!/usr/bin/env php
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use TinyFramework\Console\ConsoleKernel;
 use TinyFramework\Core\Container;
@@ -14,7 +16,7 @@ if (file_exists('vendor/composer/platform_check.php')) {
 }
 define('TINYFRAMEWORK_START_AUTOLOAD', microtime(true));
 
-define('ROOT', __DIR__);
+define('ROOT', realpath(__DIR__));
 chdir(ROOT);
 if (function_exists('pcntl_async_signals')) {
     pcntl_async_signals(true);

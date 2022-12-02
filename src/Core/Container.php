@@ -63,14 +63,14 @@ class Container implements ContainerInterface
     public function has(string $key): bool
     {
         $key = $this->resolveAlias($key);
-        return \array_key_exists($key, $this->instances);
+        return \array_key_exists($key, $this->instances) || (class_exists($key) && $key !== 'Closure');
     }
 
     public function get(string $key): mixed
     {
         $oKey = $key;
         $key = $this->resolveAlias($key);
-        if (\array_key_exists($key, $this->instances)) {
+        if (is_string($key) && \array_key_exists($key, $this->instances)) {
             if (is_callable($this->instances[$key]) || \is_string($this->instances[$key])) {
                 $this->instances[$key] = $this->call($this->instances[$key]);
             }

@@ -30,7 +30,7 @@ class XhprofServiceProvider extends ServiceProviderAwesome
         }
 
         $dir = $config->get('xhprof.dir');
-        $expire = time() - $config->get('xhprof.expire'); // 7 days default
+        $expire = time() - $config->get('xhprof.expire');
 
         if (function_exists('\\tideways_xhprof_enable')) {
             \tideways_xhprof_enable(
@@ -57,6 +57,7 @@ class XhprofServiceProvider extends ServiceProviderAwesome
 
         $kernel = $this->container->get('kernel');
         assert($kernel instanceof KernelInterface);
+
         if (!$kernel->runningInConsole() && method_exists($kernel, 'terminateRequestCallback')) {
             $kernel->terminateRequestCallback(function (Request $request, Response $response) use ($dir, $expire) {
                 if (function_exists('\\tideways_xhprof_disable')) {

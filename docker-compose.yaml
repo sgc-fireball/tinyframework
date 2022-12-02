@@ -29,6 +29,8 @@ services:
       - SMTP_PORT=1025
       - SMTP_ENCRYPTION=
       - AMQP_HOST=rabbitmq
+      - SWOOLE_HOST=0.0.0.0
+      - SWOOLE_PORT=8000
     volumes:
       - "./:/app"
       - "./storage/:/app/src/Files/storage"

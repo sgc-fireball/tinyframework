@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 use TinyFramework\Cache\CacheInterface;
-use TinyFramework\Core\Config;
 use TinyFramework\Core\ConfigInterface;
 use TinyFramework\Core\Container;
 use TinyFramework\Core\DotEnvInterface;
+use TinyFramework\Core\KernelInterface;
 use TinyFramework\Crypt\CryptInterface;
 use TinyFramework\Database\DatabaseInterface;
 use TinyFramework\Event\EventAwesome;
@@ -498,16 +498,9 @@ if (!function_exists('class_basename')) {
 if (!function_exists('inMaintenanceMode')) {
     function inMaintenanceMode(): array|null
     {
-        static $config;
-        if (isset($config)) {
-            return $config;
-        }
-        $config = null;
-        $file = root_dir() . '/storage/maintenance.json';
-        if (file_exists($file)) {
-            $config = (array)json_decode(file_get_contents($file) ?: '[]', true) ?: [];
-        }
-        return $config;
+        $kernel = container('kernel');
+        assert($kernel instanceof KernelInterface);
+        return $kernel->getMaintenanceConfig();
     }
 }
 

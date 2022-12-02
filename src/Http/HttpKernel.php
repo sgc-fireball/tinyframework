@@ -22,16 +22,19 @@ class HttpKernel extends Kernel implements HttpKernelInterface
 
     public function handle(Request $request): Response
     {
-        $this->stopWatch->start('5-router', 'kernel');
+        if (defined('SWOOLE')) {
+            $this->stopWatch = $this->resetStopWatch(microtime(true));
+        }
+        $this->stopWatch->start('router', 'kernel');
         try {
             $this->request = $request;
             $response = null;
             $this->container->alias('request', Request::class)->singleton(Request::class, $request);
             if ($request->method() === 'OPTIONS') {
-                $this->stopWatch->stop('5-router');
+                $this->stopWatch->stop('router');
                 $response = $this->getResponseByOptionsRequest($request);
             } elseif ($route = $this->container->get('router')->resolve($request)) {
-                $this->stopWatch->stop('5-router');
+                $this->stopWatch->stop('router');
                 $response = $this->callRoute($route, $request);
             }
             if (!$response) {
@@ -59,21 +62,24 @@ class HttpKernel extends Kernel implements HttpKernelInterface
             }
         }
 
-        $stopWatchEvents = $this->stopWatch->section('main')->events();
-        $events = [];
-        foreach ($stopWatchEvents as $name => $stopWatchEvent) {
-            $events[] = sprintf(
-                '%s;desc="%s";dur=%.2f',
-                $name,
-                $name,
-                $stopWatchEvent->duration() * 1000
-            );
+        if ($this->container->get('config')->get('app.env') !== 'production') {
+            $stopWatchEvents = $this->stopWatch->section('main')->events();
+            $serverTimingEvents = [];
+            $count = 0;
+            foreach ($stopWatchEvents as $name => $stopWatchEvent) {
+                $serverTimingEvents[] = sprintf(
+                    '%d-%s;desc="%d-%s";dur=%.2f',
+                    $count,
+                    $name,
+                    $count++,
+                    $name,
+                    $stopWatchEvent->duration() * 1000
+                );
+            }
+            $serverTimingEvents[] = sprintf('total;desc="total";dur=%.2f', $this->stopWatch->duration() * 1000);
+            $response->header('Server-Timing', implode(',', $serverTimingEvents));
         }
-        $events[] = sprintf('total;desc="total";dur=%.2f', $this->stopWatch->duration() * 1000);
-
-        return $response
-            ->header('X-Response-ID', $response->id())
-            ->header('Server-Timing', implode(',', $events));
+        return $response->header('X-Response-ID', $response->id());
     }
 
     public function handleException(\Throwable $e): int
@@ -92,6 +98,7 @@ class HttpKernel extends Kernel implements HttpKernelInterface
 
     private function throwableToResponse(\Throwable $e): Response
     {
+        $this->stopWatch->start('controller.error', 'kernel');
         $statusCode = $e instanceof HttpException ? $e->getCode() : 500;
         $statusCode = ($statusCode < 400 || $statusCode > 599) ? 500 : $statusCode;
         $response = Response::error($statusCode);
@@ -105,6 +112,7 @@ class HttpKernel extends Kernel implements HttpKernelInterface
                 $response->content($view->render('errors.' . $statusCode, compact('e', 'response')));
             }
         }
+        $this->stopWatch->stop('controller.error');
         return $response;
     }
 
@@ -137,7 +145,7 @@ class HttpKernel extends Kernel implements HttpKernelInterface
         $request->route($route);
         $middlewares = $route->middleware();
         $onion = new Pipeline();
-        $this->stopWatch->start('6-middleware', 'kernel');
+        $this->stopWatch->start('middleware', 'kernel');
         foreach ($middlewares as $middleware) {
             $onion->layers(function (Request $request, Closure $next) use ($middleware): Response {
                 $parameters = [$request, $next];
@@ -149,8 +157,8 @@ class HttpKernel extends Kernel implements HttpKernelInterface
                 return $this->container->call($middleware . '@handle', $parameters);
             });
         }
-        $this->stopWatch->stop('6-middleware');
-        $this->stopWatch->start('7-controller', 'kernel');
+        $this->stopWatch->stop('middleware');
+        $this->stopWatch->start('controller', 'kernel');
         $response = $onion->call(function (Request $request): Response {
             $response = $this->container->call($request->route()->action(), $request->route()->parameter());
             if (!($response instanceof Response)) {
@@ -161,7 +169,7 @@ class HttpKernel extends Kernel implements HttpKernelInterface
         if ($request->method() === 'HEAD') {
             $response->content('');
         }
-        $this->stopWatch->stop('7-controller');
+        $this->stopWatch->stop('controller');
         return $response;
     }
 
@@ -174,7 +182,7 @@ class HttpKernel extends Kernel implements HttpKernelInterface
                 $this->container->get('logger')->error(exception2text($e));
             }
         }
-        $this->terminateRequestCallbacks = [];
+        $this->request = null;
         return $this;
     }
 

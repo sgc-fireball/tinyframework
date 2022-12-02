@@ -6,6 +6,7 @@ namespace TinyFramework\Core;
 
 use ErrorException;
 use RuntimeException;
+use TinyFramework\ServiceProvider\AuthServiceProvider;
 use TinyFramework\ServiceProvider\BroadcastServiceProvider;
 use TinyFramework\ServiceProvider\CacheServiceProvider;
 use TinyFramework\ServiceProvider\ConfigServiceProvider;
@@ -21,6 +22,7 @@ use TinyFramework\ServiceProvider\QueueServiceProvider;
 use TinyFramework\ServiceProvider\RouterServiceProvider;
 use TinyFramework\ServiceProvider\ServiceProviderInterface;
 use TinyFramework\ServiceProvider\SessionServiceProvider;
+use TinyFramework\ServiceProvider\SwooleServiceProvider;
 use TinyFramework\ServiceProvider\ValidationServiceProvider;
 use TinyFramework\ServiceProvider\ViewServiceProvider;
 use TinyFramework\ServiceProvider\XhprofServiceProvider;
@@ -53,16 +55,18 @@ abstract class Kernel implements KernelInterface
         self::$reservedMemory = str_repeat('x', 10240); // reserve 10 kb
 
         $this->container = $container;
-        $this->stopWatch = $this->container
-            ->alias('stopwatch', StopWatch::class)
-            ->singleton(StopWatch::class, StopWatch::class)
-            ->get(StopWatch::class);
+        $this->stopWatch = $this->resetStopWatch();
         $this->stopWatch->section('main')
-            ->addEventPeriod('0-fastcgi', 'system', $_SERVER['REQUEST_TIME_FLOAT'], TINYFRAMEWORK_START)
-            ->addEventPeriod('1-autoload', 'composer', TINYFRAMEWORK_START, TINYFRAMEWORK_START_AUTOLOAD)
-            ->addEventPeriod('2-kernel.start', 'kernel', TINYFRAMEWORK_START_AUTOLOAD, microtime(true));
+            ->addEventPeriod(
+                'fastcgi',
+                'system',
+                $_SERVER['REQUEST_TIME_FLOAT'] ?? TINYFRAMEWORK_START,
+                TINYFRAMEWORK_START
+            )
+            ->addEventPeriod('autoload', 'composer', TINYFRAMEWORK_START, TINYFRAMEWORK_START_AUTOLOAD)
+            ->addEventPeriod('kernel.start', 'kernel', TINYFRAMEWORK_START_AUTOLOAD, microtime(true));
 
-        $this->stopWatch->start('3-kernel.register', 'kernel');
+        $this->stopWatch->start('kernel.register', 'kernel');
         $this->container
             ->alias('kernel', get_class($this))
             ->alias(Kernel::class, get_class($this))
@@ -80,11 +84,18 @@ abstract class Kernel implements KernelInterface
         register_shutdown_function([$this, 'handleShutdown']);
         $this->findServiceProviders();
         $this->register();
-        $this->stopWatch->stop('3-kernel.register');
+        $this->stopWatch->stop('kernel.register');
 
-        $this->stopWatch->start('4-kernel.boot', 'kernel');
+        $this->stopWatch->start('kernel.boot', 'kernel');
         $this->boot();
-        $this->stopWatch->stop('4-kernel.boot');
+        $this->stopWatch->stop('kernel.boot');
+    }
+
+    protected function resetStopWatch(float $start = null): StopWatch
+    {
+        /** @var StopWatch $stopWatch */
+        $stopWatch = $this->container->get(StopWatch::class);
+        return $stopWatch->reset($start);
     }
 
     protected function findServiceProviders(): void
@@ -97,6 +108,7 @@ abstract class Kernel implements KernelInterface
             HashServiceProvider::class,
             LoggerServiceProvider::class,
             CacheServiceProvider::class,
+            AuthServiceProvider::class,
             ViewServiceProvider::class,
             MailServiceProvider::class,
             DatabaseServiceProvider::class,
@@ -106,6 +118,7 @@ abstract class Kernel implements KernelInterface
             BroadcastServiceProvider::class,
             LocalizationServiceProvider::class,
             ValidationServiceProvider::class,
+            SwooleServiceProvider::class,
         ];
         if ($this->runningInConsole()) {
             $this->serviceProviderNames[] = ConsoleServiceProvider::class;
@@ -171,12 +184,20 @@ abstract class Kernel implements KernelInterface
 
     public function runningInConsole(): bool
     {
-        return running_in_console();
+        return PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg';
     }
 
     public function inMaintenanceMode(): bool
     {
-        return file_exists('storage/maintenance.json');
+        return file_exists(root_dir() . '/storage/maintenance.json');
+    }
+
+    public function getMaintenanceConfig(): array|null
+    {
+        if (!$this->inMaintenanceMode()) {
+            return null;
+        }
+        return json_decode(file_exists(root_dir() . '/storage/maintenance.json') ?: '{}');
     }
 
     public function handleError(int $level, string $message, string $file = '', int $line = 0): bool

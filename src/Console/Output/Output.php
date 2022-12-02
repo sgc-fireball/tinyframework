@@ -88,7 +88,7 @@ class Output implements OutputInterface
         $this->onResize();
     }
 
-    protected function onResize(): void
+    public function onResize(): void
     {
         $command = trim(`which stty`);
         if ($command && is_executable($command)) {

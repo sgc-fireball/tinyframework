@@ -105,6 +105,7 @@ $view->compileString('<b>{{ $key }}</b>'); // php code
 ```
 
 ### Props
+
 ```blade
 @props(['time' => time()])
 Time: {{ $time }}
@@ -313,6 +314,36 @@ A `@parent` tag, is a placeholder in a section. On these position the parent con
 ### content
 
 TBD
+
+### auth
+
+```blade
+@auth
+    <a href="/logout">Logout</a>
+@else
+    <a href="/Login">Go to login</a>
+@endif
+```
+
+### can
+
+```blade
+@can('premium')
+    Current user has a premium subsciption.
+@else
+    Current user is a normal user.
+@endif
+```
+
+or
+
+```blade
+@can('edit', $media)
+    Current user can "edit" on $media.
+@else
+    Current user can't "edit" on $media.
+@endif
+```
 
 ## Todos
 

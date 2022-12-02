@@ -36,6 +36,11 @@ class URL implements \Stringable
             $this->path = $parts['path'] ?? '/';
             $this->query = $parts['query'] ?? null;
             $this->fragment = $parts['fragment'] ?? null;
+            if ($this->host && strpos($this->host, ':') !== false) {
+                [$host, $port] = explode(':', $this->host);
+                $this->host = $host;
+                $this->port = (int)$port;
+            }
         }
     }
 
@@ -399,9 +404,6 @@ class URL implements \Stringable
         return true;
     }
 
-    /**
-     * @return string
-     */
     public function __toString(): string
     {
         $url = '';

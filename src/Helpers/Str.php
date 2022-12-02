@@ -42,6 +42,11 @@ class Str implements \Stringable
         return $this->value;
     }
 
+    public function toString(): string
+    {
+        return $this->value;
+    }
+
     public function __toString(): string
     {
         return $this->value;

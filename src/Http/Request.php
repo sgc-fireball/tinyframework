@@ -5,10 +5,24 @@ declare(strict_types=1);
 namespace TinyFramework\Http;
 
 use RuntimeException;
+use TinyFramework\Auth\Authenticatable;
 use TinyFramework\Session\SessionInterface;
 
 class Request
 {
+
+    static array $trustedProxies = [
+        '127.0.0.1',
+        '::1',
+    ];
+
+    static array $trustedHeaders = [
+        'X-Forwarded-For',
+        'X-Forwarded-Proto',
+        'X-Forwarded-Scheme',
+        'X-Forwarded-Host',
+    ];
+
     private string $id;
 
     private string $method = 'GET';
@@ -29,26 +43,43 @@ class Request
 
     private array $files = [];
 
+    private array $attributes = [];
+
     private ?Route $route = null;
 
     private ?SessionInterface $session = null;
 
-    private mixed $user = null;
+    private ?Authenticatable $user = null;
 
     private ?string $body = null;
 
     private ?string $ip = null;
 
+    private ?string $realClientIp = null;
+
+    static public function setTrustedProxies(array $trustedProxies): string
+    {
+        self::$trustedProxies = $trustedProxies;
+        return self::class;
+    }
+
+    static public function setTrustedHeaders(array $trustedHeaders): string
+    {
+        self::$trustedHeaders = $trustedHeaders;
+        return self::class;
+    }
+
     public static function fromGlobal(): Request
     {
         $request = new self();
         $request->ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+        $request->realClientIp = $request->ip;
         $request->method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
         $request->url = new URL(
             sprintf(
-                '%s://%s:%s:%d%s',
+                '%s://%s%s:%d%s',
                 to_bool($_SERVER['HTTPS'] ?? 'off') ? 'https' : 'http',
-                \array_key_exists('REMOTE_USER', $_SERVER) ? $_SERVER['REMOTE_USER'] . '@' : '',
+                \array_key_exists('REMOTE_USER', $_SERVER) ? $_SERVER['REMOTE_USER'] . '@:' : '',
                 $_SERVER['HTTP_HOST'] ?? 'localhost',
                 $_SERVER['SERVER_PORT'] ?? 80,
                 $_SERVER['REQUEST_URI'] ?? '/'
@@ -96,12 +127,104 @@ class Request
             ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'PATCH', 'PURGE', 'TRACE'],
             true
         )) {
-            return $request;
+            return self::compileTrustedProxies($request);
         }
         if (!preg_match('/^[A-Z]++$/D', $request->method)) {
             throw new RuntimeException(sprintf('Invalid method override "%s".', $request->method));
         }
         $request->body = (string)file_get_contents("php://input");
+        return self::compileTrustedProxies($request);
+    }
+
+    public static function fromSwoole(\Swoole\Http\Request $swoole, \Swoole\Http\Server $server): Request
+    {
+        if (!$swoole->isCompleted()) {
+            throw new \RuntimeException('Received an incomplete Swoole Request.');
+        }
+        $request = new Request();
+        $request->ip = $swoole->server['remote_addr'] ?? '127.0.0.1';
+        $request->realClientIp = $swoole->server['x-real-ip'] ?? $request->ip;
+        $request->method = $swoole->server['request_method'] ?? 'GET';
+        $request->url = new URL(
+            sprintf(
+                '%s://%s%s:%d%s',
+                $swoole->header['scheme'] ?? $swoole->header['x-forwarded-proto'] ?? 'http',
+                \array_key_exists('remote_user', $swoole->header) ? $swoole->header['remote_user'] . '@:' : '',
+                $swoole->header['host'] ?? $swoole->header['x-forwarded-host'] ?? 'localhost',
+                $swoole->header['server_port'] ?? $swoole->header['x-forwarded-port'] ?? 80,
+                $swoole->server['request_uri'] ?? '/'
+            )
+        );
+        $request->protocol = $swoole->server['server_protocol'] ?? 'HTTP/1.0';
+        $request->get = $swoole->get ?? [];
+        $request->post = $swoole->post ?? [];
+        $request->cookie = $swoole->cookie ?? [];
+        self::migrateFiles($swoole->files ?: [], $request->files);
+        $request->attributes = ['swoole_fd' => $swoole->fd];
+
+        foreach ($swoole->header as $key => $value) {
+            $key = mb_strtolower(str_replace('-', '_', $key));
+            $request->header[$key] = [$value];
+        }
+        foreach ($swoole->server as $key => $value) {
+            $key = mb_strtolower(str_replace('-', '_', $key));
+            $request->server[$key] = [$value];
+        }
+        $request->body = $swoole->rawContent() ?? null;
+        $request->method = $swoole->getMethod();
+        if (\array_key_exists('_method', $request->get)) {
+            $request->method = strtoupper($request->get['_method'] ?: $request->method);
+            unset($request->get['_method']);
+        }
+        if (\array_key_exists('_method', $request->post)) {
+            $request->method = strtoupper($request->post['_method'] ?: $request->method);
+            unset($request->post['_method']);
+        }
+        if (\in_array(
+            $request->method,
+            ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'PATCH', 'PURGE', 'TRACE'],
+            true
+        )) {
+            return self::compileTrustedProxies($request);
+        }
+        if (!preg_match('/^[A-Z]++$/D', $request->method)) {
+            throw new RuntimeException(sprintf('Invalid method override "%s".', $request->method));
+        }
+        return self::compileTrustedProxies($request);
+    }
+
+    public static function compileTrustedProxies(Request $request): Request
+    {
+        if (!in_array($request->ip, self::$trustedProxies)) {
+            return $request;
+        }
+        if (in_array('X-Forwarded-For', self::$trustedHeaders)) {
+            $for = $request->header('X-Forwarded-For');
+            if (count($for) === 1) {
+                $fors = explode(',', $for[0]);
+                if ($ip = trim(array_shift($fors), ', ')) {
+                    $request->realClientIp = $ip;
+                }
+            }
+        }
+        if (in_array('X-Forwarded-Proto', self::$trustedHeaders)) {
+            $proto = $request->header('X-Forwarded-Proto');
+            if (count($proto) === 1) {
+                $request->url->port((int)$proto[0]);
+            }
+        }
+        if (in_array('X-Forwarded-Scheme', self::$trustedHeaders)) {
+            $scheme = $request->header('X-Forwarded-Scheme');
+            if (count($scheme) === 1) {
+                $request->url->scheme($scheme[0]);
+            }
+        }
+        if (in_array('X-Forwarded-Host', self::$trustedHeaders)) {
+            $hosts = $request->header('X-Forwarded-Host');
+            if (count($hosts) === 1) {
+                $request->url->host($hosts[0]);
+            }
+        }
         return $request;
     }
 
@@ -130,6 +253,24 @@ class Request
             return $this->get[$key] ?? null;
         }
         $this->get[$key] = $value;
+        return $this;
+    }
+
+    public function attribute(string|array|null $key = null, mixed $value = null): mixed
+    {
+        if ($key === null) {
+            return $this->attributes;
+        }
+        if (\is_array($key)) {
+            foreach ($key as $k => $value) {
+                $this->attributes[$k] = $value;
+            }
+            return $this;
+        }
+        if ($value === null) {
+            return $this->attributes[$key] ?? null;
+        }
+        $this->attributes[$key] = $value;
         return $this;
     }
 
@@ -205,7 +346,7 @@ class Request
         return $this;
     }
 
-    public function user(mixed $user = null): mixed
+    public function user(Authenticatable $user = null): Authenticatable|null|Request
     {
         if ($user !== null) {
             $this->user = $user;
@@ -219,6 +360,7 @@ class Request
         $request = new self();
         $request->method = $this->method;
         $request->ip = $this->ip;
+        $request->realClientIp = $this->realClientIp;
         $request->id = $this->id;
         $request->url = $this->url;
         $request->get = $this->get;
@@ -227,6 +369,7 @@ class Request
         $request->server = $this->server;
         $request->cookie = $this->cookie;
         $request->files = $this->files;
+        $request->attributes = $this->attributes;
         $request->route = $this->route;
         $request->session = $this->session;
         $request->user = $this->user;
@@ -276,7 +419,7 @@ class Request
             return $this->header[$key] ?? [];
         }
         $request = $this->clone();
-        $request->header[$key] = [$value];
+        $request->header[$key] = is_array($value) ? $value : [$value];
         return $request;
     }
 

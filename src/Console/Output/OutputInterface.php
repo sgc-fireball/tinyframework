@@ -39,4 +39,6 @@ interface OutputInterface
     public function width(): int;
 
     public function height(): int;
+
+    public function onResize(): void;
 }

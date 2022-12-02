@@ -6,4 +6,5 @@ namespace TinyFramework\Database\Relations;
 
 abstract class Relation
 {
+    abstract public function load(): mixed;
 }

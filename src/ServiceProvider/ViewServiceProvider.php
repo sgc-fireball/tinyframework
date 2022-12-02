@@ -52,5 +52,23 @@ class ViewServiceProvider extends ServiceProviderAwesome
         $engine->addDirective('trans', function (string $expression): string {
             return sprintf('<?php _%s; ?>', $expression);
         });
+
+        if ($this->container->has('auth.manager')) {
+            $engine->addDirective('auth', function (string $expression): string {
+                return '<?php if (container("request")->user()): ?>';
+            });
+            $engine->addDirective('can', function (string $expression): string {
+                return sprintf(
+                    '<?php if (container("auth.manager")->can(container("request")->user(), %s))',
+                    substr($expression, 1, -1)
+                );
+            });
+            $engine->addDirective('cannot', function (string $expression): string {
+                return sprintf(
+                    '<?php if (!container("auth.manager")->can(container("request")->user(), %s))',
+                    substr($expression, 1, -1)
+                );
+            });
+        }
     }
 }

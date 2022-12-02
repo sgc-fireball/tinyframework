@@ -4,6 +4,7 @@
 /.reports
 /.local
 /.sonar
+/.public
 /.scannerwork
 /.vscode
 /vendor
