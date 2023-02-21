@@ -46,4 +46,13 @@ class GPSTest extends TestCase
         $this->assertEquals('N 51° 23\' 23.759" E 6° 38\' 19.979"', $gps->getWGS84Seconds());
     }
 
+    public function testDistance()
+    {
+        $gps1 = new GPS('51.39264552969704 6.59161149214419');
+        $gps2 = new GPS('51.39360953877256 6.642594919487844');
+        $this->assertEquals(3.54, $gps1->distance($gps2, 'k'));
+        $this->assertEquals(2.2, $gps1->distance($gps2, 'm'));
+        $this->assertEquals(1.91, $gps1->distance($gps2, 'n'));
+    }
+
 }

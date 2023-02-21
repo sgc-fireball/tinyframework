@@ -118,7 +118,10 @@ class GPS
     public function getLongitude(): float
     {
         $result = $this->longitudeDirection == 'W' ? '-' : '';
-        $result .= round($this->longitudeHours + ($this->longitudeMinutes / 60) + (($this->longitudeSeconds) / 3600), 6);
+        $result .= round(
+            $this->longitudeHours + ($this->longitudeMinutes / 60) + (($this->longitudeSeconds) / 3600),
+            6
+        );
         return (float)$result;
     }
 
@@ -149,8 +152,11 @@ class GPS
         );
     }
 
-    public function distance(GPS|string $position, string $unit = 'km'): float
+    public function distance(GPS|string $position, string $unit = 'k'): float
     {
+        if (!in_array($unit, ['k', 'm', 'n'])) {
+            throw new \InvalidArgumentException('Unit must be a value of: k(ilometer), m(iles), n(autical miles)');
+        }
         $position = $position instanceof self ? $position : new self($position);
         $latitudeA = $this->getLatitude();
         $longitudeA = $this->getLongitude();
@@ -168,17 +174,15 @@ class GPS
         $latDelta = $latTo - $latFrom;
         $lonDelta = $lonTo - $lonFrom;
         $angle = 2 * asin(sqrt((sin($latDelta / 2) ** 2) + cos($latFrom) * cos($latTo) * (sin($lonDelta / 2) ** 2)));
-        $km = $angle * 6371000;
+        $km = round($angle * 6371, 2);
 
         $unit = strtolower($unit);
-        if (in_array($unit, ['k', 'km', 'kilometer'])) {
-            return $km;
-        } elseif (in_array($unit, ['m', 'miles'])) {
-            return $km * 1.609344;
-        } elseif (in_array($unit, ['n', 'nm', 'nautical miles'])) {
-            return $km * 18.52;
-        } else {
-            throw new \InvalidArgumentException('Unknown distance type: ' . $unit);
+        if ($unit === 'm') {
+            return round($km * 0.621371, 2);
         }
+        if ($unit === 'n') {
+            return round($km * 0.539957, 2);
+        }
+        return $km;
     }
 }
