@@ -406,16 +406,12 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
     }
 
     public function multisort(
-        mixed $array1_sort_order = SORT_ASC,
-        mixed $array1_sort_flags = SORT_REGULAR,
-        array ...$arrays
+        array ...$args
     ): static {
-        \array_unshift($arrays, $array1_sort_flags);
-        \array_unshift($arrays, $array1_sort_order);
-        \array_unshift($arrays, $this->items);
-        $result = \call_user_func_array('\\array_multisort', $arrays);
-        if (is_array($result)) {
-            $this->items = $result;
+        \array_unshift($args, $this->items);
+        $this->items = &$args[0];
+        if (!\call_user_func_array('\\array_multisort', $args)) {
+            throw new \RuntimeException('array_multisort returns an error.');
         }
         return $this;
     }
@@ -541,7 +537,8 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         if ($length === null) {
             $length = \count($this->items);
         }
-        $this->items = \array_splice($this->items, $offset, $length, $replacement);
+        $result = \array_splice($this->items, $offset, $length, $replacement);
+        $this->items = $result;
         return $this;
     }
 
@@ -672,7 +669,7 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         if ($callback && \is_callable($callback)) {
             \uasort($this->items, $callback);
         } else {
-            \asort($this->items, $callback ?: SORT_REGULAR);
+            \asort($this->items, is_null($callback) ? SORT_REGULAR : $callback);
         }
         return $this;
     }
@@ -716,7 +713,15 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
 
     public function containsAll(array $needles, bool $strict = false): bool
     {
-        return !$this->containsOne($needles, $strict);
+        if (count($needles) === 0) {
+            return true;
+        }
+        foreach ($needles as $needle) {
+            if (!$this->inArray($needle, $strict)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public function sortKeys(int $sort_flags = SORT_REGULAR, bool $descending = false): static
@@ -972,6 +977,12 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
     {
         $new = [];
         $position = 0;
+        if ($step < 2) {
+            throw new \InvalidArgumentException('Step size must be greater then 1.');
+        }
+        if ($offset >= $step) {
+            throw new \InvalidArgumentException('Offset size must be slower then step size.');
+        }
         foreach ($this->items as $item) {
             if ($position % $step === $offset) {
                 $new[] = $item;
