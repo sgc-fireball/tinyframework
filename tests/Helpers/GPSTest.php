@@ -15,7 +15,6 @@ use TinyFramework\Helpers\GPS;
  */
 class GPSTest extends TestCase
 {
-
     public function testOne()
     {
         $gps = new GPS('51.389933 6.638883');
@@ -54,5 +53,4 @@ class GPSTest extends TestCase
         $this->assertEquals(2.2, $gps1->distance($gps2, 'm'));
         $this->assertEquals(1.91, $gps1->distance($gps2, 'n'));
     }
-
 }
