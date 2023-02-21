@@ -41,7 +41,7 @@ class GPS
             $tmp = (float)('0.' . $match[4]) * 60;
             $this->longitudeMinutes = (int)$tmp;
             $this->longitudeSeconds = (float)($tmp - (int)$tmp) * 60;
-            // dd mm.mmm
+        // dd mm.mmm
         } elseif (preg_match(
             '/^(N|S) (\d{1,2}) (\d{1,2})\.(\d{1,6}) (O|E|W) (\d{1,3}) (\d{1,2})\.(\d{1,6})$/i',
             $position,
@@ -53,11 +53,11 @@ class GPS
             $this->latitudeDirections = strtoupper($match[1]);
             $this->latitudeHours = (int)$match[2];
             $this->latitudeMinutes = (int)$match[3];
-            $this->latitudeSeconds = (float)($match[4] / 1000000 * 60);
+            $this->latitudeSeconds = (float)((int)$match[4] / 1000000 * 60);
             $this->longitudeDirection = strtoupper($match[5]);
             $this->longitudeHours = (int)$match[6];
             $this->longitudeMinutes = (int)$match[7];
-            $this->longitudeSeconds = (float)($match[8] / 1000000 * 60);
+            $this->longitudeSeconds = (float)((int)$match[8] / 1000000 * 60);
         } elseif (preg_match(
             '/^(N|S)\s{0,1}(\d{1,2}) (\d{1,2}) (\d{1,2}) (E|O|W)\s{0,1}(\d{1,2}) (\d{1,2}) (\d{1,2})$/',
             $position,
