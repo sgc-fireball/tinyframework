@@ -133,12 +133,16 @@ class ArrTest extends TestCase
 
     public function testCombineWithValues(): void
     {
-        $this->markTestSkipped('TODO');
+        $arr = new Arr(['firstname', 'lastname']);
+        $arr->combineWithValues(['richard', 'huelsberg']);
+        $this->assertEquals(['firstname' => 'richard', 'lastname' => 'huelsberg'], $arr->toArray());
     }
 
     public function testCombineWithKeys(): void
     {
-        $this->markTestSkipped('TODO');
+        $arr = new Arr(['richard', 'huelsberg']);
+        $arr->combineWithKeys(['firstname', 'lastname']);
+        $this->assertEquals(['firstname' => 'richard', 'lastname' => 'huelsberg'], $arr->toArray());
     }
 
     public function testCountBy(): void
@@ -222,7 +226,7 @@ class ArrTest extends TestCase
     public function testFilter(): void
     {
         $arr = new Arr([1, 2, 3, 4]);
-        $this->assertEquals([0 => 1, 2 => 3], $arr->filter(fn (int $i) => $i % 2)->toArray());
+        $this->assertEquals([0 => 1, 2 => 3], $arr->filter(fn(int $i) => $i % 2)->toArray());
     }
 
     public function testFirst(): void
@@ -297,7 +301,7 @@ class ArrTest extends TestCase
     public function testMap(): void
     {
         $arr1 = new Arr(['a' => 1, 'b' => 2, 'c' => 3]);
-        $arr2 = $arr1->map(fn ($value) => $value * 2);
+        $arr2 = $arr1->map(fn($value) => $value * 2);
         $this->assertEquals(['a' => 1, 'b' => 2, 'c' => 3], $arr1->toArray());
         $this->assertEquals(['a' => 2, 'b' => 4, 'c' => 6], $arr2->toArray());
     }
@@ -305,14 +309,14 @@ class ArrTest extends TestCase
     public function testTransform(): void
     {
         $arr = new Arr(['a' => 1, 'b' => 2, 'c' => 3]);
-        $arr->transform(fn ($value) => $value * 2);
+        $arr->transform(fn($value) => $value * 2);
         $this->assertEquals(['a' => 2, 'b' => 4, 'c' => 6], $arr->toArray());
     }
 
     public function testMapWithKeys(): void
     {
         $arr1 = new Arr(['a' => 1, 'b' => 2, 'c' => 3]);
-        $arr2 = $arr1->mapWithKeys(fn ($value, $key) => [$key . 'a' => $value * 2]);
+        $arr2 = $arr1->mapWithKeys(fn($value, $key) => [$key . 'a' => $value * 2]);
         $this->assertEquals(['a' => 1, 'b' => 2, 'c' => 3], $arr1->toArray());
         $this->assertEquals(['aa' => 2, 'ba' => 4, 'ca' => 6], $arr2->toArray());
     }
@@ -320,7 +324,7 @@ class ArrTest extends TestCase
     public function testTransformWithKeys(): void
     {
         $arr = new Arr(['a' => 1, 'b' => 2, 'c' => 3]);
-        $arr->transformWithKeys(fn ($value, $key) => [$key . 'a' => $value * 2]);
+        $arr->transformWithKeys(fn($value, $key) => [$key . 'a' => $value * 2]);
         $this->assertEquals(['aa' => 2, 'ba' => 4, 'ca' => 6], $arr->toArray());
     }
 
@@ -418,7 +422,7 @@ class ArrTest extends TestCase
     public function testReduce(): void
     {
         $arr = new Arr([1, 2, 3]);
-        $result = $arr->reduce(fn (int $carry, int $item): int => $carry + $item, 0);
+        $result = $arr->reduce(fn(int $carry, int $item): int => $carry + $item, 0);
         $this->assertTrue(is_integer($result));
         $this->assertEquals(6, $result);
     }
@@ -641,7 +645,11 @@ class ArrTest extends TestCase
 
     public function testSortKeys(): void
     {
-        $this->markTestSkipped('TODO');
+        $arr = new Arr(['c' => 2, 'b' => 3, 'a' => 1]);
+        $this->assertEquals(
+            ['a' => 1, 'b' => 3, 'c' => 2],
+            $arr->sortKeys()->toArray()
+        );
     }
 
     public function testNatcasesort(): void
@@ -669,59 +677,159 @@ class ArrTest extends TestCase
         $this->markTestSkipped('TODO');
     }
 
-    public function testEach(): void
+    public function testEach1(): void
     {
-        $this->markTestSkipped('TODO');
+        $arr = new Arr(['a' => 1, 'b' => 2, 'c' => 3]);
+        $count = 0;
+        $arr->each(function (int $value, string $key) use (&$count) {
+            $count += $value;
+        });
+        $this->assertEquals(6, $count);
     }
 
-    public function testOnly(): void
+    public function testEach2(): void
     {
-        $this->markTestSkipped('TODO');
+        $arr = new Arr(['a' => 1, 'b' => 2, 'c' => 3]);
+        $count = 0;
+        $arr->each(function (int $value, string $key) use (&$count) {
+            $count += $value;
+            if ($value === 2) {
+                return false;
+            }
+        });
+        $this->assertEquals(3, $count);
     }
 
-    public function testPrepend(): void
+    public function testOnly1(): void
     {
-        $this->markTestSkipped('TODO');
+        $arr = new Arr(['a' => 1, 'b' => 2, 'c' => 3]);
+        $this->assertEquals(
+            ['b' => 2],
+            $arr->only('b')->toArray()
+        );
     }
 
-    public function testAppend(): void
+    public function testOnly2(): void
     {
-        $this->markTestSkipped('TODO');
+        $arr = new Arr(['a' => 1, 'b' => 2, 'c' => 3]);
+        $this->assertEquals(
+            ['b' => 2],
+            $arr->only(['b'])->toArray()
+        );
+    }
+
+    public function testPrepend1(): void
+    {
+        $arr = new Arr(['b' => 2, 'c' => 3]);
+        $this->assertEquals(['a' => 1, 'b' => 2, 'c' => 3], $arr->prepend(1, 'a')->toArray());
+    }
+
+    public function testPrepend2(): void
+    {
+        $arr = new Arr(['b', 'c']);
+        $this->assertEquals(['a', 'b', 'c'], $arr->prepend('a')->toArray());
+    }
+
+    public function testAppend1(): void
+    {
+        $arr = new Arr(['a', 'b']);
+        $this->assertEquals(['a', 'b', 'c'], $arr->append('c')->toArray());
+    }
+
+    public function testAppend2(): void
+    {
+        $arr = new Arr(['a' => 1, 'b' => 2]);
+        $this->assertEquals(['a' => 1, 'b' => 2, 'c' => 3], $arr->append(3, 'c')->toArray());
     }
 
     public function testDivide(): void
     {
-        $this->markTestSkipped('TODO');
+        $arr = new Arr(['a' => 3, 'b' => 2, 'c' => 1]);
+        $this->assertEquals([['a', 'b', 'c'], [3, 2, 1]], $arr->divide()->toArray());
     }
 
     public function testDot(): void
     {
-        $this->markTestSkipped('TODO');
+        $arr = new Arr([
+            'a' => 1,
+            'b' => [
+                'c' => 2,
+                'd' => 3,
+            ],
+            'e' => 4,
+        ]);
+        $this->assertEquals([
+            'a' => 1,
+            'b.c' => 2,
+            'b.d' => 3,
+            'e' => 4,
+        ], $arr->dot()->toArray());
     }
 
     public function testUndot(): void
     {
-        $this->markTestSkipped('TODO');
+        $arr = new Arr([
+            'a' => 1,
+            'b.c' => 2,
+            'b.d' => 3,
+            'e' => 4,
+        ]);
+        $this->assertEquals([
+            'a' => 1,
+            'b' => [
+                'c' => 2,
+                'd' => 3,
+            ],
+            'e' => 4,
+        ], $arr->undot()->toArray());
     }
 
     public function testImplode(): void
     {
-        $this->markTestSkipped('TODO');
+        $arr = new Arr(['a', 'b', 'c']);
+        $this->assertEquals('a,b,c', $arr->implode(','));
     }
 
     public function testHttpBuildQuery(): void
     {
-        $this->markTestSkipped('TODO');
+        $arr = new Arr(['a' => 1, 'b' => ['c' => 2, 'd' => 3, 'e' => 4]]);
+        $this->assertEquals('a=1&b%5Bc%5D=2&b%5Bd%5D=3&b%5Be%5D=4', $arr->httpBuildQuery()->toString());
     }
 
-    public function testForget(): void
+    public function testForget1(): void
     {
-        $this->markTestSkipped('TODO');
+        $arr = new Arr(['a' => 1, 'b' => 2, 'c' => 3]);
+        $this->assertEquals(
+            ['a' => 1, 'c' => 3],
+            $arr->forget('b')->toArray()
+        );
+    }
+
+    public function testForget2(): void
+    {
+        $arr = new Arr(['a' => 1, 'b' => 2, 'c' => 3]);
+        $this->assertEquals(
+            ['a' => 1, 'c' => 3],
+            $arr->forget(['b'])->toArray()
+        );
+    }
+
+    public function testForget3(): void
+    {
+        $arr = new Arr(['a' => 1, 'b' => ['c' => 2, 'd' => 3,], 'e' => 4]);
+        $this->assertEquals(
+            ['a' => 1, 'b' => ['c' => 2,], 'e' => 4],
+            $arr->forget(['b.d'])->toArray()
+        );
     }
 
     public function testExcept(): void
     {
-        $this->markTestSkipped('TODO');
+        $arr = new Arr(['a' => 1, 'b' => 2, 'c' => 3]);
+        $this->assertEquals(
+            ['a' => 1, 'c' => 3],
+            $arr->except(['b'])->toArray()
+        );
     }
 
     public function testIsEmpty(): void
@@ -753,7 +861,7 @@ class ArrTest extends TestCase
     {
         $arr = new Arr([['name' => 'Peter'], ['name' => 'Peter'], ['name' => 'Maike']]);
         $this->expectException(\RuntimeException::class);
-        $arr->groupBy(fn (array $v) => $v['name']);
+        $arr->groupBy(fn(array $v) => $v['name']);
     }
 
     public function testSet(): void

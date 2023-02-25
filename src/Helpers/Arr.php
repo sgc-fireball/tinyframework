@@ -5,12 +5,17 @@ declare(strict_types=1);
 namespace TinyFramework\Helpers;
 
 /**
+ * @template TValue
  * @see https://www.php.net/manual/de/ref.array.php
  */
 class Arr implements \ArrayAccess, \Iterator, \Countable
 {
     protected array $items = [];
 
+    /**
+     * @param array<array-key, TValue> $items
+     * @return Arr
+     */
     public static function factory(array $items = []): Arr
     {
         return new self($items);
@@ -35,6 +40,9 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         return new self(\range($start, $end, $step));
     }
 
+    /**
+     * @param array<array-key, TValue> $items
+     */
     public function __construct(array $items = [])
     {
         $this->items = $items;
@@ -45,26 +53,43 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         return new self($this->items);
     }
 
+    /**
+     * @return array<array-key, TValue>
+     */
     public function array(): array
     {
         return $this->items;
     }
 
+    /**
+     * @return array<array-key, TValue>
+     */
     public function toArray(): array
     {
         return $this->items;
     }
 
+    /**
+     * @return array<array-key, TValue>
+     */
     public function __toArray(): array
     {
         return $this->items;
     }
 
+    /**
+     * @return TValue|null
+     */
     public function __get(string $name): mixed
     {
         return $this->items[$name] ?? null;
     }
 
+    /**
+     * @param string $name
+     * @param TValue $value
+     * @return void
+     */
     public function __set(string $name, mixed $value): void
     {
         $this->items[$name] = $value;
@@ -87,11 +112,17 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         return \array_key_exists($offset, $this->items);
     }
 
+    /**
+     * @return TValue
+     */
     public function offsetGet(mixed $offset): mixed
     {
         return $this->items[$offset];
     }
 
+    /**
+     * @param TValue $value
+     */
     public function offsetSet(mixed $offset, mixed $value): void
     {
         $this->items[$offset] = $value;
@@ -102,6 +133,9 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         unset($this->items[$offset]);
     }
 
+    /**
+     * @return TValue
+     */
     public function current(): mixed
     {
         return \current($this->items);
@@ -256,6 +290,9 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         return $this;
     }
 
+    /**
+     * @return TValue|null
+     */
     public function first(callable $callback = null): mixed
     {
         if (\is_callable($callback)) {
@@ -345,6 +382,9 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         return $this;
     }
 
+    /**
+     * @return TValue|null
+     */
     public function last(callable $callback = null): mixed
     {
         if (\is_callable($callback)) {
@@ -422,6 +462,9 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         return $this;
     }
 
+    /**
+     * @return TValue
+     */
     public function pop(): mixed
     {
         $result = \array_pop($this->items);
@@ -502,6 +545,9 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         return \array_search($needle, $this->items, $strict);
     }
 
+    /**
+     * @return TValue|self|Str
+     */
     public function shift(): mixed
     {
         $result = \array_shift($this->items);
@@ -641,6 +687,9 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         return $this;
     }
 
+    /**
+     * @param TValue $value
+     */
     public function unshift(mixed $value): int
     {
         return \array_unshift($this->items, $value);
@@ -770,12 +819,16 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         return $this;
     }
 
-    public function only(array $keys): static
+    public function only(string|array $keys): static
     {
+        $keys = is_string($keys) ? [$keys] : $keys;
         $this->items = \array_intersect_key($this->items, \array_flip($keys));
         return $this;
     }
 
+    /**
+     * @param TValue $value
+     */
     public function prepend(mixed $value, string|bool|null|float|int $key = null): static
     {
         if ($key === null) {
@@ -786,6 +839,9 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         return $this;
     }
 
+    /**
+     * @param TValue $value
+     */
     public function append(mixed $value, string|bool|null|float|int $key = null): static
     {
         if ($key === null) {
@@ -852,7 +908,7 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
     }
 
     public function httpBuildQuery(
-        string $numeric_prefix = null,
+        string $numeric_prefix = '',
         string $arg_separator = null,
         int $encoding_type = PHP_QUERY_RFC1738
     ): Str {
@@ -905,6 +961,9 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         return !empty($this->items);
     }
 
+    /**
+     * @return array|TValue|mixed|null
+     */
     public function get(string $key = null, string $delimiter = '.'): mixed
     {
         if ($key === null) {
@@ -931,6 +990,9 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         throw new \RuntimeException('Currently not supported!'); // @TODO
     }
 
+    /**
+     * @param TValue $value
+     */
     public function set(string $key, mixed $value, string $delimiter = '.'): static
     {
         assert(!empty($delimiter), 'Parameter #3 $delimiter of function explode expects non-empty-string.');
