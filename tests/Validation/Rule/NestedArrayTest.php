@@ -14,7 +14,6 @@ use TinyFramework\Validation\ValidationException;
 
 class NestedArrayTest extends ValidationTestCase
 {
-
     public function setUp(): void
     {
         parent::setUp();
@@ -124,5 +123,4 @@ class NestedArrayTest extends ValidationTestCase
             $this->assertFalse($result['data'][$i]['data']['no']);
         }
     }
-
 }
