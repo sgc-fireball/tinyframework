@@ -35,6 +35,11 @@ class ViewServiceProvider extends ServiceProviderAwesome
 
     private function registerBladeDirective(Blade $engine): void
     {
+        $environment = $this->container->get('config')->get('app.env');
+        $engine->share('__environment', $environment);
+        $engine->addDirective('env', function (string $expression): string {
+            return sprintf('<?php if ($__environment === %s): ?>', substr($expression, 1, -1));
+        });
         $engine->addDirective('csrf', function (string $expression): string {
             $token = $this->container->get('request')?->session()?->get('csrf-token') ?? '';
             return sprintf('<input type="hidden" name="_token" value="%s">', $token);
@@ -44,7 +49,7 @@ class ViewServiceProvider extends ServiceProviderAwesome
             return sprintf('<?php $%s = container("%s"); ?>', trim($variable), trim($service));
         });
         $engine->addDirective('dump', function (string $expression): string {
-            return sprintf('<?php dump%s ?>', $expression);
+            return sprintf('<?php dump%s; ?>', $expression);
         });
         $engine->addDirective('dd', function (string $expression): string {
             return sprintf('<?php dd%s; ?>', $expression);
