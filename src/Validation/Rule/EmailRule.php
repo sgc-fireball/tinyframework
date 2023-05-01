@@ -39,6 +39,8 @@ class EmailRule extends RuleAwesome
             }
         }
 
+        // @TODO implement a smtp tcp port 25 check
+
         if (in_array('rfc', $parameters)) {
             if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
                 return [$this->translator->trans('validation.email', ['attribute' => $this->getTransName($name)])];

@@ -57,7 +57,7 @@ class Validator implements ValidatorInterface
             throw $exception;
         }
 
-        $values = array_filter($values, fn($value) => !is_array($value));
+        $values = array_filter($values, fn ($value) => !is_array($value));
         $values = Arr::factory($values)->undot()->array();
         return $values;
     }
