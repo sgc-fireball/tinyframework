@@ -7,7 +7,6 @@ namespace TinyFramework\Validation\Rule;
  */
 class BicRule extends RuleAwesome
 {
-
     private array $countryCodes = [
         'AD',
         'AE',
@@ -280,5 +279,4 @@ class BicRule extends RuleAwesome
 
         return [$this->translator->trans('validation.bic', ['attribute' => $this->getTransName($name)])];
     }
-
 }

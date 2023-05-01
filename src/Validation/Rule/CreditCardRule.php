@@ -7,7 +7,6 @@ namespace TinyFramework\Validation\Rule;
  */
 class CreditCardRule extends RuleAwesome
 {
-
     private array $providers = [
         'amex' => '/^3[47][0-9]{13}$/',
         'dinersclub' => '/^3(?:0[0-5]|[68][0-9])[0-9]{11}$/',
@@ -43,5 +42,4 @@ class CreditCardRule extends RuleAwesome
         }
         return [$this->translator->trans('validation.creditcard', ['attribute' => $this->getTransName($name)])];
     }
-
 }

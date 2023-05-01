@@ -9,7 +9,6 @@ namespace TinyFramework\Validation\Rule;
  */
 class CountryCodeNumberRule extends RuleAwesome
 {
-
     private array $countryCodes = [
         '004',
         '818',
@@ -287,5 +286,4 @@ class CountryCodeNumberRule extends RuleAwesome
 
         return [$this->translator->trans('validation.countrycodenumber', ['attribute' => $this->getTransName($name)])];
     }
-
 }

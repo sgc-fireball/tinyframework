@@ -9,7 +9,6 @@ namespace TinyFramework\Validation\Rule;
  */
 class CountryCodeAplha3Rule extends RuleAwesome
 {
-
     private array $countryCodes = [
         'AFG',
         'EGY',
@@ -294,5 +293,4 @@ class CountryCodeAplha3Rule extends RuleAwesome
 
         return [$this->translator->trans('validation.countrycode3', ['attribute' => $this->getTransName($name)])];
     }
-
 }

@@ -7,7 +7,6 @@ namespace TinyFramework\Validation\Rule;
  */
 class VatIdRule extends RuleAwesome
 {
-
     public function getName(): string
     {
         return 'vatid';
@@ -128,7 +127,7 @@ class VatIdRule extends RuleAwesome
         $tin = $match[2];
         $digits = str_split($tin);
         $digits = array_slice($digits, 0, 8);
-        $digits = array_map(fn($i) => intval($i), $digits);
+        $digits = array_map(fn ($i) => intval($i), $digits);
         $checksum = 11 - ($this->reverseMultiplyAndSum($digits, 9) % 11);
         if ($checksum > 9) {
             return intval($tin[8]) === 0;
@@ -161,7 +160,7 @@ class VatIdRule extends RuleAwesome
 
         $numbers = preg_replace('/[^0-9]/', '', $vatId);
         $numbers = str_split($numbers);
-        $numbers = array_map(fn($num) => +$num, $numbers);
+        $numbers = array_map(fn ($num) => +$num, $numbers);
 
         /**
          * @link https://www.estv.admin.ch/estv/de/home/mehrwertsteuer/uid/mwst-uid-nummer.html
@@ -178,5 +177,4 @@ class VatIdRule extends RuleAwesome
         }
         return $total;
     }
-
 }
