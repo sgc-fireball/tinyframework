@@ -41,4 +41,7 @@
         <server name="XHPROF_ENABLE" value="false"/>
         <server name="MYSQL_DATABASE" value="tinyframework"/>
     </php>
+    <extensions>
+        <extension class="\TinyFramework\Tests\LongrunningTestAlert"/>
+    </extensions>
 </phpunit>
