@@ -6,6 +6,11 @@ namespace TinyFramework\Database;
 
 use Closure;
 use RuntimeException;
+use TinyFramework\Database\Relations\BelongsToMany;
+use TinyFramework\Database\Relations\BelongsToOne;
+use TinyFramework\Database\Relations\HasMany;
+use TinyFramework\Database\Relations\HasOne;
+use TinyFramework\Database\Relations\Relation;
 use TinyFramework\Helpers\DatabaseRaw;
 
 abstract class QueryAwesome implements QueryInterface
@@ -28,14 +33,14 @@ abstract class QueryAwesome implements QueryInterface
 
     protected ?int $offset = null;
 
+    protected array $with = [];
+
     protected DatabaseInterface $driver;
 
     public function __construct(DatabaseInterface $driver)
     {
         $this->driver = $driver;
     }
-
-    // @TODO with
 
     public function raw(string $str): DatabaseRaw
     {
@@ -258,7 +263,10 @@ abstract class QueryAwesome implements QueryInterface
 
     public function get(): array
     {
-        return $this->buildModels($this->load());
+        $rows = $this->load();
+        $models = $this->buildModels($rows);
+        $this->eagerLoading($models);
+        return $models;
     }
 
     public function first(): BaseModel|array|null
@@ -337,7 +345,8 @@ abstract class QueryAwesome implements QueryInterface
     protected function buildModel(array $result = []): array|BaseModel
     {
         if ($this->class) {
-            $model = new $this->class();
+            $class = $this->class;
+            $model = new $class();
             $model->forceFill($result);
             return $model;
         }
@@ -351,5 +360,187 @@ abstract class QueryAwesome implements QueryInterface
         $model = $model instanceof BaseModel ? $model : (new $this->class());
         $this->table($model->getTable());
         return $this;
+    }
+
+    public function with(array|string|null $paths = null): static|array
+    {
+        if ($paths === null) {
+            return $this->with;
+        }
+        if (empty($paths)) {
+            return $this;
+        }
+        assignEagerLoadingPaths(
+            $this,
+            $this->with,
+            $paths,
+            function (BaseModel $model, string $relation): void {
+                $reflectionClass = new \ReflectionClass(get_class($model));
+                $message = sprintf(
+                    'Invalid relation call (%s::%s).',
+                    $reflectionClass->getName(),
+                    $relation
+                );
+                if (!$reflectionClass->hasMethod($relation)) {
+                    throw new \InvalidArgumentException($message . ' Missing method.');
+                }
+                $reflectionMethod = $reflectionClass->getMethod($relation);
+                if (!$reflectionMethod->isPublic()) {
+                    throw new \InvalidArgumentException($message . ' Relation is not public.');
+                }
+                if (!$reflectionMethod->hasReturnType()) {
+                    throw new \InvalidArgumentException($message . ' Method has no return type.');
+                }
+                $reflectionNamedType = $reflectionMethod->getReturnType();
+                if (!is_subclass_of($reflectionNamedType->getName(), Relation::class)) {
+                    throw new \InvalidArgumentException(
+                        $message . ' Return type mismatch or doesn\'t extends ' . Relation::class
+                    );
+                }
+            }
+        );
+        return $this;
+    }
+
+    /**
+     * @param BaseModel[] $models
+     * @return void
+     */
+    private function eagerLoading(array &$models): void
+    {
+        if (!count($models) || !count($this->with)) {
+            return;
+        }
+        foreach ($this->with as $with => $subWith) {
+            if (!method_exists($models[0], $with)) {
+                throw new \RuntimeException('Unknown relation method ' . get_class($models[0]) . '::' . $with);
+            }
+            /** @var Relation $relation */
+            $relation = [$models[0], $with]();
+            if ($relation instanceof HasOne) {
+                $this->eagerLoadingHasOne($relation, $models, $with, $subWith);
+            } elseif ($relation instanceof HasMany) {
+                $this->eagerLoadingHasMany($relation, $models, $with, $subWith);
+            } elseif ($relation instanceof BelongsToOne) {
+                $this->eagerLoadingBelongsToOne($relation, $models, $with, $subWith);
+            } elseif ($relation instanceof BelongsToMany) {
+                $this->eagerLoadingBelongsToMany($relation, $models, $with, $subWith);
+            } else {
+                throw new \RuntimeException(
+                    'Unknown relation type ' . get_class($relation) . ' from ' . get_class($models[0]) . '::' . $with
+                );
+            }
+        }
+    }
+
+    /**
+     * @param HasOne $relation
+     * @param BaseModel[] $models
+     * @param string $with
+     * @param string[] $subWith
+     * @return void
+     */
+    private function eagerLoadingHasOne(HasOne $relation, array &$models, string $with, array $subWith): void
+    {
+        $ids = [];
+        foreach ($models as $model) {
+            /** @var HasOne $relation */
+            $relation = $model->{$with}();
+            $ids[] = $model->{$relation->getLocalKey()};
+        }
+        $relationModels = $relation->eagerLoad($ids, $subWith);
+        foreach ($models as $model) {
+            $relationModel = array_values(
+                array_filter($relationModels, function (BaseModel $relationModel) use ($model, $relation) {
+                    return $model->id === $relationModel->{$relation->getForeignKey()};
+                })
+            );
+            $model->setRelation($with, count($relationModel) === 1 ? $relationModel[0] : null);
+        }
+    }
+
+    /**
+     * @param HasMany $relation
+     * @param BaseModel[] $models
+     * @param string $with
+     * @param string[] $subWith
+     * @return void
+     */
+    private function eagerLoadingHasMany(HasMany $relation, array &$models, string $with, array $subWith): void
+    {
+        $ids = [];
+        foreach ($models as $model) {
+            /** @var HasMany $relation */
+            $relation = $model->{$with}();
+            $ids[] = $model->{$relation->getLocalKey()};
+        }
+        $relationModels = $relation->eagerLoad($ids, $subWith);
+        foreach ($models as $model) {
+            $relationModel = array_values(
+                array_filter($relationModels, function (BaseModel $relationModel) use ($model, $relation) {
+                    return $model->id === $relationModel->{$relation->getForeignKey()};
+                })
+            );
+            $model->setRelation($with, $relationModel);
+        }
+    }
+
+    /**
+     * @param BelongsToOne $relation
+     * @param BaseModel[] $models
+     * @param string $with
+     * @param string[] $subWith
+     * @return void
+     */
+    private function eagerLoadingBelongsToOne(
+        BelongsToOne $relation,
+        array &$models,
+        string $with,
+        array $subWith
+    ): void {
+        $mapping = [];
+        foreach ($models as $model) {
+            /** @var BelongsToOne $relation */
+            $relation = $model->{$with}();
+            $ownerId = $model->{$relation->getOwnerKey()};
+            $mapping[$model->id] ??= [];
+            $mapping[$model->id][] = $ownerId;
+        }
+
+        $ids = array_unique(array_merge(...array_values($mapping)));
+        $relationModels = $relation->eagerLoad($ids, $subWith);
+        foreach ($models as $model) {
+            $relationModel = array_values(
+                array_filter($relationModels, function (BaseModel $relationModel) use ($model, $mapping) {
+                    return in_array($relationModel->id, $mapping[$model->id]);
+                })
+            );
+            $model->setRelation($with, count($relationModel) === 1 ? $relationModel[0] : null);
+        }
+    }
+
+    /**
+     * @param BelongsToMany $relation
+     * @param BaseModel[] $models
+     * @param string $with
+     * @param string[] $subWith
+     * @return void
+     */
+    private function eagerLoadingBelongsToMany(
+        BelongsToMany $relation,
+        array &$models,
+        string $with,
+        array $subWith
+    ): void {
+        $ids = [];
+        foreach ($models as $model) {
+            /** @var BelongsToMany $relation */
+            $relation = $model->{$with}();
+            $ids[] = $model->{$relation->getParentKey()};
+        }
+        $relationModels = $relation->eagerLoad($ids, $subWith);
+        foreach ($models as $model) {
+            $model->setRelation($with, $relationModels[$model->{$relation->getParentKey()}] ?? []);
+        }
     }
 }

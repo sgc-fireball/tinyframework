@@ -2,13 +2,17 @@
 
 declare(strict_types=1);
 
+use TinyFramework\Broadcast\BroadcastInterface;
 use TinyFramework\Cache\CacheInterface;
 use TinyFramework\Core\ConfigInterface;
 use TinyFramework\Core\Container;
 use TinyFramework\Core\DotEnvInterface;
 use TinyFramework\Core\KernelInterface;
 use TinyFramework\Crypt\CryptInterface;
+use TinyFramework\Database\BaseModel;
 use TinyFramework\Database\DatabaseInterface;
+use TinyFramework\Database\QueryInterface;
+use TinyFramework\Database\Relations\Relation;
 use TinyFramework\Event\EventAwesome;
 use TinyFramework\Event\EventDispatcherInterface;
 use TinyFramework\Hash\HashInterface;
@@ -47,17 +51,38 @@ if (!function_exists('public_dir')) {
     }
 }
 
+if (!function_exists('storage_dir')) {
+    function storage_dir(string $file = ''): string
+    {
+        return rtrim(root_dir() . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . $file, DIRECTORY_SEPARATOR);
+    }
+}
+
+if (!function_exists('base64_to_base64url')) {
+    function base64_to_base64url(string $data): string
+    {
+        return rtrim(strtr($data, '+/', '-_'), '=');
+    }
+}
+
+if (!function_exists('base64url_to_base64')) {
+    function base64url_to_base64(string $data): string
+    {
+        return str_pad(strtr($data, '-_', '+/'), \strlen($data) % 4, '=');
+    }
+}
+
 if (!function_exists('base64url_encode')) {
     function base64url_encode(string $data): string
     {
-        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+        return base64_to_base64url(base64_encode($data));
     }
 }
 
 if (!function_exists('base64url_decode')) {
     function base64url_decode(string $data): string
     {
-        return base64_decode(str_pad(strtr($data, '-_', '+/'), \strlen($data) % 4, '=', STR_PAD_RIGHT));
+        return base64_decode(base64url_to_base64($data));
     }
 }
 
@@ -83,8 +108,11 @@ if (!function_exists('container')) {
 if (!function_exists('config')) {
     function config(?string $key = null, mixed $value = null): ConfigInterface|array|string|bool|int|null
     {
-        $config = container('config');
-        assert($config instanceof ConfigInterface);
+        static $config;
+        if (!isset($config)) {
+            $config = container('config');
+            assert($config instanceof ConfigInterface);
+        }
         if ($key === null) {
             return $config;
         }
@@ -206,7 +234,7 @@ if (!function_exists('dump')) {
 if (!function_exists('dd')) {
     /**
      * @param mixed ...$val
-     * @return void
+     * @return void|never
      */
     function dd(...$val): void
     {
@@ -223,8 +251,11 @@ if (!function_exists('env')) {
      */
     function env(string $key, $default = null): mixed
     {
-        $env = container(DotEnvInterface::class);
-        assert($env instanceof DotEnvInterface);
+        static $env;
+        if (!isset($env)) {
+            $env = container(DotEnvInterface::class);
+            assert($env instanceof DotEnvInterface);
+        }
         return $env->get($key) ?? $default;
     }
 }
@@ -254,29 +285,15 @@ if (!function_exists('exception2text')) {
 if (!function_exists('guid')) {
     function guid(): string
     {
-        if (function_exists('openssl_random_pseudo_bytes')) {
-            $data = (string)openssl_random_pseudo_bytes(16);
-            $data[6] = \chr(\ord($data[6]) & 0x0f | 0x40); // set version to 0100
-            $data[8] = \chr(\ord($data[8]) & 0x3f | 0x80); // set bits 6-7 to 10
-            return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
-        }
-        if (function_exists('random_bytes')) {
-            $data = (string)random_bytes(16);
-            $data[6] = \chr(\ord($data[6]) & 0x0f | 0x40); // set version to 0100
-            $data[8] = \chr(\ord($data[8]) & 0x3f | 0x80); // set bits 6-7 to 10
-            return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
-        }
-        return sprintf(
-            '%04X%04X-%04X-%04X-%04X-%04X%04X%04X',
-            random_int(0, 65535),
-            random_int(0, 65535),
-            random_int(0, 65535),
-            random_int(16384, 20479),
-            random_int(32768, 49151),
-            random_int(0, 65535),
-            random_int(0, 65535),
-            random_int(0, 65535)
-        );
+        $function = function_exists('openssl_random_pseudo_bytes') ? 'openssl_random_pseudo_bytes' : 'random_bytes';
+        $uuid = explode(' ', microtime(false));
+        $uuid = $uuid[1] . substr($uuid[0], 2, 6);
+        $uuid = str_pad(dechex((int)$uuid), 15, '0', STR_PAD_LEFT);
+        $uuid = substr($uuid, 0, 12) . '4' . substr($uuid, 12, 3);
+        $uuid = hex2bin($uuid) . call_user_func($function, (32 - strlen($uuid)) / 2);
+        //$uuid[6] = \chr(\ord($uuid[6]) & 0x0f | 0x40); // set version to 0100
+        $uuid[8] = \chr(\ord($uuid[8]) & 0x3f | 0x80); // set bits 6-7 to 10
+        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($uuid), 4));
     }
 }
 
@@ -326,7 +343,22 @@ if (!function_exists('validator')) {
 if (!function_exists('asset_version')) {
     function asset_version(string $path): string
     {
+        static $mapping;
+        if (!isset($mapping)) {
+            $mapping = [];
+            $mixFile = root_dir() . '/mix-manifest.json';
+            if (file_exists($mixFile) && is_readable($mixFile)) {
+                foreach ((array)json_decode(file_get_contents($mixFile), true) as $source => $target) {
+                    $mapping[str_replace('/public/', '', $source)] = str_replace('/public/', '', $target);
+                }
+            }
+        }
+
         $filepath = str_contains($path, '?') ? substr($path, 0, strpos($path, '?')) : $path;
+        if (array_key_exists($filepath, $mapping)) {
+            $filepath = $mapping[$filepath];
+        }
+
         $filepath = public_dir() . DIRECTORY_SEPARATOR . ltrim($filepath, '/');
         return !file_exists($filepath) ? $path : url(
             $path,
@@ -535,5 +567,93 @@ if (!function_exists('arr')) {
     function arr(array $arr): Arr
     {
         return Arr::factory($arr);
+    }
+}
+
+if (!function_exists('collect')) {
+    function collect(array $arr): Arr
+    {
+        return Arr::factory($arr);
+    }
+}
+
+if (!function_exists('broadcast')) {
+    function broadcast(string $channel, array $message): void
+    {
+        $broadcast = container(BroadcastInterface::class);
+        assert($broadcast instanceof BroadcastInterface);
+        $broadcast->publish($channel, $message);
+    }
+}
+
+if (!function_exists('assignEagerLoadingPaths')) {
+    function assignEagerLoadingPaths(
+        BaseModel|QueryInterface $model,
+        array &$with,
+        string|array $paths,
+        callable $tester = null
+    ) {
+        $realModel = $model;
+        if ($model instanceof QueryInterface) {
+            $class = $model->class();
+            if (!$class) {
+                throw new \RuntimeException('EagerLoading can only be used on models.');
+            }
+            $realModel = new $class();
+        }
+        $paths = is_string($paths) ? [$paths] : $paths;
+        foreach ($paths as $key => $value) {
+            if (is_integer($key)) {
+                if (is_string($value)) {
+                    $value = str_contains($value, '.') ? explode('.', $value) : [$value];
+                    $subModel = $realModel;
+                    $subWith = &$with;
+                    foreach ($value as $subKey) {
+                        if ($tester) {
+                            $tester($subModel, $subKey);
+                        }
+                        $subWith[$subKey] ??= [];
+                        $subWith = &$subWith[$subKey];
+                        $subModel = $subModel->{$subKey}()->getBlankTargetObject();
+                    }
+                }
+            } else {
+                if ($tester) {
+                    $tester($realModel, $key);
+                }
+                $with[$key] ??= [];
+                assignEagerLoadingPaths(
+                    $realModel->{$key}()->getBlankTargetObject(),
+                    $with[$key],
+                    $value,
+                    $tester
+                );
+            }
+        }
+    }
+}
+
+if (!function_exists('isLuhnValid')) {
+    function isLuhnValid(string|int $number): bool
+    {
+        $sanitized = preg_replace('/[- ]/', '', (string)$number);
+        $sum = 0;
+        $shouldDouble = null;
+        for ($i = count($sanitized) - 1; $i >= 0; $i--) {
+            $digit = substr($sanitized, $i, ($i + 1));
+            $tmpNum = intval($digit);
+            if ($shouldDouble) {
+                $tmpNum *= 2;
+                if ($tmpNum >= 10) {
+                    $sum += (($tmpNum % 10) + 1);
+                } else {
+                    $sum += $tmpNum;
+                }
+            } else {
+                $sum += $tmpNum;
+            }
+            $shouldDouble = !$shouldDouble;
+        }
+        return !!(($sum % 10) === 0 ? $sanitized : false);
     }
 }

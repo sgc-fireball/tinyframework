@@ -22,7 +22,7 @@ class MailServiceProvider extends ServiceProviderAwesome
             ->alias(MailerInterface::class, $config['driver'])
             ->singleton($config['driver'], function () use ($config) {
                 $class = $config['driver'];
-                return new $class($config);
+                return $this->container->call($class, ['config' => $config]);
             });
     }
 }

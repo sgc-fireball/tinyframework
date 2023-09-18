@@ -16,6 +16,9 @@ class XhprofServiceProvider extends ServiceProviderAwesome
         if (!extension_loaded('tideways_xhprof') && !extension_loaded('xhprof')) {
             return;
         }
+        if (!defined('TINYFRAMEWORK_START')) {
+            return;
+        }
 
         $config = $this->container->get('config');
         assert($config instanceof ConfigInterface);

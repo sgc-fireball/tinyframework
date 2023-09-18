@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TinyFramework\Http;
 
 use Closure;
+use Throwable;
 use TinyFramework\Core\Kernel;
 use TinyFramework\Core\Pipeline;
 use TinyFramework\Exception\HttpException;
@@ -22,7 +23,7 @@ class HttpKernel extends Kernel implements HttpKernelInterface
 
     public function handle(Request $request): Response
     {
-        if (defined('SWOOLE')) {
+        if (defined('SWOOLE') && SWOOLE) {
             $this->stopWatch = $this->resetStopWatch(microtime(true));
         }
         $this->stopWatch->start('router', 'kernel');
@@ -38,9 +39,9 @@ class HttpKernel extends Kernel implements HttpKernelInterface
                 $response = $this->callRoute($route, $request);
             }
             if (!$response) {
-                throw new HttpException('Page not found!', 404);
+                throw new HttpException('Page ' . $request->url()->__toString() . ' not found!', 404);
             }
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $response = $this->throwableToResponse($e);
             $this->container->get('logger')->error(
                 exception2text($e),
@@ -82,7 +83,7 @@ class HttpKernel extends Kernel implements HttpKernelInterface
         return $response->header('X-Response-ID', $response->id());
     }
 
-    public function handleException(\Throwable $e): int
+    public function handleException(Throwable $e): int
     {
         self::$reservedMemory = null; // free 10kb ram
         $response = $this->throwableToResponse($e);
@@ -96,19 +97,16 @@ class HttpKernel extends Kernel implements HttpKernelInterface
         die();
     }
 
-    private function throwableToResponse(\Throwable $e): Response
+    public function throwableToResponse(Throwable $e): Response
     {
         $this->stopWatch->start('controller.error', 'kernel');
         $statusCode = $e instanceof HttpException ? $e->getCode() : 500;
         $statusCode = ($statusCode < 400 || $statusCode > 599) ? 500 : $statusCode;
         $response = Response::error($statusCode);
-        if (!$this->container->has('blade')) {
-            $response = Response::new('', $statusCode);
-        } else {
+        if ($this->container->has('blade')) {
             $view = $this->container->get('blade');
             assert($view instanceof Blade);
             if ($view->exists('errors.' . $statusCode)) {
-                $response = Response::new('', $statusCode);
                 $response->content($view->render('errors.' . $statusCode, compact('e', 'response')));
             }
         }
@@ -178,7 +176,7 @@ class HttpKernel extends Kernel implements HttpKernelInterface
         foreach ($this->terminateRequestCallbacks as $callback) {
             try {
                 $this->container->call($callback, ['request' => $request, 'response' => $response]);
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $this->container->get('logger')->error(exception2text($e));
             }
         }
@@ -191,7 +189,7 @@ class HttpKernel extends Kernel implements HttpKernelInterface
         foreach ($this->terminateCallbacks as $callback) {
             try {
                 $this->container->call($callback);
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $this->container->get('logger')->error(exception2text($e));
             }
         }

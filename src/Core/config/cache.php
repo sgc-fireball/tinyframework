@@ -12,7 +12,7 @@ return [
     ],
     'file' => [
         'driver' => \TinyFramework\Cache\FileCache::class,
-        'path' => env('CACHE_FILE_PATH', 'storage/cache')
+        'path' => env('CACHE_FILE_PATH', root_dir() . '/storage/cache'),
     ],
     'redis' => [
         'driver' => \TinyFramework\Cache\RedisCache::class,
@@ -21,6 +21,9 @@ return [
         'password' => env('REDIS_PASSWORD', null),
         'database' => (int)env('REDIS_CACHE_DATABASE', 0),
         'read_write_timeout' => (int)env('REDIS_READ_WRITE_TIMEOUT', -1),
-        'prefix' => env('REDIS_CACHE_PREFIX', 'tinyframework:cache:')
-    ]
+        'prefix' => env('REDIS_CACHE_PREFIX', 'tinyframework:cache:'),
+    ],
+    'swoole' => [
+        'driver' => \TinyFramework\Cache\SwooleCache::class,
+    ],
 ];

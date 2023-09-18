@@ -27,7 +27,7 @@
     }
   },
   "require": {
-    "php": "^8.0||^8.1",
+    "php": "^8.0||^8.1||^8.2",
     "ext-json": "*",
     "ext-mysqli": "*",
     "ext-simplexml": "*",
@@ -38,10 +38,11 @@
     "ext-pcntl": "*",
     "ext-intl": "*",
     "ext-iconv": "*",
+    "ext-posix": "*",
     "roave/security-advisories": "dev-latest"
   },
   "require-dev": {
-    "phpstan/phpstan": "^1.7",
+    "phpstan/phpstan": "^1.9",
     "phpunit/phpunit": "^9.5",
     "phpunit/php-code-coverage": "^9.2",
     "phpunit/php-file-iterator": "^3.0",
@@ -49,12 +50,13 @@
     "phpunit/php-timer": "^5.0",
     "phpunit/php-token-stream": "^4.0",
     "phpunit/phpcov": "^8.2",
-    "symplify/easy-coding-standard": "^10.0"
+    "symplify/easy-coding-standard": "^11.1"
   },
   "suggest": {
     "ext-redis": "To use Redis for Caching, Queues instanceof database or file systems.",
     "ext-amqp": "To use AMQP (RabbitMQ) Queues instanceof Sync or Redis Queues.",
-    "ext-swoole": "To use swoole http server to speed up your application."
+    "ext-swoole": "To use swoole http server to speed up your application.",
+    "ext-sodium": "To use curve encryption, for example jwt."
   },
   "scripts": {
     "post-install-cmd": [
@@ -67,20 +69,21 @@
       "@php vendor/bin/ecs --fix"
     ],
     "analyse": [
-      "@php $(which composer) dump-autoload",
-      "@php vendor/bin/phpstan analyse"
+      "@php $(which composer) dump-autoload #",
+      "@php vendor/bin/phpstan analyse --xdebug"
     ],
     "serve": [
       "@php -d variables_order=EGPCS -S 0.0.0.0:8000 -t src/Files/"
     ],
     "test": [
+      "@php $(which composer) dump-autoload #",
       "@php -d xdebug.mode=coverage vendor/bin/phpunit"
     ],
     "sonar-scanner": [
-      "mkdir -p .reports",
-      "@php $(which composer) dump-autoload",
-      "@php -d xdebug.mode=coverage vendor/bin/phpunit || true",
-      "@php vendor/bin/phpstan --error-format=json analyse 2>/dev/null >.reports/phpstan.json || true",
+      "mkdir -p .reports # ",
+      "@php $(which composer) dump-autoload #",
+      "@php -d xdebug.mode=coverage vendor/bin/phpunit || true #",
+      "@php vendor/bin/phpstan --error-format=json analyse 2>/dev/null >.reports/phpstan.json || true #",
       "/opt/sonar-scanner/bin/sonar-scanner"
     ]
   },

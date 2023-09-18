@@ -13,7 +13,6 @@ use TinyFramework\Http\Response;
 
 class CanMiddleware implements MiddlewareInterface
 {
-
     public function __construct(
         protected AuthManager $gateManager
     ) {
@@ -32,5 +31,4 @@ class CanMiddleware implements MiddlewareInterface
         }
         return $next($request);
     }
-
 }

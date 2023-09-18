@@ -8,6 +8,7 @@ use TinyFramework\Console\CommandAwesome;
 use TinyFramework\Console\Input\InputDefinitionInterface;
 use TinyFramework\Console\Input\InputInterface;
 use TinyFramework\Console\Output\Components\ProgressBar;
+use TinyFramework\Console\Output\Components\Punctation;
 use TinyFramework\Console\Output\Components\Table;
 use TinyFramework\Console\Output\OutputInterface;
 
@@ -45,6 +46,7 @@ class TestCommand extends CommandAwesome
 
         $this->testTable();
         $this->testProgressBar();
+        $this->testPunctation();
         return 0;
     }
 
@@ -92,5 +94,27 @@ class TestCommand extends CommandAwesome
             }
             $progressBar->stop();
         }
+    }
+
+    private function testPunctation(): void
+    {
+        $punctation = new Punctation($this->output);
+        $punctation
+
+            ->title('Test')->value(time())->display()
+            ->title('Test2')->value(false)->display()
+            ->title('Test 3')->value(new \stdClass())->display()
+            ->title(str_repeat('Test', (int)($this->output->width() / 5)))->value(new \stdClass())->display()
+            ->title(str_repeat('Test', (int)($this->output->width() / 2)))->value(new \stdClass())->display()
+            ->title('Test')->value(str_repeat('Test', (int)($this->output->width() / 5)))->display()
+
+            ->title(str_repeat('Test', (int)($this->output->width() / 5)))
+            ->value(str_repeat('Test', (int)($this->output->width() / 5)))
+            ->display()
+
+            ->title(str_repeat('A', (int)($this->output->width() * 1.2)))
+            ->value(str_repeat('A', (int)($this->output->width() * 1.2)))
+            ->display()
+        ;
     }
 }

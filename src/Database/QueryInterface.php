@@ -21,7 +21,11 @@ interface QueryInterface
 
     public function leftJoin(string $tableA, string $fieldA, string $tableB, string $fieldB): QueryInterface;
 
-    public function where(string|DatabaseRaw|Closure $field, string $operation = null, mixed $value = null): QueryInterface;
+    public function where(
+        string|DatabaseRaw|Closure $field,
+        string $operation = null,
+        mixed $value = null
+    ): QueryInterface;
 
     public function whereNull(string $field): QueryInterface;
 
@@ -66,4 +70,6 @@ interface QueryInterface
     public function commit(): void;
 
     public function rollback(): void;
+
+    public function with(array|string|null $paths = null): QueryInterface|array;
 }

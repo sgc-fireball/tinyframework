@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace TinyFramework\Helpers;
 
-use Closure;
-use ReflectionClass;
 use BadMethodCallException;
+use Closure;
 use InvalidArgumentException;
+use ReflectionClass;
 
 trait Macroable
 {
-
     /** @var Closure[]|callable[] */
     private static array $staticMacros = [];
 
@@ -99,5 +98,4 @@ trait Macroable
             )
         );
     }
-
 }

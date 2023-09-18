@@ -8,6 +8,38 @@ use PHPUnit\Framework\TestCase;
 use TinyFramework\Helpers\Arr;
 use TinyFramework\Helpers\Str;
 
+class CR
+{
+    private float $priv_member;
+
+    public function __construct(float $val)
+    {
+        $this->priv_member = $val;
+    }
+
+    public static function comp_func_cr(CR $a, CR $b)
+    {
+        if ($a->priv_member === $b->priv_member) {
+            return 0;
+        }
+        return ($a->priv_member > $b->priv_member) ? 1 : -1;
+    }
+
+    public static function comp_func_key(int|string $a, int|string $b)
+    {
+        if ($a === $b) {
+            return 0;
+        }
+        return ($a > $b) ? 1 : -1;
+    }
+
+    public function getPrivNumber(): float
+    {
+        return $this->priv_member;
+    }
+}
+
+
 class ArrTest extends TestCase
 {
     public function testStaticFactory(): void
@@ -147,7 +179,36 @@ class ArrTest extends TestCase
 
     public function testCountBy(): void
     {
-        $this->markTestSkipped('SKIP');
+        $arr = new Arr(["one", "two", "two", "three", "three", "four"]);
+        $result = $arr->countBy()->toArray();
+        $this->assertIsArray($result);
+        $this->assertCount(4, $result);
+        $this->assertArrayHasKey('one', $result);
+        $this->assertArrayHasKey('two', $result);
+        $this->assertArrayHasKey('three', $result);
+        $this->assertArrayHasKey('four', $result);
+        $this->assertEquals(1, $result['one']);
+        $this->assertEquals(2, $result['two']);
+        $this->assertEquals(2, $result['three']);
+        $this->assertEquals(1, $result['four']);
+    }
+
+    public function testCountByWithCallable(): void
+    {
+        $arr = new Arr([
+            ['id' => 1, 'name' => 'a', 'role' => 'Admin'],
+            ['id' => 2, 'name' => 'b', 'role' => 'Admin'],
+            ['id' => 3, 'name' => 'c', 'role' => 'User'],
+        ]);
+        $result = $arr->countBy(function (array $value, int $key) {
+            return $value['role'];
+        })->toArray();
+        $this->assertIsArray($result);
+        $this->assertCount(2, $result);
+        $this->assertArrayHasKey('Admin', $result);
+        $this->assertArrayHasKey('User', $result);
+        $this->assertEquals(2, $result['Admin']);
+        $this->assertEquals(1, $result['User']);
     }
 
     public function testCountValues(): void
@@ -163,12 +224,34 @@ class ArrTest extends TestCase
 
     public function testDiffAssoc(): void
     {
-        $this->markTestSkipped('TODO');
+        $arr1 = new Arr(["a" => "gruen", "b" => "braun", "c" => "blau", "rot"]);
+        $result = $arr1->diffAssoc(["a" => "gruen", "gelb", "rot"])->toArray();
+        $this->assertCount(3, $result);
+        $this->assertEquals('b', array_key_first($result));
+        $this->assertEquals(0, array_key_last($result));
+        $this->assertEquals('braun', $result['b']);
+        $this->assertEquals('blau', $result['c']);
+        $this->assertEquals('rot', $result[0]);
     }
 
     public function testDiffUAssoc(): void
     {
-        $this->markTestSkipped('TODO');
+        $arr1 = new Arr(["a" => "gruen", "b" => "braun", "c" => "blau", "rot"]);
+        $result = $arr1->diffUAssoc(
+            ["a" => "gruen", "gelb", "rot"],
+            function (mixed $a, mixed $b) {
+                if ($a === $b) {
+                    return 0;
+                }
+                return ($a > $b) ? 1 : -1;
+            }
+        )->toArray();
+        $this->assertCount(3, $result);
+        $this->assertEquals('b', array_key_first($result));
+        $this->assertEquals(0, array_key_last($result));
+        $this->assertEquals('braun', $result['b']);
+        $this->assertEquals('blau', $result['c']);
+        $this->assertEquals('rot', $result[0]);
     }
 
     public function testDiffKey(): void
@@ -180,12 +263,33 @@ class ArrTest extends TestCase
 
     public function testDiffUKey(): void
     {
-        $this->markTestSkipped('TODO');
+        $arr1 = new Arr(['blau' => 1, 'rot' => 2, 'grün' => 3, 'violett' => 4]);
+        $result = $arr1->diffUKey(
+            ['grün' => 5, 'blau' => 6, 'gelb' => 7, 'türkis' => 8],
+            function (mixed $key1, mixed $key2) {
+                if ($key1 == $key2) {
+                    return 0;
+                } elseif ($key1 > $key2) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            }
+        )->toArray();
+        $this->assertCount(2, $result);
+        $this->assertEquals('rot', array_key_first($result));
+        $this->assertEquals('violett', array_key_last($result));
+        $this->assertEquals(2, $result['rot']);
+        $this->assertEquals(4, $result['violett']);
     }
 
     public function testDiff(): void
     {
-        $this->markTestSkipped('TODO');
+        $arr = new Arr(["a" => "grün", "rot", "blau", "rot"]);
+        $result = $arr->diff(["b" => "grün", "gelb", "rot"])->toArray();
+        $this->assertCount(1, $result);
+        $this->assertEquals(1, array_key_first($result));
+        $this->assertEquals('blau', $result[1]);
     }
 
     public function testFlat(): void
@@ -226,7 +330,7 @@ class ArrTest extends TestCase
     public function testFilter(): void
     {
         $arr = new Arr([1, 2, 3, 4]);
-        $this->assertEquals([0 => 1, 2 => 3], $arr->filter(fn(int $i) => $i % 2)->toArray());
+        $this->assertEquals([0 => 1, 2 => 3], $arr->filter(fn (int $i) => $i % 2)->toArray());
     }
 
     public function testFirst(): void
@@ -301,7 +405,7 @@ class ArrTest extends TestCase
     public function testMap(): void
     {
         $arr1 = new Arr(['a' => 1, 'b' => 2, 'c' => 3]);
-        $arr2 = $arr1->map(fn($value) => $value * 2);
+        $arr2 = $arr1->map(fn ($value) => $value * 2);
         $this->assertEquals(['a' => 1, 'b' => 2, 'c' => 3], $arr1->toArray());
         $this->assertEquals(['a' => 2, 'b' => 4, 'c' => 6], $arr2->toArray());
     }
@@ -309,14 +413,14 @@ class ArrTest extends TestCase
     public function testTransform(): void
     {
         $arr = new Arr(['a' => 1, 'b' => 2, 'c' => 3]);
-        $arr->transform(fn($value) => $value * 2);
+        $arr->transform(fn ($value) => $value * 2);
         $this->assertEquals(['a' => 2, 'b' => 4, 'c' => 6], $arr->toArray());
     }
 
     public function testMapWithKeys(): void
     {
         $arr1 = new Arr(['a' => 1, 'b' => 2, 'c' => 3]);
-        $arr2 = $arr1->mapWithKeys(fn($value, $key) => [$key . 'a' => $value * 2]);
+        $arr2 = $arr1->mapWithKeys(fn ($value, $key) => [$key . 'a' => $value * 2]);
         $this->assertEquals(['a' => 1, 'b' => 2, 'c' => 3], $arr1->toArray());
         $this->assertEquals(['aa' => 2, 'ba' => 4, 'ca' => 6], $arr2->toArray());
     }
@@ -324,7 +428,7 @@ class ArrTest extends TestCase
     public function testTransformWithKeys(): void
     {
         $arr = new Arr(['a' => 1, 'b' => 2, 'c' => 3]);
-        $arr->transformWithKeys(fn($value, $key) => [$key . 'a' => $value * 2]);
+        $arr->transformWithKeys(fn ($value, $key) => [$key . 'a' => $value * 2]);
         $this->assertEquals(['aa' => 2, 'ba' => 4, 'ca' => 6], $arr->toArray());
     }
 
@@ -422,7 +526,7 @@ class ArrTest extends TestCase
     public function testReduce(): void
     {
         $arr = new Arr([1, 2, 3]);
-        $result = $arr->reduce(fn(int $carry, int $item): int => $carry + $item, 0);
+        $result = $arr->reduce(fn (int $carry, int $item): int => $carry + $item, 0);
         $this->assertTrue(is_integer($result));
         $this->assertEquals(6, $result);
     }
@@ -522,17 +626,89 @@ class ArrTest extends TestCase
 
     public function testUDiffAssoc(): void
     {
-        $this->markTestSkipped('TODO');
+        $arr1 = new Arr([
+            "0.1" => new CR(9),
+            "0.5" => new CR(12),
+            0 => new CR(23),
+            1 => new CR(4),
+            2 => new CR(-15),
+        ]);
+        $arr2 = [
+            "0.2" => new CR(9),
+            "0.5" => new CR(22),
+            0 => new CR(3),
+            1 => new CR(4),
+            2 => new CR(-15),
+        ];
+        $result = $arr1->uDiffAssoc($arr2, [CR::class, "comp_func_cr"])->toArray();
+        $this->assertIsArray($result);
+        $this->assertCount(3, $result);
+        $this->assertEquals('0.1', array_key_first($result));
+        $this->assertArrayHasKey('0.5', $result);
+        $this->assertEquals(0, array_key_last($result));
+        $this->assertInstanceOf(CR::class, $result['0.1']);
+        $this->assertInstanceOf(CR::class, $result['0.5']);
+        $this->assertInstanceOf(CR::class, $result[0]);
+        $this->assertEquals(9, $result['0.1']->getPrivNumber());
+        $this->assertEquals(12, $result['0.5']->getPrivNumber());
+        $this->assertEquals(23, $result[0]->getPrivNumber());
     }
 
     public function testUDiffUAssoc(): void
     {
-        $this->markTestSkipped('TODO');
+        $arr1 = new Arr([
+            "0.1" => new CR(9),
+            "0.5" => new CR(12),
+            0 => new CR(23),
+            1 => new CR(4),
+            2 => new CR(-15),
+        ]);
+        $arr2 = [
+            "0.2" => new CR(9),
+            "0.5" => new CR(22),
+            0 => new CR(3),
+            1 => new CR(4),
+            2 => new CR(-15),
+        ];
+        $result = $arr1->uDiffUAssoc($arr2, [CR::class, "comp_func_cr"], [CR::class, "comp_func_key"])->toArray();
+        $this->assertIsArray($result);
+        $this->assertCount(3, $result);
+        $this->assertEquals('0.1', array_key_first($result));
+        $this->assertArrayHasKey('0.5', $result);
+        $this->assertEquals(0, array_key_last($result));
+        $this->assertInstanceOf(CR::class, $result['0.1']);
+        $this->assertInstanceOf(CR::class, $result['0.5']);
+        $this->assertInstanceOf(CR::class, $result[0]);
+        $this->assertEquals(9, $result['0.1']->getPrivNumber());
+        $this->assertEquals(12, $result['0.5']->getPrivNumber());
+        $this->assertEquals(23, $result[0]->getPrivNumber());
     }
 
     public function testUDiff(): void
     {
-        $this->markTestSkipped('TODO');
+        $arr1 = new Arr([['Bob', 42], ['Phil', 37], ['Frank', 39]]);
+        $arr2 = [['Phil', 37], ['Mark', 45]];
+        $arr3 = $arr1->uDiff($arr2, function (mixed $a, mixed $b) {
+            return strcmp(implode("", $a), implode("", $b));
+        })->toArray();
+        $this->assertIsArray($arr3);
+        $this->assertCount(2, $arr3);
+        $this->assertEquals(0, array_key_first($arr3));
+        $this->assertEquals(2, array_key_last($arr3));
+
+        $this->assertIsArray($arr3[0]);
+        $this->assertCount(2, $arr3[0]);
+        $this->assertEquals(0, array_key_first($arr3[0]));
+        $this->assertEquals(1, array_key_last($arr3[0]));
+        $this->assertEquals('Bob', $arr3[0][0]);
+        $this->assertEquals(42, $arr3[0][1]);
+
+        $this->assertIsArray($arr3[2]);
+        $this->assertCount(2, $arr3[2]);
+        $this->assertEquals(0, array_key_first($arr3[2]));
+        $this->assertEquals(1, array_key_last($arr3[2]));
+        $this->assertEquals('Frank', $arr3[2][0]);
+        $this->assertEquals(39, $arr3[2][1]);
     }
 
     public function testUIntersectAssoc(): void
@@ -582,12 +758,23 @@ class ArrTest extends TestCase
 
     public function testWalkRecursive(): void
     {
-        $this->markTestSkipped('TODO');
+        $fruits = new Arr(['süß' => ['a' => 'Apfel', 'b' => 'Banane'], 'sauer' => 'Zitrone']);
+        $result = '';
+        $fruits->walkRecursive(function (mixed $value, mixed $key) use (&$result) {
+            $result .= sprintf('%s beinhaltet %s ', $key, $value);
+        });
+        $result = trim($result);
+        $this->assertEquals('a beinhaltet Apfel b beinhaltet Banane sauer beinhaltet Zitrone', $result);
     }
 
     public function testWalk(): void
     {
-        $this->markTestSkipped('TODO');
+        $arr = new Arr(['testa' => 1, 'testb' => 2, 'testc' => 3]);
+        $result = '';
+        $arr->walk(function (mixed $value, mixed $key) use (&$result) {
+            $result .= sprintf('%s%d', $key, $value);
+        });
+        $this->assertEquals('testa1testb2testc3', $result);
     }
 
     public function testSort(): void
@@ -654,27 +841,71 @@ class ArrTest extends TestCase
 
     public function testNatcasesort(): void
     {
-        $this->markTestSkipped('TODO');
+        $arr = new Arr(['IMG0.png', 'img12.png', 'img10.png', 'img2.png', 'img1.png', 'IMG3.png']);
+        $arr->natcasesort();
+        $array = $arr->toArray();
+        $this->assertIsArray($array);
+        $this->assertCount(6, $array);
+        $this->assertEquals(0, array_key_first($array));
+        $this->assertEquals('IMG0.png', $array[0]);
+        $this->assertEquals('img1.png', $array[4]);
+        $this->assertEquals('img2.png', $array[3]);
+        $this->assertEquals('IMG3.png', $array[5]);
+        $this->assertEquals('img10.png', $array[2]);
+        $this->assertEquals('img12.png', $array[1]);
+        $this->assertEquals(1, array_key_last($array));
     }
 
     public function testNatsort(): void
     {
-        $this->markTestSkipped('TODO');
+        $arr = new Arr(['img12.png', 'img10.png', 'img2.png', 'img1.png']);
+        $arr->natsort();
+        $array = $arr->toArray();
+        $this->assertIsArray($array);
+        $this->assertCount(4, $array);
+        $this->assertEquals(3, array_key_first($array));
+        $this->assertEquals('img1.png', $array[3]);
+        $this->assertEquals('img2.png', $array[2]);
+        $this->assertEquals('img10.png', $array[1]);
+        $this->assertEquals('img12.png', $array[0]);
+        $this->assertEquals(0, array_key_last($array));
     }
 
     public function testShuffle(): void
     {
-        $this->markTestSkipped('TODO');
+        $arr = new Arr([1, 2, 3, 4, 5, 6, 7, 8, 9, 0]);
+        $arr->shuffle();
+        $array = $arr->toArray();
+        $this->assertIsArray($array);
+        $this->assertCount(10, $array);
+        $this->assertNotEquals('1234567890', implode('', $array));
+        for ($i = 0; $i < 10; $i++) {
+            $this->assertTrue(in_array(1, $array));
+        }
     }
 
     public function testUksort(): void
     {
-        $this->markTestSkipped('TODO');
+        $arr = new Arr(['John' => 1, 'the Earth' => 2, 'an apple' => 3, 'a banana' => 4]);
+        $arr->uksort(function (mixed $a, mixed $b): int {
+            $a = preg_replace('@^(a|an|the) @', '', $a);
+            $b = preg_replace('@^(a|an|the) @', '', $b);
+            return strcasecmp($a, $b);
+        });
+        $array = $arr->toArray();
+        $this->assertTrue(array_key_first($array) === 'an apple');
+        $this->assertEquals(3, $array['an apple']);
+        $this->assertTrue(array_key_last($array) === 'John');
+        $this->assertEquals(1, $array['John']);
     }
 
     public function testUsort(): void
     {
-        $this->markTestSkipped('TODO');
+        $arr = new Arr([4, 3, 2, 1, 5, 6, 7, 8, 9, 0]);
+        $arr->usort(fn (mixed $a, mixed $b): int => $a - $b);
+        $this->assertEquals('0123456789', implode('', $arr->toArray()));
+        $arr->usort(fn (mixed $a, mixed $b): int => $b - $a);
+        $this->assertEquals('9876543210', implode('', $arr->toArray()));
     }
 
     public function testEach1(): void
@@ -816,9 +1047,9 @@ class ArrTest extends TestCase
 
     public function testForget3(): void
     {
-        $arr = new Arr(['a' => 1, 'b' => ['c' => 2, 'd' => 3,], 'e' => 4]);
+        $arr = new Arr(['a' => 1, 'b' => ['c' => 2, 'd' => 3, ], 'e' => 4]);
         $this->assertEquals(
-            ['a' => 1, 'b' => ['c' => 2,], 'e' => 4],
+            ['a' => 1, 'b' => ['c' => 2, ], 'e' => 4],
             $arr->forget(['b.d'])->toArray()
         );
     }
@@ -859,9 +1090,35 @@ class ArrTest extends TestCase
 
     public function testGroupBy(): void
     {
-        $arr = new Arr([['name' => 'Peter'], ['name' => 'Peter'], ['name' => 'Maike']]);
-        $this->expectException(\RuntimeException::class);
-        $arr->groupBy(fn(array $v) => $v['name']);
+        $arr = new Arr([
+            1 => ['id' => 1, 'name' => 'a', 'role' => 'Admin'],
+            2 => ['id' => 2, 'name' => 'b', 'role' => 'Admin'],
+            3 => ['id' => 3, 'name' => 'c', 'role' => 'User'],
+        ]);
+        $result = $arr->groupBy(function (array $value, int $key) {
+            return $value['role'];
+        })->toArray();
+        $this->assertIsArray($result);
+        $this->assertCount(2, $result);
+        $this->assertArrayHasKey('Admin', $result);
+        $this->assertArrayHasKey('User', $result);
+
+        $this->assertIsArray($result['Admin']);
+        $this->assertCount(2, $result['Admin']);
+        $this->assertArrayHasKey(1, $result['Admin']);
+        $this->assertArrayHasKey(2, $result['Admin']);
+        $this->assertIsArray($result['Admin'][1]);
+        $this->assertArrayHasKey('id', $result['Admin'][1]);
+        $this->assertEquals(1, $result['Admin'][1]['id']);
+        $this->assertEquals('Admin', $result['Admin'][1]['role']);
+
+        $this->assertIsArray($result['User']);
+        $this->assertCount(1, $result['User']);
+        $this->assertArrayHasKey(3, $result['User']);
+        $this->assertIsArray($result['User'][3]);
+        $this->assertArrayHasKey('id', $result['User'][3]);
+        $this->assertEquals(3, $result['User'][3]['id']);
+        $this->assertEquals('User', $result['User'][3]['role']);
     }
 
     public function testSet(): void

@@ -78,7 +78,7 @@ class BroadcastManager
                 };
             }
         }
-        return fn(string $channel, mixed $user) => false;
+        return fn (string $channel, mixed $user) => false;
     }
 
     protected function translateChannel(string $channel): string

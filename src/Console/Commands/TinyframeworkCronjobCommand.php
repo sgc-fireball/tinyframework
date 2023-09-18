@@ -102,5 +102,4 @@ class TinyframeworkCronjobCommand extends CommandAwesome
         }
         return 0;
     }
-
 }

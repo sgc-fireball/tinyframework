@@ -7,7 +7,6 @@ use TinyFramework\Exception\HttpException;
 
 class AuthException extends HttpException
 {
-
     protected ?Authenticatable $user = null;
 
     public function __construct(
@@ -24,5 +23,4 @@ class AuthException extends HttpException
     {
         return $this->user;
     }
-
 }

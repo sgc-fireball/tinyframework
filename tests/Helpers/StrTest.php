@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TinyFramework\Tests\Helpers;
 
 use PHPUnit\Framework\TestCase;
+use TinyFramework\Helpers\Str;
 
 class StrTest extends TestCase
 {
@@ -20,32 +21,49 @@ class StrTest extends TestCase
 
     public function testSlug(): void
     {
+        $str = Str::factory('Hello, world!')->slug();
+        $this->assertInstanceOf(Str::class, $str);
+        $this->assertEquals('hello-world', $str->string());
+
         $this->markTestSkipped('TODO');
+        /*$str = Str::factory('äöüß')->slug();
+        $this->assertInstanceOf(Str::class, $str);
+        $this->assertEquals('aeoeuess', $str->string());*/
     }
 
     public function testKebabCase(): void
     {
-        $this->markTestSkipped('TODO');
+        $str = Str::factory('Hello, World!')->kebabCase();
+        $this->assertInstanceOf(Str::class, $str);
+        $this->assertEquals('hello-world', $str->string());
     }
 
     public function testSnakeCase(): void
     {
-        $this->markTestSkipped('TODO');
+        $str = Str::factory('Hello, World!')->snakeCase();
+        $this->assertInstanceOf(Str::class, $str);
+        $this->assertEquals('hello_world', $str->string());
     }
 
     public function testCamelCase(): void
     {
-        $this->markTestSkipped('TODO');
+        $str = Str::factory('Hello, World!')->camelCase();
+        $this->assertInstanceOf(Str::class, $str);
+        $this->assertEquals('helloWorld', $str->string());
     }
 
     public function testLowerCase(): void
     {
-        $this->markTestSkipped('TODO');
+        $str = Str::factory('Hello, World!')->lowerCase();
+        $this->assertInstanceOf(Str::class, $str);
+        $this->assertEquals('hello, world!', $str->string());
     }
 
     public function testUpperCase(): void
     {
-        $this->markTestSkipped('TODO');
+        $str = Str::factory('Hello, World!')->upperCase();
+        $this->assertInstanceOf(Str::class, $str);
+        $this->assertEquals('HELLO, WORLD!', $str->string());
     }
 
     public function testAddCSlashes(): void

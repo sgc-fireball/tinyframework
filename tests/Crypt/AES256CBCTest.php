@@ -14,7 +14,6 @@ class AES256CBCTest extends TestCase
     public function setUp(): void
     {
         $this->key = random_bytes(32);
-        #$this->key = substr(str_shuffle(md5((string)microtime(true))), 0, 32);
     }
 
     public function testEncryptAndDecrypt(): void

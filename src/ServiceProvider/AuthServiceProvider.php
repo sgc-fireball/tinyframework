@@ -30,5 +30,4 @@ class AuthServiceProvider extends ServiceProviderAwesome
     public function boot(): void
     {
     }
-
 }

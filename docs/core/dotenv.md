@@ -8,6 +8,9 @@
 ```php
 use TinyFramework\Core\DotEnv;
 DotEnv::instance()->load('.env')->load('.env.local');
+if (SWOOLE) {
+    DotEnv::instance()->load('.env.swoole')
+}
 ```
 
 ## .env File

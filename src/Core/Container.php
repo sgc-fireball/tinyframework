@@ -79,6 +79,7 @@ class Container implements ContainerInterface
         if (class_exists($key) || is_callable($key) || function_exists($key) || $key instanceof Closure) {
             return $this->call($key, []);
         }
+        debug_print_backtrace();
         throw new RuntimeException('Could not resolve or call ' . $oKey);
     }
 

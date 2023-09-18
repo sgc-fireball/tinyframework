@@ -70,5 +70,4 @@ class AES256CBC implements CryptInterface
             throw new CryptException('Invalid AES256CBC key length.');
         }
     }
-
 }

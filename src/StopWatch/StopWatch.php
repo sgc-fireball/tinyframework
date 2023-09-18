@@ -99,5 +99,4 @@ class StopWatch
             $this->closeSection($id);
         }
     }
-
 }

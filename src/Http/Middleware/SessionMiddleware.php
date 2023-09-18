@@ -25,8 +25,8 @@ class SessionMiddleware implements MiddlewareInterface
         assert($session instanceof SessionInterface);
         $name = $this->container->get('config')->get('session.cookie');
         if ($name) {
-            $session->open((string)$request->cookie($name));
-            $response = $next($request->session($session));
+            $id = (string)$request->cookie($name) ?: guid();
+            $response = $next($request->session($session->open($id)));
             assert($response instanceof Response);
             $session->close();
             $response->cookie(

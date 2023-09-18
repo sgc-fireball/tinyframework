@@ -22,10 +22,12 @@ class Hook
 
     private static function checkPublicIndex(): void
     {
-        if (!is_dir('docs') && !is_dir('src')) {
-            self::installFolder();
-            self::installFiles();
+        if (is_dir('docs') || is_dir('src')) {
+            return;
         }
+        self::installFolder();
+        self::installFiles();
+        self::initOpenSSLRandom();
     }
 
     private static function installFolder(): void
@@ -57,5 +59,16 @@ class Hook
             chmod($consoleTarget, 0700);
         }
         copy(__DIR__ . '/../Files/index.php', 'public/index.php');
+    }
+
+    private static function initOpenSSLRandom(): void
+    {
+        $command = `which openssl`;
+        if ($command) {
+            exec('openssl rand -writerand ~/.rnd', $output, $result);
+            if ($result !== 0) {
+                throw new \RuntimeException('Could not create or init openssl .rnd file in $HOME.');
+            }
+        }
     }
 }

@@ -4,21 +4,24 @@ declare(strict_types=1);
 
 namespace TinyFramework\Queue;
 
-use Swoole\Http\Server as HttpServer;
-use Swoole\Websocket\Server as WebsocketServer;
 use Swoole\Timer;
+use Swoole\Websocket\Server as BaseServer;
 use TinyFramework\Core\Container;
 
 class SwooleQueue implements QueueInterface
 {
+    protected static ?Container $container = null;
 
-    private HttpServer $server;
+    private BaseServer $server;
 
-    public function __construct(Container $container)
+    public function __construct(/*array $config = []*/)
     {
-        $this->server = $container->has(WebsocketServer::class)
-            ? $container->get(WebsocketServer::class) :
-            $container->get(HttpServer::class);
+        $this->server = self::$container->get(BaseServer::class);
+    }
+
+    public static function setContainer(Container $container): void
+    {
+        static::$container = $container;
     }
 
     public function name(string $name = null): QueueInterface|string
@@ -40,7 +43,7 @@ class SwooleQueue implements QueueInterface
         $server = $this->server;
         Timer::after(
             $job->delay() * 1000,
-            function (HttpServer $server, JobInterface $job) {
+            function (BaseServer $server, JobInterface $job) {
                 $server->task($job);
             },
             [$server, $job]
@@ -62,5 +65,4 @@ class SwooleQueue implements QueueInterface
     {
         return $this;
     }
-
 }

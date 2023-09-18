@@ -7,28 +7,22 @@ namespace TinyFramework\Http\Middleware;
 use Closure;
 use TinyFramework\Auth\Authenticatable;
 use TinyFramework\Auth\AuthManager;
-use TinyFramework\Crypt\AES256CBC;
-use TinyFramework\Crypt\CryptInterface;
 use TinyFramework\Http\Request;
 use TinyFramework\Http\Response;
 
 class AuthenticatableMiddleware implements MiddlewareInterface
 {
-
-    const REMEMBERME_IDENTIFIER_KEY = 'rememberme';
-    const AUTHENTICATEABLE_IDENTIFIER_KEY = 'authenticatable';
+    public const REMEMBERME_IDENTIFIER_KEY = 'rememberme';
+    public const AUTHENTICATEABLE_IDENTIFIER_KEY = 'authenticatable';
 
     public function __construct(
-        private AuthManager $authManager,
-        private CryptInterface $crypt
-    )
-    {
+        private AuthManager $authManager
+    ) {
     }
 
     public function handle(Request $request, Closure $next, mixed ...$parameters): Response
     {
-        $authIdentifier = $this->handleSession($request, $next, ...$parameters)
-            ?? $this->handleRememberMe($request, $next, ...$parameters);
+        $authIdentifier = $this->handleSession($request) ?? $this->handleRememberMe($request);
         if ($authIdentifier) {
             $request->user($authIdentifier);
             if ($request->session()) {
@@ -39,7 +33,7 @@ class AuthenticatableMiddleware implements MiddlewareInterface
         return $next($request);
     }
 
-    public function handleSession(Request $request, Closure $next, mixed ...$parameters): ?Authenticatable
+    public function handleSession(Request $request): ?Authenticatable
     {
         if (!$request->session()) {
             return null;
@@ -51,7 +45,7 @@ class AuthenticatableMiddleware implements MiddlewareInterface
         return $this->authManager->getByAuthIdentifier($authIdentifier);
     }
 
-    protected function handleRememberMe(Request $request, Closure $next, mixed ...$parameters): ?Authenticatable
+    protected function handleRememberMe(Request $request): ?Authenticatable
     {
         $rememberMeToken = $request->cookie(self::REMEMBERME_IDENTIFIER_KEY);
         if (!$rememberMeToken) {
@@ -59,5 +53,4 @@ class AuthenticatableMiddleware implements MiddlewareInterface
         }
         return $this->authManager->getByRememberMeToken($rememberMeToken);
     }
-
 }

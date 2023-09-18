@@ -36,9 +36,8 @@ class RedisSession extends SessionAwesome implements SessionInterface
 
     public function open(?string $id): static
     {
-        if ($id) {
-            $this->id = $id;
-        }
+        $this->data = [];
+        $this->id = $id ?: guid();
         if ($this->redis->exists($this->getId())) {
             if ($value = $this->redis->get($this->getId())) {
                 $this->data = unserialize($value);

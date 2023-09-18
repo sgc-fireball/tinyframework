@@ -12,9 +12,16 @@ use TinyFramework\Database\Relations\BelongsToOne;
 use TinyFramework\Database\Relations\HasMany;
 use TinyFramework\Database\Relations\HasOne;
 use TinyFramework\Database\Relations\Relation;
+use TinyFramework\Helpers\Arr;
 use TinyFramework\Helpers\Str;
+
 use function PHPUnit\Framework\isInstanceOf;
 
+/**
+ * @property string id
+ * @property \DateTime created_at
+ * @property \DateTime|null updated_at
+ */
 class BaseModel implements JsonSerializable, ArrayAccess
 {
     protected string $connection;
@@ -34,6 +41,10 @@ class BaseModel implements JsonSerializable, ArrayAccess
     protected array $originals = [];
 
     protected array $relations = [];
+
+    protected array $with = [];
+
+    protected ?array $pivot = null;
 
     public function __construct(array $attributes = [])
     {
@@ -103,8 +114,8 @@ class BaseModel implements JsonSerializable, ArrayAccess
         if ($value === null) {
             return null;
         }
-        $type = strtolower($this->casts[$name] ?? '') ?: null;
-        if ($type === null) {
+        $type = strtolower($this->casts[$name] ?? '') ?: '';
+        if ($type === '') {
             return $value;
         }
         if (str_starts_with($type, 'encrypted:')) {
@@ -124,6 +135,8 @@ class BaseModel implements JsonSerializable, ArrayAccess
             return number_format((float)$value, (int)explode(':', $type, 2)[1]);
         } elseif ($type === 'array') {
             return is_array($value) ? $value : null;
+        } elseif ($type === 'json') {
+            return @json_decode($value) ?: null;
         } elseif ($type === 'object') {
             return is_object($value) ? $value : null;
         } elseif (in_array($type, ['date', 'datetime'])) {
@@ -140,7 +153,7 @@ class BaseModel implements JsonSerializable, ArrayAccess
     public function __set(string $name, mixed $value): void
     {
         if ($value !== null) {
-            $type = strtolower($this->casts[$name] ?? '') ?: null;
+            $type = strtolower($this->casts[$name] ?? '') ?: '';
             $encrypt = str_starts_with($type, 'encrypted:');
             if ($encrypt) {
                 $type = substr($type, 10);
@@ -165,22 +178,28 @@ class BaseModel implements JsonSerializable, ArrayAccess
                     }
                 }
                 if (!is_array($value)) {
-                    throw new \InvalidArgumentException(sprintf(
-                        'Value %for s->%s must be an array.',
-                        get_class($this),
-                        $name
-                    ));
+                    throw new \InvalidArgumentException(
+                        sprintf(
+                            'Value %for s->%s must be an array.',
+                            get_class($this),
+                            $name
+                        )
+                    );
                 }
+            } elseif ($type === 'json') {
+                $value = json_encode($type);
             } elseif ($type === 'object') {
                 if (is_string($value) && (str_starts_with($value, '{') && str_ends_with($value, '}'))) {
                     $value = json_decode($value);
                 }
                 if (!is_object($value)) {
-                    throw new \InvalidArgumentException(sprintf(
-                        'Value for %s->%s must be an object.',
-                        get_class($this),
-                        $name
-                    ));
+                    throw new \InvalidArgumentException(
+                        sprintf(
+                            'Value for %s->%s must be an object.',
+                            get_class($this),
+                            $name
+                        )
+                    );
                 }
             } elseif (in_array($type, ['date', 'datetime', 'timestamp'])) {
                 if (is_numeric($value)) {
@@ -191,11 +210,13 @@ class BaseModel implements JsonSerializable, ArrayAccess
                     }
                 }
                 if (!($value instanceof \DateTime)) {
-                    throw new \InvalidArgumentException(sprintf(
-                        'Value for %s->%s must be an integer, a parseable strtorime value or an \DateTime object.',
-                        get_class($this),
-                        $name
-                    ));
+                    throw new \InvalidArgumentException(
+                        sprintf(
+                            'Value for %s->%s must be an integer, a parseable strtorime value or an \DateTime object.',
+                            get_class($this),
+                            $name
+                        )
+                    );
                 }
                 if ($type === 'date') {
                     $value->setTime(0, 0, 0);
@@ -274,7 +295,8 @@ class BaseModel implements JsonSerializable, ArrayAccess
             ->getConnection()
             ->query()
             ->table($model->getTable())
-            ->class($class);
+            ->class($class)
+            ->with($model->with());
     }
 
     public function save(): static
@@ -316,8 +338,7 @@ class BaseModel implements JsonSerializable, ArrayAccess
         string $class,
         string $foreignKey = null,
         string $localKey = null
-    ): HasOne
-    {
+    ): HasOne {
         $caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1];
         return new HasOne(
             $this->getRelatedQuery($class),
@@ -332,8 +353,7 @@ class BaseModel implements JsonSerializable, ArrayAccess
         string $class,
         string $foreignKey = null,
         string $localKey = null
-    ): HasMany
-    {
+    ): HasMany {
         $caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1];
         return new HasMany(
             $this->getRelatedQuery($class),
@@ -348,8 +368,7 @@ class BaseModel implements JsonSerializable, ArrayAccess
         string $class,
         string $foreignKey = 'id',
         string $ownerKey = null
-    ): BelongsToOne
-    {
+    ): BelongsToOne {
         $caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1];
         $ownerKey ??= Str::factory(class_basename($class))->snakeCase() . '_id';
         return new BelongsToOne(
@@ -368,8 +387,7 @@ class BaseModel implements JsonSerializable, ArrayAccess
         string $relatedPivotKey = null,
         string $parentKey = 'id',
         string $relatedKey = 'id'
-    ): BelongsToMany
-    {
+    ): BelongsToMany {
         $tableA = $this->getTable();
         $tableB = (new $class())->getTable();
         $table ??= $tableA < $tableB ? $tableA . '_2_' . $tableB : $tableB . '_2_' . $tableA;
@@ -397,5 +415,51 @@ class BaseModel implements JsonSerializable, ArrayAccess
             ->query()
             ->table($model->getTable())
             ->class($class);
+    }
+
+    public function with(array|string|null $paths = null)
+    {
+        if ($paths === null) {
+            return $this->with;
+        }
+        assignEagerLoadingPaths(
+            $this,
+            $this->with,
+            $paths,
+            function (BaseModel $model, string $relation): void {
+                $reflectionClass = new \ReflectionClass(get_class($model));
+                $message = sprintf(
+                    'Invalid relation call (%s::%s).',
+                    $reflectionClass->getName(),
+                    $relation
+                );
+                if (!$reflectionClass->hasMethod($relation)) {
+                    throw new \InvalidArgumentException($message . ' Missing method.');
+                }
+                $reflectionMethod = $reflectionClass->getMethod($relation);
+                if (!$reflectionMethod->isPublic()) {
+                    throw new \InvalidArgumentException($message . ' Relation is not public.');
+                }
+                if (!$reflectionMethod->hasReturnType()) {
+                    throw new \InvalidArgumentException($message . ' Method has no return type.');
+                }
+                $reflectionNamedType = $reflectionMethod->getReturnType();
+                if (!is_subclass_of($reflectionNamedType->getName(), Relation::class)) {
+                    throw new \InvalidArgumentException(
+                        $message . ' Return type mismatch or doesn\'t extends ' . Relation::class
+                    );
+                }
+            }
+        );
+        return $this;
+    }
+
+    public function pivot(array|null $pivot = null): array|null|static
+    {
+        if ($pivot === null) {
+            return $this->pivot;
+        }
+        $this->pivot = $pivot;
+        return $this;
     }
 }

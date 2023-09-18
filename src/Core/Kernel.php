@@ -30,7 +30,6 @@ use TinyFramework\StopWatch\StopWatch;
 
 abstract class Kernel implements KernelInterface
 {
-
     protected static ?string $reservedMemory;
 
     protected ContainerInterface $container;
@@ -77,6 +76,9 @@ abstract class Kernel implements KernelInterface
             ->singleton(DotEnvInterface::class, DotEnv::class)
             ->get(DotEnvInterface::class);
         $dotEnv->load('.env')->load('.env.local');
+        if (defined('SWOOLE') && SWOOLE) {
+            $dotEnv->load('.env.swoole');
+        }
 
         error_reporting($dotEnv->get('APP_ENV') === 'testing' ? E_ALL | E_NOTICE | E_DEPRECATED : 0);
         set_error_handler([$this, 'handleError']);
@@ -184,7 +186,7 @@ abstract class Kernel implements KernelInterface
 
     public function runningInConsole(): bool
     {
-        return PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg';
+        return in_array(PHP_SAPI, ['cli', 'phpdbg'], true);
     }
 
     public function inMaintenanceMode(): bool

@@ -1,0 +1,19 @@
+#!/bin/sh
+
+exit 0
+
+cd $(dirname $(dirname $0))
+
+if [ ! -d vendor/ ]; then
+    composer install --no-ansi --prefer-dist --no-progress --no-autoloader --no-scripts 1>/dev/null
+fi
+
+composer dump-autoload --no-ansi --no-interaction
+vendor/bin/ecs --fix --no-progress-bar --no-ansi --no-interaction
+exit 0
+
+vendor/bin/phpstan analyse \
+    --level=$(($(grep "level:" "phpstan.neon" | cut -d ':' -f 2) - 1)) \
+    --no-ansi --no-interaction --no-progress --xdebug
+
+exit $?

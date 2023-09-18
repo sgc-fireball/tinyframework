@@ -14,8 +14,6 @@ composer.lock
 Thumbs.db
 .phpunit.result.cache
 .phpstorm.meta.php
-.bash_history
-.bashrc
 
 /app
 /public

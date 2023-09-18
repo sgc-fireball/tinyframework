@@ -37,8 +37,8 @@ class BelongsToOneTest extends FeatureTestCase
         assert($database instanceof Database);
         $database->execute('DROP TABLE IF EXISTS `test_model_a`');
         $database->execute('DROP TABLE IF EXISTS `test_model_b`');
-        $database->execute('CREATE TABLE IF NOT EXISTS `test_model_a` (`id` varchar(36) NOT NULL,`name` varchar(36) NOT NULL,PRIMARY KEY (`id`))');
-        $database->execute('CREATE TABLE IF NOT EXISTS `test_model_b` (`id` varchar(36) NOT NULL,`name` varchar(36) NOT NULL,`belongs_to_one_model_a_id` varchar(36) DEFAULT NULL,PRIMARY KEY (`id`))');
+        $database->execute('CREATE TABLE IF NOT EXISTS `test_model_a` (`id` char(36) NOT NULL,`name` char(36) NOT NULL,PRIMARY KEY (`id`))');
+        $database->execute('CREATE TABLE IF NOT EXISTS `test_model_b` (`id` char(36) NOT NULL,`name` char(36) NOT NULL,`belongs_to_one_model_a_id` char(36) DEFAULT NULL,PRIMARY KEY (`id`))');
     }
 
     public function testCouldNotFoundModels(): void
@@ -61,5 +61,27 @@ class BelongsToOneTest extends FeatureTestCase
         $modelB = (new BelongsToOneModelB(['name' => 'modelb', 'belongs_to_one_model_a_id' => $modelA->id]))->save();
         $this->assertEquals($modelB->belongs_to_one_model_a_id, $modelA->id);
         $this->assertEquals($modelA->id, $modelB->belongsToOneModelA->id);
+    }
+
+    public function testBelongsToOneEagerLoading(): void
+    {
+        $modelA1 = (new BelongsToOneModelA(['name' => 'modela1']))->save();
+        $modelA2 = (new BelongsToOneModelA(['name' => 'modela2']))->save();
+        (new BelongsToOneModelB(['name' => 'modelb1', 'belongs_to_one_model_a_id' => $modelA1->id]))->save();
+        (new BelongsToOneModelB(['name' => 'modelb2', 'belongs_to_one_model_a_id' => $modelA1->id]))->save();
+        (new BelongsToOneModelB(['name' => 'modelb3', 'belongs_to_one_model_a_id' => $modelA2->id]))->save();
+        (new BelongsToOneModelB(['name' => 'modelb4', 'belongs_to_one_model_a_id' => $modelA2->id]))->save();
+        $modelBs = BelongsToOneModelB::query()->with('belongsToOneModelA')->get();
+        $this->assertIsArray($modelBs);
+        $this->assertCount(4, $modelBs);
+        $this->assertInstanceOf(BelongsToOneModelB::class, $modelBs[0]);
+        $this->assertInstanceOf(BelongsToOneModelB::class, $modelBs[1]);
+        $this->assertInstanceOf(BelongsToOneModelB::class, $modelBs[2]);
+        $this->assertInstanceOf(BelongsToOneModelB::class, $modelBs[3]);
+        $this->assertInstanceOf(BelongsToOneModelA::class, $modelBs[0]->belongsToOneModelA);
+        $this->assertInstanceOf(BelongsToOneModelA::class, $modelBs[1]->belongsToOneModelA);
+        $this->assertInstanceOf(BelongsToOneModelA::class, $modelBs[2]->belongsToOneModelA);
+        $this->assertInstanceOf(BelongsToOneModelA::class, $modelBs[3]->belongsToOneModelA);
+        // @TODO test database counts
     }
 }

@@ -186,7 +186,7 @@ class Blade implements ViewInterface
 
         $content = (string)preg_replace_callback(
             '/\B@(@?\w+(?:::\w+)?)([ \t]*)(\( ( (?>[^()]+) | (?3) )* \))?/x',
-            fn($match) => $this->compileStatement($match),
+            fn ($match) => $this->compileStatement($match),
             $content
         );
 
@@ -281,7 +281,10 @@ class Blade implements ViewInterface
 
     public function compileComment(string $content): string
     {
-        return (string)preg_replace('/\{\{--.*--\}\}/', '', $content);
+        /**
+         * @TODO BUG
+         */
+        return (string)str_replace(['{{--', '--}}'], ['<?php /**  ', ' **/ ?>'], $content);
     }
 
     public function compileEcho(string $content): string

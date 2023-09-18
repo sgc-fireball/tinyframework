@@ -15,6 +15,9 @@ return [
         'password' => env('REDIS_PASSWORD', null),
         'database' => (int)env('REDIS_BROADCAST_DATABASE', 0),
         'read_write_timeout' => (int)env('REDIS_READ_WRITE_TIMEOUT', -1),
-        'prefix' => env('REDIS_BROADCAST_PREFIX', 'tinyframework:broadcast:')
-    ]
+        'prefix' => env('REDIS_BROADCAST_PREFIX', 'tinyframework:broadcast:'),
+    ],
+    'swoole' => [
+        'driver' => \TinyFramework\Broadcast\SwooleBroadcast::class,
+    ],
 ];

@@ -27,9 +27,7 @@ class FileSession extends SessionAwesome implements SessionInterface
     public function open(string $id = null): static
     {
         $this->data = [];
-        if ($id !== null) {
-            $this->id = $id;
-        }
+        $this->id = $id ?: guid();
         $file = sprintf('%s/%s.session.tmp', $this->path, $this->getId());
         if (!file_exists($file)) {
             return $this;

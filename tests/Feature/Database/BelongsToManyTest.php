@@ -43,9 +43,15 @@ class BelongsToManyTest extends FeatureTestCase
         $database->execute('DROP TABLE IF EXISTS `test_model_a`');
         $database->execute('DROP TABLE IF EXISTS `test_model_b`');
         $database->execute('DROP TABLE IF EXISTS `test_model_a_2_test_model_b`');
-        $database->execute('CREATE TABLE IF NOT EXISTS `test_model_a` (`id` varchar(36) NOT NULL,`name` varchar(36) NOT NULL,PRIMARY KEY (`id`))');
-        $database->execute('CREATE TABLE IF NOT EXISTS `test_model_b` (`id` varchar(36) NOT NULL,`name` varchar(36) NOT NULL,PRIMARY KEY (`id`))');
-        $database->execute('CREATE TABLE IF NOT EXISTS `test_model_a_2_test_model_b` (`test_model_a_id` varchar(36) NOT NULL,`test_model_b_id` varchar(36) NOT NULL,PRIMARY KEY (`test_model_a_id`,`test_model_b_id`))');
+        $database->execute(
+            'CREATE TABLE IF NOT EXISTS `test_model_a` (`id` char(36) NOT NULL,`name` char(36) NOT NULL,PRIMARY KEY (`id`))'
+        );
+        $database->execute(
+            'CREATE TABLE IF NOT EXISTS `test_model_b` (`id` char(36) NOT NULL,`name` char(36) NOT NULL,PRIMARY KEY (`id`))'
+        );
+        $database->execute(
+            'CREATE TABLE IF NOT EXISTS `test_model_a_2_test_model_b` (`test_model_a_id` char(36) NOT NULL,`test_model_b_id` char(36) NOT NULL,PRIMARY KEY (`test_model_a_id`,`test_model_b_id`))'
+        );
     }
 
     public function testCouldNotFoundModels(): void
@@ -58,8 +64,16 @@ class BelongsToManyTest extends FeatureTestCase
     {
         $modelA = (new BelongsToManyModelA(['name' => 'modela']))->save();
         $modelB = (new BelongsToManyModelB(['name' => 'modelb']))->save();
-        $this->assertEquals(1, BelongsToManyModelA::query()->count(), 'Found an invalid count for BelongsToManyModelA entries.');
-        $this->assertEquals(1, BelongsToManyModelB::query()->count(), 'Found an invalid count for BelongsToManyModelB entries.');
+        $this->assertEquals(
+            1,
+            BelongsToManyModelA::query()->count(),
+            'Found an invalid count for BelongsToManyModelA entries.'
+        );
+        $this->assertEquals(
+            1,
+            BelongsToManyModelB::query()->count(),
+            'Found an invalid count for BelongsToManyModelB entries.'
+        );
     }
 
     public function testBelongsToMany(): void
@@ -68,20 +82,32 @@ class BelongsToManyTest extends FeatureTestCase
         $modelAA = (new BelongsToManyModelA(['name' => 'modela']))->save();
         $modelB = (new BelongsToManyModelB(['name' => 'modelb']))->save();
         $modelBB = (new BelongsToManyModelB(['name' => 'modelb']))->save();
-        $this->assertEquals(2, BelongsToManyModelA::query()->count(), 'Found an invalid count for BelongsToManyModelA entries.');
-        $this->assertEquals(2, BelongsToManyModelB::query()->count(), 'Found an invalid count for BelongsToManyModelB entries.');
+        $this->assertEquals(
+            2,
+            BelongsToManyModelA::query()->count(),
+            'Found an invalid count for BelongsToManyModelA entries.'
+        );
+        $this->assertEquals(
+            2,
+            BelongsToManyModelB::query()->count(),
+            'Found an invalid count for BelongsToManyModelB entries.'
+        );
         /** @var Database $database */
         $database = container('database');
-        $database->execute(sprintf(
-            'INSERT INTO `test_model_a_2_test_model_b` SET test_model_a_id=%s, test_model_b_id=%s',
-            $database->escape($modelA->id),
-            $database->escape($modelB->id),
-        ));
-        $database->execute(sprintf(
-            'INSERT INTO `test_model_a_2_test_model_b` SET test_model_a_id=%s, test_model_b_id=%s',
-            $database->escape($modelAA->id),
-            $database->escape($modelBB->id),
-        ));
+        $database->execute(
+            sprintf(
+                'INSERT INTO `test_model_a_2_test_model_b` SET test_model_a_id=%s, test_model_b_id=%s',
+                $database->escape($modelA->id),
+                $database->escape($modelB->id),
+            )
+        );
+        $database->execute(
+            sprintf(
+                'INSERT INTO `test_model_a_2_test_model_b` SET test_model_a_id=%s, test_model_b_id=%s',
+                $database->escape($modelAA->id),
+                $database->escape($modelBB->id),
+            )
+        );
         $this->assertEquals(2, $database->query()->table('test_model_a_2_test_model_b')->count());
 
         $this->assertIsArray($modelA->belongsToManyModelB);
@@ -95,5 +121,57 @@ class BelongsToManyTest extends FeatureTestCase
         $this->assertEquals($modelA->id, $modelB->belongsToManyModelA[0]->id);
         $this->assertCount(1, $modelB->belongsToManyModelA[0]->belongsToManyModelB);
         $this->assertEquals($modelB->id, $modelB->belongsToManyModelA[0]->belongsToManyModelB[0]->id);
+    }
+
+    public function testBelongsToManyEagerLoading(): void
+    {
+        $modelA1 = (new BelongsToManyModelA(['name' => 'modela1']))->save();
+        $modelA2 = (new BelongsToManyModelA(['name' => 'modela2']))->save();
+        $modelB1 = (new BelongsToManyModelB(['name' => 'modelb1']))->save();
+        $modelB2 = (new BelongsToManyModelB(['name' => 'modelb2']))->save();
+        $modelB3 = (new BelongsToManyModelB(['name' => 'modelb3']))->save();
+        $modelB4 = (new BelongsToManyModelB(['name' => 'modelb4']))->save();
+
+        /** @var Database $database */
+        $database = container('database');
+        $database->execute(
+            sprintf(
+                'INSERT INTO `test_model_a_2_test_model_b` SET test_model_a_id=%s, test_model_b_id=%s',
+                $database->escape($modelA1->id),
+                $database->escape($modelB1->id),
+            )
+        );
+        $database->execute(
+            sprintf(
+                'INSERT INTO `test_model_a_2_test_model_b` SET test_model_a_id=%s, test_model_b_id=%s',
+                $database->escape($modelA1->id),
+                $database->escape($modelB2->id),
+            )
+        );
+        $database->execute(
+            sprintf(
+                'INSERT INTO `test_model_a_2_test_model_b` SET test_model_a_id=%s, test_model_b_id=%s',
+                $database->escape($modelA2->id),
+                $database->escape($modelB3->id),
+            )
+        );
+        $database->execute(
+            sprintf(
+                'INSERT INTO `test_model_a_2_test_model_b` SET test_model_a_id=%s, test_model_b_id=%s',
+                $database->escape($modelA2->id),
+                $database->escape($modelB4->id),
+            )
+        );
+
+        $modelAs = BelongsToManyModelA::query()->with('belongsToManyModelB')->get();
+        $this->assertIsArray($modelAs);
+        $this->assertCount(2, $modelAs);
+        $this->assertInstanceOf(BelongsToManyModelA::class, $modelAs[0]);
+        $this->assertInstanceOf(BelongsToManyModelA::class, $modelAs[1]);
+        $this->assertIsArray($modelAs[0]->belongsToManyModelB);
+        $this->assertIsArray($modelAs[1]->belongsToManyModelB);
+        $this->assertCount(2, $modelAs[0]->belongsToManyModelB);
+        $this->assertCount(2, $modelAs[1]->belongsToManyModelB);
+        // @TODO test database counts
     }
 }

@@ -6,6 +6,7 @@ namespace TinyFramework\Http;
 
 use Closure;
 use RuntimeException;
+use TinyFramework\Core\Config;
 use TinyFramework\Core\ContainerInterface;
 use TinyFramework\Http\Middleware\MaintenanceMiddleware;
 use TinyFramework\Http\Middleware\ProjectHoneyPotMiddleware;
@@ -35,7 +36,7 @@ class Router
     public function routes(): array
     {
         // destroy pointers
-        return array_map(fn(Route $route) => clone $route, $this->routes);
+        return array_map(fn (Route $route) => clone $route, $this->routes);
     }
 
     public function load(): static
@@ -315,7 +316,7 @@ class Router
         if (\in_array('GET', $result)) {
             $result[] = 'HEAD';
         }
-        $results = array_unique(array_filter($result, fn($method) => $method !== 'ANY'));
+        $results = array_unique(array_filter($result, fn ($method) => $method !== 'ANY'));
         sort($results);
         return $results;
     }
@@ -403,9 +404,8 @@ class Router
                 $url = rtrim($url, '&');
                 $url .= str_contains($url, '?') ? '&' : '?';
                 $url .= http_build_query($parameters);
-                $url = rtrim($url, '?&');
             }
-            return $url;
+            return rtrim($url, '?&');
         }
         throw new RuntimeException('Could not found route.');
     }
@@ -415,14 +415,19 @@ class Router
         $url = '/' . ltrim($path, '/');
         $url .= mb_strpos($url, '?') === false ? '?' : '&';
         $url .= http_build_query($parameters);
-        if ($request = $this->container->get('request')) {
-            assert($request instanceof Request);
-            return (new URL($url))
-                ->scheme($request->url()->scheme())
-                ->host($request->url()->host())
-                ->port($request->url()->port())
-                ->__toString();
+        $url = new URL($url);
+        $config = $this->container->get('config');
+        assert($config instanceof Config);
+        $appUrl = new URL($config->get('app.url'));
+        if ($appUrl->scheme()) {
+            $url = $url->scheme($appUrl->scheme());
         }
-        return rtrim($url, '?&');
+        if ($appUrl->host()) {
+            $url = $url->host($appUrl->host());
+        }
+        if ($appUrl->port()) {
+            $url = $url->port($appUrl->port());
+        }
+        return $url->__toString();
     }
 }

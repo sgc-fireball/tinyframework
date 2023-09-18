@@ -11,12 +11,18 @@ use TinyFramework\Database\QueryInterface;
 class BelongsToOne extends Relation
 {
     public function __construct(
-        private QueryInterface $query,
-        private BaseModel $model,
+        protected QueryInterface $query,
+        protected BaseModel $model,
         private string $foreignKey,
         private string $ownerKey,
         private string $relation
     ) {
+        parent::__construct($this->query, $this->model);
+    }
+
+    public function getOwnerKey(): string
+    {
+        return $this->ownerKey;
     }
 
     /**
@@ -29,5 +35,16 @@ class BelongsToOne extends Relation
             ->first();
         $this->model->setRelation($this->relation, $model);
         return $model;
+    }
+
+    /**
+     * @return BaseModel[]
+     * @internal
+     */
+    public function eagerLoad(array $ids, array $with = []): array
+    {
+        return $this->query
+            ->where($this->foreignKey, 'IN', $ids)
+            ->get();
     }
 }

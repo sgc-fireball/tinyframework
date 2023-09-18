@@ -17,11 +17,8 @@ abstract class SessionAwesome implements SessionInterface, ArrayAccess
 
     protected int $ttl = 300;
 
-    public function getId(): string
+    public function getId(): ?string
     {
-        if ($this->id === null) {
-            $this->id = guid();
-        }
         return $this->id;
     }
 

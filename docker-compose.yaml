@@ -2,98 +2,113 @@ version: "3.7"
 
 services:
   php:
-    image: tinyframework
-    build: .
+    image: "tinyframework"
+    build:
+      context: "./"
+      dockerfile: "Dockerfile"
+      args:
+        - "_UID=${_UID:-1000}"
+        - "_GID=${_GID:-1000}"
+    user: "${_UID:-1000}:${_GID:-1000}"
+
+
+
+
+
+
+
+
+
+
     depends_on:
-      - mysql
-      - redis
-      - mailhog
-      - rabbitmq
+      - "mysql"
+      - "redis"
+      - "mailhog"
+      - "rabbitmq"
     ports:
-      - 8000:8000 # http
+      - "8000:8000" # http
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
-      - APP_ENV=dev
-      - APP_DEBUG=true
-      - REDIS_HOST=redis
-      - DATABASE_DRIVER=mysql
-      - BROADCAST_DRIVER=redis
-      - CACHE_DRIVER=redis
-      - QUEUE_DRIVER=amqp
-      - MYSQL_HOST=mysql
-      - MYSQL_USERNAME=tinyframework
-      - MYSQL_PASSWORD=tinyframework
-      - MYSQL_DATABASE=tinyframework
-      - SMTP_HOST=mailhog
-      - SMTP_PORT=1025
-      - SMTP_ENCRYPTION=
-      - AMQP_HOST=rabbitmq
-      - SWOOLE_HOST=0.0.0.0
-      - SWOOLE_PORT=8000
+      - "APP_ENV=dev"
+      - "APP_DEBUG=true"
+      - "REDIS_HOST=redis"
+      - "DATABASE_DRIVER=mysql"
+      - "BROADCAST_DRIVER=redis"
+      - "CACHE_DRIVER=redis"
+      - "QUEUE_DRIVER=amqp"
+      - "MYSQL_HOST=mysql"
+      - "MYSQL_USERNAME=tinyframework"
+      - "MYSQL_PASSWORD=tinyframework"
+      - "MYSQL_DATABASE=tinyframework"
+      - "SMTP_HOST=mailhog"
+      - "SMTP_PORT=1025"
+      - "SMTP_ENCRYPTION="
+      - "AMQP_HOST=rabbitmq"
+      - "SWOOLE_HOST=0.0.0.0"
+      - "SWOOLE_PORT=8000"
     volumes:
       - "./:/app"
       - "./storage/:/app/src/Files/storage"
-      - ${SSH_AUTH_SOCK}:/tmp/ssh-auth.sock
     networks:
-      - tinyframework
+      - "tinyframework"
 
   mysql:
-    image: mariadb:10.5
+    image: "mariadb:10.5"
     environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=tinyframework
-      - MYSQL_USER=tinyframework
-      - MYSQL_PASSWORD=tinyframework
+      - "MYSQL_ROOT_PASSWORD=root"
+      - "MYSQL_DATABASE=tinyframework"
+      - "MYSQL_USER=tinyframework"
+      - "MYSQL_PASSWORD=tinyframework"
     ports:
-      - 3306:3306 # mysql
+      - "3306:3306" # mysql
     healthcheck:
       test: [ "CMD", "mysqlcheck", "-h", "localhost", "-P", "3306", "-u", "shopware", "-pshopware", "shopware" ]
-      interval: 30s
-      timeout: 5s
+      interval: "30s"
+      timeout: "5s"
       retries: 60
     volumes:
-      - data-mysql:/var/lib/mysql:rw
+      - "data-mysql:/var/lib/mysql:rw"
     networks:
-      - tinyframework
+      - "tinyframework"
 
   mailhog:
-    image: mailhog/mailhog
+    image: "mailhog/mailhog:latest"
     ports:
       - "1025:1025" # smtp
       - "8025:8025" # http
     healthcheck:
       test: [ "CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8025/" ]
-      interval: 30s
-      timeout: 5s
+      interval: "30s"
+      timeout: "5s"
       retries: 60
     networks:
-      - tinyframework
+      - "tinyframework"
 
   redis:
-    image: redis:4.0.14-alpine3.9
+    image: "redis:4.0.14-alpine3.9"
     ports:
-      - 6379:6379 # redis
+      - "6379:6379" # redis
     healthcheck:
       test: [ "CMD", "redis-cli", "PING" ]
-      interval: 30s
-      timeout: 5s
+      interval: "30s"
+      timeout: "5s"
       retries: 60
     volumes:
-      - data-redis:/data:rw
+      - "data-redis:/data:rw"
     networks:
-      - tinyframework
+      - "tinyframework"
 
   rabbitmq:
-    image: rabbitmq:3-management
+    image: "rabbitmq:3-management"
     ports:
-      - 5671:5671 # amqps
-      - 5672:5672 # amqp
-      - 15672:15672 # http
+      - "5671:5671" # amqps
+      - "5672:5672" # amqp
+      - "15672:15672" # http
     volumes:
-      - data-rabbitmq:/var/lib/rabbitmq:rw
+      - "data-rabbitmq:/var/lib/rabbitmq:rw"
     networks:
-      - tinyframework
+      - "tinyframework"
 
 #  postgres:
 #    image: postgres:11
@@ -124,17 +139,17 @@ services:
 
 volumes:
   data-mysql:
-    driver: local
+    driver: "local"
   data-redis:
-    driver: local
+    driver: "local"
   data-rabbitmq:
-    driver: local
+    driver: "local"
   data-sonarqube-data:
-    driver: local
+    driver: "local"
   data-postgres:
-    driver: local
+    driver: "local"
 
 networks:
   tinyframework:
-    driver: bridge
-    name: tinyframework
+    driver: "bridge"
+    name: "tinyframework"

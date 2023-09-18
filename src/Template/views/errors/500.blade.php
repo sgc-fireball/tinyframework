@@ -7,9 +7,24 @@
 <body>
 <h1>500 Internal Server Error</h1>
 @if (config('app.debug'))
-    <strong>{{ get_class($e) }} [{{ $e->getCode() }}]</strong>
-    {{ str_replace([getcwd()], '', $e->getMessage()) }}
-    in {{ ltrim(str_replace([getcwd()], '', $e->getFile()), '/') }}:{{ $e->getLine() }}
+    <p><strong>{{ get_class($e) }} [{{ $e->getCode() }}]</strong>
+    {{ str_replace([root_dir()], '', $e->getMessage()) }}
+    <br>
+    in {{ ltrim(str_replace([root_dir()], '', $e->getFile()), '/') }}:{{ $e->getLine() }}</p>
+@endif
+@if ($e instanceof TinyFramework\Validation\ValidationException)
+    <ul>
+        @foreach ($e->getErrorBag() as $field => $errors)
+            <li><b>{{ $field }}</b></li>
+            <li>
+                <ul>
+                    @foreach ($errors as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </li>
+        @endforeach
+    </ul>
 @endif
 <p>Response-ID: {{ $response->id() }}</p>
 </body>

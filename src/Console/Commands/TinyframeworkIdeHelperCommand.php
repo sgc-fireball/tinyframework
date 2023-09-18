@@ -69,7 +69,6 @@ class TinyframeworkIdeHelperCommand extends CommandAwesome
 
         $content = [];
         $content[] = '<?php';
-        $content[] = '';
         $content[] = '/**';
         $content[] = ' * PhpStorm Meta file, to provide autocomplete information for PhpStorm';
         $content[] = ' *';
@@ -80,13 +79,13 @@ class TinyframeworkIdeHelperCommand extends CommandAwesome
         $content[] = ' */';
         $content[] = '';
         $content[] = 'namespace PHPSTORM_META {';
-        $content[] = '    overwrite(\container(0), map([';
-        $content[] = '        \'\' => \TinyFramework\Core\Container::class,';
+        $content[] = '    overwrite(\\container(0), map([';
+        $content[] = '        \'\' => \\TinyFramework\\Core\\Container::class,';
         foreach ($mappings as $key => $class) {
             $content[] = sprintf('        \'%s\' => \\%s::class,', $key, ltrim($class, '\\'));
         }
         $content[] = '    ]));';
-        $content[] = '    overwrite(\TinyFramework\Core\Container::get(0), map([';
+        $content[] = '    overwrite(\\TinyFramework\\Core\\Container::get(0), map([';
         foreach ($mappings as $key => $class) {
             $content[] = sprintf('        \'%s\' => \\%s::class,', $key, ltrim($class, '\\'));
         }
@@ -94,8 +93,18 @@ class TinyframeworkIdeHelperCommand extends CommandAwesome
         $content[] = '}';
         $content[] = '';
 
+        // expectedArguments(
+        //        \Symfony\Component\Console\Command\Command::addArgument(),
+        //        1,
+        //        \Symfony\Component\Console\Input\InputArgument::OPTIONAL,
+        //        \Symfony\Component\Console\Input\InputArgument::REQUIRED,
+        //        \Symfony\Component\Console\Input\InputArgument::IS_ARRAY
+        //);
+
+        // exitPoint(Application::terminate('bar'));
+
         $file = root_dir() . '/.phpstorm.meta.php';
-        file_put_contents($file, implode("\n", $content));
+        file_put_contents($file, implode(PHP_EOL, $content));
         chmod($file, 0640);
     }
 }

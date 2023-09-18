@@ -8,7 +8,6 @@ use TinyFramework\Console\Output\OutputInterface;
 
 class Punctation
 {
-
     private OutputInterface $output;
     private string $titleStyle = '<fg:darkgray>%s</fg>';
     private string $valueStyle = '<fg:yellow>%s</fg>';
@@ -101,5 +100,4 @@ class Punctation
         $this->valueStyle = $style;
         return $this;
     }
-
 }

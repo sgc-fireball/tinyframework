@@ -38,8 +38,12 @@ class HasOneTest extends FeatureTestCase
         assert($database instanceof Database);
         $database->execute('DROP TABLE IF EXISTS `test_model_a`');
         $database->execute('DROP TABLE IF EXISTS `test_model_b`');
-        $database->execute('CREATE TABLE IF NOT EXISTS `test_model_a` (`id` varchar(36) NOT NULL,`name` varchar(36) NOT NULL,PRIMARY KEY (`id`))');
-        $database->execute('CREATE TABLE IF NOT EXISTS `test_model_b` (`id` varchar(36) NOT NULL,`name` varchar(36) NOT NULL,`has_one_model_a_id` varchar(36) DEFAULT NULL,PRIMARY KEY (`id`))');
+        $database->execute(
+            'CREATE TABLE IF NOT EXISTS `test_model_a` (`id` char(36) NOT NULL,`name` char(36) NOT NULL,PRIMARY KEY (`id`))'
+        );
+        $database->execute(
+            'CREATE TABLE IF NOT EXISTS `test_model_b` (`id` char(36) NOT NULL,`name` char(36) NOT NULL,`has_one_model_a_id` char(36) DEFAULT NULL,PRIMARY KEY (`id`))'
+        );
     }
 
     public function testCouldNotFoundModels(): void
@@ -62,5 +66,26 @@ class HasOneTest extends FeatureTestCase
         $modelB = (new HasOneModelB(['name' => 'modelb', 'has_one_model_a_id' => $modelA->id]))->save();
         $this->assertEquals($modelB->id, $modelA->modelB->id);
         $this->assertEquals($modelA->id, $modelA->modelB->has_one_model_a_id);
+    }
+
+    public function testHasOneEagerLoading(): void
+    {
+        $modelA1 = (new HasOneModelA(['name' => 'modela1']))->save();
+        $modelA2 = (new HasOneModelA(['name' => 'modela2']))->save();
+        $modelB1 = (new HasOneModelB(['name' => 'modelb1', 'has_one_model_a_id' => $modelA1->id]))->save();
+        $modelB2 = (new HasOneModelB(['name' => 'modelb1', 'has_one_model_a_id' => $modelA2->id]))->save();
+        $modelAs = HasOneModelA::query()->with('modelB')->get();
+
+        $this->assertIsArray($modelAs);
+        $this->assertCount(2, $modelAs);
+        $this->assertInstanceOf(HasOneModelA::class, $modelAs[0]);
+        $this->assertInstanceOf(HasOneModelA::class, $modelAs[1]);
+        $this->assertInstanceOf(HasOneModelB::class, $modelAs[0]->modelB);
+        $this->assertInstanceOf(HasOneModelB::class, $modelAs[1]->modelB);
+        $this->assertEquals($modelA1->id, $modelB1->has_one_model_a_id);
+        $this->assertEquals($modelA1->modelB->id, $modelB1->id);
+        $this->assertEquals($modelA2->id, $modelB2->has_one_model_a_id);
+        $this->assertEquals($modelA2->modelB->id, $modelB2->id);
+        // @TODO test database counts
     }
 }

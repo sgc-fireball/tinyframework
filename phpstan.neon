@@ -4,11 +4,14 @@ parameters:
     checkMissingIterableValueType: false
     treatPhpDocTypesAsCertain: false
     checkGenericClassInNonGenericObjectType: false
+    dynamicConstantNames:
+        - SWOOLE
     ignoreErrors:
-        - '#If condition is always false.#'
+        - '#Negated boolean expression is always false\.#'
         - '#Constant TIDEWAYS_#'
-        - '#Constant TINYFRAMEWORK_START not found.#'
-        - '#has invalid type Composer\\Script\\Event.#'
+        - '#has invalid type Composer\\Script\\Event\.#'
+        - '#Call to an undefined method AMQPConnection::setConnectionName#'
+        - '#Used function Swoole\\.*#'
 
     level: 6
     paths:

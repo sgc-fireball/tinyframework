@@ -332,7 +332,7 @@ class BladeTest extends TestCase
     public function testDirective(): void
     {
         $time = (string)microtime(true);
-        $this->blade->addDirective('time', fn(string $expression) => $time);
+        $this->blade->addDirective('time', fn (string $expression) => $time);
         $this->assertEquals($time, $this->blade->compileString('@time'));
         $this->assertEquals($time, $this->blade->compileString('@time()'));
         $this->assertEquals($time, $this->blade->compileString('@time(123)'));

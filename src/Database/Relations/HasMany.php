@@ -11,12 +11,23 @@ use TinyFramework\Database\QueryInterface;
 class HasMany extends Relation
 {
     public function __construct(
-        private QueryInterface $query,
-        private BaseModel $model,
+        protected QueryInterface $query,
+        protected BaseModel $model,
         private string $foreignKey,
         private string $localKey,
         private string $relation
     ) {
+        parent::__construct($this->query, $this->model);
+    }
+
+    public function getLocalKey(): string
+    {
+        return $this->localKey;
+    }
+
+    public function getForeignKey(): string
+    {
+        return $this->foreignKey;
     }
 
     /**
@@ -29,5 +40,17 @@ class HasMany extends Relation
             ->get();
         $this->model->setRelation($this->relation, $models);
         return $models;
+    }
+
+    /**
+     * @return BaseModel[]
+     * @internal
+     */
+    public function eagerLoad(array $ids, array $with = []): array
+    {
+        return $this->query
+            ->with($with)
+            ->where($this->foreignKey, 'IN', $ids)
+            ->get();
     }
 }

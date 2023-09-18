@@ -14,7 +14,6 @@ use TinyFramework\Shell\TabCompletion\TinyFrameworkMatcher;
 
 class ListCommand extends CommandAwesome
 {
-
     private const HEADER = <<<EOF
  _____ _             _____                                            _
 |_   _(_)_ __  _   _|  ___| __ __ _ _ __ ___   _____      _____  _ __| | __
@@ -75,5 +74,4 @@ EOF;
         }
         return 0;
     }
-
 }

@@ -55,6 +55,16 @@ class Database implements DatabaseInterface
                 (new DateTime('now', new DateTimeZone($this->config['timezone'])))->format('P')
             ));
             $this->connection->query('SET SESSION sql_mode = "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION"');
+        } else {
+            try {
+                if ($this->connection->ping()) {
+                    return $this;
+                }
+                throw new \RuntimeException('reconnect needed.');
+            } catch (\Throwable $e) {
+                $this->connection = null;
+                return $this->connect();
+            }
         }
         return $this;
     }

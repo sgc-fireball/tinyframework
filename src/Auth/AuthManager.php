@@ -4,7 +4,6 @@ namespace TinyFramework\Auth;
 
 class AuthManager
 {
-
     protected array $config = [
         'enabled' => false,
     ];
@@ -64,5 +63,4 @@ class AuthManager
     {
         return null;
     }
-
 }

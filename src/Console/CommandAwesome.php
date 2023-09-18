@@ -49,6 +49,10 @@ abstract class CommandAwesome
         $this->output = $output;
         $this->container = Container::instance();
 
+        if (posix_getuid() === 0) {
+            $this->output->warning('Running programms as root can be dangerous. Please be careful!');
+        }
+
         /** @var int $verbosity */
         $verbosity = $this->output->verbosity();
         if ($verbosity >= OutputInterface::VERBOSITY_VERBOSE) {

@@ -11,7 +11,6 @@ use TinyFramework\Http\Response;
 
 class ProjectHoneyPotMiddleware implements MiddlewareInterface
 {
-
     private ?string $key;
 
     public function __construct(Config $config)
@@ -21,7 +20,7 @@ class ProjectHoneyPotMiddleware implements MiddlewareInterface
 
     public function handle(Request $request, Closure $next, mixed ...$parameters): Response
     {
-        if ($result = $this->resolve($request->ip())) {
+        if ($result = $this->resolve($request->realIp())) {
             if ($result['type'] > 0) {
                 return Response::view('errors.projectHoneyPot', $result, 403);
             }
@@ -46,7 +45,7 @@ class ProjectHoneyPotMiddleware implements MiddlewareInterface
         if ($host === $ip) {
             return null;
         }
-        [$prefix, $activity, $threat, $type] = array_map(fn($item) => (int)$item, explode('.', $ip));
+        [$prefix, $activity, $threat, $type] = array_map(fn ($item) => (int)$item, explode('.', $ip));
         if ($prefix !== 127) {
             return null;
         }
@@ -57,5 +56,4 @@ class ProjectHoneyPotMiddleware implements MiddlewareInterface
             'type' => $type,
         ];
     }
-
 }

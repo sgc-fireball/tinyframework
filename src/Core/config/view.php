@@ -8,10 +8,11 @@ return [
     'blade' => [
         'driver' => \TinyFramework\Template\Blade::class,
         'cache' => env('BLADE_CACHE', env('APP_CACHE', true)),
-        'source' => 'resources/views',
+        'source' => root_dir() . '/resources/views',
     ],
 
     'php' => [
         'driver' => \TinyFramework\Template\PHP::class,
+        'source' => root_dir() . '/resources/views',
     ],
 ];

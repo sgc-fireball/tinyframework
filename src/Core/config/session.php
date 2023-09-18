@@ -9,7 +9,7 @@ return [
     'default' => env('SESSION_DRIVER', 'redis'),
     'file' => [
         'driver' => TinyFramework\Session\FileSession::class,
-        'path' => env('SESSION_FILE_PATH', 'storage/sessions')
+        'path' => env('SESSION_FILE_PATH', root_dir() . '/storage/sessions'),
     ],
     'redis' => [
         'driver' => \TinyFramework\Session\RedisSession::class,
@@ -19,5 +19,8 @@ return [
         'database' => (int)env('REDIS_SESSION_DATABASE', 0),
         'read_write_timeout' => (int)env('REDIS_READ_WRITE_TIMEOUT', -1),
         'prefix' => env('REDIS_SESSION_PREFIX', 'tinyframework:session:'),
-    ]
+    ],
+    'swoole' => [
+        'driver' => \TinyFramework\Session\SwooleTableSession::class,
+    ],
 ];

@@ -355,7 +355,7 @@ class Query extends QueryAwesome
                 $this->driver->escape('%' . str_replace('%', '%%', $term) . '%'),
                 $likeValue
             );
-        }, $fields);
+        }, array_values($fields), array_keys($fields));
         $raw = 'SUM(' . implode(' + ', $ifs) . ') as _score';
         $this->select([new DatabaseRaw($raw)]);
         $this->where('_score', '>=', $minValue);

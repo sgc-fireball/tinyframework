@@ -20,7 +20,7 @@ class DatabaseServiceProvider extends ServiceProviderAwesome
             $this->container
                 ->singleton('database.' . $connection, function () use ($settings) {
                     $class = $settings['driver'];
-                    return new $class($settings);
+                    return $this->container->call($class, ['config' => $settings]);
                 });
         }
         $this->container

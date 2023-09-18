@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TinyFramework\Helpers;
 
 /**
+ * @template TKey
  * @template TValue
  * @see https://www.php.net/manual/de/ref.array.php
  */
@@ -13,7 +14,7 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
     protected array $items = [];
 
     /**
-     * @param array<array-key, TValue> $items
+     * @param array<TKey, TValue> $items
      * @return Arr
      */
     public static function factory(array $items = []): Arr
@@ -41,7 +42,7 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
     }
 
     /**
-     * @param array<array-key, TValue> $items
+     * @param array<TKey, TValue> $items
      */
     public function __construct(array $items = [])
     {
@@ -53,32 +54,23 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         return new self($this->items);
     }
 
-    /**
-     * @return array<array-key, TValue>
-     */
     public function array(): array
     {
         return $this->items;
     }
 
-    /**
-     * @return array<array-key, TValue>
-     */
     public function toArray(): array
     {
         return $this->items;
     }
 
-    /**
-     * @return array<array-key, TValue>
-     */
     public function __toArray(): array
     {
         return $this->items;
     }
 
     /**
-     * @return TValue|null
+     * @return TValue|mixed|null
      */
     public function __get(string $name): mixed
     {
@@ -86,7 +78,7 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
     }
 
     /**
-     * @param string $name
+     * @param TKey|string $name
      * @param TValue $value
      * @return void
      */
@@ -95,11 +87,19 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         $this->items[$name] = $value;
     }
 
+    /**
+     * @param TKey|string $name
+     * @return bool
+     */
     public function __isset(string $name): bool
     {
         return \array_key_exists($name, $this->items);
     }
 
+    /**
+     * @param TKey|string $name
+     * @return void
+     */
     public function __unset(string $name): void
     {
         if (\array_key_exists($name, $this->items)) {
@@ -107,6 +107,10 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         }
     }
 
+    /**
+     * @param TKey|mixed $offset
+     * @return bool
+     */
     public function offsetExists(mixed $offset): bool
     {
         return \array_key_exists($offset, $this->items);
@@ -121,6 +125,7 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
     }
 
     /**
+     * @param TKey|mixed $offset
      * @param TValue $value
      */
     public function offsetSet(mixed $offset, mixed $value): void
@@ -128,6 +133,10 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         $this->items[$offset] = $value;
     }
 
+    /**
+     * @param TKey|mixed $offset
+     * @return void
+     */
     public function offsetUnset(mixed $offset): void
     {
         unset($this->items[$offset]);
@@ -146,6 +155,9 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         \next($this->items);
     }
 
+    /**
+     * @return TKey|int|string|null
+     */
     public function key(): int|null|string
     {
         return \key($this->items);
@@ -191,9 +203,17 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         return $this;
     }
 
-    public function countBy(\Closure $closure = null): static
+    public function countBy(callable $callable = null): static
     {
-        throw new \RuntimeException('Currently not supported!'); // @TODO
+        /** @var array<mixed, integer> $result */
+        $result = [];
+        foreach ($this->items as $key => $value) {
+            $value = \is_callable($callable) ? $callable($value, $key) : $value;
+            $result[$value] ??= 0;
+            $result[$value]++;
+        }
+        $this->items = $result;
+        return $this;
     }
 
     public function countValues(): static
@@ -202,7 +222,7 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         return $this;
     }
 
-    public function diffAssoc(array $array2, array ...$arrays): static
+    public function diffAssoc(array $array2, array|callable ...$arrays): static
     {
         \array_unshift($arrays, $array2);
         \array_unshift($arrays, $this->items);
@@ -210,7 +230,7 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         return $this;
     }
 
-    public function diffUAssoc(array $array2, array ...$arrays): static
+    public function diffUAssoc(array $array2, array|callable ...$arrays): static
     {
         \array_unshift($arrays, $array2);
         \array_unshift($arrays, $this->items);
@@ -229,7 +249,7 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         return $this;
     }
 
-    public function diffUKey(array $array2, array ...$arrays): static
+    public function diffUKey(array $array2, array|callable ...$arrays): static
     {
         \array_unshift($arrays, $array2);
         \array_unshift($arrays, $this->items);
@@ -291,7 +311,7 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
     }
 
     /**
-     * @return TValue|null
+     * @return TValue|mixed|null
      */
     public function first(callable $callback = null): mixed
     {
@@ -361,16 +381,26 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         return $this;
     }
 
+    /**
+     * @param TKey|mixed $key
+     * @return bool
+     */
     public function keyExists(mixed $key): bool
     {
         return \array_key_exists($key, $this->items);
     }
 
+    /**
+     * @return TKey|string|int|null
+     */
     public function keyFirst(): string|int|null
     {
         return \array_key_first($this->items);
     }
 
+    /**
+     * @return TKey|string|int|null
+     */
     public function keyLast(): string|int|null
     {
         return \array_key_last($this->items);
@@ -383,7 +413,7 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
     }
 
     /**
-     * @return TValue|null
+     * @return TValue|mixed|null
      */
     public function last(callable $callback = null): mixed
     {
@@ -546,7 +576,7 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
     }
 
     /**
-     * @return TValue|self|Str
+     * @return TValue|mixed|self|Str
      */
     public function shift(): mixed
     {
@@ -609,7 +639,7 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
             : $array[\intval($middle)];
     }
 
-    public function uDiffAssoc(array $array2, array ...$arrays): static
+    public function uDiffAssoc(array $array2, array|callable ...$arrays): static
     {
         \array_unshift($arrays, $array2);
         \array_unshift($arrays, $this->items);
@@ -634,7 +664,7 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         return $this;
     }
 
-    public function uDiff(array $array2, array ...$arrays): static
+    public function uDiff(array $array2, array|callable...$arrays): static
     {
         \array_unshift($arrays, $array2);
         \array_unshift($arrays, $this->items);
@@ -985,9 +1015,16 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         return $result;
     }
 
-    public function groupBy(\Closure $closure): static
+    public function groupBy(callable $callable): static
     {
-        throw new \RuntimeException('Currently not supported!'); // @TODO
+        $result = [];
+        foreach ($this->items as $key => $value) {
+            $groupBy = $callable($value, $key);
+            $result[$groupBy] ??= [];
+            $result[$groupBy][$key] = $value;
+        }
+        $this->items = $result;
+        return $this;
     }
 
     /**

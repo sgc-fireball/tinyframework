@@ -24,7 +24,7 @@ class MaintenanceMiddleware implements MiddlewareInterface
         if ($config = $this->kernel->getMaintenanceConfig()) {
             if (array_key_exists('whitelist', $config)) {
                 $whitelist = is_array($config['whitelist']) ? $config['whitelist'] : [$config['whitelist']];
-                if (in_array($request->ip(), $whitelist)) {
+                if (in_array($request->realIp(), $whitelist)) {
                     return $next($request);
                 }
             }

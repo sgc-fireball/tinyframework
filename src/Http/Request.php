@@ -6,17 +6,19 @@ namespace TinyFramework\Http;
 
 use RuntimeException;
 use TinyFramework\Auth\Authenticatable;
+use TinyFramework\Helpers\IPv4;
+use TinyFramework\Helpers\IPv6;
 use TinyFramework\Session\SessionInterface;
 
 class Request
 {
-
-    static array $trustedProxies = [
+    public static array $trustedProxies = [
         '127.0.0.1',
         '::1',
     ];
 
-    static array $trustedHeaders = [
+    public static array $trustedHeaders = [
+        'X-Real-IP',
         'X-Forwarded-For',
         'X-Forwarded-Proto',
         'X-Forwarded-Scheme',
@@ -55,15 +57,15 @@ class Request
 
     private ?string $ip = null;
 
-    private ?string $realClientIp = null;
+    private ?string $realIp = null;
 
-    static public function setTrustedProxies(array $trustedProxies): string
+    public static function setTrustedProxies(array $trustedProxies): string
     {
         self::$trustedProxies = $trustedProxies;
         return self::class;
     }
 
-    static public function setTrustedHeaders(array $trustedHeaders): string
+    public static function setTrustedHeaders(array $trustedHeaders): string
     {
         self::$trustedHeaders = $trustedHeaders;
         return self::class;
@@ -73,7 +75,7 @@ class Request
     {
         $request = new self();
         $request->ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
-        $request->realClientIp = $request->ip;
+        $request->realIp = $request->ip;
         $request->method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
         $request->url = new URL(
             sprintf(
@@ -136,14 +138,14 @@ class Request
         return self::compileTrustedProxies($request);
     }
 
-    public static function fromSwoole(\Swoole\Http\Request $swoole, \Swoole\Http\Server $server): Request
+    public static function fromSwoole(\Swoole\Http\Request $swoole, \Swoole\Websocket\Server $server): Request
     {
         if (!$swoole->isCompleted()) {
             throw new \RuntimeException('Received an incomplete Swoole Request.');
         }
         $request = new Request();
         $request->ip = $swoole->server['remote_addr'] ?? '127.0.0.1';
-        $request->realClientIp = $swoole->server['x-real-ip'] ?? $request->ip;
+        $request->realIp = $request->ip;
         $request->method = $swoole->server['request_method'] ?? 'GET';
         $request->url = new URL(
             sprintf(
@@ -169,7 +171,7 @@ class Request
             $key = mb_strtolower(str_replace('-', '_', $key));
             $request->server[$key] = [$value];
         }
-        $request->body = $swoole->rawContent() ?? null;
+        $request->body = $swoole->rawContent() ?: null;
         if (\array_key_exists('_method', $request->get)) {
             $request->method = strtoupper($request->get['_method'] ?: $request->method);
             unset($request->get['_method']);
@@ -193,15 +195,40 @@ class Request
 
     public static function compileTrustedProxies(Request $request): Request
     {
-        if (!in_array($request->ip, self::$trustedProxies)) {
+        $trusted = false;
+        foreach (self::$trustedProxies as $trustedProxy) {
+            if ($request->ip === $trustedProxy) {
+                $trusted = true;
+                break;
+            }
+            if (strpos($trustedProxy, '/') !== false) {
+                $ip = null;
+                if (filter_var($trustedProxy, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                    $ip = new IPv4($request->ip);
+                } elseif (filter_var($trustedProxy, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+                    $ip = new IPv6($request->ip);
+                }
+                if ($ip?->isIpInSubnet($request->ip)) {
+                    $trusted = true;
+                    break;
+                }
+            }
+        }
+        if (!$trusted) {
             return $request;
+        }
+        if (in_array('X-Real-IP', self::$trustedHeaders)) {
+            $ip = $request->header('X-Forwarded-For');
+            if (count($ip) === 1) {
+                $request->realIp = $ip[0];
+            }
         }
         if (in_array('X-Forwarded-For', self::$trustedHeaders)) {
             $for = $request->header('X-Forwarded-For');
             if (count($for) === 1) {
                 $fors = explode(',', $for[0]);
                 if ($ip = trim(array_shift($fors), ', ')) {
-                    $request->realClientIp = $ip;
+                    $request->realIp = $ip;
                 }
             }
         }
@@ -358,7 +385,7 @@ class Request
         $request = new self();
         $request->method = $this->method;
         $request->ip = $this->ip;
-        $request->realClientIp = $this->realClientIp;
+        $request->realIp = $this->realIp;
         $request->id = $this->id;
         $request->url = $this->url;
         $request->get = $this->get;
@@ -448,7 +475,7 @@ class Request
     public function json(mixed $json = null): Request|array|null
     {
         if ($json === null) {
-            return json_decode($this->body, true);
+            return json_decode($this->body, true) ?? [];
         }
         $request = $this->clone();
         $request->body = json_encode($json);
@@ -464,10 +491,19 @@ class Request
         return $this;
     }
 
+    public function realIp(string $realIp = null): static|string|null
+    {
+        if ($realIp === null) {
+            return $this->realIp;
+        }
+        $this->realIp = $realIp;
+        return $this;
+    }
+
     public function expectJson(): bool
     {
         $accept = explode(',', (string)$this->header('accept'));
-        return count(array_filter($accept, fn($line) => str_starts_with(trim((string)$line), 'application/json'))) >= 1;
+        return count(array_filter($accept, fn ($line) => str_starts_with(trim((string)$line), 'application/json'))) >= 1;
     }
 
     public function wantsJson(): bool

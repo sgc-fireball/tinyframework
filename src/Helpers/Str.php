@@ -25,7 +25,7 @@ class Str implements \Stringable
 
     public static function httpBuildQuery(
         mixed $data,
-        string $numeric_prefix = null,
+        string $numeric_prefix = '',
         string $arg_separator = null,
         int $encoding_type = PHP_QUERY_RFC1738
     ): Str {
@@ -59,6 +59,10 @@ class Str implements \Stringable
 
     public function slug(string $separator = '-', string $language = null): static
     {
+        $locale = setlocale(LC_CTYPE, "0");
+        if ($language) {
+            setlocale(LC_ALL, $language);
+        }
         $value = $this->value;
         if (\in_array(\setlocale(LC_CTYPE, "0"), [null, 'C', 'POSIX'])) {
             if (\str_contains($value = \htmlentities($value, ENT_QUOTES, 'UTF-8'), '&')) {
@@ -83,6 +87,9 @@ class Str implements \Stringable
         $value = \preg_replace('![' . \preg_quote($separator) . '\s]+!u', $separator, $value);
         $value = \trim($value, $separator);
         $this->value = $value;
+        if ($language) {
+            setlocale(LC_ALL, $locale);
+        }
         return $this;
     }
 

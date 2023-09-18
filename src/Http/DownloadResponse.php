@@ -6,7 +6,6 @@ namespace TinyFramework\Http;
 
 class DownloadResponse extends Response
 {
-
     private string $file;
 
     private int $fileSize;
@@ -80,5 +79,4 @@ class DownloadResponse extends Response
         }
         return $this;
     }
-
 }

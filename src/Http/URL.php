@@ -24,6 +24,11 @@ class URL implements \Stringable
 
     private ?string $fragment = null;
 
+    public static function factory(string $url = null): URL
+    {
+        return new URL($url);
+    }
+
     public function __construct(string $url = null)
     {
         if (!empty($url)) {
@@ -114,7 +119,7 @@ class URL implements \Stringable
             throw new InvalidArgumentException('Invalid port.');
         }
         $url = $this->clone();
-        $url->port = (int)$port;
+        $url->port = $port;
         return $url;
     }
 
@@ -420,6 +425,17 @@ class URL implements \Stringable
         $url .= $this->path ?? '/';
         $url .= $this->query ? '?' . $this->query : '';
         $url .= $this->fragment ? '#' . $this->fragment : '';
+        return rtrim($url, '?&#');
+    }
+
+    public function origin(): string
+    {
+        $url = '';
+        $url .= $this->schema ? $this->schema . '://' : '';
+        $url .= $this->host;
+        if ($this->needPort()) {
+            $url .= $this->port ? ':' . $this->port : '';
+        }
         return $url;
     }
 }

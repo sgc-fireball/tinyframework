@@ -6,7 +6,5 @@ namespace TinyFramework\Auth;
 
 interface Authenticatable
 {
-
     public function getAuthIdentifier(): string;
-
 }

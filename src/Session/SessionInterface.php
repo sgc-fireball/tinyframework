@@ -6,7 +6,7 @@ namespace TinyFramework\Session;
 
 interface SessionInterface
 {
-    public function getId(): string;
+    public function getId(): ?string;
 
     public function open(?string $id): SessionInterface;
 
