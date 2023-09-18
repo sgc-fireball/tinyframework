@@ -281,10 +281,7 @@ class Blade implements ViewInterface
 
     public function compileComment(string $content): string
     {
-        /**
-         * @TODO BUG
-         */
-        return (string)str_replace(['{{--', '--}}'], ['<?php /**  ', ' **/ ?>'], $content);
+        return preg_replace('/{{--(.*?)--}}/s', '', $content);
     }
 
     public function compileEcho(string $content): string
