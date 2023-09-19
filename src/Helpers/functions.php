@@ -657,3 +657,21 @@ if (!function_exists('isLuhnValid')) {
         return !!(($sum % 10) === 0 ? $sanitized : false);
     }
 }
+
+if (!function_exists('timems')) {
+    function timems(): int
+    {
+        $timestamp = microtime(false);
+        $unixts = intval(substr($timestamp, 11), 10);
+        return $unixts * 1000 + intval(substr($timestamp, 2, 3), 10);
+    }
+}
+
+if (!function_exists('timens')) {
+    function timens(): int
+    {
+        $timestamp = microtime(false);
+        $unixts = intval(substr($timestamp, 11), 10);
+        return $unixts * 1000000 + intval(substr($timestamp, 2, 6), 10);
+    }
+}
