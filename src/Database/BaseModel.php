@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TinyFramework\Database;
 
 use ArrayAccess;
+use DateTime;
 use JsonSerializable;
 use TinyFramework\Cast\CastInterface;
 use TinyFramework\Database\Relations\BelongsToMany;
@@ -12,15 +13,12 @@ use TinyFramework\Database\Relations\BelongsToOne;
 use TinyFramework\Database\Relations\HasMany;
 use TinyFramework\Database\Relations\HasOne;
 use TinyFramework\Database\Relations\Relation;
-use TinyFramework\Helpers\Arr;
 use TinyFramework\Helpers\Str;
 
-use function PHPUnit\Framework\isInstanceOf;
-
 /**
- * @property string id
- * @property \DateTime created_at
- * @property \DateTime|null updated_at
+ * @property string $id
+ * @property DateTime $created_at
+ * @property DateTime|null $updated_at
  */
 class BaseModel implements JsonSerializable, ArrayAccess
 {
@@ -140,7 +138,7 @@ class BaseModel implements JsonSerializable, ArrayAccess
         } elseif ($type === 'object') {
             return is_object($value) ? $value : null;
         } elseif (in_array($type, ['date', 'datetime'])) {
-            $value = $value instanceof \DateTime ? $value : null;
+            $value = $value instanceof DateTime ? $value : null;
         }
         return $value;
     }
@@ -203,13 +201,13 @@ class BaseModel implements JsonSerializable, ArrayAccess
                 }
             } elseif (in_array($type, ['date', 'datetime', 'timestamp'])) {
                 if (is_numeric($value)) {
-                    $value = \DateTime::createFromFormat('u', $value);
+                    $value = DateTime::createFromFormat('u', $value);
                 } elseif (is_string($value) && $value) {
                     if ($time = strtotime((string)$value)) {
-                        $value = (new \Datetime())->setTimestamp($time);
+                        $value = (new Datetime())->setTimestamp($time);
                     }
                 }
-                if (!($value instanceof \DateTime)) {
+                if (!($value instanceof DateTime)) {
                     throw new \InvalidArgumentException(
                         sprintf(
                             'Value for %s->%s must be an integer, a parseable strtorime value or an \DateTime object.',
@@ -417,7 +415,7 @@ class BaseModel implements JsonSerializable, ArrayAccess
             ->class($class);
     }
 
-    public function with(array|string|null $paths = null)
+    public function with(array|string|null $paths = null): array|static
     {
         if ($paths === null) {
             return $this->with;

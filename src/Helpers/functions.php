@@ -592,7 +592,7 @@ if (!function_exists('assignEagerLoadingPaths')) {
         array &$with,
         string|array $paths,
         callable $tester = null
-    ) {
+    ): void {
         $realModel = $model;
         if ($model instanceof QueryInterface) {
             $class = $model->class();
@@ -639,7 +639,7 @@ if (!function_exists('isLuhnValid')) {
         $sanitized = preg_replace('/[- ]/', '', (string)$number);
         $sum = 0;
         $shouldDouble = null;
-        for ($i = count($sanitized) - 1; $i >= 0; $i--) {
+        for ($i = strlen($sanitized) - 1; $i >= 0; $i--) {
             $digit = substr($sanitized, $i, ($i + 1));
             $tmpNum = intval($digit);
             if ($shouldDouble) {
