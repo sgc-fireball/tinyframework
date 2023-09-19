@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace TinyFramework\Tests\Helpers;
 
 use PHPUnit\Framework\TestCase;
-use TinyFramework\Helpers\Str;
 
 class FunctionsTest extends TestCase
 {
-
     public function testGuid(): void
     {
         $guid = [
@@ -34,5 +32,4 @@ class FunctionsTest extends TestCase
             $this->assertTrue($guid[$i] < $guid[$i + 1]);
         }
     }
-
 }

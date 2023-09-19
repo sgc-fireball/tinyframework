@@ -19,8 +19,9 @@ return static function (ECSConfig $ecsConfig): void {
         'syntax' => 'short',
     ]);
 
-    // run and fix, one by one
     $ecsConfig->sets([
         SetList::PSR_12,
     ]);
+
+    $ecsConfig->parallel();
 };
