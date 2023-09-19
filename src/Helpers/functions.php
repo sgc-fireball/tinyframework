@@ -12,7 +12,6 @@ use TinyFramework\Crypt\CryptInterface;
 use TinyFramework\Database\BaseModel;
 use TinyFramework\Database\DatabaseInterface;
 use TinyFramework\Database\QueryInterface;
-use TinyFramework\Database\Relations\Relation;
 use TinyFramework\Event\EventAwesome;
 use TinyFramework\Event\EventDispatcherInterface;
 use TinyFramework\Hash\HashInterface;
@@ -283,15 +282,16 @@ if (!function_exists('exception2text')) {
 }
 
 if (!function_exists('guid')) {
-    function guid(): string
+    function guid(string $microtime = null): string
     {
+        $microtime ??= microtime();
         $function = function_exists('openssl_random_pseudo_bytes') ? 'openssl_random_pseudo_bytes' : 'random_bytes';
-        $uuid = explode(' ', microtime(false));
+        $uuid = explode(' ', $microtime);
         $uuid = $uuid[1] . substr($uuid[0], 2, 6);
         $uuid = str_pad(dechex((int)$uuid), 15, '0', STR_PAD_LEFT);
         $uuid = substr($uuid, 0, 12) . '4' . substr($uuid, 12, 3);
         $uuid = hex2bin($uuid) . call_user_func($function, (32 - strlen($uuid)) / 2);
-        //$uuid[6] = \chr(\ord($uuid[6]) & 0x0f | 0x40); // set version to 0100
+        $uuid[6] = \chr(\ord($uuid[6]) & 0x0f | 0x40); // set version to 0100
         $uuid[8] = \chr(\ord($uuid[8]) & 0x3f | 0x80); // set bits 6-7 to 10
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($uuid), 4));
     }
