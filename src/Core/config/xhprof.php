@@ -7,7 +7,7 @@ return [
 
     'percent' => env('XHPROF_PERCENT', 100),
 
-    'dir' => env('XHPROF_DIR', root_dir() . '/storage/xhprof'),
+    'dir' => env('XHPROF_DIR', storage_dir('xhprof')),
 
     'expire' => 604800, // 7 days
 ];

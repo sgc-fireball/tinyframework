@@ -25,7 +25,7 @@ class TinyframeworkServeCommand extends CommandAwesome
     public function run(InputInterface $input, OutputInterface $output): int
     {
         parent::run($input, $output);
-        $cmd = $_SERVER['_'];
+        $cmd = PHP_BINARY;
         $host = $this->input->option('host')->value();
         $port = (int)$this->input->option('port')->value();
         $root = root_dir() . '/public';

@@ -6,6 +6,6 @@ return [
     'default' => env('LOG_DRIVER', 'file'),
     'file' => [
         'driver' => \TinyFramework\Logger\FileLogger::class,
-        'path' => env('LOG_DIR', root_dir() . '/storage/logs'),
+        'path' => env('LOG_DIR', storage_dir('logs')),
     ],
 ];

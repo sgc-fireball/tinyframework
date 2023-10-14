@@ -27,7 +27,7 @@ class TinyframeworkDownCommand extends CommandAwesome
         parent::run($input, $output);
         $whitelist = $this->input->option('ip') ? $this->input->option('ip')->value() : '127.0.0.1';
         $whitelist = is_array($whitelist) ? $whitelist : explode(',', $whitelist);
-        $file = root_dir() . '/storage/maintenance.json';
+        $file = storage_dir('/maintenance.json');
         if (file_put_contents($file, json_encode(['whitelist' => $whitelist])) === false) {
             throw new RuntimeException('Could not write maintenance file.');
         }

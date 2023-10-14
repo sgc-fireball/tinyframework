@@ -12,7 +12,7 @@ return [
     ],
     'file' => [
         'driver' => \TinyFramework\Cache\FileCache::class,
-        'path' => env('CACHE_FILE_PATH', root_dir() . '/storage/cache'),
+        'path' => env('CACHE_FILE_PATH', storage_dir('cache')),
     ],
     'redis' => [
         'driver' => \TinyFramework\Cache\RedisCache::class,

@@ -10,16 +10,6 @@ services:
         - "_UID=${_UID:-1000}"
         - "_GID=${_GID:-1000}"
     user: "${_UID:-1000}:${_GID:-1000}"
-
-
-
-
-
-
-
-
-
-
     depends_on:
       - "mysql"
       - "redis"

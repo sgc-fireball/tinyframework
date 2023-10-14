@@ -18,6 +18,7 @@ use TinyFramework\Hash\HashInterface;
 use TinyFramework\Helpers\Arr;
 use TinyFramework\Helpers\Htmlable;
 use TinyFramework\Helpers\Str;
+use TinyFramework\Helpers\Uuid;
 use TinyFramework\Http\Response;
 use TinyFramework\Http\Router;
 use TinyFramework\Localization\TranslatorInterface;
@@ -53,6 +54,17 @@ if (!function_exists('public_dir')) {
 if (!function_exists('storage_dir')) {
     function storage_dir(string $file = ''): string
     {
+        if (PHARBIN) {
+            return rtrim(
+                implode(DIRECTORY_SEPARATOR, [
+                    $_SERVER['HOME'],
+                    '.config',
+                    'tinyframework',
+                    'storage',
+                ]) . DIRECTORY_SEPARATOR . $file,
+                DIRECTORY_SEPARATOR
+            );
+        }
         return rtrim(root_dir() . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . $file, DIRECTORY_SEPARATOR);
     }
 }
@@ -276,7 +288,12 @@ if (!function_exists('exception2text')) {
         if ($e = $e->getPrevious()) {
             $result .= sprintf("\n - %s", exception2text($e, $stacktrace));
         }
-        $result = str_replace(root_dir(), '', $result);
+        if (root_dir() === '/') {
+            $result = preg_replace('/phar:\/\/.*\/src/', 'src', $result);
+            $result = preg_replace('/phar:\/\/.*\/vendor/', 'vendor', $result);
+        } else {
+            $result = str_replace(root_dir(), '', $result);
+        }
         return $result;
     }
 }
@@ -658,8 +675,8 @@ if (!function_exists('isLuhnValid')) {
     }
 }
 
-if (!function_exists('timems')) {
-    function timems(): int
+if (!function_exists('time_ms')) {
+    function time_ms(): int
     {
         $timestamp = microtime(false);
         $unixts = intval(substr($timestamp, 11), 10);
@@ -667,11 +684,61 @@ if (!function_exists('timems')) {
     }
 }
 
-if (!function_exists('timens')) {
-    function timens(): int
+if (!function_exists('time_us')) {
+    function time_us(): int
     {
         $timestamp = microtime(false);
         $unixts = intval(substr($timestamp, 11), 10);
         return $unixts * 1000000 + intval(substr($timestamp, 2, 6), 10);
+    }
+}
+
+if (!function_exists('time_ns')) {
+    function time_ns(): int
+    {
+        $timestamp = microtime(false);
+        $unixts = intval(substr($timestamp, 11), 10);
+        return $unixts * 1000000000 + intval(substr($timestamp, 2, 8) . '0', 10);
+    }
+}
+
+if (!function_exists('node')) {
+    function node(): string
+    {
+        static $node;
+        if (isset($node) && $node) {
+            return $node;
+        }
+
+        $key = '__tinyframework_uuid_node';
+        if (\function_exists('apcu_fetch')) {
+            $node = apcu_fetch($key);
+        }
+        $cacheFile = storage_dir('id_node');
+        if (!$node && file_exists($cacheFile)) {
+            try {
+                $node = require_once($cacheFile);
+            } catch (\Throwable $e) {
+                @unlink($cacheFile);
+            }
+        }
+        if (!$node) {
+            $node = sprintf('%06x%06x', random_int(0, 0xFFFFFF) | 0x010000, random_int(0, 0xFFFFFF));
+        }
+        if (\function_exists('apcu_store')) {
+            apcu_store($key, $node);
+        }
+        $dir = dirname($cacheFile);
+        if (!is_dir($dir)) {
+            if (!mkdir($dir, 0750, true)) {
+                trigger_error('Could not create dir: ' . $dir, E_USER_WARNING);
+                return $node;
+            }
+        }
+        file_put_contents(
+            $cacheFile,
+            '<?php /** created from file src/Helpers/functions.php function node */ return \'' . $node . '\';'
+        );
+        return $node;
     }
 }

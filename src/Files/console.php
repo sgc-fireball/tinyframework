@@ -6,6 +6,7 @@ declare(strict_types=1);
 use TinyFramework\Console\ConsoleKernel;
 use TinyFramework\Core\Container;
 
+define('PHARBIN', str_starts_with(__DIR__, 'phar://'));
 define('TINYFRAMEWORK_START', microtime(true));
 if (function_exists('pcntl_async_signals')) {
     pcntl_async_signals(true);
@@ -13,10 +14,13 @@ if (function_exists('pcntl_async_signals')) {
     declare(ticks=10);
 }
 
-$path = preg_replace('/\/src\/.*/', '', __DIR__);
+$path = __DIR__;
+$path = preg_replace('/\/src\/.*/', '', $path);
 $path = preg_replace('/\/vendor\/.*/', '', $path);
-define('ROOT', realpath($path));
-chdir(ROOT);
+define('ROOT', PHARBIN ? $path : realpath($path));
+if (!PHARBIN) {
+    chdir(ROOT);
+}
 umask(0027);
 define('SWOOLE', extension_loaded('swoole'));
 

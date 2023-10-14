@@ -12,6 +12,7 @@ composer.phar
 composer.lock
 .DS_Store
 Thumbs.db
+tinyframework.phar
 .phpunit.result.cache
 .phpstorm.meta.php
 

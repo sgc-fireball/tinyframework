@@ -19,7 +19,7 @@ class Readline
 
     public function __construct(string $prompt = '$', array $matchers = [])
     {
-        $this->historyFile = root_dir() . '/storage/shell/.php_history';
+        $this->historyFile = storage_dir('shell/.php_history');
         $this->prompt = $prompt;
         $this->matchers = $matchers;
         readline_completion_function([&$this, 'autocomplete']);

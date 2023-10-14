@@ -25,10 +25,6 @@ class Shell
 
     public function run(): void
     {
-        #$this->output->error('This is an error.');
-        #$this->output->warning('This is an warning.');
-        #$this->output->info('This is an info.');
-        #$this->output->successful('This is an successful.');
         $this->readline->readHistory();
         while (true) {
             $line = $this->readline->prompt('php$');
@@ -42,14 +38,16 @@ class Shell
                 $this->execute($line);
                 $this->readline->saveHistory();
             } catch (\Throwable $e) {
-                $this->output->error(sprintf(
-                    "%s[%d]\n%s\nin %s:%d",
-                    \get_class($e),
-                    $e->getCode(),
-                    $e->getMessage(),
-                    str_replace(root_dir() . '/', '', $e->getFile()),
-                    $e->getLine(),
-                ));
+                $this->output->error(
+                    sprintf(
+                        "%s[%d]\n%s\nin %s:%d",
+                        \get_class($e),
+                        $e->getCode(),
+                        $e->getMessage(),
+                        str_replace(root_dir() . '/', '', $e->getFile()),
+                        $e->getLine(),
+                    )
+                );
                 $verbosity = (int)$this->output->verbosity();
                 if ($verbosity >= OutputInterface::VERBOSITY_VERBOSE) {
                     $this->output->write("\n");
@@ -74,18 +72,20 @@ class Shell
                             break;
                         }
 
-                        $this->output->write(sprintf(
-                            "<green>%2d)</green> <%s>%s:%d</%s>\n    %s\n\n",
-                            $index,
-                            $color,
-                            str_replace(root_dir() . '/', '', $trace['file']),
-                            $trace['line'] ?? 0,
-                            $color,
-                            $call
-                        ));
+                        $this->output->write(
+                            sprintf(
+                                "<green>%2d)</green> <%s>%s:%d</%s>\n    %s\n\n",
+                                $index,
+                                $color,
+                                str_replace(root_dir() . '/', '', $trace['file']),
+                                $trace['line'] ?? 0,
+                                $color,
+                                $call
+                            )
+                        );
                     }
                 }
-            };
+            }
         }
     }
 
@@ -93,7 +93,6 @@ class Shell
     {
         $closure = function () use ($__internal__code) {
             try {
-                //ob_start();
                 set_error_handler([$this, 'handleError']);
                 $this->context->setVariable('__internal__code', $__internal__code);
                 $__internal__variables = $this->context->getVariables();
@@ -103,12 +102,7 @@ class Shell
                 $this->context->setVariables(get_defined_vars());
                 $this->readline->addHistory($__internal__code);
                 $this->readline->saveHistory();
-                //$content = rtrim(ob_get_clean());
-                //if (!empty($content)) {
-                //echo rtrim($content) . PHP_EOL;
-                //}
             } catch (\Throwable $e) {
-                //ob_end_clean();
                 throw $e;
             } finally {
                 restore_error_handler();
@@ -129,6 +123,6 @@ class Shell
      */
     public function handleError(int $errno, string $errstr, string $errfile, int $errline): bool
     {
-        throw new RuntimeException($errstr, $errno);
+        throw new RuntimeException(sprintf('%s in %s:%d', $errstr, $errfile, $errline), $errno);
     }
 }

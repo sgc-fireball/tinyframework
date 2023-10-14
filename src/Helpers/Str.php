@@ -32,6 +32,77 @@ class Str implements \Stringable
         return new self(\http_build_query($data, $numeric_prefix, $arg_separator, $encoding_type));
     }
 
+    public static function uuid1(): Str
+    {
+        return new self(Uuid::v1());
+    }
+
+    public static function uuid2(): Str
+    {
+        return new self(Uuid::v2());
+    }
+
+    public static function uuid3(string $namespace, string $name): Str
+    {
+        return new self(Uuid::v3($namespace, $name));
+    }
+
+    public static function uuid4(): Str
+    {
+        return new self(Uuid::v4());
+    }
+
+    public static function uuid5(string $namespace, string $name): Str
+    {
+        return new self(Uuid::v5($namespace, $name));
+    }
+
+    public static function uuid6(): Str
+    {
+        return new self(Uuid::v6());
+    }
+
+    public static function uuid7(): Str
+    {
+        return new self(Uuid::v7());
+    }
+
+    public static function uuid8(): Str
+    {
+        return new self(Uuid::v8());
+    }
+
+    public static function uild(string $microtime = null): Str
+    {
+        /**
+         * @link https://github.com/symfony/uid/blob/6.3/Ulid.php
+         * @link https://cran.r-project.org/web/packages/ulid/vignettes/intro-to-ulid.html
+         */
+        $time = $microtime ?? microtime(false);
+        $time = substr($time, 11) . substr($time, 2, 3);
+        $rand = unpack('n*', random_bytes(10));
+        $rand[1] |= ($rand[5] <<= 4) & 0xF0000;
+        $rand[2] |= ($rand[5] <<= 4) & 0xF0000;
+        $rand[3] |= ($rand[5] <<= 4) & 0xF0000;
+        $rand[4] |= ($rand[5] <<= 4) & 0xF0000;
+        unset($rand[5]);
+        $time = base_convert($time, 10, 32);
+        return new self(
+            strtr(
+                sprintf(
+                    '%010s%04s%04s%04s%04s',
+                    $time,
+                    base_convert((string)$rand[1], 10, 32),
+                    base_convert((string)$rand[2], 10, 32),
+                    base_convert((string)$rand[3], 10, 32),
+                    base_convert((string)$rand[4], 10, 32)
+                ),
+                'abcdefghijklmnopqrstuv',
+                'ABCDEFGHJKMNPQRSTVWXYZ'
+            )
+        );
+    }
+
     public function __construct(string $value = '')
     {
         $this->value = $value;

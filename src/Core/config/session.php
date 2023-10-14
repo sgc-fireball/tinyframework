@@ -9,7 +9,7 @@ return [
     'default' => env('SESSION_DRIVER', 'redis'),
     'file' => [
         'driver' => TinyFramework\Session\FileSession::class,
-        'path' => env('SESSION_FILE_PATH', root_dir() . '/storage/sessions'),
+        'path' => env('SESSION_FILE_PATH', storage_dir('sessions')),
     ],
     'redis' => [
         'driver' => \TinyFramework\Session\RedisSession::class,

@@ -20,8 +20,9 @@ class TinyframeworkUpCommand extends CommandAwesome
     public function run(InputInterface $input, OutputInterface $output): int
     {
         parent::run($input, $output);
-        if (file_exists('storage/maintenance.json')) {
-            @unlink('storage/maintenance.json');
+        $file = storage_dir('maintenance.json');
+        if (file_exists($file)) {
+            @unlink($file);
         }
         $this->output->writeln('<green>Application is now live.</green>');
         return 0;

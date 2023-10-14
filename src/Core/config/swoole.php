@@ -15,9 +15,9 @@ return [
          * @link https://openswoole.com/docs/modules/swoole-server/configuration
          */
         'daemonize' => (bool)env('SWOOLE_DAEMONIZE', false),
-        'pid_file' => root_dir() . '/storage/shell/swoole.pid',
+        'pid_file' => storage_dir('shell/swoole.pid'),
         'max_request' => env('SWOOLE_MAX_REQUEST', 0),
-        'chroot' => root_dir(),
+        'chroot' => PHARBIN ? sys_get_temp_dir() : root_dir(),
         'worker_num' => env('SWOOLE_WORKER_NUM', $cpus),
         'reactor_num' => env('SWOOLE_WORKER_NUM', $cpus) * 2,
         'backlog' => env('SWOOLE_BACKLOG', 128),
@@ -32,7 +32,7 @@ return [
 
         // Logging
         'log_level' => 1,
-        'log_file' => env('LOG_DIR', root_dir() . '/storage/logs') . '/swoole.log',
+        'log_file' => env('LOG_DIR', storage_dir('logs')) . '/swoole.log',
         'log_rotation' => SWOOLE_LOG_ROTATION_DAILY,
         'log_date_format' => '%Y-%m-%d %H:%M:%S',
         'log_date_with_microseconds' => false,

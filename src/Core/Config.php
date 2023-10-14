@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace TinyFramework\Core;
 
+use GlobIterator;
 use RuntimeException;
 
 class Config implements ConfigInterface
 {
     private array $config = [];
 
-    public function __construct(array $config)
+    public function __construct(array $config = [])
     {
         $this->config = array_merge($this->config, $config);
         // @TODO implement config cache
@@ -21,7 +22,10 @@ class Config implements ConfigInterface
     private function loadFolder(string $path): static
     {
         if (is_dir($path)) {
-            foreach (glob($path . '/*.php') as $file) {
+            $list = scandir($path); // allow real folders and .phar folders
+            $list = array_filter($list, fn($f) => str_ends_with($f, '.php'));
+            $list = array_map(fn($f) => $path . '/' . $f, $list);
+            foreach ($list as $file) {
                 $this->load(str_replace('.php', '', basename($file)), $file);
             }
         }

@@ -57,9 +57,12 @@ class ConsoleKernel extends Kernel implements ConsoleKernelInterface
         if (!is_dir($path)) {
             return;
         }
+        $list = scandir($path); // allow real folders and .phar folders
+        $list = array_filter($list, fn($f) => str_ends_with($f, '.php'));
+        $list = array_map(fn($f) => $path . '/' . $f, $list);
         $classes = array_map(function ($path) use ($namespace) {
             return trim($namespace, '\\') . '\\' . str_replace('.php', '', basename($path));
-        }, glob($path . '/*.php'));
+        }, $list);
         $classes = array_filter($classes, function ($class) {
             return class_exists($class);
         });
@@ -67,6 +70,9 @@ class ConsoleKernel extends Kernel implements ConsoleKernelInterface
             /** @var CommandAwesome $command */
             $command = $this->container->get($class);
             $inputDefinition = $command->configuration();
+            if (PHARBIN && $inputDefinition->name() === 'tinyframework:package:build') {
+                return;
+            }
             $this->commands[$inputDefinition->name()] = $command;
         }, $classes);
     }
@@ -150,7 +156,7 @@ class ConsoleKernel extends Kernel implements ConsoleKernelInterface
 
         $this->input->argv([
             'list',
-            $this->input->argv()[0] ?? null
+            $this->input->argv()[0] ?? null,
         ]);
         return $this->tryHandle();
     }
@@ -172,7 +178,7 @@ class ConsoleKernel extends Kernel implements ConsoleKernelInterface
             $this->output->writeln("<white>SYNOPSIS</white>");
             $message = sprintf(
                 "\t<yellow>%s %s %s</yellow>",
-                $_SERVER['_'],
+                PHP_BINARY,
                 $_SERVER['SCRIPT_NAME'],
                 $definition->name()
             );

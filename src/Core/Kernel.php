@@ -155,7 +155,11 @@ abstract class Kernel implements KernelInterface
         // @TODO implement load Providers by Namespace
         $root = root_dir();
         if (is_dir($root . '/app/Providers')) {
-            foreach (glob($root . '/app/Providers/*.php') as $file) {
+            $path = $root . '/app/Providers';
+            $list = scandir($path); // allow real folders and .phar folders
+            $list = array_filter($list, fn($f) => str_ends_with($f, '.php'));
+            $list = array_map(fn($f) => $path . '/' . $f, $list);
+            foreach ($list as $file) {
                 $provider = 'App\\Providers\\' . str_replace('.php', '', basename($file));
                 if (class_exists($provider)) {
                     $this->serviceProviderNames[] = $provider;
@@ -191,7 +195,7 @@ abstract class Kernel implements KernelInterface
 
     public function inMaintenanceMode(): bool
     {
-        return file_exists(root_dir() . '/storage/maintenance.json');
+        return file_exists(storage_dir('maintenance.json'));
     }
 
     public function getMaintenanceConfig(): array|null
@@ -199,7 +203,7 @@ abstract class Kernel implements KernelInterface
         if (!$this->inMaintenanceMode()) {
             return null;
         }
-        return json_decode(file_exists(root_dir() . '/storage/maintenance.json') ?: '{}');
+        return json_decode(file_get_contents(storage_dir('maintenance.json')) ?: '{}');
     }
 
     public function handleError(int $level, string $message, string $file = '', int $line = 0): bool

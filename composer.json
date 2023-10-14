@@ -56,8 +56,14 @@
     "ext-redis": "To use Redis for Caching, Queues instanceof database or file systems.",
     "ext-amqp": "To use AMQP (RabbitMQ) Queues instanceof Sync or Redis Queues.",
     "ext-swoole": "To use swoole http server to speed up your application.",
-    "ext-sodium": "To use curve encryption, for example jwt."
+    "ext-sodium": "To use curve encryption, for example jwt.",
+    "ext-apcu": "To store UUID Node id.",
+    "ext-phar": "To build the hole application as a phar."
   },
+  "support": {
+    "issues": "https://github.com/sgc-fireball/tinyframework/issues"
+  },
+  "prefer-stable": true,
   "scripts": {
     "post-install-cmd": [
       "TinyFramework\\Composer\\Hook::postInstallCommand"
@@ -96,6 +102,8 @@
   },
   "config": {
     "process-timeout": 0,
+    "optimize-autoloader": true,
+    "sort-packages": true,
     "allow-plugins": {
       "phpstan/extension-installer": true
     }
