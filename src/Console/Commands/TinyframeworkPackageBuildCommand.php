@@ -84,7 +84,7 @@ class TinyframeworkPackageBuildCommand extends CommandAwesome
         }
 
         // Add the rest of the apps files
-        $phar->buildFromDirectory(root_dir(), '/\.(php|json)$/');
+        $phar->buildFromDirectory(root_dir());
 
         // Customize the stub to add the shebang
         $stub = "#!/usr/bin/env php \n" . $defaultStub;
