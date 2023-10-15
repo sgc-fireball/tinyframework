@@ -22,13 +22,13 @@ class TinyframeworkCronjobCommand extends CommandAwesome
     {
         return parent::configure()
             ->description('Cronjob Service')
-            ->option(Option::create('list', 'l', Option::VALUE_OPTIONAL, 'Prints a list with all cronjobs.', false));
+            ->option(Option::create('list', 'l', Option::VALUE_NONE, 'Prints a list with all cronjobs.'));
     }
 
     public function run(InputInterface $input, OutputInterface $output): int
     {
         parent::run($input, $output);
-        if ($input->option('list')) {
+        if ($input->option('list')->value()) {
             return $this->runCronjobList($input, $output);
         }
         return $this->runCronjobs($input, $output);
