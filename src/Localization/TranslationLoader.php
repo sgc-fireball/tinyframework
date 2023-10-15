@@ -47,8 +47,8 @@ class TranslationLoader
         }
         $globPath = $path . '/' . $locale;
         $list = scandir($globPath); // allow real folders and .phar folders
-        $list = array_filter($list, fn($f) => str_ends_with($f, '.php'));
-        $list = array_map(fn($f) => $path . '/' . $f, $list);
+        $list = array_filter($list, fn ($f) => str_ends_with($f, '.php'));
+        $list = array_map(fn ($f) => $path . '/' . $f, $list);
         foreach ($list as $file) {
             $this->loadFile($locale, $file);
         }

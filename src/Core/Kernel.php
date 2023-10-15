@@ -157,8 +157,8 @@ abstract class Kernel implements KernelInterface
         if (is_dir($root . '/app/Providers')) {
             $path = $root . '/app/Providers';
             $list = scandir($path); // allow real folders and .phar folders
-            $list = array_filter($list, fn($f) => str_ends_with($f, '.php'));
-            $list = array_map(fn($f) => $path . '/' . $f, $list);
+            $list = array_filter($list, fn ($f) => str_ends_with($f, '.php'));
+            $list = array_map(fn ($f) => $path . '/' . $f, $list);
             foreach ($list as $file) {
                 $provider = 'App\\Providers\\' . str_replace('.php', '', basename($file));
                 if (class_exists($provider)) {

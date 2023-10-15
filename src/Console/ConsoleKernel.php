@@ -58,8 +58,8 @@ class ConsoleKernel extends Kernel implements ConsoleKernelInterface
             return;
         }
         $list = scandir($path); // allow real folders and .phar folders
-        $list = array_filter($list, fn($f) => str_ends_with($f, '.php'));
-        $list = array_map(fn($f) => $path . '/' . $f, $list);
+        $list = array_filter($list, fn ($f) => str_ends_with($f, '.php'));
+        $list = array_map(fn ($f) => $path . '/' . $f, $list);
         $classes = array_map(function ($path) use ($namespace) {
             return trim($namespace, '\\') . '\\' . str_replace('.php', '', basename($path));
         }, $list);

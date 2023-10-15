@@ -12,7 +12,6 @@ namespace TinyFramework\Helpers;
  */
 class Uuid
 {
-
     /**
      * midnight 15 October 1582 UTC
      */
@@ -231,5 +230,4 @@ class Uuid
     {
         return pack('H*', self::stripExtras($uuid));
     }
-
 }

@@ -45,27 +45,26 @@ if (!function_exists('root_dir')) {
 }
 
 if (!function_exists('public_dir')) {
-    function public_dir(): string
+    function public_dir(string $file = ''): string
     {
-        return root_dir() . DIRECTORY_SEPARATOR . 'public';
+        $file = ltrim($file, DIRECTORY_SEPARATOR);
+        $rootDir = root_dir();
+        if (defined('PHARBIN') && PHARBIN) {
+            $rootDir = implode(DIRECTORY_SEPARATOR, [$_SERVER['HOME'], '.config', 'tinyframework']);
+        }
+        return rtrim($rootDir . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . $file, DIRECTORY_SEPARATOR);
     }
 }
 
 if (!function_exists('storage_dir')) {
     function storage_dir(string $file = ''): string
     {
+        $file = ltrim($file, DIRECTORY_SEPARATOR);
+        $rootDir = root_dir();
         if (defined('PHARBIN') && PHARBIN) {
-            return rtrim(
-                implode(DIRECTORY_SEPARATOR, [
-                    $_SERVER['HOME'],
-                    '.config',
-                    'tinyframework',
-                    'storage',
-                ]) . DIRECTORY_SEPARATOR . $file,
-                DIRECTORY_SEPARATOR
-            );
+            $rootDir = implode(DIRECTORY_SEPARATOR, [$_SERVER['HOME'], '.config', 'tinyframework']);
         }
-        return rtrim(root_dir() . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . $file, DIRECTORY_SEPARATOR);
+        return rtrim($rootDir . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . $file, DIRECTORY_SEPARATOR);
     }
 }
 

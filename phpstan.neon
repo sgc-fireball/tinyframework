@@ -7,7 +7,6 @@ parameters:
     dynamicConstantNames:
         - SWOOLE
     ignoreErrors:
-        - '#Negated boolean expression is always false\.#'
         - '#Constant TIDEWAYS_#'
         - '#has invalid type Composer\\Script\\Event\.#'
         - '#Call to an undefined method AMQPConnection::setConnectionName#'

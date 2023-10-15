@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 $cpus = max(1, (int)shell_exec('egrep ^processor /proc/cpuinfo  | wc -l'));
 
-return [
+$config = [
     'host' => env('SWOOLE_HOST', '127.0.0.1'),
     'port' => (int)env('SWOOLE_PORT', 9501),
     'mode' => SWOOLE_PROCESS,
@@ -43,9 +43,9 @@ return [
         'open_websocket_protocol' => true,
 
         // Static Files
-        'document_root' => root_dir() . '/public',
+        'document_root' => public_dir(),
         'enable_static_handler' => true,
-        'static_handler_locations' => [root_dir() . '/public'],
+        'static_handler_locations' => [public_dir()],
         'http_index_files' => [],
 
         // Compression
@@ -53,3 +53,19 @@ return [
         'websocket_compression' => false,
     ],
 ];
+
+$logFile = $config['settings']['log_file'];
+$logDir = dirname($logFile);
+if (!is_dir($logDir)) {
+    mkdir($logDir, 0750, true);
+}
+if (!file_exists($logFile)) {
+    touch($logFile);
+}
+
+$publicDir = $config['settings']['document_root'];
+if (!is_dir($publicDir)) {
+    mkdir($publicDir, 0750, true);
+}
+
+return $config;

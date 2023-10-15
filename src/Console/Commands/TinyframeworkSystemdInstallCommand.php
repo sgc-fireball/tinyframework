@@ -63,7 +63,7 @@ class TinyframeworkSystemdInstallCommand extends CommandAwesome
         $user = (string)$input->option('user')->value();
         $group = (string)$input->option('group')->value();
         $root = root_dir();
-        $binary = $root . DIRECTORY_SEPARATOR . 'swoole.php';
+        $binary = $root . DIRECTORY_SEPARATOR . 'console --swoole';
         return <<<EOF
 [Unit]
 Description=${$name} Swoole Service
@@ -75,7 +75,7 @@ User=${user}
 Group=${group}
 Environment="SWOOLE_DAEMONIZE=1"
 WorkingDirectory=${root}
-ExecStart=php ${binary}
+ExecStart=/usr/bin/php ${binary}
 ExecStop=/bin/kill -TERM \$MAINPID
 ExecReload=/bin/kill -USR1 \$MAINPID
 PIDFile=${root}/storage/shell/swoole.pid

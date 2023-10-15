@@ -13,7 +13,6 @@ use TinyFramework\Console\Output\OutputInterface;
 
 class TinyframeworkPackageBuildCommand extends CommandAwesome
 {
-
     protected function configure(): InputDefinitionInterface
     {
         return parent::configure()
@@ -40,12 +39,14 @@ class TinyframeworkPackageBuildCommand extends CommandAwesome
 
         $file = $input->option('file')->value();
         if (intval(ini_get('phar.readonly')) === 1) {
-            $command = sprintf(
-                '%s -d phar.readonly=0 %s %s -n -f %s',
-                PHP_BINARY,
-                $_SERVER['PHP_SELF'],
-                $this->configuration()->name(),
-                $file
+            $command = trim(
+                sprintf(
+                    '%s -d phar.readonly=0 %s %s -n --file %s',
+                    PHP_BINARY,
+                    $_SERVER['PHP_SELF'],
+                    $this->configuration()->name(),
+                    $file
+                )
             );
             $this->output->info('Forward: ' . $command);
             passthru($command, $exitCode);
