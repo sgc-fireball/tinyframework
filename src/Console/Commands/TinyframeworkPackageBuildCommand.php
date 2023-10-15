@@ -32,7 +32,7 @@ class TinyframeworkPackageBuildCommand extends CommandAwesome
     {
         parent::run($input, $output);
 
-        if (!class_exists(Phar::class)) {
+        if (!extension_loaded('phar') || !class_exists(Phar::class)) {
             $this->output->error('Error: Missing ext-phar. Please install ext-phar first!');
             return 1;
         }
@@ -41,7 +41,7 @@ class TinyframeworkPackageBuildCommand extends CommandAwesome
         if (intval(ini_get('phar.readonly')) === 1) {
             $command = trim(
                 sprintf(
-                    '%s -d phar.readonly=0 %s %s -n --file %s',
+                    '%s -d phar.readonly=0 -d memory_limit=-1 %s %s -n --file %s',
                     PHP_BINARY,
                     $_SERVER['PHP_SELF'],
                     $this->configuration()->name(),
@@ -55,7 +55,7 @@ class TinyframeworkPackageBuildCommand extends CommandAwesome
 
         $this->cleanup($file);
         $this->build($file);
-        $this->output->successful('Build successful: ' . $file . '');
+        $this->output->successful('Build successful: ' . $file);
         return 0;
     }
 
@@ -85,7 +85,7 @@ class TinyframeworkPackageBuildCommand extends CommandAwesome
         }
 
         // Add the rest of the apps files
-        $phar->buildFromDirectory(root_dir());
+        $phar->buildFromDirectory(root_dir(), '/[^(node_modules|\.git|\.reports|\.docker)]/');
 
         // Customize the stub to add the shebang
         $stub = "#!/usr/bin/env php \n" . $defaultStub;
