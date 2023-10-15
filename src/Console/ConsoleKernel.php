@@ -70,7 +70,7 @@ class ConsoleKernel extends Kernel implements ConsoleKernelInterface
             /** @var CommandAwesome $command */
             $command = $this->container->get($class);
             $inputDefinition = $command->configuration();
-            if (PHARBIN && $inputDefinition->name() === 'tinyframework:package:build') {
+            if (defined('PHARBIN') && PHARBIN && $inputDefinition->name() === 'tinyframework:package:build') {
                 return;
             }
             $this->commands[$inputDefinition->name()] = $command;

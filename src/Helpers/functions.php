@@ -54,7 +54,7 @@ if (!function_exists('public_dir')) {
 if (!function_exists('storage_dir')) {
     function storage_dir(string $file = ''): string
     {
-        if (PHARBIN) {
+        if (defined('PHARBIN') && PHARBIN) {
             return rtrim(
                 implode(DIRECTORY_SEPARATOR, [
                     $_SERVER['HOME'],

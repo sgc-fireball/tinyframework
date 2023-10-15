@@ -17,7 +17,7 @@ return [
         'daemonize' => (bool)env('SWOOLE_DAEMONIZE', false),
         'pid_file' => storage_dir('shell/swoole.pid'),
         'max_request' => env('SWOOLE_MAX_REQUEST', 0),
-        'chroot' => PHARBIN ? sys_get_temp_dir() : root_dir(),
+        'chroot' => defined('PHARBIN') && PHARBIN ? sys_get_temp_dir() : root_dir(),
         'worker_num' => env('SWOOLE_WORKER_NUM', $cpus),
         'reactor_num' => env('SWOOLE_WORKER_NUM', $cpus) * 2,
         'backlog' => env('SWOOLE_BACKLOG', 128),

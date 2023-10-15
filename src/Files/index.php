@@ -6,6 +6,7 @@ use TinyFramework\Core\Container;
 use TinyFramework\Http\HttpKernel;
 use TinyFramework\Http\Request;
 
+define('PHARBIN', false);
 $path = preg_replace('/\/src\/.*/', '', __DIR__);
 $path = preg_replace('/\/vendor\/.*/', '', $path);
 $path = preg_replace('/\/public($|\/.*)/', '', $path);
