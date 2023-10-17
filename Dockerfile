@@ -7,7 +7,7 @@ ARG _GID=1000
 RUN export DEBIAN_FRONTEND=${DEBIAN_FRONTEND}
 RUN apt-get -qy update \
     && apt-get -qy upgrade \
-    && apt-get -qy install software-properties-common unzip wget
+    && apt-get -qy install software-properties-common unzip wget mysql-client-8.0
 RUN add-apt-repository ppa:ondrej/php
 RUN apt-get -qy update
 RUN apt-get -qy install \

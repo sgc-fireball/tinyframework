@@ -69,16 +69,17 @@ class TinyframeworkIdeHelperCommand extends CommandAwesome
 
         $content = [];
         $content[] = '<?php';
-        $content[] = '/**';
-        $content[] = ' * PhpStorm Meta file, to provide autocomplete information for PhpStorm';
-        $content[] = ' *';
-        $content[] = ' * @formatter:off';
-        $content[] = ' * @author Richard Huelsberg <rh+github@hrdns.de>';
-        $content[] = ' * @since ' . date('Y-m-d H:i:s');
-        $content[] = ' * @link https://confluence.jetbrains.com/display/PhpStorm/PhpStorm+Advanced+Metadata';
-        $content[] = ' */';
+        $content[] = '// @formatter:off';
         $content[] = '';
         $content[] = 'namespace PHPSTORM_META {';
+        $content[] = '';
+        $content[] = '    /**';
+        $content[] = '     * PhpStorm Meta file, to provide autocomplete information for PhpStorm';
+        $content[] = '     *';
+        $content[] = '     * @author Richard Huelsberg <rh+github@hrdns.de>';
+        $content[] = '     * @since ' . date('Y-m-d H:i:s');
+        $content[] = '     * @link https://confluence.jetbrains.com/display/PhpStorm/PhpStorm+Advanced+Metadata';
+        $content[] = '     */';
         $content[] = '    overwrite(\\container(0), map([';
         $content[] = '        \'\' => \\TinyFramework\\Core\\Container::class,';
         foreach ($mappings as $key => $class) {

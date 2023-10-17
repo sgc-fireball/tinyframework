@@ -48,7 +48,11 @@ class TinyframeworkDatabaseCommand extends CommandAwesome
 
     private function getCommand(string $cmd): ?string
     {
-        $return = trim(shell_exec(sprintf("which %s", escapeshellarg($cmd))));
+        $response = shell_exec(sprintf("which %s", escapeshellarg($cmd)));
+        if (!$response) {
+            return null;
+        }
+        $return = trim($response);
         return empty($return) ? null : $return;
     }
 

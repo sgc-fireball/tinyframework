@@ -18,7 +18,6 @@ use TinyFramework\Hash\HashInterface;
 use TinyFramework\Helpers\Arr;
 use TinyFramework\Helpers\Htmlable;
 use TinyFramework\Helpers\Str;
-use TinyFramework\Helpers\Uuid;
 use TinyFramework\Http\Response;
 use TinyFramework\Http\Router;
 use TinyFramework\Localization\TranslatorInterface;
