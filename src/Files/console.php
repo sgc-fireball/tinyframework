@@ -26,14 +26,6 @@ if (!PHARBIN) {
 umask(0027);
 define('SWOOLE', extension_loaded('swoole'));
 
-/*if (fileowner(__FILE__) !== 0) {
-    $groupId = filegroup(__FILE__);
-    $userId = fileowner(__FILE__);
-    printf("Change user to %d:%d.\n", $userId, $groupId);
-    posix_setgid($groupId);
-    posix_setuid($userId);
-}*/
-
 if (!file_exists('vendor/autoload.php')) {
     echo "Please run 'composer install' first.\n";
     exit(1);
