@@ -216,13 +216,14 @@ class Response
 
     public function cookie(
         string $name,
-        string $value = "",
+        string $value = '',
         int $expires = -1,
-        string $path = "",
-        string $domain = "",
+        string $path = '',
+        string $domain = '',
         bool $secure = false,
         bool $httponly = false,
-        bool $partitioned = false
+        bool $partitioned = false,
+        string $sameSite = ''
     ): static {
         $line = sprintf('%s=%s', urlencode($name), urlencode($value));
         if ($httponly) {
@@ -242,6 +243,14 @@ class Response
         }
         if ($partitioned) {
             $line .= '; Partitioned';
+        }
+        if ($sameSite) {
+            if (!in_array($sameSite, ['Strict', 'Lax', 'None'])) {
+                throw new \InvalidArgumentException(
+                    'Invalid argument for attribute $sameSite. Allowed values are: Strict, Lax, None'
+                );
+            }
+            $line .= sprintf('; SameSite=%s', $sameSite);
         }
         return $this->header('Set-Cookie', $line);
     }
