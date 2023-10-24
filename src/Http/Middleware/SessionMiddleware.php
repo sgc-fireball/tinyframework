@@ -32,7 +32,7 @@ class SessionMiddleware implements MiddlewareInterface
             $response->cookie(
                 $name,
                 $session->getId(),
-                0,
+                -1,
                 '',
                 $request->url()->host(),
                 to_bool($request->server('https')[0] ?? false),

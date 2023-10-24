@@ -217,17 +217,18 @@ class Response
     public function cookie(
         string $name,
         string $value = "",
-        int $expires = 0,
+        int $expires = -1,
         string $path = "",
         string $domain = "",
         bool $secure = false,
-        bool $httponly = false
+        bool $httponly = false,
+        bool $partitioned = false
     ): static {
         $line = sprintf('%s=%s', urlencode($name), urlencode($value));
         if ($httponly) {
             $line .= '; HttpOnly';
         }
-        if ($expires) {
+        if ($expires > -1) {
             $line .= '; expires=' . urlencode(date('r', time() + $expires));
         }
         if ($path) {
@@ -238,6 +239,9 @@ class Response
         }
         if ($secure) {
             $line .= '; Secure';
+        }
+        if ($partitioned) {
+            $line .= '; Partitioned';
         }
         return $this->header('Set-Cookie', $line);
     }
