@@ -356,7 +356,7 @@ class Query extends QueryAwesome
                 $likeValue
             );
         }, array_values($fields), array_keys($fields));
-        $raw = 'SUM(' . implode(' + ', $ifs) . ') as _score';
+        $raw = 'SUM(' . implode(' + ', $ifs) . ') as `_score`';
         $this->select([new DatabaseRaw($raw)]);
         $this->where('_score', '>=', $minValue);
         $this->orderBy('_score', 'DESC');
