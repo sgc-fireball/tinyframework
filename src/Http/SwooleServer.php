@@ -159,7 +159,6 @@ class SwooleServer
             assert($response instanceof Response);
         } catch (\Throwable $e) {
             $response = $this->kernel->throwableToResponse($e);
-            assert($response instanceof Response);
         }
         foreach ($response->headers() as $key => $value) {
             if (in_array($key, Response::$multiLineHeader) && is_array($value)) {

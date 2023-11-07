@@ -156,29 +156,36 @@ class Output implements OutputInterface
         }
         preg_match_all('/<(\/)?([a-zA-Z0-9#:]+)>/', $text, $matches, PREG_SET_ORDER);
         foreach ($matches as $match) {
-            $replace = '';
+            $found = false;
             list($match, $end, $command) = $match;
-            if ($this->ansi) {
-                $replace = "\e[0m";
-                if (array_key_exists($command, $this->ansiCommands)) {
-                    $replace = $this->ansiCommands[$command][$end ? 1 : 0];
-                } else {
-                    $value = $command;
-                    if (strpos($command, ':') !== false) {
-                        [$command, $value] = explode(':', $command);
-                    }
-                    $xterm = $this->color->name2xterm($value);
-                    $xterm = $xterm === null && preg_match('/^#[a-z0-9]{6}$/', $value) ? $this->color->hex2xterm($value) : $xterm;
-                    if ($xterm) {
-                        if ($command === 'bg') {
-                            $replace = $end ? "\e[49m" : sprintf("\e[48;5;%dm", $xterm);
-                        } elseif ($command === 'fg' || $command === $value) {
-                            $replace = $end ? "\e[39m" : sprintf("\e[38;5;%dm", $xterm);
-                        }
+
+            $replace = "\e[0m";
+            if (array_key_exists($command, $this->ansiCommands)) {
+                $found = true;
+                $replace = $this->ansiCommands[$command][$end ? 1 : 0];
+            } else {
+                $value = $command;
+                if (strpos($command, ':') !== false) {
+                    [$command, $value] = explode(':', $command);
+                }
+                $xterm = $this->color->name2xterm($value);
+                $xterm = $xterm === null && preg_match('/^#[a-z0-9]{6}$/', $value)
+                    ? $this->color->hex2xterm($value)
+                    : $xterm;
+                if ($xterm) {
+                    if ($command === 'bg') {
+                        $found = true;
+                        $replace = $end ? "\e[49m" : sprintf("\e[48;5;%dm", $xterm);
+                    } elseif ($command === 'fg' || $command === $value) {
+                        $found = true;
+                        $replace = $end ? "\e[39m" : sprintf("\e[38;5;%dm", $xterm);
                     }
                 }
             }
-            $text = str_replace($match, $replace, $text);
+
+            if ($found) {
+                $text = str_replace($match, $this->ansi ? $replace : '', $text);
+            }
         }
         echo $text;
         flush();

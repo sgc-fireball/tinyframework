@@ -71,9 +71,9 @@ class Input implements InputInterface
         $this->tokens = $this->argv;
         $argumentPosition = 0;
         while (null !== $token = array_shift($this->tokens)) {
-            if (mb_strpos($token, '--') === 0) {
+            if (str_starts_with($token, '--')) {
                 $this->parseLongOption($token);
-            } elseif (mb_strpos($token, '-') === 0) {
+            } elseif (str_starts_with($token, '-')) {
                 $this->parseShortOption($token);
             } else {
                 if ($command === null) {
@@ -84,12 +84,27 @@ class Input implements InputInterface
                 }
             }
         }
-        
+
         $interaction = $_SERVER['DEBIAN_FRONTEND'] ?? $_ENV['DEBIAN_FRONTEND'] ?? getenv('DEBIAN_FRONTEND');
         if ($interaction === 'noninteractive') {
             $this->interaction = false;
         }
         return $command;
+    }
+
+    public function completion(): array
+    {
+        $words = [];
+        $token = count($this->argv) ? $this->argv[count($this->argv) - 1] : '';
+        foreach ($this->inputDefinition->option() as $option) {
+            if ($option->long() && str_starts_with('--' . $option->long(), $token)) {
+                $words[] = '--' . $option->long();
+            }
+            if ($option->short() && (!$token || str_starts_with('-' . $option->short(), $token))) {
+                $words[] = '-' . $option->short();
+            }
+        }
+        return array_unique($words);
     }
 
     private function parseLongOption(string $token): void

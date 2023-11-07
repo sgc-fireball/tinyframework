@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace TinyFramework\Helpers;
 
 /**
- * @template TKey
- * @template TValue
+ * @template TKey of int|string
+ * @template TValue of mixed
  * @see https://www.php.net/manual/de/ref.array.php
  */
 class Arr implements \ArrayAccess, \Iterator, \Countable
@@ -78,29 +78,29 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
     }
 
     /**
-     * @param TKey|string $name
+     * @param TKey $name
      * @param TValue $value
      * @return void
      */
-    public function __set(string $name, mixed $value): void
+    public function __set(string|int $name, mixed $value): void
     {
         $this->items[$name] = $value;
     }
 
     /**
-     * @param TKey|string $name
+     * @param TKey $name
      * @return bool
      */
-    public function __isset(string $name): bool
+    public function __isset(string|int $name): bool
     {
         return \array_key_exists($name, $this->items);
     }
 
     /**
-     * @param TKey|string $name
+     * @param TKey $name
      * @return void
      */
-    public function __unset(string $name): void
+    public function __unset(string|int $name): void
     {
         if (\array_key_exists($name, $this->items)) {
             unset($this->items[$name]);
@@ -1034,7 +1034,6 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
     {
         assert(!empty($delimiter), 'Parameter #3 $delimiter of function explode expects non-empty-string.');
         $keys = \str_contains($key, $delimiter) ? \explode($delimiter, $key) : [$key];
-        /** @var mixed $item */
         $item = &$this->items;
         foreach ($keys as $key) {
             $item = \is_array($item) ? $item : [];

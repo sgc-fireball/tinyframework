@@ -26,6 +26,11 @@ class TinyframeworkDatabaseCommand extends CommandAwesome
         );
         return parent::configure()
             ->description('Starts the system native database client, if supported')
+            ->sections([
+                'EXIT STATUS' => 'The program utility exits 0 on success, and >0 if an error occurs.',
+                'BUGS' => 'https://github.com/sgc-fireball/tinyframework/issues',
+                'WWW' => 'https://github.com/sgc-fireball/tinyframework'
+            ])
             ->argument(Argument::create('connection', Argument::VALUE_OPTIONAL, $connections, config('database.default')));
     }
 

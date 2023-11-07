@@ -41,7 +41,7 @@ class DotEnv implements DotEnvInterface
             if (mb_substr($value, 0, 1) === "'" && mb_substr($value, -1) === "'") {
                 $value = mb_substr($value, 1, -1);
             }
-            $value = \is_string($value) && empty($value) ? 'null' : $value;
+            $value = empty($value) ? 'null' : $value;
             putenv(sprintf('%s=%s', $key, $value));
             if (function_exists('apache_setenv')) {
                 apache_setenv($key, $value);

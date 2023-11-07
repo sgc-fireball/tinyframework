@@ -14,6 +14,8 @@ interface InputInterface
 
     public function parse(): ?string;
 
+    public function completion(): array;
+
     public function option(string $name): ?Option;
 
     public function argument(string $name): ?Argument;

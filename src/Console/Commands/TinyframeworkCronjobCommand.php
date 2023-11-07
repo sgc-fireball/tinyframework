@@ -22,6 +22,11 @@ class TinyframeworkCronjobCommand extends CommandAwesome
     {
         return parent::configure()
             ->description('Cronjob Service')
+            ->sections([
+                'EXIT STATUS' => 'The program utility exits 0 on success, and >0 if an error occurs.',
+                'BUGS' => 'https://github.com/sgc-fireball/tinyframework/issues',
+                'WWW' => 'https://github.com/sgc-fireball/tinyframework'
+            ])
             ->option(Option::create('list', 'l', Option::VALUE_NONE, 'Prints a list with all cronjobs.'));
     }
 

@@ -59,19 +59,16 @@ class RedisQueue implements QueueInterface
         if (!$job->delay()) {
             return $this->repush($job);
         }
-        $queue = method_exists($job, 'queue') ? $job->queue() : $this->config['name'];
         $data = serialize($job);
-        $queue = $queue . ':delayed';
         $ttl = microtime(true) + $job->delay();
-        $this->redis->zAdd($queue, $ttl, $data);
+        $this->redis->zAdd($job->queue() . ':delayed', $ttl, $data);
         return $this;
     }
 
     private function repush(JobInterface $job): static
     {
-        $queue = method_exists($job, 'queue') ? $job->queue() : $this->config['name'];
         $data = serialize($job);
-        $this->redis->rPush($queue, $data);
+        $this->redis->rPush($job->queue(), $data);
         return $this;
     }
 

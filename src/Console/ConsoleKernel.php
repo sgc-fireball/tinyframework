@@ -58,8 +58,8 @@ class ConsoleKernel extends Kernel implements ConsoleKernelInterface
             return;
         }
         $list = scandir($path); // allow real folders and .phar folders
-        $list = array_filter($list, fn ($f) => str_ends_with($f, '.php'));
-        $list = array_map(fn ($f) => $path . '/' . $f, $list);
+        $list = array_filter($list, fn($f) => str_ends_with($f, '.php'));
+        $list = array_map(fn($f) => $path . '/' . $f, $list);
         $classes = array_map(function ($path) use ($namespace) {
             return trim($namespace, '\\') . '\\' . str_replace('.php', '', basename($path));
         }, $list);
@@ -165,17 +165,16 @@ class ConsoleKernel extends Kernel implements ConsoleKernelInterface
     {
         if ($definition === null) {
             return $this->commands['list']->run($this->input, $this->output);
-            #return $this->commandList('usage');
         }
 
-        $this->output->writeln("<white>NAME</white>");
+        $this->output->writeln("<white><bold>NAME</bold></white>");
         $this->output->writeln("\t<yellow>" . $definition->name() . "</yellow>\n");
         /** @var Option[] $options */
         $options = $definition->option();
         /** @var Argument[] $arguments */
         $arguments = $definition->argument();
         if ($options || $arguments) {
-            $this->output->writeln("<white>SYNOPSIS</white>");
+            $this->output->writeln("<white><bold>SYNOPSIS</bold></white>");
             $message = sprintf(
                 "\t<yellow>%s %s %s</yellow>",
                 PHP_BINARY,
@@ -197,6 +196,9 @@ class ConsoleKernel extends Kernel implements ConsoleKernelInterface
                         $message .= ' <value>';
                     }
                     $message .= $option->isRequired() ? '>' : ']';
+                    if ($option->isArray()) {
+                        $message .= '...';
+                    }
                 }
             }
             if ($arguments) {
@@ -211,13 +213,13 @@ class ConsoleKernel extends Kernel implements ConsoleKernelInterface
             $this->output->writeln($message . "\n");
         }
         if ($description = $definition->description()) {
-            $this->output->writeln("<white>DESCRIPTION</white>");
+            $this->output->writeln("<white><bold>DESCRIPTION</bold></white>");
             $this->output->writeln("\t" . $description . "\n");
         }
 
         /** @var Option[] $options */
         if ($options) {
-            $this->output->writeln('<white>OPTIONS</white>');
+            $this->output->writeln('<white><bold>OPTIONS</bold></white>');
             foreach ($options as $key => $option) {
                 if (mb_strlen($key) === 1) {
                     continue;
@@ -238,13 +240,29 @@ class ConsoleKernel extends Kernel implements ConsoleKernelInterface
 
         /** @var Argument[] $arguments */
         if ($arguments) {
-            $this->output->writeln('<white>ARGUMENTS</white>');
+            $this->output->writeln('<white><bold>ARGUMENTS</bold></white>');
             foreach ($arguments as $argument) {
                 $message = "\t<white>" . $argument->name() . '</white>' . PHP_EOL;
                 $message .= "\t    " . $argument->description() . PHP_EOL;
                 $this->output->writeln($message);
             }
         }
+
+        if ($sections = $definition->sections()) {
+            foreach ($sections as $section => $context) {
+                $this->output->writeln('<white><bold>' . $section . '</bold></white>');
+                if (is_string($context)) {
+                    $this->output->writeln("\t" . $context . "\n");
+                } else {
+                    foreach ($context as $subSection => $subContext) {
+                        $this->output->writeln("\t" . $subSection);
+                        $this->output->writeln("\t\t" . $subContext . "\n");
+                    }
+                    $this->output->writeln("\n");
+                }
+            }
+        }
+
         return 1;
     }
 }

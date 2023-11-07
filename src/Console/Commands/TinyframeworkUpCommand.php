@@ -14,7 +14,13 @@ class TinyframeworkUpCommand extends CommandAwesome
     protected function configure(): InputDefinitionInterface
     {
         return parent::configure()
-            ->description('Bring the application out of maintenance mode.');
+            ->description('Bring the application out of maintenance mode.')
+            ->sections([
+                'EXIT STATUS' => 'The program utility exits 0 on success, and >0 if an error occurs.',
+                'SEE ALSO' => 'tinyframework:down',
+                'BUGS' => 'https://github.com/sgc-fireball/tinyframework/issues',
+                'WWW' => 'https://github.com/sgc-fireball/tinyframework'
+            ]);
     }
 
     public function run(InputInterface $input, OutputInterface $output): int

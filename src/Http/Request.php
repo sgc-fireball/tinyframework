@@ -103,7 +103,7 @@ class Request
         foreach ($_SERVER as $key => $value) {
             if (mb_strpos($key, 'HTTP_') === 0) {
                 if ($key === 'HTTP_AUTHORIZATION') {
-                    [$user, $pw] = explode(':', base64_decode(mb_substr($_SERVER['HTTP_AUTHORIZATION'], 6)));
+                    [$user, $pw] = explode(':', base64_decode(mb_substr($_SERVER['HTTP_AUTHORIZATION'], 6), true));
                     $request->header['php_auth_user'] = $user ?: null;
                     $request->header['php_auth_pass'] = $pw ?: null;
                 }

@@ -17,6 +17,11 @@ class TinyframeworkSystemdInstallCommand extends CommandAwesome
     {
         return parent::configure()
             ->description('Installing swoole server into systemd services.')
+            ->sections([
+                'EXIT STATUS' => 'The program utility exits 0 on success, and >0 if an error occurs.',
+                'BUGS' => 'https://github.com/sgc-fireball/tinyframework/issues',
+                'WWW' => 'https://github.com/sgc-fireball/tinyframework',
+            ])
             ->option(Option::create('name', 'n', Option::VALUE_REQUIRED, 'The systemd service name.', 'tinyframework'))
             ->option(Option::create('user', 'u', Option::VALUE_REQUIRED, 'The systemd service username.', 'www-data'))
             ->option(Option::create('group', 'g', Option::VALUE_REQUIRED, 'The systemd service group.', 'www-data'));
@@ -64,24 +69,26 @@ class TinyframeworkSystemdInstallCommand extends CommandAwesome
         $group = (string)$input->option('group')->value();
         $root = root_dir();
         $binary = $root . DIRECTORY_SEPARATOR . 'console --swoole';
-        return <<<EOF
-[Unit]
-Description=${$name} Swoole Service
-After=network.target
 
-[Service]
-Type=forking
-User=${user}
-Group=${group}
-Environment="SWOOLE_DAEMONIZE=1"
-WorkingDirectory=${root}
-ExecStart=/usr/bin/php ${binary}
-ExecStop=/bin/kill -TERM \$MAINPID
-ExecReload=/bin/kill -USR1 \$MAINPID
-PIDFile=${root}/storage/shell/swoole.pid
-
-[Install]
-WantedBy = multi-user.target
-EOF;
+        $content = [];
+        $content[] = '[Unit]';
+        $content[] = 'Description=' . $name . ' Swoole Service';
+        $content[] = 'After=network.target';
+        $content[] = '';
+        $content[] = '[Service]';
+        $content[] = 'Type=forking';
+        $content[] = 'User=' . $user;
+        $content[] = 'Group=' . $group;
+        $content[] = 'Environment="SWOOLE_DAEMONIZE=1"';
+        $content[] = 'WorkingDirectory=' . $root;
+        $content[] = 'ExecStart=/usr/bin/php ' . $binary;
+        $content[] = 'ExecStop=/bin/kill -TERM \$MAINPID';
+        $content[] = 'ExecReload=/bin/kill -USR1 \$MAINPID';
+        $content[] = 'PIDFile=' . $root . '/storage/shell/swoole.pid';
+        $content[] = '';
+        $content[] = '[Install]';
+        $content[] = 'WantedBy = multi-user.target';
+        $content[] = '';
+        return implode("\n", $content);
     }
 }

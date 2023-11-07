@@ -22,11 +22,9 @@ class Pipeline implements PipelineInterface
         if ($layers instanceof Closure) {
             $layers = [$layers];
         }
-        if (\is_array($layers)) {
-            foreach ($layers as $layer) {
-                if ($layer instanceof Closure) {
-                    $this->layers[] = $layer;
-                }
+        foreach ($layers as $layer) {
+            if ($layer instanceof Closure) {
+                $this->layers[] = $layer;
             }
         }
         return $this;

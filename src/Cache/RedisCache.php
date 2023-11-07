@@ -62,7 +62,14 @@ class RedisCache extends CacheAwesome
 
     public function has(string $key): bool
     {
-        return $this->redis->exists($key) > 0;
+        $result = $this->redis->exists($key);
+        if (is_bool($result) && $result) {
+            return true;
+        }
+        if (is_int($result) && $result > 0) {
+            return true;
+        }
+        return false;
     }
 
     public function set(string $key, mixed $value = null, null|int|\DateTimeInterface|\DateInterval $ttl = null): static

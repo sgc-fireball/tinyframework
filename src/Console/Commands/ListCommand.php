@@ -27,6 +27,11 @@ EOF;
     {
         return parent::configure()
             ->description('List all commands')
+            ->sections([
+                'EXIT STATUS' => 'The program utility exits 0 on success, and >0 if an error occurs.',
+                'BUGS' => 'https://github.com/sgc-fireball/tinyframework/issues',
+                'WWW' => 'https://github.com/sgc-fireball/tinyframework'
+            ])
             ->argument(new Argument('hint', Argument::VALUE_OPTIONAL, 'Filter the command list.'));
     }
 

@@ -27,7 +27,7 @@
     }
   },
   "require": {
-    "php": "^8.0||^8.1||^8.2",
+    "php": "^8.1||^8.2",
     "ext-json": "*",
     "ext-mysqli": "*",
     "ext-simplexml": "*",
@@ -42,23 +42,28 @@
     "roave/security-advisories": "dev-latest"
   },
   "require-dev": {
-    "phpstan/phpstan": "^1.9",
-    "phpunit/phpunit": "^9.5",
+    "cyclonedx/cyclonedx-php-composer": "^4.2",
+    "php-parallel-lint/php-parallel-lint": "^1.3",
+    "phpstan/phpstan": "^1.10",
+    "phpstan/phpstan-deprecation-rules": "^1.1",
+    "phpstan/phpstan-phpunit": "^1.3",
+    "phpstan/phpstan-strict-rules": "^1.5",
     "phpunit/php-code-coverage": "^9.2",
     "phpunit/php-file-iterator": "^3.0",
     "phpunit/php-text-template": "^2.0",
     "phpunit/php-timer": "^5.0",
     "phpunit/php-token-stream": "^4.0",
     "phpunit/phpcov": "^8.2",
-    "symplify/easy-coding-standard": "^11.1"
+    "phpunit/phpunit": "^9.6",
+    "symplify/easy-coding-standard": "^11.5"
   },
   "suggest": {
     "ext-redis": "To use Redis for Caching, Queues instanceof database or file systems.",
     "ext-amqp": "To use AMQP (RabbitMQ) Queues instanceof Sync or Redis Queues.",
     "ext-swoole": "To use swoole http server to speed up your application.",
     "ext-sodium": "To use curve encryption, for example jwt.",
-    "ext-apcu": "To store UUID Node id.",
-    "ext-phar": "To build the hole application as a phar."
+    "ext-apcu": "To store UUID Node id, otherwise we are using filesystem fallback.",
+    "ext-phar": "To build the hole application as a phar, if desired."
   },
   "support": {
     "issues": "https://github.com/sgc-fireball/tinyframework/issues"
@@ -76,6 +81,7 @@
     ],
     "analyse": [
       "@php $(which composer) dump-autoload #",
+      "@php vendor/bin/parallel-lint --no-colors --no-progress --show-deprecated src/ tests/ #",
       "@php vendor/bin/phpstan analyse --xdebug"
     ],
     "serve": [
@@ -83,7 +89,12 @@
     ],
     "test": [
       "@php $(which composer) dump-autoload #",
+      "@php vendor/bin/parallel-lint --no-colors --no-progress --show-deprecated src/ tests/ #",
       "@php -d xdebug.mode=coverage vendor/bin/phpunit"
+    ],
+    "sbom": [
+      "mkdir -p .reports # ",
+      "@php $(which composer) CycloneDX:make-sbom --output-format=xml --output-file=.reports/sbom.xml --omit=dev"
     ],
     "sonar-scanner": [
       "mkdir -p .reports # ",
@@ -98,14 +109,16 @@
     "test": "Starts the framework unit tests.",
     "ecs": "Running easy coding standard.",
     "sonar-scanner": "Running sonar-qube scanner.",
-    "serve": "Starting php internal webserver."
+    "serve": "Starting php internal webserver.",
+    "sbom": "Create a software bill of material report."
   },
   "config": {
     "process-timeout": 0,
     "optimize-autoloader": true,
     "sort-packages": true,
     "allow-plugins": {
-      "phpstan/extension-installer": true
+      "phpstan/extension-installer": true,
+      "cyclonedx/cyclonedx-php-composer": true
     }
   }
 }

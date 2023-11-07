@@ -18,6 +18,11 @@ class TinyframeworkMigrateCommand extends CommandAwesome
     {
         return parent::configure()
             ->description('Run all database migrations.')
+            ->sections([
+                'EXIT STATUS' => 'The program utility exits 0 on success, and >0 if an error occurs.',
+                'BUGS' => 'https://github.com/sgc-fireball/tinyframework/issues',
+                'WWW' => 'https://github.com/sgc-fireball/tinyframework'
+            ])
             ->argument(Argument::create('direction', Argument::VALUE_OPTIONAL, 'up or down', 'up'));
     }
 

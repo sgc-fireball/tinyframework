@@ -91,7 +91,7 @@ if (!function_exists('base64url_encode')) {
 if (!function_exists('base64url_decode')) {
     function base64url_decode(string $data): string
     {
-        return base64_decode(base64url_to_base64($data));
+        return base64_decode(base64url_to_base64($data), true);
     }
 }
 

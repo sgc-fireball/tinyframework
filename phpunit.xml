@@ -42,6 +42,6 @@
         <server name="MYSQL_DATABASE" value="tinyframework"/>
     </php>
     <extensions>
-        <extension class="\TinyFramework\Tests\LongrunningTestAlert"/>
+        <extension class="\TinyFramework\Tests\LongRunningTestAlert"/>
     </extensions>
 </phpunit>

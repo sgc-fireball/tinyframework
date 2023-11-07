@@ -499,7 +499,7 @@ class Color
      * @param int $red
      * @param int $green
      * @param int $blue
-     * @return array(float,float,integer)
+     * @return array{0: float, 1: float, 2: integer}
      */
     public function rgb2xyb(int $red = 0, int $green = 0, int $blue = 0): array
     {
@@ -518,18 +518,18 @@ class Color
         $blue = ($blue > 0.04045) ? pow(($blue + 0.055) / (1.0 + 0.055), 2.4) : ($blue / 12.92);
 
         // Convert the RGB values to XYZ using the Wide RGB D65 conversion formula The formulas used
-        $X = $red * 0.664511 + $green * 0.154324 + $blue * 0.162028;
-        $Y = $red * 0.283881 + $green * 0.668433 + $blue * 0.047685;
-        $Z = $red * 0.000088 + $green * 0.072310 + $blue * 0.986039;
+        $tmpX = $red * 0.664511 + $green * 0.154324 + $blue * 0.162028;
+        $tmpY = $red * 0.283881 + $green * 0.668433 + $blue * 0.047685;
+        $tmpZ = $red * 0.000088 + $green * 0.072310 + $blue * 0.986039;
 
         // Calculate the xy values from the XYZ values
-        $x = $X + $Y + $Z;
-        $x = $x == 0 ? 0 : $X / $x;
-        $y = $X + $Y + $Z;
-        $y = $y == 0 ? 0 : $Y / $y;
+        $x = $tmpX + $tmpY + $tmpZ;
+        $x = $x == 0 ? 0 : $tmpX / $x;
+        $y = $tmpX + $tmpY + $tmpZ;
+        $y = $y == 0 ? 0 : $tmpY / $y;
 
         // Use the Y value of XYZ as brightness The Y value indicates the brightness of the converted color.
-        return [round($x, 6), round($y, 6), min(254, max(0, round($Y * 255, 0)))];
+        return [round($x, 6), round($y, 6), min(254, max(0, round($tmpY * 255, 0)))];
     }
 
     public function xyb2rgb(float $x, float $y, int $brightness = 254): array

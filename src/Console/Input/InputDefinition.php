@@ -10,6 +10,8 @@ class InputDefinition implements InputDefinitionInterface
 
     private ?string $description = null;
 
+    private array $sections = [];
+
     /** @var Argument[] */
     private array $arguments = [];
 
@@ -61,6 +63,15 @@ class InputDefinition implements InputDefinitionInterface
         return $this;
     }
 
+    public function sections(array $sections = null): static|array
+    {
+        if ($sections === null) {
+            return $this->sections;
+        }
+        $this->sections = $sections;
+        return $this;
+    }
+
     public function option(Option|string $option = null): static|Option|array|null
     {
         if ($option === null) {
@@ -72,7 +83,6 @@ class InputDefinition implements InputDefinitionInterface
             }
             return null;
         }
-        assert($option instanceof Option);
         $this->options[$option->long()] = $option;
         if ($option->short()) {
             $this->options[$option->short()] = $option;

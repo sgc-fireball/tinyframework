@@ -18,7 +18,12 @@ class TinyframeworkConfigShowCommand extends CommandAwesome
     protected function configure(): InputDefinitionInterface
     {
         return parent::configure()
-            ->description('Show the configuration');
+            ->description('Show the configuration')
+            ->sections([
+                'EXIT STATUS' => 'The program utility exits 0 on success, and >0 if an error occurs.',
+                'BUGS' => 'https://github.com/sgc-fireball/tinyframework/issues',
+                'WWW' => 'https://github.com/sgc-fireball/tinyframework'
+            ]);
     }
 
     public function run(InputInterface $input, OutputInterface $output): int

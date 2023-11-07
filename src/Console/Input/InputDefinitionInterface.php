@@ -17,6 +17,8 @@ interface InputDefinitionInterface
 
     public function description(string $description = null): InputDefinitionInterface|string|null;
 
+    public function sections(array $sections = null): InputDefinitionInterface|array;
+
     public function argument(Argument|string|int $argument = null): InputDefinitionInterface|Argument|array|null;
 
     public function option(Option|string $option = null): InputDefinitionInterface|Option|array|null;

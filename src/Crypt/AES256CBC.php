@@ -53,7 +53,7 @@ class AES256CBC implements CryptInterface
         }
         self::checkKey($key);
 
-        $encrypted = base64_decode($encrypted);
+        $encrypted = base64_decode($encrypted, true);
         $length = openssl_cipher_iv_length($this->cipher);
         $iv = hex2bin(substr($encrypted, 0, $length * 2));
         $mac = substr($encrypted, $length * 2, 64);

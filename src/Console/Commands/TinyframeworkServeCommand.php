@@ -18,6 +18,11 @@ class TinyframeworkServeCommand extends CommandAwesome
     {
         return parent::configure()
             ->description('Start a webserver.')
+            ->sections([
+                'EXIT STATUS' => 'The program utility exits 0 on success, and >0 if an error occurs.',
+                'BUGS' => 'https://github.com/sgc-fireball/tinyframework/issues',
+                'WWW' => 'https://github.com/sgc-fireball/tinyframework'
+            ])
             ->option(Option::create('host', null, Option::VALUE_OPTIONAL, 'listen host', '0.0.0.0'))
             ->option(Option::create('port', 'p', Option::VALUE_OPTIONAL, 'listen port', 8000));
     }

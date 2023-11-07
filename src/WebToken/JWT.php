@@ -61,8 +61,8 @@ class JWT
             }
             $this->private = file_exists($this->private) ? file_get_contents($this->private) : $this->private;
             $this->public = file_exists($this->public) ? file_get_contents($this->public) : $this->public;
-            $this->private = base64_decode($this->private);
-            $this->public = base64_decode($this->public);
+            $this->private = base64_decode($this->private, true);
+            $this->public = base64_decode($this->public, true);
         }
     }
 
@@ -262,7 +262,7 @@ class JWT
         if ($remainder) {
             $input .= str_repeat('=', 4 - $remainder);
         }
-        return base64_decode(\strtr($input, '-_', '+/'));
+        return base64_decode(\strtr($input, '-_', '+/'), true);
     }
 
     private function signatureToDER(string $sig): string

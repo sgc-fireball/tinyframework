@@ -17,6 +17,11 @@ class TinyframeworkPackageBuildCommand extends CommandAwesome
     {
         return parent::configure()
             ->description('Build the hole application into a phar file.')
+            ->sections([
+                'EXIT STATUS' => 'The program utility exits 0 on success, and >0 if an error occurs.',
+                'BUGS' => 'https://github.com/sgc-fireball/tinyframework/issues',
+                'WWW' => 'https://github.com/sgc-fireball/tinyframework'
+            ])
             ->option(
                 Option::create(
                     'file',

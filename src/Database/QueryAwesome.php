@@ -272,7 +272,7 @@ abstract class QueryAwesome implements QueryInterface
     public function first(): BaseModel|array|null
     {
         $result = $this->limit(1)->load();
-        if (\is_array($result) && isset($result[0]) && \is_array($result[0])) {
+        if (isset($result[0]) && \is_array($result[0])) {
             return $this->buildModel($result[0]);
         }
         return null;
