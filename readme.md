@@ -1,8 +1,13 @@
 # [TinyFramework](https://github.com/sgc-fireball/tinyframework)
 
 - [Introduction](#introduction)
-- [Documentation](./docs/index.md)
+- [How to start](#how-to-start)
+- [Debugging](#debugging)
+- [Performance](#performance)
 - [Author](#author)
+
+- [Documentation](./docs/index.md)
+- [Security](./docs/index.md)
 
 ## Introduction
 
@@ -93,7 +98,7 @@ phpx console
 ## Ideas
 
 - foreach $loop and $loop->parent
-- Markdown interpretor for Str.
+- Markdown interpreter for Str.
 
 ## Author
 
