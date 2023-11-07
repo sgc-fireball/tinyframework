@@ -158,7 +158,9 @@ class Output implements OutputInterface
         foreach ($matches as $match) {
             $found = false;
             list($match, $end, $command) = $match;
-
+            if ($end) {
+                $found = true;
+            }
             $replace = "\e[0m";
             if (array_key_exists($command, $this->ansiCommands)) {
                 $found = true;
