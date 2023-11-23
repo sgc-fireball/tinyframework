@@ -26,7 +26,7 @@ class Database implements DatabaseInterface
 
     protected ?mysqli $connection = null;
 
-    public function __construct(array $config = [])
+    public function __construct(#[\SensitiveParameter] array $config = [])
     {
         foreach ($this->config as $key => $default) {
             if (array_key_exists($key, $config)) {
@@ -157,8 +157,8 @@ class Database implements DatabaseInterface
                 )
             );
         }
-        if (mb_strpos($query, 'SELECT') === 0) {
-            return (array)mysqli_fetch_all($result, MYSQLI_ASSOC);
+        if (str_starts_with($query, 'SELECT') === 0) {
+            return mysqli_fetch_all($result, MYSQLI_ASSOC);
         }
         return $result;
     }
