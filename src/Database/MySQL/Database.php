@@ -157,7 +157,7 @@ class Database implements DatabaseInterface
                 )
             );
         }
-        if (str_starts_with($query, 'SELECT') === 0) {
+        if (str_starts_with($query, 'SELECT')) {
             return mysqli_fetch_all($result, MYSQLI_ASSOC);
         }
         return $result;
