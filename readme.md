@@ -72,14 +72,9 @@ phpx console
     composer dump-autoload --optimize-autoloader --classmap-authoritative
     ```
 
-2. Disable xhprof:
-    ```dotenv
-    XHPROF_ENABLE=false
-    ```
+2. Uninstall!!!! xdebug
 
-3. Uninstall!!!! xdebug
-
-4. Use PHP OpCache. But be case, and disable caching files under /storage/. Watch
+3. Use PHP OpCache. But be case, and disable caching files under /storage/. Watch
    here [TinyFramework Opcache](https://github.com/sgc-fireball/tinyframework-opcache)
 
 ## Todos

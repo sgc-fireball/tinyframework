@@ -6,7 +6,7 @@ namespace TinyFramework\Database;
 
 interface DatabaseInterface
 {
-    public function __construct(array $config = []);
+    public function __construct(#[\SensitiveParameter] array $config = []);
 
     public function connect(): DatabaseInterface;
 

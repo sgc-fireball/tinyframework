@@ -6,7 +6,7 @@ namespace TinyFramework\Core;
 
 interface ConfigInterface
 {
-    public function __construct(array $config);
+    public function __construct(#[\SensitiveParameter] array $config);
 
     public function load(string $name, string $file): ConfigInterface;
 

@@ -20,7 +20,7 @@ class SmtpMailer extends MailerAwesome implements MailerInterface
         'from_name' => null,
     ];
 
-    public function __construct(array $config = [])
+    public function __construct(#[\SensitiveParameter] array $config = [])
     {
         $this->config = array_merge($this->config, $config);
         $this->config['encryption'] = strtolower($this->config['encryption']);

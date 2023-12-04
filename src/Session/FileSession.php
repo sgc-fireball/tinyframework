@@ -10,7 +10,7 @@ class FileSession extends SessionAwesome implements SessionInterface
 {
     private string $path;
 
-    public function __construct(array $config = [])
+    public function __construct(#[\SensitiveParameter] array $config = [])
     {
         $this->path = $config['path'] ?? sys_get_temp_dir();
         if (!is_dir($this->path)) {

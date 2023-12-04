@@ -31,7 +31,7 @@ class AMQPQueue implements QueueInterface
         'name' => 'default',
     ];
 
-    public function __construct(array $config = [])
+    public function __construct(#[\SensitiveParameter] array $config = [])
     {
         if (!\extension_loaded('amqp')) {
             throw new \RuntimeException(sprintf(

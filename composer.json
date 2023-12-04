@@ -27,7 +27,7 @@
     }
   },
   "require": {
-    "php": "^8.1||^8.2",
+    "php": "^8.2||^8.3",
     "ext-json": "*",
     "ext-mysqli": "*",
     "ext-simplexml": "*",
@@ -63,7 +63,8 @@
     "ext-swoole": "To use swoole http server to speed up your application.",
     "ext-sodium": "To use curve encryption, for example jwt.",
     "ext-apcu": "To store UUID Node id, otherwise we are using filesystem fallback.",
-    "ext-phar": "To build the hole application as a phar, if desired."
+    "ext-phar": "To build the hole application as a phar, if desired.",
+    "ext-gd": "To use image helper wrapper."
   },
   "support": {
     "issues": "https://github.com/sgc-fireball/tinyframework/issues"
@@ -77,6 +78,7 @@
       "TinyFramework\\Composer\\Hook::postUpdateCommand"
     ],
     "ecs": [
+      "@php vendor/bin/parallel-lint --no-colors --no-progress --show-deprecated src/ tests/ #",
       "@php vendor/bin/ecs --fix"
     ],
     "analyse": [

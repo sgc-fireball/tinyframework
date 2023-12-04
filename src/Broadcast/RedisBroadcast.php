@@ -15,7 +15,7 @@ class RedisBroadcast implements BroadcastInterface
 
     private \Closure|array|string|null $callback = null;
 
-    public function __construct(array $config = [])
+    public function __construct(#[\SensitiveParameter] array $config = [])
     {
         if (!\extension_loaded('redis')) {
             throw new \RuntimeException(sprintf(

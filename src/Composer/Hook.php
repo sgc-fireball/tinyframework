@@ -42,7 +42,6 @@ class Hook
             'storage/psych',
             'storage/cache',
             'storage/sessions',
-            'storage/xhprof',
         ];
         foreach ($folders as $folder) {
             if (!is_dir('./' . $folder)) {

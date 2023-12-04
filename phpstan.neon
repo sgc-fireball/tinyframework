@@ -13,13 +13,6 @@ parameters:
     dynamicConstantNames:
         - SWOOLE
     ignoreErrors:
-        -
-            message: '#Unreachable statement - code above always terminates#'
-            path: src/Http/SwooleServer.php
-        -
-            message: '#Constructor of class TinyFramework\\Broadcast\\SwooleBroadcast has an unused parameter \$config\.#'
-            path: src/Broadcast/SwooleBroadcast.php
-        - '#Constant TIDEWAYS_#'
         - '#has invalid type Composer\\Script\\Event\.#'
         - '#Call to an undefined method AMQPConnection::setConnectionName#'
         - '#Used function Swoole\\.*#'
@@ -28,6 +21,12 @@ parameters:
         - '#return type has no value type specified in iterable type iterable#'
         - '#type has no value type specified in iterable type array#'
         - '#has no value type specified in iterable type array#'
+        -
+            message: '#Unreachable statement - code above always terminates#'
+            path: src/Http/SwooleServer.php
+        -
+            message: '#Constructor of class TinyFramework\\Broadcast\\SwooleBroadcast has an unused parameter \$config\.#'
+            path: src/Broadcast/SwooleBroadcast.php
 
     level: 6
     paths:

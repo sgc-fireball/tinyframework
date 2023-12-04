@@ -13,7 +13,7 @@ class RedisQueue implements QueueInterface
 
     private array $config = [];
 
-    public function __construct(array $config = [])
+    public function __construct(#[\SensitiveParameter] array $config = [])
     {
         if (!\extension_loaded('redis')) {
             throw new \RuntimeException(sprintf(

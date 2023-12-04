@@ -25,7 +25,6 @@ use TinyFramework\ServiceProvider\SessionServiceProvider;
 use TinyFramework\ServiceProvider\SwooleServiceProvider;
 use TinyFramework\ServiceProvider\ValidationServiceProvider;
 use TinyFramework\ServiceProvider\ViewServiceProvider;
-use TinyFramework\ServiceProvider\XhprofServiceProvider;
 use TinyFramework\StopWatch\StopWatch;
 
 abstract class Kernel implements KernelInterface
@@ -105,7 +104,6 @@ abstract class Kernel implements KernelInterface
         $this->serviceProviderNames = [
             EventServiceProvider::class,
             ConfigServiceProvider::class,
-            XhprofServiceProvider::class,
             CryptServiceProvider::class,
             HashServiceProvider::class,
             LoggerServiceProvider::class,

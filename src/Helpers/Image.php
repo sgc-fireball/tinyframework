@@ -209,15 +209,16 @@ class Image
 
     public function getExifData(): array
     {
-        $result = [];
-        if ($this->path && file_exists($this->path) && is_readable($this->path) && $exif = @exif_read_data(
-            $this->path
-        )) {
-            $result = array_filter($exif, function ($value, $key) {
-                return $value === null;
-            });
+        if (!$this->path || !is_file($this->path) || !is_readable($this->path)) {
+            return [];
         }
-        return $result;
+        $exif = @exif_read_data($this->path);
+        if (!$exif) {
+            return [];
+        }
+        return array_filter($exif, function (mixed $value): mixed {
+            return $value === null;
+        });
     }
 
     /**

@@ -15,12 +15,12 @@ class BCrypt implements HashInterface
         $this->cost = $cost;
     }
 
-    public function hash(string $plaintext): string
+    public function hash(#[\SensitiveParameter] string $plaintext): string
     {
         return password_hash($plaintext, $this->algorithm, ['cost' => $this->cost]);
     }
 
-    public function verify(string $plaintext, string $hash): bool
+    public function verify(#[\SensitiveParameter] string $plaintext, #[\SensitiveParameter] string $hash): bool
     {
         return password_verify($plaintext, $hash);
     }

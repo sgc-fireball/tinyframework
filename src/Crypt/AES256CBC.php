@@ -12,14 +12,14 @@ class AES256CBC implements CryptInterface
 
     private string $key;
 
-    public function __construct(string $key = null)
+    public function __construct(#[\SensitiveParameter] string $key = null)
     {
         if ($key !== null) {
             $this->key($key);
         }
     }
 
-    public function key(string $key = null): static|string
+    public function key(#[\SensitiveParameter] string $key = null): static|string
     {
         if ($key === null) {
             return $this->key;
@@ -30,7 +30,7 @@ class AES256CBC implements CryptInterface
         return $this;
     }
 
-    public function encrypt(string $plaintext, string $key = null): string
+    public function encrypt(string $plaintext, #[\SensitiveParameter] string $key = null): string
     {
         if ($key === null) {
             $key = $this->key;
@@ -46,7 +46,7 @@ class AES256CBC implements CryptInterface
         return base64_encode($iv . $mac . $encrypted);
     }
 
-    public function decrypt(string $encrypted, string $key = null): string
+    public function decrypt(string $encrypted, #[\SensitiveParameter] string $key = null): string
     {
         if ($key === null) {
             $key = $this->key;
@@ -64,7 +64,7 @@ class AES256CBC implements CryptInterface
         return openssl_decrypt($encrypted, $this->cipher, $key, OPENSSL_RAW_DATA, $iv);
     }
 
-    private static function checkKey(string $key): void
+    private static function checkKey(#[\SensitiveParameter] string $key): void
     {
         if (mb_strlen($key, '8bit') !== 32) {
             throw new CryptException('Invalid AES256CBC key length.');

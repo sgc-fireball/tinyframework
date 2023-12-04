@@ -10,7 +10,7 @@ class FileCache extends CacheAwesome
 {
     private string $path;
 
-    public function __construct(array $config = [])
+    public function __construct(#[\SensitiveParameter] array $config = [])
     {
         parent::__construct($config);
         $this->path = $this->config['path'] ?? sys_get_temp_dir();

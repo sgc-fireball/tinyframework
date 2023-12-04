@@ -20,6 +20,8 @@
     - [Router](./http/router.md)
         - [Route](./http/router/route.md)
     - [Url](./http/url.md)
+- [Images](./images/index.md)
+  - [ImageOptimizer](./images/optimizer.md)
 - [Localization](localization.md)
 - [Logger](./logger.md)
 - [Mail](./mail.md)

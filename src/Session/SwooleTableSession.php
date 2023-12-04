@@ -12,7 +12,7 @@ class SwooleTableSession extends SessionAwesome implements SessionInterface
 
     private Table $table;
 
-    public function __construct(array $config = [])
+    public function __construct(#[\SensitiveParameter] array $config = [])
     {
         $this->config['ttl'] = (int)($config['ttl'] ?? 300);
 

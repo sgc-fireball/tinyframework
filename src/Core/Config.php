@@ -11,7 +11,7 @@ class Config implements ConfigInterface
 {
     private array $config = [];
 
-    public function __construct(array $config = [])
+    public function __construct(#[\SensitiveParameter] array $config = [])
     {
         $this->config = array_merge($this->config, $config);
         // @TODO implement config cache

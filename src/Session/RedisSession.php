@@ -13,7 +13,7 @@ class RedisSession extends SessionAwesome implements SessionInterface
 
     private array $config = [];
 
-    public function __construct(array $config = [])
+    public function __construct(#[\SensitiveParameter] array $config = [])
     {
         $this->config['host'] = $config['host'] ?? '127.0.0.1';
         $this->config['port'] = (int)($config['port'] ?? 6379);

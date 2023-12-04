@@ -13,7 +13,7 @@ abstract class CacheAwesome implements CacheInterface, ArrayAccess
 
     protected array $tags = [];
 
-    public function __construct(array $config = [])
+    public function __construct(#[\SensitiveParameter] array $config = [])
     {
         $this->config = $config;
     }

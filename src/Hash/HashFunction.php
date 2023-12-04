@@ -13,12 +13,12 @@ class HashFunction implements HashInterface
         $this->algorithm = $algorithm;
     }
 
-    public function hash(string $plaintext): string
+    public function hash(#[\SensitiveParameter] string $plaintext): string
     {
         return hash($this->algorithm, $plaintext);
     }
 
-    public function verify(string $plaintext, string $hash): bool
+    public function verify(#[\SensitiveParameter] string $plaintext, #[\SensitiveParameter] string $hash): bool
     {
         return hash_equals($hash, $this->hash($plaintext));
     }

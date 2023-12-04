@@ -34,7 +34,7 @@ class JWT
 
     public function __construct(
         private string $alg,
-        private OpenSSLAsymmetricKey|string $private,
+        #[\SensitiveParameter] private OpenSSLAsymmetricKey|string $private,
         private OpenSSLAsymmetricKey|string $public = ''
     ) {
         $this->time = time() - 1;
@@ -154,7 +154,7 @@ class JWT
         return $body . '.' . $this->base64UrlEncode($sign);
     }
 
-    public function decode(string $jwt, bool $verify = true): array
+    public function decode(#[\SensitiveParameter] string $jwt, bool $verify = true): array
     {
         if ($verify && !$this->verify($jwt, true)) {
             throw new RuntimeException('Invalid jwt sign!');
@@ -169,7 +169,7 @@ class JWT
         return $payload;
     }
 
-    public function verify(string $jwt, bool $throw = false): bool
+    public function verify(#[\SensitiveParameter] string $jwt, bool $throw = false): bool
     {
         $components = explode('.', $jwt);
         if (count($components) !== 3) {
@@ -251,12 +251,12 @@ class JWT
         return $success;
     }
 
-    private function base64UrlEncode(string $input): string
+    private function base64UrlEncode(#[\SensitiveParameter] string $input): string
     {
         return str_replace('=', '', strtr(\base64_encode($input), '+/', '-_'));
     }
 
-    private function base64UrlDecode(string $input): string
+    private function base64UrlDecode(#[\SensitiveParameter] string $input): string
     {
         $remainder = strlen($input) % 4;
         if ($remainder) {

@@ -12,7 +12,7 @@ class RedisCache extends CacheAwesome
     /** @var Redis */
     private Redis $redis;
 
-    public function __construct(array $config = [])
+    public function __construct(#[\SensitiveParameter] array $config = [])
     {
         parent::__construct($config);
         $this->config['host'] = $config['host'] ?? '127.0.0.1';

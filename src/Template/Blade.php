@@ -37,8 +37,11 @@ class Blade implements ViewInterface
 
     private array $shared = [];
 
-    public function __construct(array $config, StopWatch $stopWatch = null, CacheInterface $cache = null)
-    {
+    public function __construct(
+        #[\SensitiveParameter] array $config,
+        StopWatch $stopWatch = null,
+        CacheInterface $cache = null
+    ) {
         $this->config = $config;
         $this->config['cache'] = $this->config['cache'] ?? true;
         $this->config['source'] = $this->config['source'] ?? 'resources/views';

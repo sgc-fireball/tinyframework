@@ -76,7 +76,7 @@ class URL implements \Stringable
         return $url;
     }
 
-    public function userInfo(string $user = null, string $pass = null): URL|string|null
+    public function userInfo(string $user = null, #[\SensitiveParameter] string $pass = null): URL|string|null
     {
         if ($user === null) {
             return ($this->user . ($this->pass ? ':' . $this->pass : '')) ?: null;

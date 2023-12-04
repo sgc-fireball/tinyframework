@@ -70,7 +70,7 @@ class Uuid
             // 16 bits for "time_hi_and_version",
             // four most significant bits holds version number 1
             substr($time, -15, 3),
-            self::clockSeq($clockTime) & 0x3FFF | 0x8000, // 0x800 = RFC4122 varaint
+            self::clockSeq($clockTime) & 0x3FFF | 0x8000, // 0x800 = RFC4122 variant
             self::nodeId()
         );
     }
@@ -162,7 +162,7 @@ class Uuid
         $time = intval(($timeNs ?? time_ns()) / 100);
         $timehex = str_pad(dechex($time + self::TIME_OFFSET_INT), 15, '0', \STR_PAD_LEFT);
         $uhex = substr_replace(substr($timehex, -15), '6', -3, 0);
-        $uhex .= bin2hex(random_bytes(2)); // clock seq
+        $uhex .= self::clockSeq($time) & 0x3FFF | 0x8000; // 0x800 = RFC4122 variant
         $uhex .= self::nodeId(); // nod
         return self::uuidFromHex($uhex, 6);
     }

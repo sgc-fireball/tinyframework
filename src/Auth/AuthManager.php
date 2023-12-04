@@ -11,7 +11,7 @@ class AuthManager
     /** @var PermissionInterface[] */
     protected array $permissions = [];
 
-    public function __construct(array $config = [])
+    public function __construct(#[\SensitiveParameter] array $config = [])
     {
         $this->config = array_merge($this->config, $config);
     }

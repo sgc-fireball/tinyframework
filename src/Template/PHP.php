@@ -12,7 +12,7 @@ class PHP implements ViewInterface
 
     private array $shared = [];
 
-    public function __construct(array $config)
+    public function __construct(#[\SensitiveParameter] array $config)
     {
         $this->config = $config;
         $this->config['source'] = $this->config['source'] ?? 'resources/views';

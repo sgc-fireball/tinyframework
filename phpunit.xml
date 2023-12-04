@@ -38,7 +38,6 @@
         <server name="CACHE_DRIVER" value="array"/>
         <server name="BCRYPT_COST" value="2"/>
         <server name="QUEUE_DRIVER" value="sync"/>
-        <server name="XHPROF_ENABLE" value="false"/>
         <server name="MYSQL_DATABASE" value="tinyframework"/>
     </php>
     <extensions>

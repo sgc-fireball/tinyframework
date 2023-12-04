@@ -124,17 +124,10 @@ class Request
             $request->method = strtoupper($request->post['_method'] ?: $request->method);
             unset($request->post['_method']);
         }
-        if (\in_array(
-            $request->method,
-            ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'PATCH', 'PURGE', 'TRACE'],
-            true
-        )) {
-            return self::compileTrustedProxies($request);
-        }
+        $request->body = (string)file_get_contents("php://input");
         if (!preg_match('/^[A-Z]++$/D', $request->method)) {
             throw new RuntimeException(sprintf('Invalid method override "%s".', $request->method));
         }
-        $request->body = (string)file_get_contents("php://input");
         return self::compileTrustedProxies($request);
     }
 

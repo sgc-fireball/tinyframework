@@ -18,6 +18,7 @@ use TinyFramework\Hash\HashInterface;
 use TinyFramework\Helpers\Arr;
 use TinyFramework\Helpers\Htmlable;
 use TinyFramework\Helpers\Str;
+use TinyFramework\Helpers\Uuid;
 use TinyFramework\Http\Response;
 use TinyFramework\Http\Router;
 use TinyFramework\Localization\TranslatorInterface;
@@ -226,11 +227,7 @@ if (!function_exists('running_in_console')) {
 }
 
 if (!function_exists('dump')) {
-    /**
-     * @param mixed ...$val
-     * @return void
-     */
-    function dump(...$val): void
+    function dump(mixed ...$val): void
     {
         foreach ($val as $value) {
             echo running_in_console() ? '' : '<code><pre>';
@@ -241,11 +238,7 @@ if (!function_exists('dump')) {
 }
 
 if (!function_exists('dd')) {
-    /**
-     * @param mixed ...$val
-     * @return void|never
-     */
-    function dd(...$val): void
+    function dd(mixed ...$val): never
     {
         \call_user_func_array('dump', $val);
         running_in_console() ? exit(1) : die();
@@ -253,12 +246,7 @@ if (!function_exists('dd')) {
 }
 
 if (!function_exists('env')) {
-    /**
-     * @param string $key
-     * @param mixed|null $default
-     * @return mixed|null
-     */
-    function env(string $key, $default = null): mixed
+    function env(string $key, mixed $default = null): mixed
     {
         static $env;
         if (!isset($env)) {
@@ -297,18 +285,9 @@ if (!function_exists('exception2text')) {
 }
 
 if (!function_exists('guid')) {
-    function guid(string $microtime = null): string
+    function guid(): string
     {
-        $microtime ??= microtime();
-        $function = function_exists('openssl_random_pseudo_bytes') ? 'openssl_random_pseudo_bytes' : 'random_bytes';
-        $uuid = explode(' ', $microtime);
-        $uuid = $uuid[1] . substr($uuid[0], 2, 6);
-        $uuid = str_pad(dechex((int)$uuid), 15, '0', STR_PAD_LEFT);
-        $uuid = substr($uuid, 0, 12) . '4' . substr($uuid, 12, 3);
-        $uuid = hex2bin($uuid) . call_user_func($function, (32 - strlen($uuid)) / 2);
-        $uuid[6] = \chr(\ord($uuid[6]) & 0x0f | 0x40); // set version to 0100
-        $uuid[8] = \chr(\ord($uuid[8]) & 0x3f | 0x80); // set bits 6-7 to 10
-        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($uuid), 4));
+        return Uuid::v6();
     }
 }
 
@@ -738,5 +717,29 @@ if (!function_exists('node')) {
             '<?php /** created from file src/Helpers/functions.php function node */ return \'' . $node . '\';'
         );
         return $node;
+    }
+}
+
+if (!function_exists('command_exists')) {
+    function command_exists(string $command): bool
+    {
+        $cmd = 'which ' . escapeshellarg($command) . ' 2>/dev/null';
+        return !empty(`$cmd`);
+    }
+}
+
+if (!function_exists('mimetype_from_file')) {
+    function mimetype_from_file(string $path): string|null
+    {
+        if (!is_file($path) || !is_readable($path)) {
+            return null;
+        }
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        if (!$finfo) {
+            return null;
+        }
+        $mime = finfo_file($finfo, $path);
+        finfo_close($finfo);
+        return $mime ?: null;
     }
 }

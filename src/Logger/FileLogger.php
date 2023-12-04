@@ -10,7 +10,7 @@ class FileLogger extends LoggerAwesome implements LoggerInterface
 {
     private string $path;
 
-    public function __construct(array $config)
+    public function __construct(#[\SensitiveParameter] array $config)
     {
         if (!is_dir($config['path'])) {
             if (!mkdir($config['path'], 0750, true)) {
