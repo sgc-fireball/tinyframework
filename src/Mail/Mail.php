@@ -136,7 +136,7 @@ class Mail
         if ($priority === null) {
             return $this->priority;
         }
-        $this->priority = min(max(1, (int)$priority), 5);
+        $this->priority = min(max(1, $priority), 5);
         return $this;
     }
 
@@ -188,17 +188,20 @@ class Mail
         $this->attachments[] = [
             'path' => $path,
             'filename' => $filename ?: basename($path),
-            'mimetype' => $mimeType ?: mime_content_type($path) ?: 'application/octet-stream'
+            'mimetype' => $mimeType ?: mime_content_type($path) ?: 'application/octet-stream',
         ];
         return $this;
     }
 
-    public function attachmentBody(string $content, string $filename, string $mimeType = 'application/octet-stream'): static
-    {
+    public function attachmentBody(
+        string $content,
+        string $filename,
+        string $mimeType = 'application/octet-stream'
+    ): static {
         $this->attachments[] = [
             'content' => $content,
             'filename' => $filename,
-            'mimetype' => $mimeType
+            'mimetype' => $mimeType,
         ];
         return $this;
     }
