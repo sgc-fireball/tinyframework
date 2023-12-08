@@ -34,7 +34,7 @@ class TinyframeworkServeCommand extends CommandAwesome
         $host = $this->input->option('host')->value();
         $port = (int)$this->input->option('port')->value();
         $root = root_dir() . '/public';
-        passthru(sprintf('%s -S %s:%d -f %s', $cmd, $host, $port, $root));
+        passthru(sprintf('%s -S %s:%d -t %s', $cmd, $host, $port, $root));
         return 0;
     }
 }
