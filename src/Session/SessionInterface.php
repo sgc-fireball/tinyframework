@@ -22,5 +22,7 @@ interface SessionInterface
 
     public function forget(string $key): SessionInterface;
 
+    public function regenerate(): SessionInterface;
+
     public function clear(): SessionInterface;
 }

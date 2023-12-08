@@ -53,6 +53,18 @@ abstract class SessionAwesome implements SessionInterface, ArrayAccess
         return $this;
     }
 
+    public function regenerate(bool $cleanup = false): static
+    {
+        if ($this->id) {
+            $this->destroy();
+        }
+        if ($cleanup) {
+            $this->data = [];
+        }
+        $this->id = guid();
+        return $this;
+    }
+
     protected function calculateExpiration(null|int|DateTimeInterface|DateInterval $ttl): int|null
     {
         if ($ttl === null) {

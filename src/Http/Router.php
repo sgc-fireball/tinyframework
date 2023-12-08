@@ -39,15 +39,20 @@ class Router
         return array_map(fn (Route $route) => clone $route, $this->routes);
     }
 
-    public function load(): static
+    public function load(string $path = null): static
     {
-        $router = $this;
+        if (!$path) {
+            if (is_file($path) && is_readable($path)) {
+                $router = $this;
+                require_once($path);
+            }
+            return $this;
+        }
+
         $files = ['config', 'api', 'web', 'websocket'];
         foreach ($files as $file) {
             $file = sprintf('routes/%s.php', $file);
-            if (file_exists($file)) {
-                require_once($file);
-            }
+            $this->load($file);
         }
         return $this;
     }
