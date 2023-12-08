@@ -41,7 +41,7 @@ class Router
 
     public function load(string $path = null): static
     {
-        if (!$path) {
+        if ($path) {
             if (is_file($path) && is_readable($path)) {
                 $router = $this;
                 require_once($path);
