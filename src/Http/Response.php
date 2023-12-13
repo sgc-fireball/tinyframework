@@ -137,7 +137,7 @@ class Response
     {
         $request = container('request');
         assert($request instanceof Request);
-        $back = ($request->header('referer') ?: $fallback) ?: $request->url()->__toString();
+        $back = ($request->header('referer') ?: [$fallback])[0] ?: $request->url()->__toString();
         return self::redirect($back, 302, $headers);
     }
 

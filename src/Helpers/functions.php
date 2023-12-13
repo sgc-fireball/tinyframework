@@ -743,3 +743,10 @@ if (!function_exists('mimetype_from_file')) {
         return $mime ?: null;
     }
 }
+
+if (!function_exists('now')) {
+    function now(): DateTime
+    {
+        return new DateTime('now', new DateTimeZone(config('app.timezone') ?: 'UTC'));
+    }
+}

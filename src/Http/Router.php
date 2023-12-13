@@ -36,7 +36,7 @@ class Router
     public function routes(): array
     {
         // destroy pointers
-        return array_map(fn (Route $route) => clone $route, $this->routes);
+        return array_map(fn(Route $route) => clone $route, $this->routes);
     }
 
     public function load(string $path = null): static
@@ -321,7 +321,7 @@ class Router
         if (\in_array('GET', $result)) {
             $result[] = 'HEAD';
         }
-        $results = array_unique(array_filter($result, fn ($method) => $method !== 'ANY'));
+        $results = array_unique(array_filter($result, fn($method) => $method !== 'ANY'));
         sort($results);
         return $results;
     }
@@ -402,7 +402,7 @@ class Router
                 unset($parameters[$key]);
             }
             if (mb_strpos($url, '{') || strpos($url, '}')) {
-                throw new RuntimeException('Missing parameters.');
+                throw new RuntimeException('Missing parameters: ' . $url);
             }
             $url = rtrim('/' . ltrim($url, '/'));
             if (!empty($url)) {

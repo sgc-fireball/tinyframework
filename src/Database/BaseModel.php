@@ -307,6 +307,12 @@ class BaseModel implements JsonSerializable, ArrayAccess
         if (!$this->isDirty()) {
             return $this;
         }
+        if (array_key_exists('created_at', $this->attributes) && !$this->attributes['created_at']) {
+            $this->created_at = now();
+        }
+        if (array_key_exists('updated_at', $this->attributes)) {
+            $this->updated_at = now();
+        }
         $this::query()->put($this->attributes);
         $this->originals = $this->attributes;
         return $this;

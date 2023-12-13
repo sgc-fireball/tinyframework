@@ -41,8 +41,10 @@ class ViewServiceProvider extends ServiceProviderAwesome
             return sprintf('<?php if ($__environment === %s): ?>', substr($expression, 1, -1));
         });
         $engine->addDirective('csrf', function (string $expression): string {
-            $token = $this->container->get('request')?->session()?->get('csrf-token') ?? '';
-            return sprintf('<input type="hidden" name="_token" value="%s">', $token);
+            if ($token = $this->container->get('request')?->session()?->get('csrf-token')) {
+                return sprintf('<input type="hidden" name="csrf-token" value="%s">', $token);
+            }
+            return '';
         });
         $engine->addDirective('inject', function (string $expression): string {
             [$variable, $service] = explode(',', (string)preg_replace("/[\(\)\\\"\']/", '', $expression));

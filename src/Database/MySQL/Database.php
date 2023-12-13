@@ -45,16 +45,22 @@ class Database implements DatabaseInterface
                 $this->config['database'],
                 $this->config['port']
             );
-            $this->connection->query(sprintf(
-                "SET NAMES %s COLLATE %s",
-                $this->config['charset'],
-                $this->config['collation']
-            ));
-            $this->connection->query(sprintf(
-                'SET time_zone = "%s";',
-                (new DateTime('now', new DateTimeZone($this->config['timezone'])))->format('P')
-            ));
-            $this->connection->query('SET SESSION sql_mode = "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION"');
+            $this->connection->query(
+                sprintf(
+                    "SET NAMES %s COLLATE %s",
+                    $this->config['charset'],
+                    $this->config['collation']
+                )
+            );
+            $this->connection->query(
+                sprintf(
+                    'SET time_zone = "%s";',
+                    (new DateTime('now', new DateTimeZone($this->config['timezone'])))->format('P')
+                )
+            );
+            $this->connection->query(
+                'SET SESSION sql_mode = "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION"'
+            );
         } else {
             try {
                 if ($this->connection->ping()) {
@@ -90,15 +96,24 @@ class Database implements DatabaseInterface
             return $value->__toString();
         }
         if (is_array($value)) {
-            return sprintf('(%s)', implode(',', array_map(function ($value) {
-                return $this->escape($value);
-            }, array_values($value))));
+            return sprintf(
+                '(%s)',
+                implode(
+                    ',',
+                    array_map(function ($value) {
+                        return $this->escape($value);
+                    }, array_values($value))
+                )
+            );
         } elseif ($value === null) {
             return 'NULL';
         } elseif (is_float($value) || is_int($value)) {
             return $value;
         } elseif (is_bool($value)) {
             return $value ? 'TRUE' : 'FALSE';
+        } elseif ($value instanceof DateTime) {
+            $value->setTimezone(new DateTimeZone($this->config['timezone']));
+            return $this->escape($value->format('Y-m-d H:i:s.u'));
         } elseif (is_object($value)) {
             if (method_exists($value, 'toString')) {
                 return $this->escape($value->toString());
@@ -170,13 +185,15 @@ class Database implements DatabaseInterface
 
     public function createMigrationTable(): static
     {
-        $this->connect()->execute(implode(" ", [
-            'CREATE TABLE IF NOT EXISTS `migrations` (',
-            '`id` varchar(255) NOT NULL,',
-            '`batch` int(11) unsigned NOT NULL,',
-            'PRIMARY KEY (`id`)',
-            ')',
-        ]));
+        $this->connect()->execute(
+            implode(" ", [
+                'CREATE TABLE IF NOT EXISTS `migrations` (',
+                '`id` varchar(255) NOT NULL,',
+                '`batch` int(11) unsigned NOT NULL,',
+                'PRIMARY KEY (`id`)',
+                ')',
+            ])
+        );
         return $this;
     }
 }

@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace TinyFramework\Tests\Color;
 
+use PHPUnit\Framework\TestCase;
 use TinyFramework\Color\XTermConverter;
 
-class XTermConverterTest extends \PHPUnit\Framework\TestCase
+class XTermConverterTest extends TestCase
 {
     private ?XTermConverter $converter = null;
 
