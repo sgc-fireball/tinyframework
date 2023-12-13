@@ -1,11 +1,9 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <title>429 Too many requests</title>
-    <meta name="robots" content="noindex">
-</head>
-<body>
-<h1>429 Too many requests</h1>
-<p>Response-ID: {{ $response->id() }}</p>
-</body>
-</html>
+@extends('errors.layout')
+
+@section('title')
+    429 Too many requests
+@endsection
+
+@section('headline')
+    429 Too many requests
+@endsection
