@@ -249,6 +249,7 @@ class Request
     public function __construct()
     {
         $this->id = guid();
+        $this->url = new URL();
     }
 
     public function id(): string
