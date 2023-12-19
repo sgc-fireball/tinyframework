@@ -28,7 +28,7 @@ class ProjectHoneyPotMiddleware implements MiddlewareInterface
         return $next($request);
     }
 
-    private function resolve(string $ip): ?array
+    private function resolve(string|null $ip): ?array
     {
         if ($this->key === null) {
             return null;
