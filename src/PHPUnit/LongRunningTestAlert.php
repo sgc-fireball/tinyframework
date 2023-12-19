@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TinyFramework\Tests;
+namespace TinyFramework\PHPUnit;
 
 use PHPUnit\Runner\AfterTestHook;
 
