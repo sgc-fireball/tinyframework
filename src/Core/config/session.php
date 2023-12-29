@@ -23,4 +23,7 @@ return [
     'swoole' => [
         'driver' => \TinyFramework\Session\SwooleTableSession::class,
     ],
+    'array' => [
+        'driver' => \TinyFramework\Session\ArraySession::class,
+    ],
 ];
