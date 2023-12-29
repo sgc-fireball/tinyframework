@@ -30,7 +30,7 @@ class ArraySession extends SessionAwesome implements SessionInterface
 
     public function close(): static
     {
-        self::$sessions[$this->id] = $this->data;
+        self::$sessions[$this->id] = serialize($this->data);
         $this->data = [];
         return $this;
     }
