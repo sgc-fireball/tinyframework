@@ -8,7 +8,7 @@ use RuntimeException;
 
 class ArraySession extends SessionAwesome implements SessionInterface
 {
-    private static array $sessions;
+    private static array $sessions = [];
 
     public function open(string $id = null): static
     {
