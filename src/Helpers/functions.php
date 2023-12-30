@@ -722,6 +722,7 @@ if (!function_exists('node')) {
                 ' */',
                 'declare(strict_types=1);',
                 'return ' . var_export($node, true) . ';',
+                ''
             ])
         );
         return $node;
