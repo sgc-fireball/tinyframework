@@ -692,14 +692,14 @@ if (!function_exists('node')) {
             $node = apcu_fetch($key);
         }
         $cacheFile = storage_dir('id_node');
-        if (!$node && file_exists($cacheFile)) {
+        if ((!$node || strlen($node) !== 12) && is_file($cacheFile) && is_readable($cacheFile)) {
             try {
                 $node = require_once($cacheFile);
             } catch (\Throwable $e) {
                 @unlink($cacheFile);
             }
         }
-        if (!$node) {
+        if (!$node || strlen($node) !== 12) {
             $node = sprintf('%06x%06x', random_int(0, 0xFFFFFF) | 0x010000, random_int(0, 0xFFFFFF));
         }
         if (\function_exists('apcu_store')) {
@@ -714,7 +714,15 @@ if (!function_exists('node')) {
         }
         file_put_contents(
             $cacheFile,
-            '<?php /** created from file src/Helpers/functions.php function node */ return \'' . $node . '\';'
+            implode(PHP_EOL, [
+                '<?php',
+                '/**',
+                ' * @see src/Helpers/functions.php',
+                ' * @see \\node',
+                ' */',
+                'declare(strict_types=1);',
+                'return ' . var_export($node, true) . ';',
+            ])
         );
         return $node;
     }
