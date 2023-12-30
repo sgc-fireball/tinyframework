@@ -8,6 +8,7 @@ use ArrayAccess;
 use DateInterval;
 use DateTime;
 use DateTimeInterface;
+use TinyFramework\Helpers\Uuid;
 
 abstract class SessionAwesome implements SessionInterface, ArrayAccess
 {
@@ -121,6 +122,6 @@ abstract class SessionAwesome implements SessionInterface, ArrayAccess
 
     protected function newId(): string
     {
-        return bin2hex(random_bytes(32));
+        return Uuid::v4();
     }
 }
