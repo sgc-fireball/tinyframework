@@ -26,7 +26,7 @@ class SwooleTableSession extends SessionAwesome implements SessionInterface
     public function open(?string $id): static
     {
         $this->data = [];
-        $this->id = $id ?: bin2hex(random_bytes(32));
+        $this->id = $id ?: $this->newId();
         $value = $this->table->get($this->getId());
         if (!$value) {
             return $this;

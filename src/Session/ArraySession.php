@@ -13,7 +13,7 @@ class ArraySession extends SessionAwesome implements SessionInterface
     public function open(string $id = null): static
     {
         $this->data = [];
-        $this->id = $id ?: bin2hex(random_bytes(32));
+        $this->id = $id ?: $this->newId();
         if (!array_key_exists($this->id, self::$sessions)) {
             return $this;
         }

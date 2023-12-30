@@ -61,7 +61,7 @@ abstract class SessionAwesome implements SessionInterface, ArrayAccess
         if ($cleanup) {
             $this->data = [];
         }
-        $this->id = guid();
+        $this->id = $this->newId();
         return $this;
     }
 
@@ -117,5 +117,10 @@ abstract class SessionAwesome implements SessionInterface, ArrayAccess
     public function __unset(string $name): void
     {
         $this->set($name, null);
+    }
+
+    protected function newId(): string
+    {
+        return bin2hex(random_bytes(32));
     }
 }
