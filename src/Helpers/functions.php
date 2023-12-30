@@ -691,7 +691,7 @@ if (!function_exists('node')) {
         if (\function_exists('apcu_fetch')) {
             $node = apcu_fetch($key);
         }
-        $cacheFile = storage_dir('id_node');
+        $cacheFile = storage_dir('id_node.php');
         if ((!$node || strlen($node) !== 12) && is_file($cacheFile) && is_readable($cacheFile)) {
             try {
                 $node = require_once($cacheFile);
