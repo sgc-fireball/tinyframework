@@ -327,6 +327,18 @@ class BaseModel implements JsonSerializable, ArrayAccess
         return $this;
     }
 
+    public function reload(): static
+    {
+        if (\array_key_exists('id', $this->attributes) && !empty($this->attributes['id'])) {
+            $data = $this::query()
+                ->where('id', '=', $this->attributes['id'])
+                ?->first()?->attributes ?? [];
+            $this->relations = $this->pivot = [];
+            $this->attributes = $this->originals = $data;
+        }
+        return $this;
+    }
+
     public function setRelation(string $field, BaseModel|array|null $value = null): static
     {
         $this->relations[$field] = $value;
