@@ -26,7 +26,7 @@ class BaseModelTest extends FeatureTestCase
         assert($database instanceof Database);
         $database->execute('DROP TABLE IF EXISTS `test_model`');
         $database->execute(
-            'CREATE TABLE IF NOT EXISTS `test_model_a` (`id` UUID NOT NULL,`name` varchar(255) NOT NULL,PRIMARY KEY (`id`))'
+            'CREATE TABLE IF NOT EXISTS `test_model` (`id` char(36) NOT NULL,`name` varchar(255) NOT NULL,PRIMARY KEY (`id`))'
         );
     }
 
