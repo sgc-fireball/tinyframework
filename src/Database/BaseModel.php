@@ -139,6 +139,8 @@ class BaseModel implements JsonSerializable, ArrayAccess
             return is_object($value) ? $value : null;
         } elseif (in_array($type, ['date', 'datetime'])) {
             $value = $value instanceof DateTime ? $value : null;
+        } elseif (class_exists($type)) {
+            return new $type($value);
         }
         return $value;
     }
@@ -200,10 +202,12 @@ class BaseModel implements JsonSerializable, ArrayAccess
                     );
                 }
             } elseif (in_array($type, ['date', 'datetime', 'timestamp'])) {
-                if (is_numeric($value)) {
+                if (is_null($value)) {
+                    // do nothing - null is fine!
+                } elseif (is_numeric($value)) {
                     $value = DateTime::createFromFormat('u', $value);
                 } elseif (is_string($value) && $value) {
-                    if ($time = strtotime((string)$value)) {
+                    if ($time = strtotime($value)) {
                         $value = (new Datetime())->setTimestamp($time);
                     }
                 }
@@ -220,6 +224,12 @@ class BaseModel implements JsonSerializable, ArrayAccess
                     $value->setTime(0, 0, 0);
                 } elseif ($type === 'timestamp') {
                     $value = $value->getTimestamp();
+                }
+            } elseif (class_exists($type)) {
+                if (!($value instanceof $type)) {
+                    $value = null;
+                } elseif (method_exists($value, '__toString')) {
+                    $value = $value->__toString();
                 }
             }
             if ($encrypt) {
