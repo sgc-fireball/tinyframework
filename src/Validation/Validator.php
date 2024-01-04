@@ -29,7 +29,7 @@ class Validator implements ValidatorInterface
         return $this;
     }
 
-    public function validate(Iterator|Request|array $attributes, array $rules): array
+    public function validate(Iterator|Request|array $attributes, array $rules = []): array
     {
         if ($attributes instanceof Request) {
             $attributes = array_merge([], $attributes->get(), $attributes->post(), $attributes->file());
