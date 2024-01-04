@@ -138,6 +138,13 @@ class BaseModel implements JsonSerializable, ArrayAccess
         } elseif ($type === 'object') {
             return is_object($value) ? $value : null;
         } elseif (in_array($type, ['date', 'datetime'])) {
+            if (is_numeric($value)) {
+                $value = DateTime::createFromFormat('u', $value);
+            } elseif (is_string($value) && $value) {
+                if ($time = strtotime($value)) {
+                    $value = (new Datetime())->setTimestamp($time);
+                }
+            }
             $value = $value instanceof DateTime ? $value : null;
         } elseif (class_exists($type)) {
             return new $type($value);
