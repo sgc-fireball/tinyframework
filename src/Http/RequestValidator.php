@@ -8,19 +8,17 @@ use TinyFramework\Validation\Rule\RuleInterface;
 use TinyFramework\Validation\ValidationException;
 use TinyFramework\Validation\ValidatorInterface;
 
-abstract class RequestValidator extends Request
+abstract class RequestValidator
 {
-
-    protected ValidatorInterface $validator;
 
     private array $safe = [];
 
     private array $errorBag = [];
 
-    public function __construct()
-    {
-        parent::__construct();
-        $this->validator = container(ValidatorInterface::class);
+    public function __construct(
+        private ValidatorInterface $validator,
+        private Request $request
+    ) {
     }
 
     /**
@@ -31,7 +29,7 @@ abstract class RequestValidator extends Request
     public function validate(): bool
     {
         try {
-            $this->safe = $this->validator->validate($this, $this->rules());
+            $this->safe = $this->validator->validate($this->request, $this->rules());
             return true;
         } catch (ValidationException $e) {
             $this->errorBag = $e->getErrorBag();
@@ -47,6 +45,11 @@ abstract class RequestValidator extends Request
     public function getErrorBag(): array
     {
         return $this->errorBag;
+    }
+
+    public function __call(string $name, array $arguments)
+    {
+        return call_user_func_array([$this->request, $name], $arguments);
     }
 
 }
