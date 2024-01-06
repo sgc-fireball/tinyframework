@@ -10,7 +10,7 @@ use TinyFramework\Helpers\IPv4;
 use TinyFramework\Helpers\IPv6;
 use TinyFramework\Session\SessionInterface;
 
-class Request
+class Request implements RequestInterface
 {
     public static array $trustedProxies = [
         '127.0.0.1',

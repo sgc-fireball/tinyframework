@@ -30,7 +30,10 @@ class HttpKernel extends Kernel implements HttpKernelInterface
         try {
             $this->request = $request;
             $response = null;
-            $this->container->alias('request', Request::class)->singleton(Request::class, $request);
+            $this->container
+                ->alias('request', RequestInterface::class)
+                ->alias(Request::class, RequestInterface::class)
+                ->singleton(RequestInterface::class, $request);
             if ($request->method() === 'OPTIONS') {
                 $this->stopWatch->stop('router');
                 $response = $this->getResponseByOptionsRequest($request);
