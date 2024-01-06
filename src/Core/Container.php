@@ -251,6 +251,8 @@ class Container implements ContainerInterface
                 $arguments[$index] = $parameters[$reflectionParameter->name];
             } elseif ($type && $this->has($type->getName())) {
                 $arguments[$index] = $this->get($type->getName());
+            } elseif ($type && class_exists($type->getName()) && $type->getName() !== Closure::class) {
+                $arguments[$index] = $this->call($type->getName());
             } elseif ($this->has($reflectionParameter->name)) {
                 $arguments[$index] = $this->get($reflectionParameter->name);
             } elseif (\array_key_exists($index, $parameters)) {
