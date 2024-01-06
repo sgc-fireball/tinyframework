@@ -4,17 +4,8 @@ namespace TinyFramework\Auth;
 
 class AuthManager
 {
-    protected array $config = [
-        'enabled' => false,
-    ];
-
     /** @var PermissionInterface[] */
     protected array $permissions = [];
-
-    public function __construct(#[\SensitiveParameter] array $config = [])
-    {
-        $this->config = array_merge($this->config, $config);
-    }
 
     public function addPermissions(array $permissions): static
     {
@@ -32,9 +23,6 @@ class AuthManager
 
     public function can(Authenticatable $user = null, string $permission = null, mixed $meta = null): bool
     {
-        if (!$this->config['enabled']) {
-            return true;
-        }
         if (!$user) {
             return false;
         }
@@ -54,13 +42,4 @@ class AuthManager
         return !$this->can($user, $permission, $meta);
     }
 
-    public function getByAuthIdentifier(string $id): Authenticatable|null
-    {
-        return null;
-    }
-
-    public function getByRememberMeToken(string $token): Authenticatable|null
-    {
-        return null;
-    }
 }

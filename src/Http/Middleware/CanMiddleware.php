@@ -8,14 +8,13 @@ use Closure;
 use TinyFramework\Auth\Authenticatable;
 use TinyFramework\Auth\AuthException;
 use TinyFramework\Auth\AuthManager;
-use TinyFramework\Http\Request;
 use TinyFramework\Http\RequestInterface;
 use TinyFramework\Http\Response;
 
 class CanMiddleware implements MiddlewareInterface
 {
     public function __construct(
-        protected AuthManager $gateManager
+        protected AuthManager $authManager
     ) {
     }
 
@@ -26,7 +25,7 @@ class CanMiddleware implements MiddlewareInterface
             throw new AuthException('Please login.', 401);
         }
         foreach ($parameters as $permission) {
-            if (!$this->gateManager->can($user, $permission)) {
+            if (!$this->authManager->can($user, $permission)) {
                 throw new AuthException('Access denied to ' . $permission, 403, null, $user);
             }
         }
