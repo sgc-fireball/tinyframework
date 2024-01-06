@@ -8,6 +8,7 @@ use Closure;
 use TinyFramework\Core\KernelInterface;
 use TinyFramework\Exception\HttpException;
 use TinyFramework\Http\Request;
+use TinyFramework\Http\RequestInterface;
 use TinyFramework\Http\Response;
 
 class MaintenanceMiddleware implements MiddlewareInterface
@@ -19,7 +20,7 @@ class MaintenanceMiddleware implements MiddlewareInterface
         $this->kernel = $kernel;
     }
 
-    public function handle(Request $request, Closure $next, mixed ...$parameters): Response
+    public function handle(RequestInterface $request, Closure $next, mixed ...$parameters): Response
     {
         if ($config = $this->kernel->getMaintenanceConfig()) {
             if (array_key_exists('whitelist', $config)) {

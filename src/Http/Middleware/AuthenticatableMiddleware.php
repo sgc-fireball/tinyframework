@@ -8,6 +8,7 @@ use Closure;
 use TinyFramework\Auth\Authenticatable;
 use TinyFramework\Auth\AuthManager;
 use TinyFramework\Http\Request;
+use TinyFramework\Http\RequestInterface;
 use TinyFramework\Http\Response;
 
 class AuthenticatableMiddleware implements MiddlewareInterface
@@ -20,7 +21,7 @@ class AuthenticatableMiddleware implements MiddlewareInterface
     ) {
     }
 
-    public function handle(Request $request, Closure $next, mixed ...$parameters): Response
+    public function handle(RequestInterface $request, Closure $next, mixed ...$parameters): Response
     {
         $authIdentifier = $this->handleSession($request) ?? $this->handleRememberMe($request);
         if ($authIdentifier) {
@@ -33,7 +34,7 @@ class AuthenticatableMiddleware implements MiddlewareInterface
         return $next($request);
     }
 
-    public function handleSession(Request $request): ?Authenticatable
+    public function handleSession(RequestInterface $request): ?Authenticatable
     {
         if (!$request->session()) {
             return null;
@@ -45,7 +46,7 @@ class AuthenticatableMiddleware implements MiddlewareInterface
         return $this->authManager->getByAuthIdentifier($authIdentifier);
     }
 
-    protected function handleRememberMe(Request $request): ?Authenticatable
+    protected function handleRememberMe(RequestInterface $request): ?Authenticatable
     {
         $rememberMeToken = $request->cookie(self::REMEMBERME_IDENTIFIER_KEY);
         if (!$rememberMeToken) {

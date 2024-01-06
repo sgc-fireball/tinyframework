@@ -7,11 +7,12 @@ namespace TinyFramework\Http\Middleware;
 use Closure;
 use TinyFramework\Helpers\Uuid;
 use TinyFramework\Http\Request;
+use TinyFramework\Http\RequestInterface;
 use TinyFramework\Http\Response;
 
 class CsrfMiddlewaere implements MiddlewareInterface
 {
-    public function handle(Request $request, Closure $next, mixed ...$parameters): Response
+    public function handle(RequestInterface $request, Closure $next, mixed ...$parameters): Response
     {
         $session = $request->session();
         if (!$session) {

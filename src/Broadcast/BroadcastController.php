@@ -4,6 +4,7 @@ namespace TinyFramework\Broadcast;
 
 use Swoole\Websocket\Server as BaseServer;
 use TinyFramework\Http\Request;
+use TinyFramework\Http\RequestInterface;
 use TinyFramework\Http\Response;
 
 class BroadcastController
@@ -12,7 +13,7 @@ class BroadcastController
     {
     }
 
-    public function auth(Request $request): Response
+    public function auth(RequestInterface $request): Response
     {
         $whitelist = config('broadcast.global.whitelist') ?? [];
         if (!in_array($request->realIp(), $whitelist)) {
@@ -26,7 +27,7 @@ class BroadcastController
         return Response::new(null, 403);
     }
 
-    public function websocket(Request $request, BaseServer $server, BroadcastChannelTable $broadcastChannelTable): void
+    public function websocket(RequestInterface $request, BaseServer $server, BroadcastChannelTable $broadcastChannelTable): void
     {
         $message = $request->json() ?: [];
         $message['type'] ??= '';
@@ -38,7 +39,7 @@ class BroadcastController
         };
     }
 
-    private function websocketMessagePing(Request $request, BaseServer $server, array $message): void
+    private function websocketMessagePing(RequestInterface $request, BaseServer $server, array $message): void
     {
         $server->push(
             (int)$request->attribute('swoole_fd'),

@@ -10,11 +10,11 @@ use TinyFramework\Core\KernelInterface;
 
 interface HttpKernelInterface extends KernelInterface
 {
-    public function handle(Request $request): Response;
+    public function handle(RequestInterface $request): Response;
 
     public function terminateRequestCallback(Closure $closure): HttpKernelInterface;
 
-    public function terminateRequest(Request $request, Response $response): HttpKernelInterface;
+    public function terminateRequest(RequestInterface $request, Response $response): HttpKernelInterface;
 
     public function throwableToResponse(Throwable $e): Response;
 

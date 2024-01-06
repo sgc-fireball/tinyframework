@@ -21,7 +21,7 @@ class HttpKernel extends Kernel implements HttpKernelInterface
 
     private ?Request $request = null;
 
-    public function handle(Request $request): Response
+    public function handle(RequestInterface $request): Response
     {
         if (defined('SWOOLE') && SWOOLE) {
             $this->stopWatch = $this->resetStopWatch(microtime(true));
@@ -117,7 +117,7 @@ class HttpKernel extends Kernel implements HttpKernelInterface
         return $response;
     }
 
-    private function getResponseByOptionsRequest(Request $request): Response
+    private function getResponseByOptionsRequest(RequestInterface $request): Response
     {
         $response = Response::new(null, 200);
         $router = $this->container->get('router');
@@ -141,14 +141,14 @@ class HttpKernel extends Kernel implements HttpKernelInterface
         return $response;
     }
 
-    private function callRoute(Route $route, Request $request): Response
+    private function callRoute(Route $route, RequestInterface $request): Response
     {
         $request->route($route);
         $middlewares = $route->middleware();
         $onion = new Pipeline();
         $this->stopWatch->start('middleware', 'kernel');
         foreach ($middlewares as $middleware) {
-            $onion->layers(function (Request $request, Closure $next) use ($middleware): Response {
+            $onion->layers(function (RequestInterface $request, Closure $next) use ($middleware): Response {
                 $parameters = [$request, $next];
                 if (mb_strpos($middleware, ',') !== false) {
                     $additionalParameters = explode(',', $middleware);
@@ -160,7 +160,7 @@ class HttpKernel extends Kernel implements HttpKernelInterface
         }
         $this->stopWatch->stop('middleware');
         $this->stopWatch->start('controller', 'kernel');
-        $response = $onion->call(function (Request $request): Response {
+        $response = $onion->call(function (RequestInterface $request): Response {
             $response = $this->container->call($request->route()->action(), $request->route()->parameter());
             if (!($response instanceof Response)) {
                 $response = Response::new($response);
@@ -174,7 +174,7 @@ class HttpKernel extends Kernel implements HttpKernelInterface
         return $response;
     }
 
-    public function terminateRequest(Request $request, Response $response): static
+    public function terminateRequest(RequestInterface $request, Response $response): static
     {
         foreach ($this->terminateRequestCallbacks as $callback) {
             try {

@@ -7,6 +7,7 @@ namespace TinyFramework\Http\Middleware;
 use Closure;
 use TinyFramework\Core\Config;
 use TinyFramework\Http\Request;
+use TinyFramework\Http\RequestInterface;
 use TinyFramework\Http\Response;
 
 class ProjectHoneyPotMiddleware implements MiddlewareInterface
@@ -18,7 +19,7 @@ class ProjectHoneyPotMiddleware implements MiddlewareInterface
         $this->key = $config->get('services.projectHoneyPot');
     }
 
-    public function handle(Request $request, Closure $next, mixed ...$parameters): Response
+    public function handle(RequestInterface $request, Closure $next, mixed ...$parameters): Response
     {
         if ($result = $this->resolve($request->realIp())) {
             if ($result['type'] > 0) {

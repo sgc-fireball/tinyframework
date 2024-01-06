@@ -9,6 +9,7 @@ use TinyFramework\Auth\Authenticatable;
 use TinyFramework\Auth\AuthException;
 use TinyFramework\Auth\AuthManager;
 use TinyFramework\Http\Request;
+use TinyFramework\Http\RequestInterface;
 use TinyFramework\Http\Response;
 
 class CanMiddleware implements MiddlewareInterface
@@ -18,7 +19,7 @@ class CanMiddleware implements MiddlewareInterface
     ) {
     }
 
-    public function handle(Request $request, Closure $next, mixed ...$parameters): Response
+    public function handle(RequestInterface $request, Closure $next, mixed ...$parameters): Response
     {
         $user = $request->user();
         if (!($user instanceof Authenticatable)) {

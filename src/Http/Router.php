@@ -291,7 +291,7 @@ class Router
         return $this->fallback = (new Route())->method('any')->url('.*')->action($action)->name('fallback');
     }
 
-    public function resolve(Request $request): ?Route
+    public function resolve(RequestInterface $request): ?Route
     {
         $routes = $this->getPossibleRoutesByUrl($request);
         foreach ($routes as $route) {
@@ -307,7 +307,7 @@ class Router
         return null;
     }
 
-    public function getAllowedMethodsByRequest(Request $request): array
+    public function getAllowedMethodsByRequest(RequestInterface $request): array
     {
         $routes = $this->getPossibleRoutesByUrl($request);
         $result = [];
@@ -329,7 +329,7 @@ class Router
     /**
      * @return Route[]
      */
-    private function getPossibleRoutesByUrl(Request $request): array
+    private function getPossibleRoutesByUrl(RequestInterface $request): array
     {
         $routes = [];
         $url = $request->url()->query([])->fragment('')->__toString();

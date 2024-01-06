@@ -7,6 +7,7 @@ namespace TinyFramework\Http\Middleware;
 use Closure;
 use TinyFramework\Core\ContainerInterface;
 use TinyFramework\Http\Request;
+use TinyFramework\Http\RequestInterface;
 use TinyFramework\Http\Response;
 use TinyFramework\Session\SessionInterface;
 
@@ -19,7 +20,7 @@ class SessionMiddleware implements MiddlewareInterface
         $this->container = $container;
     }
 
-    public function handle(Request $request, Closure $next, mixed ...$parameters): Response
+    public function handle(RequestInterface $request, Closure $next, mixed ...$parameters): Response
     {
         $session = $this->container->get('session');
         assert($session instanceof SessionInterface);
