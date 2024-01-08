@@ -9,6 +9,7 @@ namespace TinyFramework\Helpers;
  * @template TValue of mixed
  * @see https://www.php.net/manual/de/ref.array.php
  */
+#[\AllowDynamicProperties]
 class Arr implements \ArrayAccess, \Iterator, \Countable
 {
     protected array $items = [];

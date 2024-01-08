@@ -20,6 +20,7 @@ use TinyFramework\Helpers\Str;
  * @property DateTime $created_at
  * @property DateTime|null $updated_at
  */
+#[\AllowDynamicProperties]
 class BaseModel implements JsonSerializable, ArrayAccess
 {
     protected string $connection;

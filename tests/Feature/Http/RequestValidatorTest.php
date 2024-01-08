@@ -16,8 +16,6 @@ class NoRulesValidator extends RequestValidator
     }
 }
 
-;
-
 class IDValidator extends RequestValidator
 {
     public function rules(): array

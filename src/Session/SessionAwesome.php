@@ -10,6 +10,7 @@ use DateTime;
 use DateTimeInterface;
 use TinyFramework\Helpers\Uuid;
 
+#[\AllowDynamicProperties]
 abstract class SessionAwesome implements SessionInterface, ArrayAccess
 {
     protected ?string $id = null;

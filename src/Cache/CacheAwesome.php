@@ -7,6 +7,7 @@ namespace TinyFramework\Cache;
 use ArrayAccess;
 use Closure;
 
+#[\AllowDynamicProperties]
 abstract class CacheAwesome implements CacheInterface, ArrayAccess
 {
     protected array $config;
