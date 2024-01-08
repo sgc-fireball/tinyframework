@@ -170,7 +170,7 @@ class Response
         if ($this->session) {
             if ($input === null) {
                 $request = container('request');
-                assert($request instanceof Request);
+                assert($request instanceof RequestInterface);
                 $input = array_merge($request->get(), $request->post());
             }
             $this->session->set('flash_inputs', $input);
