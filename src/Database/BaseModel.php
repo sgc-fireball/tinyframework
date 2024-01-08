@@ -14,6 +14,7 @@ use TinyFramework\Database\Relations\HasMany;
 use TinyFramework\Database\Relations\HasOne;
 use TinyFramework\Database\Relations\Relation;
 use TinyFramework\Helpers\Str;
+use TinyFramework\Helpers\Uuid;
 
 /**
  * @property string $id
@@ -319,7 +320,7 @@ class BaseModel implements JsonSerializable, ArrayAccess
     {
         if (!array_key_exists('id', $this->attributes) || empty($this->attributes['id'])) {
             if ($this->primaryType === 'uuid') {
-                $this->attributes['id'] = guid();
+                $this->attributes['id'] = Uuid::v6();
             }
         }
         if (!$this->isDirty()) {

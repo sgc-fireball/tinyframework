@@ -6,6 +6,7 @@ namespace TinyFramework\Http\Middleware;
 
 use Closure;
 use TinyFramework\Core\ContainerInterface;
+use TinyFramework\Helpers\Uuid;
 use TinyFramework\Http\Request;
 use TinyFramework\Http\RequestInterface;
 use TinyFramework\Http\Response;
@@ -26,7 +27,7 @@ class SessionMiddleware implements MiddlewareInterface
         assert($session instanceof SessionInterface);
         $name = $this->container->get('config')->get('session.cookie');
         if ($name) {
-            $id = (string)$request->cookie($name) ?: guid();
+            $id = (string)$request->cookie($name) ?: Uuid::v4();
             $response = $next($request->session($session->open($id)));
             assert($response instanceof Response);
             $session->close();

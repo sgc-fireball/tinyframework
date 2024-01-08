@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TinyFramework\Http;
 
+use TinyFramework\Helpers\Uuid;
 use TinyFramework\Session\SessionInterface;
 
 class Response
@@ -143,7 +144,7 @@ class Response
 
     public function __construct()
     {
-        $this->id = guid();
+        $this->id = Uuid::v6();
     }
 
     public function session(SessionInterface $session = null): static|SessionInterface|null

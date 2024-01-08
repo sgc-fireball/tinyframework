@@ -6,6 +6,7 @@ namespace TinyFramework\Mail;
 
 use InvalidArgumentException;
 use RuntimeException;
+use TinyFramework\Helpers\Uuid;
 
 class SmtpMailer extends MailerAwesome implements MailerInterface
 {
@@ -72,7 +73,7 @@ class SmtpMailer extends MailerAwesome implements MailerInterface
         }
         $this->write($fp, "DATA\r\n");
 
-        $this->write($fp, sprintf("Message-ID: <%s>\r\n", $this->encodeAddress(guid() . '@' . $this->config['local_domain'])), false);
+        $this->write($fp, sprintf("Message-ID: <%s>\r\n", $this->encodeAddress(Uuid::v6() . '@' . $this->config['local_domain'])), false);
         $this->write($fp, sprintf("Date: %s\r\n", date('r')), false);
         $this->write($fp, sprintf("User-Agent: TinyFramework/0.1 PHP/%s\r\n", phpversion()), false);
         $this->write($fp, sprintf("Subject: %s\r\n", mb_encode_mimeheader($mail->subject(), 'UTF-8', 'Q')), false);
@@ -113,13 +114,13 @@ class SmtpMailer extends MailerAwesome implements MailerInterface
          */
         $this->write($fp, "MIME-Version: 1.0\r\n", false);
 
-        $this->write($fp, sprintf("Content-Type: multipart/mixed; boundary=\"%s\"\r\n\r\n", $mixedBoundary = guid()), false);
+        $this->write($fp, sprintf("Content-Type: multipart/mixed; boundary=\"%s\"\r\n\r\n", $mixedBoundary = Uuid::v6()), false);
         $this->write($fp, sprintf("--%s\r\n", $mixedBoundary), false);
 
-        $this->write($fp, sprintf("Content-Type: multipart/related; boundary=\"%s\"\r\n\r\n", $relatedBoundary = guid()), false);
+        $this->write($fp, sprintf("Content-Type: multipart/related; boundary=\"%s\"\r\n\r\n", $relatedBoundary = Uuid::v6()), false);
         $this->write($fp, sprintf("--%s\r\n", $relatedBoundary), false);
 
-        $this->write($fp, sprintf("Content-Type: multipart/alternative; boundary=\"%s\"\r\n\r\n", $alternativeBoundary = guid()), false);
+        $this->write($fp, sprintf("Content-Type: multipart/alternative; boundary=\"%s\"\r\n\r\n", $alternativeBoundary = Uuid::v6()), false);
         $this->write($fp, sprintf("--%s\r\n", $alternativeBoundary), false);
         $this->write($fp, "Content-Type: text/plain;charset=\"utf-8\"\r\n", false);
         $this->write($fp, "Content-Transfer-Encoding: quoted-printable\r\n\r\n", false);

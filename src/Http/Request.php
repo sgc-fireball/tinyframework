@@ -8,6 +8,7 @@ use RuntimeException;
 use TinyFramework\Auth\Authenticatable;
 use TinyFramework\Helpers\IPv4;
 use TinyFramework\Helpers\IPv6;
+use TinyFramework\Helpers\Uuid;
 use TinyFramework\Session\SessionInterface;
 
 class Request implements RequestInterface
@@ -255,7 +256,7 @@ class Request implements RequestInterface
 
     public function __construct()
     {
-        $this->id = guid();
+        $this->id = Uuid::v6();
         $this->url = new URL();
     }
 

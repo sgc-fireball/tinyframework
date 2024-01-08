@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace TinyFramework\StopWatch;
 
+use TinyFramework\Helpers\Uuid;
+
 class StopWatchSection
 {
     private float $origin;
@@ -16,7 +18,7 @@ class StopWatchSection
     public function __construct(float $origin, string $id)
     {
         $this->origin = $origin ?: microtime(true);
-        $this->id = $id ?: guid();
+        $this->id = $id ?: Uuid::v6();
     }
 
     public function origin(): float
