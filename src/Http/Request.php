@@ -23,6 +23,7 @@ class Request implements RequestInterface
         'X-Forwarded-Proto',
         'X-Forwarded-Scheme',
         'X-Forwarded-Host',
+        'X-Forwarded-Port',
     ];
 
     private string $id;
@@ -228,7 +229,7 @@ class Request implements RequestInterface
         if (in_array('X-Forwarded-Proto', self::$trustedHeaders)) {
             $proto = $request->header('X-Forwarded-Proto');
             if (count($proto) === 1) {
-                $request->url->port((int)$proto[0]);
+                $request->url->scheme($proto[0]);
             }
         }
         if (in_array('X-Forwarded-Scheme', self::$trustedHeaders)) {
@@ -241,6 +242,12 @@ class Request implements RequestInterface
             $hosts = $request->header('X-Forwarded-Host');
             if (count($hosts) === 1) {
                 $request->url->host($hosts[0]);
+            }
+        }
+        if (in_array('X-Forwarded-Port', self::$trustedHeaders)) {
+            $proto = $request->header('X-Forwarded-Port');
+            if (count($proto) === 1) {
+                $request->url->port((int)$proto[0]);
             }
         }
         return $request;
