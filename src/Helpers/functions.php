@@ -691,40 +691,10 @@ if (!function_exists('node')) {
         if (\function_exists('apcu_fetch')) {
             $node = apcu_fetch($key);
         }
-        $cacheFile = storage_dir('id_node.php');
-        if ((!$node || strlen($node) !== 12) && is_file($cacheFile) && is_readable($cacheFile)) {
-            try {
-                $node = require_once($cacheFile);
-            } catch (\Throwable $e) {
-                @unlink($cacheFile);
-            }
-        }
-        if (!$node || strlen($node) !== 12) {
-            $node = sprintf('%06x%06x', random_int(0, 0xFFFFFF) | 0x010000, random_int(0, 0xFFFFFF));
-        }
+        $node = substr(sha1(gethostname()), 0, 12,);
         if (\function_exists('apcu_store')) {
             apcu_store($key, $node);
         }
-        $dir = dirname($cacheFile);
-        if (!is_dir($dir)) {
-            if (!mkdir($dir, 0750, true)) {
-                trigger_error('Could not create dir: ' . $dir, E_USER_WARNING);
-                return $node;
-            }
-        }
-        file_put_contents(
-            $cacheFile,
-            implode(PHP_EOL, [
-                '<?php',
-                '/**',
-                ' * @see src/Helpers/functions.php',
-                ' * @see \\node',
-                ' */',
-                'declare(strict_types=1);',
-                'return ' . var_export($node, true) . ';',
-                ''
-            ])
-        );
         return $node;
     }
 }
