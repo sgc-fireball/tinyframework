@@ -48,7 +48,7 @@ class SwooleServer
         ConfigInterface $config
     ) {
         $this->container = $container;
-        $this->container->set(self::class, $this);
+        $this->container->singleton(self::class, $this);
         $this->kernel = $kernel;
         $this->eventDispatcher = $eventDispatcher;
         $this->server = $server;
