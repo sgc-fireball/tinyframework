@@ -175,10 +175,10 @@ class SwooleServer
         $end = hrtime(true);
         $time = ($end - $start) / 1E6;
         $code = $response->code();
-        $code = is_int($code) && $code < 100 ? '<red>' . $code . '</red>' : $code; // <100
+        $code = is_int($code) && $code < 100 ? '<white>' . $code . '</white>' : $code; // <100
         $code = is_int($code) && $code < 200 ? '<lightblue>' . $code . '</lightblue>' : $code; // 100 < n < 200
-        $code = is_int($code) && $code < 300 ? '<green>' . $code . '</green>' : $code; // 200 < n < 300
-        $code = is_int($code) && $code < 400 ? '<blue>' . $code . '</blue>' : $code; // 300 < n < 400
+        $code = is_int($code) && $code < 300 ? '<blue>' . $code . '</blue>' : $code; // 200 < n < 300
+        $code = is_int($code) && $code < 400 ? '<gray>' . $code . '</gray>' : $code; // 300 < n < 400
         $code = is_int($code) && $code < 500 ? '<orange>' . $code . '</orange>' : $code; // 400 < n < 500
         $code = is_int($code) && $code > 500 ? '<red>' . $code . '</red>' : $code; // >= 500
         $this->output->writeln(
