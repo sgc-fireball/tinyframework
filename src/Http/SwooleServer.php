@@ -48,7 +48,6 @@ class SwooleServer
         ConfigInterface $config
     ) {
         $this->container = $container;
-        $this->container->singleton(self::class, $this);
         $this->kernel = $kernel;
         $this->eventDispatcher = $eventDispatcher;
         $this->server = $server;
@@ -60,6 +59,8 @@ class SwooleServer
         $this->cacheTable = new SwooleTableCache();
         $this->websocketTable = new WebsocketTable();
         $this->broadcastChannelTable = new BroadcastChannelTable();
+        $this->container->singleton(self::class, $this);
+        $this->container->singleton(BaseServer::class, $server);
         $this->container->singleton(SwooleTableCache::class, $this->cacheTable);
         $this->container->singleton(WebsocketTable::class, $this->websocketTable);
         $this->container->singleton(BroadcastChannelTable::class, $this->broadcastChannelTable);
