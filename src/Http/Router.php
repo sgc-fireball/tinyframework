@@ -412,7 +412,7 @@ class Router
             }
             return rtrim($url, '?&');
         }
-        throw new RuntimeException('Could not found route.');
+        throw new RuntimeException('Could not found route: ' . $name);
     }
 
     public function url(string $path = '/', array $parameters = []): string
