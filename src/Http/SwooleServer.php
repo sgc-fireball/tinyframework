@@ -48,6 +48,7 @@ class SwooleServer
         ConfigInterface $config
     ) {
         $this->container = $container;
+        $this->container->set(self::class, $this);
         $this->kernel = $kernel;
         $this->eventDispatcher = $eventDispatcher;
         $this->server = $server;
@@ -218,6 +219,8 @@ class SwooleServer
         }
 
         $this->broadcastChannelTable->allow($req->fd, 'system');
+        $this->broadcastChannelTable->allow($req->fd, $request->url()->__toString());
+        logger()->info('CHANNEL join: '.$request->url()->__toString());
 
         $this->output->writeln(
             sprintf(
