@@ -4,21 +4,22 @@ declare(strict_types=1);
 
 namespace TinyFramework\Broadcast;
 
-use Swoole\WebSocket\Server as BaseServer;
+use RuntimeException;
+use Swoole\WebSocket\Server;
 
 class SwooleBroadcast implements BroadcastInterface
 {
-    private BaseServer $server;
+    private Server $server;
 
     private BroadcastChannelTable $broadcastChannelTable;
 
     public function __construct(
         array $config,
-        BaseServer $server,
+        Server $server,
         BroadcastChannelTable $broadcastChannelTable
     ) {
         if (!\extension_loaded('swoole')) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 sprintf(
                     'You cannot use the "%s" as the "swoole" extension is not installed.',
                     __CLASS__
