@@ -60,7 +60,7 @@ class BroadcastChannelTable extends Table
         $ids = [];
         foreach ($this as $key => $value) {
             if ($value['channel'] === $channel) {
-                $ids = $value['fd'];
+                $ids[] = $value['fd'];
             }
         }
         return $ids;
