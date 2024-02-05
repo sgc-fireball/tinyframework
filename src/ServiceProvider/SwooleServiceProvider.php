@@ -17,6 +17,7 @@ class SwooleServiceProvider extends ServiceProviderAwesome
             $this->container
                 ->alias(\Swoole\Server::class, BaseServer::class)
                 ->alias(\Swoole\Http\Server::class, BaseServer::class)
+                ->alias(\Swoole\WebSocket\Server::class, BaseServer::class)
                 ->singleton(
                     BaseServer::class,
                     function (Config $config): BaseServer {
