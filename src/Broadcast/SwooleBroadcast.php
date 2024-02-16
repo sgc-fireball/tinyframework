@@ -32,13 +32,9 @@ class SwooleBroadcast implements BroadcastInterface
 
     public function publish(string $channel, array $message): static
     {
-        $message = json_encode([
-            'type' => 'broadcast',
-            'channel' => $channel,
-            'payload' => $message,
-        ]);
+        $msg = json_encode($message);
         foreach ($this->broadcastChannelTable->getFdByChannel($channel) as $fd) {
-            $this->server->push($fd, $message);
+            $this->server->push($fd, $msg);
         }
         return $this;
     }
