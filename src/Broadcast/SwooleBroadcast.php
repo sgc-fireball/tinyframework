@@ -38,7 +38,7 @@ class SwooleBroadcast implements BroadcastInterface
             'payload' => $message,
         ]);
         foreach ($this->broadcastChannelTable->getFdByChannel($channel) as $fd) {
-            $this->server->send($fd, $message);
+            $this->server->push($fd, $message);
         }
         return $this;
     }
