@@ -6,7 +6,6 @@ namespace TinyFramework\Http\Middleware;
 
 use Closure;
 use TinyFramework\Core\Config;
-use TinyFramework\Http\Request;
 use TinyFramework\Http\RequestInterface;
 use TinyFramework\Http\Response;
 

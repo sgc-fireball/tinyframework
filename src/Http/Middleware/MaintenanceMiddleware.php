@@ -7,7 +7,6 @@ namespace TinyFramework\Http\Middleware;
 use Closure;
 use TinyFramework\Core\KernelInterface;
 use TinyFramework\Exception\HttpException;
-use TinyFramework\Http\Request;
 use TinyFramework\Http\RequestInterface;
 use TinyFramework\Http\Response;
 

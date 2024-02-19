@@ -24,7 +24,7 @@ class ThrottleMiddleware implements MiddlewareInterface
         throw new RuntimeException('', 429);
     }
 
-    private function getRequestSignature(RequestInterface $request): string
+    public function getRequestSignature(RequestInterface $request): string
     {
         return hash('sha3-256', $request->url()->host() . '|' . $request->realIp());
     }

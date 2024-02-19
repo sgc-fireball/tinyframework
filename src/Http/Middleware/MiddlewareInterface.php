@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TinyFramework\Http\Middleware;
 
 use Closure;
-use TinyFramework\Http\Request;
 use TinyFramework\Http\RequestInterface;
 use TinyFramework\Http\Response;
 

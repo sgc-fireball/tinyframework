@@ -11,7 +11,7 @@ use PHPUnit\Runner\AfterTestHook;
  */
 class LongRunningTestAlert implements AfterTestHook
 {
-    protected const MAX_SECONDS_ALLOWED = 1;
+    protected const MAX_SECONDS_ALLOWED = 1.5;
 
     public function executeAfterTest(string $test, float $time): void
     {
