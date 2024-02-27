@@ -14,7 +14,6 @@ use TinyFramework\RateLimiter\RateLimiter;
  */
 class RateLimitMiddleware implements MiddlewareInterface
 {
-
     public function __construct(
         protected CacheInterface $cache
     ) {
@@ -40,7 +39,7 @@ class RateLimitMiddleware implements MiddlewareInterface
             $response->header('RateLimit-Reset', sprintf('%d', $rateLimit->getRetryAt() - time()));
         } else {
             if ($request->wantsJson()) {
-                $response = Response::json(['error' => 429, 'data' => 'You have exceeded your quota.',], 429);
+                $response = Response::json(['error' => 429, 'data' => 'You have exceeded your quota.', ], 429);
             } else {
                 $response = Response::view('errors.429', compact('rateLimit', 'request'), 429);
             }

@@ -12,7 +12,6 @@ use TinyFramework\Validation\ValidatorInterface;
 
 abstract class RequestValidator implements RequestInterface
 {
-
     private array $safe = [];
 
     private array $errorBag = [];

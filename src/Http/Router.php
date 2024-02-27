@@ -36,7 +36,7 @@ class Router
     public function routes(): array
     {
         // destroy pointers
-        return array_map(fn(Route $route) => clone $route, $this->routes);
+        return array_map(fn (Route $route) => clone $route, $this->routes);
     }
 
     public function load(string $path = null): static
@@ -321,7 +321,7 @@ class Router
         if (\in_array('GET', $result)) {
             $result[] = 'HEAD';
         }
-        $results = array_unique(array_filter($result, fn($method) => $method !== 'ANY'));
+        $results = array_unique(array_filter($result, fn ($method) => $method !== 'ANY'));
         sort($results);
         return $results;
     }

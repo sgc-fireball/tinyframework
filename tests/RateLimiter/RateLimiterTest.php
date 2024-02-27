@@ -138,5 +138,4 @@ class RateLimiterTest extends TestCase
     {
         return [$rateLimit->isAccepted(), $rateLimit->getRemainingTokens(), $rateLimit->getRetryAt() - time()];
     }
-
 }

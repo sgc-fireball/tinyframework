@@ -691,7 +691,7 @@ if (!function_exists('node')) {
         if (\function_exists('apcu_fetch')) {
             $node = apcu_fetch($key);
         }
-        $node = substr(sha1(gethostname()), 0, 12,);
+        $node = substr(sha1(gethostname()), 0, 12, );
         if (\function_exists('apcu_store')) {
             apcu_store($key, $node);
         }

@@ -12,7 +12,6 @@ use TinyFramework\Session\SessionInterface;
 
 interface RequestInterface
 {
-
     public function id(): string;
 
     public function get(string|array|null $key = null, mixed $value = null): mixed;
@@ -54,5 +53,4 @@ interface RequestInterface
     public function wantsJson(): bool;
 
     public function isAjax(): bool;
-
 }

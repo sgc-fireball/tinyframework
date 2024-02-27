@@ -6,8 +6,6 @@ namespace TinyFramework\Tests\Feature\Database;
 
 use TinyFramework\Database\BaseModel;
 use TinyFramework\Database\MySQL\Database;
-use TinyFramework\Database\Relations\BelongsToMany;
-use TinyFramework\Database\Relations\HasOne;
 use TinyFramework\Tests\Feature\FeatureTestCase;
 
 class TestModel extends BaseModel
@@ -56,5 +54,4 @@ class BaseModelTest extends FeatureTestCase
         $model->reload();
         $this->assertEquals('model', $model->name, 'The model->name must be "model".');
     }
-
 }

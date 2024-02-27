@@ -8,7 +8,6 @@ use TinyFramework\Cache\CacheInterface;
 
 class RateLimiter implements RateLimiterInterface
 {
-
     public function __construct(
         protected CacheInterface $cache,
         protected string $name,
@@ -30,7 +29,7 @@ class RateLimiter implements RateLimiterInterface
         $items = $this->cache->get($key);
 
         $items = is_array($items)
-            ? array_values(array_filter($items, fn(float|int $time) => $time > $window))
+            ? array_values(array_filter($items, fn (float|int $time) => $time > $window))
             : [];
         $count = count($items);
         $isAccepted = $count < $this->limit;
@@ -53,5 +52,4 @@ class RateLimiter implements RateLimiterInterface
         $this->cache->forget($this->buildKey($key));
         return $this;
     }
-
 }

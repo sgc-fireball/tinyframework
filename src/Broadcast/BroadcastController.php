@@ -27,8 +27,11 @@ class BroadcastController
         return Response::new(null, 403);
     }
 
-    public function websocket(RequestInterface $request, BaseServer $server, BroadcastChannelTable $broadcastChannelTable): void
-    {
+    public function websocket(
+        RequestInterface $request,
+        BaseServer $server,
+        BroadcastChannelTable $broadcastChannelTable
+    ): void {
         $message = $request->json() ?: [];
         $message['type'] ??= '';
         match ($message['type']) {
@@ -51,7 +54,7 @@ class BroadcastController
     }
 
     private function websocketMessageSubscribe(
-        Request $request,
+        RequestInterface $request,
         BaseServer $server,
         array $message,
         BroadcastChannelTable $broadcastChannelTable
@@ -80,7 +83,7 @@ class BroadcastController
     }
 
     private function websocketMessageUnsubscribe(
-        Request $request,
+        RequestInterface $request,
         BaseServer $server,
         array $message,
         BroadcastChannelTable $broadcastChannelTable

@@ -8,6 +8,7 @@ use Iterator;
 use RuntimeException;
 use TinyFramework\Helpers\Arr;
 use TinyFramework\Http\Request;
+use TinyFramework\Http\RequestInterface;
 use TinyFramework\Validation\Rule\RuleInterface;
 
 class Validator implements ValidatorInterface
@@ -29,7 +30,7 @@ class Validator implements ValidatorInterface
         return $this;
     }
 
-    public function validate(Iterator|Request|array $attributes, array $rules = []): array
+    public function validate(Iterator|RequestInterface|array $attributes, array $rules = []): array
     {
         if ($attributes instanceof Request) {
             $attributes = array_merge([], $attributes->get(), $attributes->post(), $attributes->file());

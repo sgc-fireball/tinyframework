@@ -19,7 +19,7 @@ class HttpKernel extends Kernel implements HttpKernelInterface
     /** @var Closure[] */
     private array $terminateRequestCallbacks = [];
 
-    private ?Request $request = null;
+    private ?RequestInterface $request = null;
 
     public function handle(RequestInterface $request): Response
     {

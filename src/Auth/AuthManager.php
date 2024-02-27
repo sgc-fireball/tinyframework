@@ -41,5 +41,4 @@ class AuthManager
     {
         return !$this->can($user, $permission, $meta);
     }
-
 }

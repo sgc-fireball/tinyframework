@@ -23,7 +23,9 @@ class MigrationInstaller
     ) {
         $this->output = $output;
         $this->database = $database;
-        $this->migrations = $migrations;
+        $this->migrations = array_filter($migrations, function ($class) {
+            return $class instanceof MigrationInterface;
+        });
         $this->loadAppMigration();
     }
 
@@ -38,15 +40,15 @@ class MigrationInstaller
         foreach ($files as $file) {
             require_once $file;
             $class = str_replace('.php', '', basename($file));
+            if (!($class instanceof MigrationInterface)) {
+                continue;
+            }
             $this->migrations[] = container()->call($class);
         }
     }
 
     protected function sortMigrations(): array
     {
-        $this->migrations = array_filter($this->migrations, function ($class) {
-            return $class instanceof MigrationInterface;
-        });
         usort($this->migrations, function ($migrationA, $migrationB) {
             $timeA = (int)explode('_', (new ReflectionClass($migrationA))->getShortName(), 3)[1];
             $timeB = (int)explode('_', (new ReflectionClass($migrationB))->getShortName(), 3)[1];

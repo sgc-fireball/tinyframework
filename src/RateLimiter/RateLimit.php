@@ -6,7 +6,6 @@ namespace TinyFramework\RateLimiter;
 
 class RateLimit implements RateLimitInterface
 {
-
     public function __construct(
         readonly private bool $isAccepted,
         readonly private int $remainingTokens,
@@ -40,5 +39,4 @@ class RateLimit implements RateLimitInterface
     {
         return max(0, $this->retryAt);
     }
-
 }
