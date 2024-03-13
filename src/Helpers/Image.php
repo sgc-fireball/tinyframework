@@ -40,6 +40,11 @@ class Image
         $this->path = null;
     }
 
+    public function getPath(): string|null
+    {
+        return $this->path;
+    }
+
     public static function createFromImage(string $imagePath, string|null $type = null): self
     {
         if ($type === null) {
@@ -207,7 +212,7 @@ class Image
         return $this->height;
     }
 
-    public function getExifData(): array
+    public function rawExif(): array
     {
         if (!$this->path || !is_file($this->path) || !is_readable($this->path)) {
             return [];
@@ -219,6 +224,37 @@ class Image
         return array_filter($exif, function (mixed $value): mixed {
             return $value === null;
         });
+    }
+
+    /**
+     * @link https://github.com/getkirby/kirby/blob/main/src/Image/Exif.php
+     */
+    public function exif(): array
+    {
+        $exif = $this->rawExif();
+
+        $camera = [
+            'make' => $exif['Make'] ?? null,
+            'model' => $exif['Model'] ?? null,
+        ];
+
+        $location = [
+            'GPSLatitude' => $exif['GPSLatitude'] ?? null,
+            'GPSLatitudeRef' => $exif['GPSLatitudeRef'] ?? null,
+            'GPSLongitude' => $exif['GPSLongitude'] ?? null,
+            'GPSLongitudeRef' => $exif['GPSLongitudeRef'] ?? null,
+        ];
+
+        return [
+            'camera' => $camera,
+            'location' => $location,
+            'timestamp' => array_key_exists('DateTimeOriginal', $exif) ? strtotime($exif['DateTimeOriginal']) : null,
+            'exposure' => $exif['ExposureTime'] ?? null,
+            'aperture' => $exif['COMPUTED']['ApertureFNumber'] ?? null,
+            'iso' => $exif['ISOSpeedRatings'] ?? null,
+            'focalLength' => $exif['FocalLength'] ?? $exif['FocalLengthIn35mmFilm'] ?? null,
+            'isColor' => $exif['COMPUTED']['IsColor'] ?? null,
+        ];
     }
 
     /**
