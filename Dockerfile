@@ -7,16 +7,18 @@ ARG _GID=1000
 RUN export DEBIAN_FRONTEND=${DEBIAN_FRONTEND}
 RUN apt-get -qy update && \
     apt-get -qy upgrade && \
-    apt-get -qy install software-properties-common ca-certificates curl gnupg unzip wget mysql-client-8.0 \
-    jpegoptim optipng pngquant gifsicle webp
+    apt-get -qy dist-upgrade && \
+    apt-get -qy install --no-install-recommends \
+      software-properties-common ca-certificates curl gnupg unzip wget mysql-client-8.0 \
+      jpegoptim optipng pngquant gifsicle webp ffmpeg
 
 RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
     echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list && \
-    apt-get update && apt-get -qy install nodejs && npm install -g svgo
+    apt-get update && apt-get -qy install --no-install-recommends nodejs && npm install -g svgo
 
 RUN add-apt-repository ppa:ondrej/php && \
     apt-get -qy update && \
-    apt-get -qy install --fix-missing \
+    apt-get -qy install --fix-missing --no-install-recommends \
     php-sodium \
     php8.2-cli php8.2-readline php8.2-mysql php8.2-mbstring php8.2-redis php8.2-amqp php8.2-xml php8.2-intl \
     php8.2-zip php8.2-xdebug php8.2-opcache php8.2-curl php8.2-gd php8.2-imagick php8.2-swoole php8.2-mcrypt \
