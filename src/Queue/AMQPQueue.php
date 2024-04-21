@@ -117,10 +117,8 @@ class AMQPQueue implements QueueInterface
         if (!(self::$connection instanceof AMQPConnection)) {
             self::$connection = new AMQPConnection($this->config);
             self::$connection->setConnectionName(implode(' ', [
-                'tinyframework/0.1', // @TODO implement a better version
-                'php/' . phpversion(),
-                'php-amqp/' . phpversion('amqp'),
-                '(' . gethostname() . '; PID:' . getmypid() . ')',
+                userAgent(),
+                'PHP-AMPQ/' . phpversion('amqp')
             ]));
         }
         if (!self::$connection->isConnected()) {

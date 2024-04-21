@@ -91,7 +91,7 @@ class URL implements \Stringable
     {
         if ($this->host) {
             $user = $this->user ? $this->user . '@' : '';
-            $port = $this->port ? ':' . $this->port : '';
+            $port = $this->port && $this->needPort() ? ':' . $this->port : '';
             return $user . $this->host . $port;
         }
         return null;
@@ -133,7 +133,7 @@ class URL implements \Stringable
         return $url;
     }
 
-    public function query(string|array $query = null): URL|string
+    public function query(string|array $query = null): URL|string|null
     {
         if ($query === null) {
             return $this->query;

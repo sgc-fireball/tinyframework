@@ -73,11 +73,33 @@ class Request implements RequestInterface
         return self::class;
     }
 
+    public static function factory(
+        string $method,
+        URL $url,
+        array $get = [],
+        array|string $post = [],
+        array $headers = []
+    ): Request {
+        $request = new self();
+        $request->realIp = $request->ip = $headers['REMOTE_ADDR'] ?? '127.0.0.1';
+        $request->method = strtoupper($method);
+        $request->url = new URL(preg_replace('/\?.*/', '', $url->__toString()));
+        $request->protocol = 'HTTP/1.0';
+        parse_str((string)$url->query(), $request->get);
+        $request->get = array_merge($request->get, $get);
+        $request->post = is_array($post) ? $post : [];
+        $request->cookie = [];
+        $request->header = array_map(function (array|string $value): array {
+            return is_array($value) ? array_values($value) : [$value];
+        }, array_values($headers));
+        $request->body = is_string($post) ? $post : null;
+        return self::compileTrustedProxies($request);
+    }
+
     public static function fromGlobal(): Request
     {
         $request = new self();
-        $request->ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
-        $request->realIp = $request->ip;
+        $request->realIp = $request->ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
         $request->method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
         $request->url = new URL(
             sprintf(
@@ -95,6 +117,7 @@ class Request implements RequestInterface
         if (\array_key_exists('HTTP_CONTENT_TYPE', $_SERVER)
             && (
                 str_contains($_SERVER['HTTP_CONTENT_TYPE'], 'application/json')
+                || str_contains($_SERVER['HTTP_CONTENT_TYPE'], 'application/problem+json')
                 || str_contains($_SERVER['HTTP_CONTENT_TYPE'], 'application/csp-report')
             )
         ) {
@@ -505,7 +528,12 @@ class Request implements RequestInterface
     public function expectJson(): bool
     {
         $accept = explode(',', (string)$this->header('accept'));
-        return count(array_filter($accept, fn ($line) => str_starts_with(trim((string)$line), 'application/json'))) >= 1;
+        $accept = array_filter(
+            $accept,
+            fn($line) => str_starts_with(trim((string)$line), 'application/json')
+                || str_starts_with(trim((string)$line), 'application/problem+json')
+        );
+        return count($accept) >= 1;
     }
 
     public function wantsJson(): bool

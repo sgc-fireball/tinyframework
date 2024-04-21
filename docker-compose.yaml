@@ -13,7 +13,8 @@ services:
     depends_on:
       - "mysql"
       - "redis"
-      - "mailhog"
+      - "minio"
+      - "mailpit"
       - "rabbitmq"
     ports:
       - "8000:8000" # http
@@ -31,12 +32,20 @@ services:
       - "MYSQL_USERNAME=tinyframework"
       - "MYSQL_PASSWORD=tinyframework"
       - "MYSQL_DATABASE=tinyframework"
-      - "SMTP_HOST=mailhog"
+      - "SMTP_HOST=mailpit"
       - "SMTP_PORT=1025"
       - "SMTP_ENCRYPTION="
       - "AMQP_HOST=rabbitmq"
       - "SWOOLE_HOST=0.0.0.0"
       - "SWOOLE_PORT=8000"
+      - "AWS_ACCESS_KEY_ID=tinyframework-minio"
+      - "AWS_SECRET_ACCESS_KEY=tinyframework-minio"
+      - "AWS_DOMAIN=http://minio:9000"
+      - "AWS_PUBLIC_DOMAIN=http://127.0.0.1:9000"
+      - "AWS_REGION=local"
+      - "AWS_BUCKET_PUBLIC=tinyframework-public"
+      - "AWS_BUCKET_PRIVATE=tinyframework-private"
+      - "FTP_BUCKET=tinyframework-ftp"
     volumes:
       - "./:/app"
       - "./storage/:/app/src/Files/storage"
@@ -53,7 +62,7 @@ services:
     ports:
       - "3306:3306" # mysql
     healthcheck:
-      test: [ "CMD", "mysqlcheck", "-h", "localhost", "-P", "3306", "-u", "shopware", "-pshopware", "shopware" ]
+      test: [ "CMD", "mysqlcheck", "-h", "localhost", "-P", "3306", "-u", "tinyframework", "-ptinyframework", "tinyframework" ]
       interval: "30s"
       timeout: "5s"
       retries: 60
@@ -62,8 +71,8 @@ services:
     networks:
       - "tinyframework"
 
-  mailhog:
-    image: "mailhog/mailhog:latest"
+  mailpit:
+    image: "axllent/mailpit:latest"
     ports:
       - "1025:1025" # smtp
       - "8025:8025" # http
@@ -100,32 +109,49 @@ services:
     networks:
       - "tinyframework"
 
-#  postgres:
-#    image: postgres:11
-#    environment:
-#      - POSTGRES_USER=sonar
-#      - POSTGRES_PASSWORD=sonar
-#      - POSTGRES_DB=sonar
-#      - PGDATA=/var/lib/postgresql/data/pgdata
-#    volumes:
-#      - data-postgres:/var/lib/postgresql/data
-#    ports:
-#      - "5432:5432" # postgres
+  minio:
+    image: "quay.io/minio/minio:latest"
+    command:
+      - "server"
+      - "/data"
+      - "--console-address=:9090"
+      - "--ftp=address=:21"
+      - "--ftp=passive-port-range=30000-30100"
+    ports:
+      - "21:21"
+      - "30000-30100:30000-30100"
+      - "9000:9000"
+      - "9090:9090"
+    environment:
+      - "MINIO_SERVER_HOST=tinyframework"
+      - "MINIO_ROOT_USER=miniouser"
+      - "MINIO_ROOT_PASSWORD=miniopass"
+    volumes:
+      - "data-minio:/data/:rw"
+    networks:
+      - "tinyframework"
 
-#  sonarqube:
-#    image: sonarqube:9-community
-#    ports:
-#      - 9000:9000 # https
-#    environment:
-#      - "JAVA_OPTIONS=-XX:+UseCompressedOops -XX:StringTableSize=1000003 -Xss16m -Xms2g -Xmx2g -Duser.language=de -Duser.country=DE"
-#      - SONAR_JDBC_URL=sonar
-#      - SONAR_JDBC_URL=sonar
-#      - SONAR_JDBC_URL=jdbc:postgresql://postgres/sonar
-#    volumes:
-#      - data-sonarqube-data:/opt/sonarqube/data
-#    networks:
-#      - tinyframework
-#    stop_grace_period: 300s
+  ready_minio:
+    image: "quay.io/minio/mc:latest"
+    environment:
+      - "MINIO_SERVER_HOST=tinyframework"
+      - "MINIO_ROOT_USER=miniouser"
+      - "MINIO_ROOT_PASSWORD=miniopass"
+      - "AWS_ACCESS_KEY_ID=tinyframework-minio"
+      - "AWS_SECRET_ACCESS_KEY=tinyframework-minio"
+      - "AWS_DOMAIN=http://minio:9000"
+      - "AWS_PUBLIC_DOMAIN=http://127.0.0.1:9000"
+      - "AWS_REGION=local"
+      - "AWS_BUCKET_PUBLIC=tinyframework-public"
+      - "AWS_BUCKET_PRIVATE=tinyframework-private"
+      - "FTP_BUCKET=tinyframework-ftp"
+    volumes:
+      - ".docker/minio/ready_entrypoint.sh:/ready_entrypoint.sh:ro"
+    entrypoint: "/ready_entrypoint.sh"
+    depends_on:
+      - "minio"
+    networks:
+      - "tinyframework"
 
 volumes:
   data-mysql:
@@ -134,9 +160,7 @@ volumes:
     driver: "local"
   data-rabbitmq:
     driver: "local"
-  data-sonarqube-data:
-    driver: "local"
-  data-postgres:
+  data-minio:
     driver: "local"
 
 networks:

@@ -24,7 +24,7 @@ class DownloadResponse extends Response
     {
         $this->content('');
         $request = container('request');
-        assert($request instanceof Request);
+        assert($request instanceof RequestInterface);
 
         $start = 0;
         $end = $this->fileSize - 1;
@@ -53,6 +53,8 @@ class DownloadResponse extends Response
                     ->header('Content-Range', sprintf('*/%d', $this->fileSize));
                 return parent::send();
             }
+
+            // @TODO limit range request 1024 kB to prevent DOS attacks
 
             $this->code(206);
             $this->header('Content-Length', (string)($end - $start));

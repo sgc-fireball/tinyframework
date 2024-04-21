@@ -1,5 +1,6 @@
 {
   "name": "sgc-fireball/tinyframework",
+  "version": "0.1.0",
   "description": "The TinyFramework PHP framework",
   "keywords": [
     "framework"
@@ -58,10 +59,13 @@
     "symplify/easy-coding-standard": "^11.5"
   },
   "suggest": {
+    "ext-ftp": "To use FTP protocol helper.",
+    "ext-http": "To use HTTP protocol helper.",
+    "ext-imap": "To use IMAP protocol helper.",
     "ext-redis": "To use Redis for Caching, Queues instanceof database or file systems.",
     "ext-amqp": "To use AMQP (RabbitMQ) Queues instanceof Sync or Redis Queues.",
     "ext-swoole": "To use swoole http server to speed up your application.",
-    "ext-sodium": "To use curve encryption, for example jwt.",
+    "ext-sodium": "To use curve encryption, for example jwt(EdDSA).",
     "ext-apcu": "To store UUID Node id, otherwise we are using filesystem fallback.",
     "ext-phar": "To build the hole application as a phar, if desired.",
     "ext-gd": "To use image helper wrapper."
@@ -78,39 +82,31 @@
       "TinyFramework\\Composer\\Hook::postUpdateCommand"
     ],
     "ecs": [
-      "@php vendor/bin/parallel-lint --no-colors --no-progress --show-deprecated src/ tests/ #",
-      "@php vendor/bin/ecs --fix"
+      "@php -d xdebug.mode=off vendor/bin/parallel-lint --no-colors --no-progress --show-deprecated src/ tests/ #",
+      "@php -d xdebug.mode=off vendor/bin/ecs --fix"
     ],
     "analyse": [
-      "@php $(which composer) dump-autoload #",
-      "@php vendor/bin/parallel-lint --no-colors --no-progress --show-deprecated src/ tests/ #",
-      "@php vendor/bin/phpstan analyse --xdebug"
+      "@php -d xdebug.mode=off $(which composer) dump-autoload #",
+      "@php -d xdebug.mode=off vendor/bin/parallel-lint --no-colors --no-progress --show-deprecated src/ tests/ #",
+      "@php -d xdebug.mode=off vendor/bin/phpstan analyse"
     ],
     "serve": [
-      "@php -d variables_order=EGPCS -S 0.0.0.0:8000 -t src/Files/"
+      "@php -d xdebug.mode=off -d variables_order=EGPCS -S 0.0.0.0:8000 -t src/Files/"
     ],
     "test": [
-      "@php $(which composer) dump-autoload #",
-      "@php vendor/bin/parallel-lint --no-colors --no-progress --show-deprecated src/ tests/ #",
+      "@php -d xdebug.mode=off $(which composer) dump-autoload #",
+      "@php -d xdebug.mode=off vendor/bin/parallel-lint --no-colors --no-progress --show-deprecated src/ tests/ #",
       "@php -d xdebug.mode=coverage vendor/bin/phpunit"
     ],
     "sbom": [
       "mkdir -p .reports # ",
-      "@php $(which composer) CycloneDX:make-sbom --output-format=xml --output-file=.reports/sbom.xml --omit=dev"
-    ],
-    "sonar-scanner": [
-      "mkdir -p .reports # ",
-      "@php $(which composer) dump-autoload #",
-      "@php -d xdebug.mode=coverage vendor/bin/phpunit || true #",
-      "@php vendor/bin/phpstan --error-format=json analyse 2>/dev/null >.reports/phpstan.json || true #",
-      "/opt/sonar-scanner/bin/sonar-scanner"
+      "@php -d xdebug.mode=off $(which composer) CycloneDX:make-sbom --output-format=xml --output-file=.reports/sbom.xml --omit=dev"
     ]
   },
   "scripts-descriptions": {
     "analyse": "Dump autoload and analyse the source with phpstan!",
     "test": "Starts the framework unit tests.",
     "ecs": "Running easy coding standard.",
-    "sonar-scanner": "Running sonar-qube scanner.",
     "serve": "Starting php internal webserver.",
     "sbom": "Create a software bill of material report."
   },

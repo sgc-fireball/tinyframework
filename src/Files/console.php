@@ -39,7 +39,7 @@ define('TINYFRAMEWORK_START_AUTOLOAD', microtime(true));
 $container = Container::instance();
 if (in_array('--swoole', $_SERVER['argv'])) {
     if (!SWOOLE) {
-        echo "Please install 'php" . phpversion('tidy') . "-swoole' first.\n";
+        echo "Please install php swoole first.\n";
         exit(2);
     }
     // Request::setTrustedProxies(['127.0.0.1', '::1']);

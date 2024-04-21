@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace TinyFramework\Template;
 
 use Closure;
-use InvalidArgumentException;
-use RuntimeException;
 use TinyFramework\Cache\CacheInterface;
+use TinyFramework\Exception\TemplateException;
 use TinyFramework\StopWatch\StopWatch;
 
 class Blade implements ViewInterface
@@ -70,7 +69,7 @@ class Blade implements ViewInterface
     public function addNamespaceDirectory(string $namespace, string $dir): static
     {
         if (!is_dir($dir) || !is_readable($dir)) {
-            throw new RuntimeException('Folder does not exists or is not readable: ' . $dir);
+            throw new TemplateException('Folder does not exists or is not readable: ' . $dir);
         }
         $this->vendorDirectories[$namespace] = $dir;
         return $this;
@@ -164,7 +163,7 @@ class Blade implements ViewInterface
 
         $file = $this->view2file($view);
         if (!$file) {
-            throw new InvalidArgumentException('View does not exists or unreadable: ' . $view);
+            throw new TemplateException('View does not exists or unreadable: ' . $view);
         }
         $content = trim($this->compileString((string)file_get_contents($file)));
         if ($this->config['cache']) {
@@ -218,7 +217,7 @@ class Blade implements ViewInterface
         } elseif (method_exists($this, $method = 'compile' . ucfirst($match[1]))) {
             return $this->$method($match[3] ?? '');
         }
-        throw new RuntimeException('Unknown blade command: ' . $match[1]);
+        throw new TemplateException('Unknown blade command: ' . $match[1]);
     }
 
     public function addPreCompiler(Closure $compiler): static
@@ -532,7 +531,7 @@ class Blade implements ViewInterface
     public function stopSection(bool $overwrite = false): string
     {
         if (empty($this->sectionStack)) {
-            throw new RuntimeException('Cannot end a section without first starting one.');
+            throw new TemplateException('Cannot end a section without first starting one.');
         }
         $section = array_pop($this->sectionStack);
         if ($overwrite) {
@@ -546,7 +545,7 @@ class Blade implements ViewInterface
     public function prependSection(): string
     {
         if (empty($this->sectionStack)) {
-            throw new RuntimeException('Cannot end a section without first starting one.');
+            throw new TemplateException('Cannot end a section without first starting one.');
         }
         $section = array_pop($this->sectionStack);
         $id = $this->getPlaceholder('section', $section);
@@ -561,7 +560,7 @@ class Blade implements ViewInterface
     public function appendSection(): string
     {
         if (empty($this->sectionStack)) {
-            throw new RuntimeException('Cannot end a section without first starting one.');
+            throw new TemplateException('Cannot end a section without first starting one.');
         }
         $section = array_pop($this->sectionStack);
         $id = $this->getPlaceholder('section', $section);

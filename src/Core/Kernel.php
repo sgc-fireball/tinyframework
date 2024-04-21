@@ -14,6 +14,7 @@ use TinyFramework\ServiceProvider\ConsoleServiceProvider;
 use TinyFramework\ServiceProvider\CryptServiceProvider;
 use TinyFramework\ServiceProvider\DatabaseServiceProvider;
 use TinyFramework\ServiceProvider\EventServiceProvider;
+use TinyFramework\ServiceProvider\FileSystemServiceProvider;
 use TinyFramework\ServiceProvider\HashServiceProvider;
 use TinyFramework\ServiceProvider\LocalizationServiceProvider;
 use TinyFramework\ServiceProvider\LoggerServiceProvider;
@@ -104,6 +105,7 @@ abstract class Kernel implements KernelInterface
         $this->serviceProviderNames = [
             EventServiceProvider::class,
             ConfigServiceProvider::class,
+            FileSystemServiceProvider::class,
             CryptServiceProvider::class,
             HashServiceProvider::class,
             LoggerServiceProvider::class,

@@ -21,6 +21,7 @@ use TinyFramework\Helpers\Str;
 use TinyFramework\Helpers\Uuid;
 use TinyFramework\Http\Response;
 use TinyFramework\Http\Router;
+use TinyFramework\Helpers\DateTime;
 use TinyFramework\Localization\TranslatorInterface;
 use TinyFramework\Logger\LoggerInterface;
 use TinyFramework\Mail\MailerInterface;
@@ -691,7 +692,7 @@ if (!function_exists('node')) {
         if (\function_exists('apcu_fetch')) {
             $node = apcu_fetch($key);
         }
-        $node = substr(sha1(gethostname()), 0, 12, );
+        $node = substr(sha1(gethostname()), 0, 12,);
         if (\function_exists('apcu_store')) {
             apcu_store($key, $node);
         }
@@ -727,5 +728,43 @@ if (!function_exists('now')) {
     function now(): DateTime
     {
         return new DateTime('now', new DateTimeZone(config('app.timezone') ?: 'UTC'));
+    }
+}
+
+if (!function_exists('secret')) {
+    function secret(): string
+    {
+        return base64_decode(config('app.secret'));
+    }
+}
+
+if (!function_exists('userAgent')) {
+    function userAgent(): string
+    {
+        static $cache;
+        if (!isset($cache)) {
+            $versions = [];
+            if (defined('ROOT') && file_exists(ROOT . '/composer.json')) {
+                $composer = json_decode(file_get_contents(ROOT . '/composer.json'), true);
+                $version = sprintf(
+                    '%s/%s',
+                    preg_replace('/[^a-zA-Z0-9_-]/', '-', $composer['name']),
+                    $composer['version'] ?? '0.1.0',
+                );
+                if (strpos($version, 'tinyframework') === false) {
+                    $versions[] = $version;
+                }
+            }
+            $tinyFrameworkVersion = '0.0';
+            $tinyFrameworkPath = dirname(dirname(dirname((__FILE__)))) . '/composer.json';
+            if (file_exists($tinyFrameworkPath)) {
+                $tinyFrameworkVersion = json_decode(file_get_contents($tinyFrameworkPath), true)['version'];
+            }
+            $versions[] = 'TinyFramework/' . $tinyFrameworkVersion;
+            $versions[] = '(' . gethostname() . '; PID:' . getmypid() . ')';
+            $versions[] = 'PHP/' . phpversion();
+            $cache = implode(' ', $versions);
+        }
+        return $cache;
     }
 }

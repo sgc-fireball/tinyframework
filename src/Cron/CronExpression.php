@@ -41,7 +41,7 @@ class CronExpression
 
     public function isDue(DateTime|\DateTimeImmutable $time = null): bool
     {
-        $time ??= new DateTime();
+        $time ??= now();
         if (!$this->month->inExpression(\intval($time->format('m')))) {
             return false;
         }
@@ -62,7 +62,7 @@ class CronExpression
 
     public function getNextRunDate(DateTime|\DateTimeImmutable $next = null): DateTime
     {
-        $next ??= new DateTime();
+        $next ??= now();
         if ($next instanceof \DateTimeImmutable) {
             $next = new DateTime($next->format('Y-m-d H:i:00'), $next->getTimezone());
         }
@@ -95,7 +95,7 @@ class CronExpression
 
     public function getPreviousRunDate(DateTime|\DateTimeImmutable $previous = null): DateTime
     {
-        $previous ??= new DateTime();
+        $previous ??= now();
         if ($previous instanceof \DateTimeImmutable) {
             $previous = new DateTime($previous->format('Y-m-d H:i:00'), $previous->getTimezone());
         }

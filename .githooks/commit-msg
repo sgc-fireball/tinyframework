@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# @link https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716
+# @link https://git-scm.com/docs/githooks
+
+die() {
+    echo "ERROR: $2"
+    exit ${1:-1}
+}
+
+cd $(dirname $(dirname $0))
+
+COMMIT_FILEPATH="${1:-}"
+[ -z "${COMMIT_FILEPATH}" ] && die 1 "Missing file name."
+[ -f "${COMMIT_FILEPATH}" ] || die 2 "File not found."
+COMMIT_MESSAGE=$(cat ${COMMIT_FILEPATH})
+
+REGEX_TYPE="(chore|build|perf|feat|fix|refactor|style|test|ci)"
+REGEX_SCOPE="(\([^\)]+\)){0,1}"
+REGEX_MESSAGE=".+"
+REGEX="^${REGEX_TYPE}${REGEX_SCOPE}:\s${REGEX_MESSAGE}"
+(echo "${COMMIT_MESSAGE}" | grep -Eq ${REGEX}) && exit 0
+
+echo "Invalid git message format!" >/dev/stderr
+echo >/dev/stderr
+echo "Valid: <type>(<scope>): <message>" >/dev/stderr
+echo "Valid: <type>: <message>" >/dev/stderr
+echo >/dev/stderr
+echo "TYPE:" >/dev/stderr
+echo "- fix:         bug fix, no new feature" >/dev/stderr
+echo "- feat:        new feature for the end user" >/dev/stderr
+echo "- perf:        hot fix changes in production" >/dev/stderr
+echo "- refactor:    refactoring production code, eg. renaming a variable" >/dev/stderr
+echo "- docs:        no production code change; changes to the documentation" >/dev/stderr
+echo "- style:       no production code change; formatting, missing semi colons, etc" >/dev/stderr
+echo "- test:        no production code change; adding missing tests, refactoring tests" >/dev/stderr
+echo "- build/chore: no production code change; updating grunt tasks etc" >/dev/stderr
+echo "- ci:          no production code change; changes to the deployment" >/dev/stderr
+echo >/dev/stderr
+echo "SCOPE:" >/dev/stderr
+echo "- Must be a JIRA ticket reference: PROJECT-000." >/dev/stderr
+echo >/dev/stderr
+echo "Help:" >/dev/stderr
+echo "- https://nitayneeman.com/posts/understanding-semantic-commit-messages-using-git-and-angular/" >/dev/stderr
+
+# notify-send -u critical -t 100 -a "Git Hooks" -i ~/Workspace/remember-shopware/public/favicon.ico -c "Git Hooks" "TEST1" "TEST2"
+
+exit 1

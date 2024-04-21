@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+#set -euo pipefail
+
+# @link https://www.atlassian.com/git/tutorials/git-hooks
+# @link https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716
+# @link https://git-scm.com/docs/githooks
+
+cd $(dirname $(dirname $0))
+
+COMMIT_FILEPATH=${1:-} # /path/to/file
+COMMIT_TYPE=${2:-}     # commit, merge
+COMMIT_HASH=${3:-}     # commit hash
+
+[ -z "${COMMIT_FILEPATH}" ] && die 1 "Missing file path."
+[ -w "${COMMIT_FILEPATH}" ] || die 2 "File not found or is not writeable."
+
+COMMIT_MESSAGE=$(cat ${COMMIT_FILEPATH})
+COMMIT_BRANCH=$(git symbolic-ref --short HEAD)
+
+echo "${COMMIT_BRANCH}" | grep -Eq "^(feature|bugfix|hotfix|release)"
+if [ ${?} -ne 0 ]; then
+    exit 0
+fi
+
+SEM_SCOPE=""
+SEM_TYPE="feat"
+if [ $(git status | egrep "(\.devop|\.git)" | wc -l) -gt 0 ]; then
+    SEM_TYPE="ci"
+fi
+if [ $(git status | egrep -i "docker" | wc -l) -gt 0 ]; then
+    SEM_TYPE="build"
+fi
+
+echo "${COMMIT_BRANCH}" | grep -Eq "^(release\/|main)"
+if [ ${?} -eq 0 ]; then
+    SEM_TYPE="perf"
+    SEM_DESCRIPTION=""
+else
+    SEM_SCOPE=$(echo "${COMMIT_BRANCH}" | sed -re 's|([a-z]+)/([A-Z]+-[0-9]+)\-(.*)$|\2|g')
+    SEM_DESCRIPTION=$(echo "${COMMIT_BRANCH}" | sed -re 's|([a-z]+)/([A-Z]+-[0-9]+)\-(.*)$|\3|g' -e 's|[-_]| |g')
+    TICKET_TYPE=$(echo "${COMMIT_BRANCH}" | sed -re 's|([a-z]+)/([A-Z]+-[0-9]+)\-(.*)$|\1|g')
+    if [ "${TICKET_TYPE}" == "bugfix" ] || [ "${TICKET_TYPE}" == "bugfix" ]; then
+        SEM_TYPE="fix"
+    fi
+fi
+
+if [ "${SEM_SCOPE}" != "" ]; then
+    SEM_SCOPE="(${SEM_SCOPE})"
+fi
+echo -en "${SEM_TYPE}${SEM_SCOPE}: ${SEM_DESCRIPTION}\n${COMMIT_MESSAGE}" >"${COMMIT_FILEPATH}"
+
+exit 0

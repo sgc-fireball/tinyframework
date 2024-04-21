@@ -119,6 +119,19 @@ class Response
         return self::new(json_encode($json), $code)->type('application/json; charset=utf-8');
     }
 
+    /**
+     * @link https://datatracker.ietf.org/doc/html/rfc7807
+     */
+    public static function problem(array $json = [], int $code = 400): Response
+    {
+        $json['type'] ??= array_key_exists($code, static::$codes)
+            ? 'https://datatracker.ietf.org/doc/html/rfc7231#section-6'
+            : '';
+        $json['status'] ??= $code;
+        $json['title'] ??= static::$codes[$code] ?? '';
+        return self::json($json, $code)->type('application/problem+json; charset=utf-8');
+    }
+
     public static function error(int $code = 400, array $headers = []): Response
     {
         $content = $code . ' ERROR';

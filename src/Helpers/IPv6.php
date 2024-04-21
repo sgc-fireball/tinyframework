@@ -40,12 +40,7 @@ class IPv6
     public function getLong(): string
     {
         if (!function_exists('gmp_init') || !function_exists('gmp_strval')) {
-            throw new RuntimeException(
-                sprintf(
-                    'please install php%d-gmp',
-                    (int)phpversion()
-                )
-            );
+            throw new RuntimeException('Please install php gmp first.');
         }
         return gmp_strval(gmp_init(str_replace(':', '', self::uncompress($this->ipAddr)), 16), 10);
     }
@@ -53,12 +48,7 @@ class IPv6
     public function setLong(int|string $long): static
     {
         if (!function_exists('gmp_init') || !function_exists('gmp_strval')) {
-            throw new RuntimeException(
-                sprintf(
-                    'please install php%d-gmp',
-                    (int)phpversion()
-                )
-            );
+            throw new RuntimeException('Please install php gmp first.');
         }
         $ipAddr = str_pad(
             gmp_strval(gmp_init($long, 10), 16),

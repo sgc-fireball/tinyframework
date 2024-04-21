@@ -144,7 +144,7 @@ class BaseModel implements JsonSerializable, ArrayAccess
                 $value = DateTime::createFromFormat('u', $value);
             } elseif (is_string($value) && $value) {
                 if ($time = strtotime($value)) {
-                    $value = (new Datetime())->setTimestamp($time);
+                    $value = now()->setTimestamp($time);
                 }
             }
             $value = $value instanceof DateTime ? $value : null;
@@ -217,7 +217,7 @@ class BaseModel implements JsonSerializable, ArrayAccess
                     $value = DateTime::createFromFormat('u', $value);
                 } elseif (is_string($value) && $value) {
                     if ($time = strtotime($value)) {
-                        $value = (new Datetime())->setTimestamp($time);
+                        $value = now()->setTimestamp($time);
                     }
                 }
                 if (!($value instanceof DateTime)) {

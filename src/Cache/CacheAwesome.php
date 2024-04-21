@@ -65,7 +65,7 @@ abstract class CacheAwesome implements CacheInterface, ArrayAccess
             return null;
         }
         if ($ttl instanceof \DateInterval) {
-            $ttl = (new \DateTime('now'))->add($ttl);
+            $ttl = now()->add($ttl);
         }
         if ($ttl instanceof \DateTimeInterface) {
             return (int)$ttl->format('U');
