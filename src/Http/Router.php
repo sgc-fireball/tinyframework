@@ -307,12 +307,13 @@ class Router
         // Static file resolver
         $file = $request->url()->path();
         $path = sprintf('%s/%s', rtrim(public_dir(), '/'), ltrim($file, '/'));
-        $path = realpath($path);
-        if (str_starts_with($path, public_dir())) {
-            if (file_exists($path)) {
-                return (new Route())->method('GET')->url($file)->action(function () use ($path): DownloadResponse {
-                    return new DownloadResponse($path);
-                });
+        if ($path = realpath($path)) {
+            if (str_starts_with($path, public_dir()) && is_file($path)) {
+                if (file_exists($path)) {
+                    return (new Route())->method('GET')->url($file)->action(function () use ($path): DownloadResponse {
+                        return new DownloadResponse($path);
+                    });
+                }
             }
         }
         return null;
