@@ -18,8 +18,6 @@ class Video
 
     private static bool $checked = false;
 
-    private array $cleanUp = [];
-
     public static function createFromFile(string $path): static
     {
         return new self($path);
@@ -128,7 +126,7 @@ class Video
         };
 
         $width = ceil($this->width() / $this->height() * $resolutions);
-        $width -= $width%2;
+        $width -= $width % 2;
 
         $command = [];
         $command[] = sprintf('ffmpeg -y -i %s', escapeshellarg($this->path));
@@ -155,15 +153,6 @@ class Video
             throw new RuntimeException('Could not read fps from ' . $this->path);
         }
         return $this;
-    }
-
-    public function __destruct()
-    {
-        foreach ($this->cleanUp as $file) {
-            if (file_exists($file)) {
-                @unlink($file);
-            }
-        }
     }
 
 }
