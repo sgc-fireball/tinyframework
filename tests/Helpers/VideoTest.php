@@ -61,4 +61,43 @@ class VideoTest extends TestCase
         $this->assertEquals(1280, $image->getWidth());
         $this->assertEquals(720, $image->getHeight());
     }
+
+    public function resolutionProvider(): array
+    {
+        return [
+            [Video::RESOLUTION_240P],
+            [Video::RESOLUTION_360P],
+            [Video::RESOLUTION_480P],
+            [Video::RESOLUTION_720P],
+            [Video::RESOLUTION_1080P],
+            [Video::RESOLUTION_1440P],
+        ];
+    }
+
+    /**
+     * @dataProvider resolutionProvider
+     */
+    public function testResolution(int $resolution)
+    {
+        if (!command_exists('ffmpeg')) {
+            $this->markTestSkipped('Missing ffmpeg.');
+        }
+        if (!command_exists('ffprobe')) {
+            $this->markTestSkipped('Missing ffprobe.');
+        }
+
+        $path = 'tests/assets/video.mp4';
+        $this->assertTrue(is_file($path));
+        $this->assertTrue(is_readable($path));
+
+        $target = sprintf('tests/assets/video_%d.mp4', $resolution);
+        if (file_exists($target)) {
+            unlink($target);
+        }
+
+        $this->assertFalse(is_file($target));
+        $this->assertInstanceOf(Video::class, Video::createFromFile($path)->resolution($resolution, $target));
+        $this->assertTrue(is_file($target));
+        $this->assertTrue(is_readable($target));
+    }
 }

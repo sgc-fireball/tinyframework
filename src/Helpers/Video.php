@@ -9,6 +9,13 @@ use RuntimeException;
 class Video
 {
 
+    public const RESOLUTION_240P = 240;
+    public const RESOLUTION_360P = 360;
+    public const RESOLUTION_480P = 480;
+    public const RESOLUTION_720P = 720;
+    public const RESOLUTION_1080P = 1080;
+    public const RESOLUTION_1440P = 1440;
+
     private static bool $checked = false;
 
     private array $cleanUp = [];
@@ -104,6 +111,50 @@ class Video
         }
         [$val1, $val2] = explode('/', implode('', $output));
         return (int)round((intval($val1, 10) / intval($val2, 10)), 0);
+    }
+
+    /**
+     * @link https://support.google.com/youtube/answer/2853702?hl=de
+     */
+    public function resolution(int $resolutions, $target): self
+    {
+        [$videoBitrate, $audioChannels, $audioSample, $audioBitrate] = match ($resolutions) {
+            self::RESOLUTION_240P => ['500k', 1, 48, '128k'], // mono 48khz
+            self::RESOLUTION_360P => ['1000k', 1, 48, '128k'], // mono 48khz
+            self::RESOLUTION_480P => ['2500k', 1, 48, '128k'], // mono 48khz
+            self::RESOLUTION_720P => ['5000k', 2, 96, '384k'], // stereo 96khz
+            self::RESOLUTION_1080P => ['8000k', 2, 96, '384k'], // stereo 96khz
+            self::RESOLUTION_1440P => ['16000k', 2, 96, '384k'], // stereo 96khz
+        };
+
+        $width = ceil($this->width() / $this->height() * $resolutions);
+        $width -= $width%2;
+
+        $command = [];
+        $command[] = sprintf('ffmpeg -y -i %s', escapeshellarg($this->path));
+        $command[] = '-v quiet'; // suppress output
+        // audio settings
+        $command[] = '-c:a aac'; // codec
+        $command[] = sprintf('-ac %d', $audioChannels); // audio channels
+        $command[] = sprintf('-ar %d', $audioSample * 1000); // sampling rate (in Hz)
+        $command[] = sprintf('-b:a %s', $audioBitrate); // bitrate
+        // video settings
+        $command[] = '-c:v libx264'; // codec
+        $command[] = sprintf('-b:v %s', $videoBitrate); // bitrate
+        $command[] = '-f flv'; // format
+        $command[] = '-g 25'; // group size of pictures
+        $command[] = '-r 25'; // fps
+        $command[] = sprintf('-s %dx%d', $width, $resolutions); // resolution
+        $command[] = '-preset ultrafast'; // converter profile
+        // output file
+        $command[] = escapeshellarg($target);
+        $command = implode(' ', $command);
+
+        exec($command, $output, $exitCode);
+        if ($exitCode !== 0) {
+            throw new RuntimeException('Could not read fps from ' . $this->path);
+        }
+        return $this;
     }
 
     public function __destruct()
