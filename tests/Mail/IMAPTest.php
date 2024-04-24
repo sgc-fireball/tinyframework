@@ -98,6 +98,25 @@ class IMAPTest extends FeatureTestCase
         $messages = $this->imap->getMessages();
         $this->assertIsArray($messages);
         $this->assertGreaterThanOrEqual(0, count($messages));
+
+        for ($i = 0; $i <= min(count($messages), 10); $i++) {
+            $message = $this->imap->getMessageOverviewByUID($messages[$i]);
+            $this->assertIsArray($message);
+            $this->assertArrayHasKey('subject', $message);
+            $this->assertArrayHasKey('from', $message);
+            $this->assertArrayHasKey('to', $message);
+            $this->assertArrayHasKey('date', $message);
+            $this->assertArrayHasKey('message_id', $message);
+            $this->assertArrayHasKey('size', $message);
+            $this->assertArrayHasKey('uid', $message);
+            $this->assertArrayHasKey('msgno', $message);
+            $this->assertArrayHasKey('recent', $message);
+            $this->assertArrayHasKey('flagged', $message);
+            $this->assertArrayHasKey('answered', $message);
+            $this->assertArrayHasKey('deleted', $message);
+            $this->assertArrayHasKey('seen', $message);
+            $this->assertArrayHasKey('draft', $message);
+        }
     }
 
     public function testCreateAndDeleteFolder(): void

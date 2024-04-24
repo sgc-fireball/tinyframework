@@ -270,7 +270,7 @@ class IMAP
         return $this->getMessageBodyByUID($this->getUIDByMsgNo($messageNumber));
     }
 
-    public function getMessageStructureByUID(int $uid)
+    public function getMessageStructureByUID(int $uid): \stdClass|false
     {
         $result = @imap_fetchstructure($this->connection, $uid, FT_UID);
         if ($result === false) {
@@ -279,7 +279,7 @@ class IMAP
         return $result;
     }
 
-    public function getMessageStructureByMsgNo(int $messageNumber): array
+    public function getMessageStructureByMsgNo(int $messageNumber): \stdClass|false
     {
         return $this->getMessageStructureByUID($this->getUIDByMsgNo($messageNumber));
     }
@@ -344,7 +344,7 @@ class IMAP
     public function mail(string $to, string $subject = '', string $body = '', string $header = null): self
     {
         $header = trim($header);
-        $header .= "\r\nX-HRDNS-Agent: HRDNS-IMAP-v.0.1.0";
+        $header .= "\r\nX-HRDNS-Agent: ".userAgent();
         $header .= "\r\nX-HRDNS-User: " . $this->config['username'];
         $header .= "\r\nX-HRDNS-Server: " . $this->config['host'];
         if (strpos($header, 'Content-Type:') === false) {
@@ -437,7 +437,7 @@ class IMAP
             throw new RuntimeException(@imap_last_error());
         }
         foreach ($result as $intKey => $folder) {
-            $result[$intKey] = preg_replace('/^\{.*\}(.*)$/', '\\1', $folder);
+            $result[$intKey] = preg_replace('/^\{.*}(.*)$/', '\\1', $folder);
         }
         return $result;
     }
@@ -466,7 +466,7 @@ class IMAP
                 unset($words[$index]);
                 continue;
             }
-            preg_match('/=\?(.*)\?([a-zA-Z0-9])\?(.*)\?=/Ue', $word, $chars);
+            preg_match('/=\?(.*)\?([a-zA-Z0-9])\?(.*)\?=/U', $word, $chars);
             if (count($chars) == 0) {
                 $words[$index] = trim($words[$index]) . ' ';
                 continue;
