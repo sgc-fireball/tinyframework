@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -uo pipefail
+set +o histexpand
 
 # @link https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716
 # @link https://git-scm.com/docs/githooks
@@ -10,23 +11,27 @@ die() {
     exit ${1:-1}
 }
 
-cd $(dirname $(dirname $0))
+cd $(dirname $(dirname $(dirname $0)))
 
 COMMIT_FILEPATH="${1:-}"
 [ -z "${COMMIT_FILEPATH}" ] && die 1 "Missing file name."
-[ -f "${COMMIT_FILEPATH}" ] || die 2 "File not found."
+[ -f "${COMMIT_FILEPATH}" ] || die 2 "File not found: ${COMMIT_FILEPATH}"
 COMMIT_MESSAGE=$(cat ${COMMIT_FILEPATH})
 
 REGEX_TYPE="(chore|build|perf|feat|fix|refactor|style|test|ci)"
-REGEX_SCOPE="(\([^\)]+\)){0,1}"
-REGEX_MESSAGE=".+"
-REGEX="^${REGEX_TYPE}${REGEX_SCOPE}:\s${REGEX_MESSAGE}"
+REGEX_SCOPE="(\(([^\)]+)\)){0,1}"
+REGEX_TICKET="(NO-TICKET|[A-Z]+-[\d]+){1}"
+REGEX_MESSAGE="(\n\n(.+)){0,1}"
+REGEX_FOOTER="(\n\n(.+)){0,1}"
+REGEX="^${REGEX_TYPE}${REGEX_SCOPE}(!?):\s${REGEX_TICKET}${REGEX_MESSAGE}${REGEX_FOOTER}$"
 (echo "${COMMIT_MESSAGE}" | grep -Eq ${REGEX}) && exit 0
 
+echo "ERROR:" >/dev/stderr
 echo "Invalid git message format!" >/dev/stderr
 echo >/dev/stderr
-echo "Valid: <type>(<scope>): <message>" >/dev/stderr
-echo "Valid: <type>: <message>" >/dev/stderr
+echo "VALID:" >/dev/stderr
+echo "- <type>(<scope>): <message>" >/dev/stderr
+echo "- <type>: <message>" >/dev/stderr
 echo >/dev/stderr
 echo "TYPE:" >/dev/stderr
 echo "- fix:         bug fix, no new feature" >/dev/stderr
@@ -40,11 +45,10 @@ echo "- build/chore: no production code change; updating grunt tasks etc" >/dev/
 echo "- ci:          no production code change; changes to the deployment" >/dev/stderr
 echo >/dev/stderr
 echo "SCOPE:" >/dev/stderr
-echo "- Must be a JIRA ticket reference: PROJECT-000." >/dev/stderr
+echo "- SHOULD BE a ticket reference: ABCDEF-000." >/dev/stderr
+echo "- otherwise SHOULD BE a key words like: core, store finder" >/dev/stderr
 echo >/dev/stderr
-echo "Help:" >/dev/stderr
-echo "- https://nitayneeman.com/posts/understanding-semantic-commit-messages-using-git-and-angular/" >/dev/stderr
-
-# notify-send -u critical -t 100 -a "Git Hooks" -i ~/Workspace/remember-shopware/public/favicon.ico -c "Git Hooks" "TEST1" "TEST2"
+echo "HELP:" >/dev/stderr
+echo "- https://www.conventionalcommits.org/en/v1.0.0/" >/dev/stderr
 
 exit 1

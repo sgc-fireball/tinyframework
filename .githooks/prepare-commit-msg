@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#set -euo pipefail
+set -uo pipefail
 
 # @link https://www.atlassian.com/git/tutorials/git-hooks
 # @link https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716
@@ -11,6 +11,11 @@ cd $(dirname $(dirname $0))
 COMMIT_FILEPATH=${1:-} # /path/to/file
 COMMIT_TYPE=${2:-}     # commit, merge
 COMMIT_HASH=${3:-}     # commit hash
+
+die() {
+    echo "ERROR: $2"
+    exit ${1:-1}
+}
 
 [ -z "${COMMIT_FILEPATH}" ] && die 1 "Missing file path."
 [ -w "${COMMIT_FILEPATH}" ] || die 2 "File not found or is not writeable."
@@ -48,6 +53,6 @@ fi
 if [ "${SEM_SCOPE}" != "" ]; then
     SEM_SCOPE="(${SEM_SCOPE})"
 fi
-echo -en "${SEM_TYPE}${SEM_SCOPE}: ${SEM_DESCRIPTION}\n${COMMIT_MESSAGE}" >"${COMMIT_FILEPATH}"
+echo -en "${SEM_TYPE}${SEM_SCOPE}: ${SEM_DESCRIPTION}\n\n${COMMIT_MESSAGE}" >"${COMMIT_FILEPATH}"
 
 exit 0

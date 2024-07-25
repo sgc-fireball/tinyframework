@@ -4,6 +4,7 @@
 - [How to start](#how-to-start)
 - [Debugging](#debugging)
 - [Performance](#performance)
+- [Git Hooks](#git-hooks)
 - [Author](#author)
 
 - [Documentation](./docs/index.md)
@@ -94,6 +95,14 @@ phpx console
 
 - foreach $loop and $loop->parent
 - Markdown interpreter for Str.
+
+## Git Hooks
+
+Please run:
+
+```bash
+git config --local core.hooksPath .githooks/
+```
 
 ## Author
 
