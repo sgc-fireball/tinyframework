@@ -40,7 +40,8 @@ return [
         'public_domain' => env('AWS_PUBLIC_DOMAIN'),
         'region' => env('AWS_REGION', 'eu-central-1'),
         'bucket' => env('AWS_BUCKET_PUBLIC'),
-        'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false)
+        'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
+        'acl' => 'public-read',
     ],
     's3_private' => [
         'driver' => S3FileSystem::class,
@@ -50,6 +51,7 @@ return [
         'public_domain' => null,
         'region' => env('AWS_REGION', 'eu-central-1'),
         'bucket' => env('AWS_BUCKET_PRIVATE'),
-        'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false)
+        'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
+        'acl' => 'private',
     ],
 ];

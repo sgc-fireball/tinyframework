@@ -10,66 +10,102 @@ use TinyFramework\Helpers\HTTP;
 
 class S3FileSystemTest extends FileSystemTestCase
 {
-    public function setUp(): void
-    {
-        parent::setUp();
-        $this->fileSystem = new S3FileSystem([
-            'access_key_id' => 'tinyframework-minio',
-            'secret_access_key' => 'tinyframework-minio',
-            'domain' => 'minio',
-            'public_domain' => 'http://minio:9000',
-            'region' => 'eu-central-1',
-            'bucket' => 'tinyframework-public',
 
-            'ssl' => false,
-            'use_path_style_endpoint' => true,
-            'host' => 'minio:9000',
-        ]);
+    public function getFileSystems(): array
+    {
+        return [
+            [
+                new S3FileSystem([
+                    'access_key_id' => 'tinyframework-minio',
+                    'secret_access_key' => 'tinyframework-minio',
+                    'domain' => 'http://minio:9000',
+                    'public_domain' => $p = 'http://minio:9000/tinyframework-public',
+                    'region' => 'minio',
+                    'bucket' => 'tinyframework-public',
+                    'use_path_style_endpoint' => true,
+                    'root' => '',
+                    'acl' => S3FileSystem::ACL_PUBLIC_READ,
+                ]),
+                $p,
+            ],
+            [
+                new S3FileSystem([
+                    'access_key_id' => 'tinyframework-minio',
+                    'secret_access_key' => 'tinyframework-minio',
+                    'domain' => 'http://minio:9000',
+                    'public_domain' => $p = 'http://minio:9000/tinyframework-public/test-rh',
+                    'region' => 'minio',
+                    'bucket' => 'tinyframework-public',
+                    'use_path_style_endpoint' => true,
+                    'root' => 'test-rh',
+                    'acl' => S3FileSystem::ACL_PUBLIC_READ,
+                ]),
+                $p,
+            ],
+        ];
     }
 
-    public function testCreateDirectory(): void
+    /**
+     * @dataProvider getFileSystems
+     */
+    public function testCreateDirectory(FileSystemInterface $fileSystem, string $publicUrl): void
     {
         $this->markTestSkipped('Unsupported on S3, because directory are not supported.');
     }
 
-    public function testDirectoryExists(): void
+    /**
+     * @dataProvider getFileSystems
+     */
+    public function testDirectoryExists(FileSystemInterface $fileSystem, string $publicUrl): void
     {
         $this->markTestSkipped('Unsupported on S3, because directory are not supported.');
     }
 
-    public function testExists(): void
+    /**
+     * @dataProvider getFileSystems
+     */
+    public function testExists(FileSystemInterface $fileSystem, string $publicUrl): void
     {
         $this->markTestSkipped('Unsupported on S3, because no directory exists.');
     }
 
-    public function testUrl(): void
+    /**
+     * @dataProvider getFileSystems
+     */
+    public function testUrl(FileSystemInterface $fileSystem, string $publicUrl): void
     {
         $file = 'testUrl';
         $rand = mt_rand(0, 1_000_000);
-        $this->assertInstanceOf(FileSystemInterface::class, $this->fileSystem->write($file, $rand));
-        $url = $this->fileSystem->url($file);
-        $this->assertEquals('http://minio:9000/tinyframework-public/testUrl', $url);
+        $this->assertInstanceOf(FileSystemInterface::class, $fileSystem->write($file, $rand));
+        $url = $fileSystem->url($file);
+        $this->assertEquals($publicUrl . '/testUrl', $url);
         $this->assertEquals(200, (new HTTP())->request('GET', $url)->code());
     }
 
-    public function testTemporaryUrl(): void
+    /**
+     * @dataProvider getFileSystems
+     */
+    public function testTemporaryUrl(FileSystemInterface $fileSystem, string $publicUrl): void
     {
         $file = 'testTemporaryUrl';
         $rand = mt_rand(0, 1_000_000);
-        $this->assertInstanceOf(FileSystemInterface::class, $this->fileSystem->write($file, $rand));
-        $url = $this->fileSystem->temporaryUrl($file, 60);
-        $this->assertStringStartsWith('http://minio:9000/tinyframework-public/testTemporaryUrl?', $url);
+        $this->assertInstanceOf(FileSystemInterface::class, $fileSystem->write($file, $rand));
+        $url = $fileSystem->temporaryUrl($file, 60);
+        $this->assertStringStartsWith($publicUrl . '/testTemporaryUrl?', $url);
         $this->assertStringContainsString('X-Amz-Expires=60', $url);
         $this->assertEquals(200, (new HTTP())->request('GET', $url)->code());
     }
 
-    public function testInvalidTemporaryUrl(): void
+    /**
+     * @dataProvider getFileSystems
+     */
+    public function testInvalidTemporaryUrl(FileSystemInterface $fileSystem, string $publicUrl): void
     {
         $file = 'testTemporaryUrl';
         $rand = mt_rand(0, 1_000_000);
-        $this->assertInstanceOf(FileSystemInterface::class, $this->fileSystem->write($file, $rand));
-        $url = $this->fileSystem->temporaryUrl($file, 0);
-        $this->assertStringStartsWith('http://minio:9000/tinyframework-public/testTemporaryUrl?', $url);
+        $this->assertInstanceOf(FileSystemInterface::class, $fileSystem->write($file, $rand));
+        $url = $fileSystem->temporaryUrl($file, 0);
+        $this->assertStringStartsWith($publicUrl . '/testTemporaryUrl?', $url);
         $this->assertStringContainsString('X-Amz-Expires=0', $url);
         sleep(1);
         $this->assertEquals(403, (new HTTP())->request('GET', $url)->code());

@@ -14,23 +14,57 @@ use TinyFramework\Http\URL;
  */
 class S3FileSystem extends FileSystemAwesome implements FileSystemInterface
 {
+
+    public const ACL_PRIVATE = 'private';
+    public const ACL_PUBLIC_READ = 'public-read';
+    public const ACL_PUBLIC_READ_WRITE = 'public-read-write';
+    public const ACL_AUTHENTICATED_READ = 'authenticated-read';
+    public const ACL_AWS_EXEC_READ = 'aws-exec-read';
+    public const ACL_BUCKET_OWNER_READ = 'bucket-owner-read';
+    public const ACL_BUCKET_OWNER_FULL_CONTROL = 'bucket-owner-full-control';
+
+    public const STORAGE_CLASS_STANDARD = 'STANDARD';
+    public const STORAGE_CLASS_REDUCED_REDUNDANCY = 'REDUCED_REDUNDANCY';
+    public const STORAGE_CLASS_STANDARD_IA = 'STANDARD_IA';
+    public const STORAGE_CLASS_ONEZONE_IA = 'ONEZONE_IA';
+    public const STORAGE_CLASS_INTELLIGENT_TIERING = 'INTELLIGENT_TIERING';
+    public const STORAGE_CLASS_GLACIER = 'GLACIER';
+    public const STORAGE_CLASS_DEEP_ARCHIVE = 'DEEP_ARCHIVE';
+    public const STORAGE_CLASS_OUTPOSTS = 'OUTPOSTS';
+    public const STORAGE_CLASS_GLACIER_IR = 'GLACIER_IR';
+    public const STORAGE_CLASS_SNOW = 'SNOW';
+    public const STORAGE_CLASS_EXPRESS_ONEZONE = 'EXPRESS_ONEZONE';
+
     protected array $config = [
-        'debug' => false,
         'access_key_id' => null,
         'secret_access_key' => null,
         'domain' => null,
         'public_domain' => null,
         'region' => 'eu-central-1',
-        'ssl' => true,
         'bucket' => null,
-        'host' => null,
         'use_path_style_endpoint' => false,
+        'acl' => 'private',
+        'root' => '',
     ];
 
     public function __construct(array $config)
     {
         $this->config = array_merge($this->config, $config);
-        $this->config['host'] ??= sprintf('%s.s3.%s.amazonaws.com', $this->config['bucket'], $this->config['region']);
+        if ($this->config['domain'] === null) {
+            if ($this->config['use_path_style_endpoint']) {
+                $this->config['domain'] = sprintf(
+                    'https://s3.%s.amazonaws.com',
+                    $this->config['bucket']
+                );
+            } else {
+                $this->config['domain'] = sprintf(
+                    'https://%s.s3.%s.amazonaws.com',
+                    $this->config['bucket'],
+                    $this->config['region']
+                );
+            }
+        }
+        $this->config['domain'] = rtrim($this->config['domain'], '/');
     }
 
     public function fileExists(string $location): bool
@@ -64,6 +98,47 @@ class S3FileSystem extends FileSystemAwesome implements FileSystemInterface
         if (array_key_exists('ttl', $config)) {
             $headers['X-Amz-Expires'] = (int)$config['ttl'];
         }
+        $acl = $config['acl'] ?? $this->config['acl'] ?? self::ACL_PRIVATE;
+        $allowed = [
+            self::ACL_PRIVATE,
+            self::ACL_PUBLIC_READ,
+            self::ACL_PUBLIC_READ_WRITE,
+            self::ACL_AUTHENTICATED_READ,
+            self::ACL_AWS_EXEC_READ,
+            self::ACL_BUCKET_OWNER_READ,
+            self::ACL_BUCKET_OWNER_FULL_CONTROL,
+        ];
+        if (!in_array($acl, $allowed)) {
+            throw new \InvalidArgumentException(
+                'Invalid ACL value: ' . $acl . '. Valid values are: ' . implode(', ', $allowed)
+            );
+        }
+        $headers['X-Amz-ACL'] = $acl;
+
+        $storageClass = $config['storageClass'] ?? $this->config['storageClass'] ?? self::STORAGE_CLASS_STANDARD;
+        $allowedStorageClass = [
+            self::STORAGE_CLASS_STANDARD,
+            self::STORAGE_CLASS_REDUCED_REDUNDANCY,
+            self::STORAGE_CLASS_STANDARD_IA,
+            self::STORAGE_CLASS_ONEZONE_IA,
+            self::STORAGE_CLASS_INTELLIGENT_TIERING,
+            self::STORAGE_CLASS_GLACIER,
+            self::STORAGE_CLASS_DEEP_ARCHIVE,
+            self::STORAGE_CLASS_OUTPOSTS,
+            self::STORAGE_CLASS_GLACIER_IR,
+            self::STORAGE_CLASS_SNOW,
+            self::STORAGE_CLASS_EXPRESS_ONEZONE,
+        ];
+        if (!in_array($storageClass, $allowedStorageClass)) {
+            throw new \InvalidArgumentException(
+                'Invalid Storage Class value: ' . $storageClass . '. Valid values are: ' . implode(
+                    ', ',
+                    $allowedStorageClass
+                )
+            );
+        }
+        $headers['X-Amz-Storage-Class'] = $storageClass;
+
         $response = $this->s3PutObject($location, (string)$contents, $headers);
         if ($response->code() !== 200) {
             throw new FileSystemException('Could not write location.');
@@ -77,7 +152,7 @@ class S3FileSystem extends FileSystemAwesome implements FileSystemInterface
         while (!feof($contents)) {
             $content .= fread($contents, 4096);
         }
-        return $this->write($location, $content);
+        return $this->write($location, $content, $config);
     }
 
     public function read(string $location): string
@@ -123,7 +198,11 @@ class S3FileSystem extends FileSystemAwesome implements FileSystemInterface
     {
         $list = [];
         $parameters = array_merge(
-            ['max-keys' => 10000],
+            [
+                'max-keys' => 10000,
+                'delimiter' => '/',
+                'encoding' => 'url',
+            ],
             $parameters,
         );
         $response = $this->s3ListObjectV2($location, $parameters);
@@ -137,7 +216,7 @@ class S3FileSystem extends FileSystemAwesome implements FileSystemInterface
         $xml = simplexml_load_string($content);
         $json = json_decode(json_encode($xml), true);
         foreach (($json['Contents'] ?? []) as $item) {
-            $list[] = $item['Key'];
+            $list[] = urldecode($item['Key']);
         }
         if (
             array_key_exists('IsTruncated', $json) && $json['IsTruncated'] &&
@@ -163,6 +242,9 @@ class S3FileSystem extends FileSystemAwesome implements FileSystemInterface
     public function copy(string $source, string $destination, array $config = []): self
     {
         $response = $this->s3CopyObject($source, $destination);
+        if ($response->code() === 403) {
+            throw new FileSystemException('Could not copy source to destination. Permission denied.');
+        }
         if ($response->code() !== 200) {
             throw new FileSystemException('Could not copy source to destination.');
         }
@@ -189,23 +271,28 @@ class S3FileSystem extends FileSystemAwesome implements FileSystemInterface
 
     public function url(string $location): string
     {
-        // @TODO with public_domain
-        return $this->baseUrl($location)->__toString();
+        $url = $this->baseUrl($location);
+        if ($this->config['public_domain']) {
+            $publicUrl = new URL($this->config['public_domain']);
+            if ($publicUrl->scheme()) {
+                $url = $url->scheme($publicUrl->scheme());
+            }
+            if ($publicUrl->host()) {
+                $url = $url->host($publicUrl->host());
+            }
+            if ($publicUrl->port()) {
+                $url = $url->port($publicUrl->port());
+            }
+        }
+        return $url->__toString();
     }
 
     public function temporaryUrl(string $location, int $ttl = 604800, array $config = []): string
     {
         if ($ttl > 604800) {
-            throw new FileSystemException('The maximum ttl is one week.');
+            throw new FileSystemException('The maximum ttl is one week (ttl=604800).');
         }
-
-        $url = $this->baseUrl($location);
-        if ($this->config['public_domain']) {
-            $publicUrl = new URL($this->config['public_domain']);
-            $url = $url->scheme($publicUrl->scheme())
-                ->host($publicUrl->host())
-                ->port($publicUrl->port());
-        }
+        $url = new URL($this->url($location));
         return $this->signUrl('GET', $url, $ttl)->__toString();
     }
 
@@ -241,12 +328,13 @@ class S3FileSystem extends FileSystemAwesome implements FileSystemInterface
         string $path,
         array $config = []
     ): Response {
-        $config['max-keys'] ??= 10000;
-        $config['delimiter'] = '/';
         $config['list-type'] = 2;
         $config['prefix'] = ltrim(trim($path, '/') . '/', '/');
+        if ($this->config['root']) {
+            $config['prefix'] = trim($this->config['root'], '/') . '/' . $config['prefix'];
+        }
         ksort($config);
-        $url = $this->baseUrl('')->query($config);
+        $url = $this->baseUrl('', false)->query($config);
         return $this->request('GET', $url);
     }
 
@@ -271,17 +359,16 @@ class S3FileSystem extends FileSystemAwesome implements FileSystemInterface
         ]);
     }
 
-    private function baseUrl(string $path): URL
+    private function baseUrl(string $path, bool $withRoot = true): URL
     {
-        return new URL(
-            sprintf(
-                'http%s://%s/%s%s',
-                $this->config['ssl'] ? 's' : '',
-                $this->config['host'],
-                $this->config['use_path_style_endpoint'] ? $this->config['bucket'] . '/' : '',
-                ltrim($path, '/')
-            )
+        $url = sprintf(
+            '%s%s%s%s',
+            $this->config['domain'],
+            $this->config['use_path_style_endpoint'] ? '/' . $this->config['bucket'] : '',
+            $withRoot && $this->config['root'] ? '/' . $this->config['root'] : '',
+            '/' . ltrim($path, '/')
         );
+        return new URL($url);
     }
 
     protected function createCredentialScope(string $date): string
@@ -313,7 +400,11 @@ class S3FileSystem extends FileSystemAwesome implements FileSystemInterface
     protected function request(string $method, URL $url, string $body = null, array $_headers = []): Response
     {
         $date = date('Ymd\THis\Z');
-        $headers['Host'] = $this->config['host'];
+        $host = $url->host();
+        if ($url->port()) {
+            $host .= ':' . $url->port();
+        }
+        $headers['Host'] = $host;
         $headers['User-Agent'] = userAgent();
 
         $headers['X-Amz-Algorithm'] = 'AWS4-HMAC-SHA256';

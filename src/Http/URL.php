@@ -33,10 +33,13 @@ class URL implements \Stringable
     {
         if (!empty($url)) {
             $parts = parse_url($url);
+            if (!is_array($parts)) {
+                throw new InvalidArgumentException('Invalid url given: '.$url);
+            }
             $this->schema = $parts['scheme'] ?? null;
             $this->user = $parts['user'] ?? null;
             $this->pass = $parts['pass'] ?? null;
-            $this->host = \array_key_exists('host', $parts) && $parts['host'] ? ltrim($parts['host'], ':') : null;
+            $this->host = \array_key_exists('host', $parts) && is_string($parts['host']) ? ltrim($parts['host'], ':') : null;
             $this->port = $parts['port'] ?? null;
             $this->path = $parts['path'] ?? '/';
             $this->query = $parts['query'] ?? null;

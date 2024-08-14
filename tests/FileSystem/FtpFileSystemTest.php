@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TinyFramework\Tests\FileSystem;
 
-use PHPUnit\Framework\TestCase;
+use TinyFramework\FileSystem\FileSystemInterface;
 use TinyFramework\FileSystem\FtpFileSystem;
 
 class FtpFileSystemTest extends FileSystemTestCase
@@ -14,44 +14,66 @@ class FtpFileSystemTest extends FileSystemTestCase
         parent::setUp();
         $host = 'minio';
         if (gethostbyname($host) === $host) {
-            $this->markTestSkipped('Please run phpunit inside docker-compose env.');
+            $this->markTestSkipped('Please run phpunit inside docker-compose env. Could not found test minio host.');
         }
         if (!extension_loaded('ftp')) {
             $this->markTestSkipped('Missing ext-ftp.');
         }
-        $this->fileSystem = new FtpFileSystem([
-            'ssl' => false,
-            'username' => 'tinyframework-minio',
-            'password' => 'tinyframework-minio',
-            'host' => $host,
-            'passiv' => true,
-            'basePath' => 'tinyframework-ftp',
-            'folderPermission' => null,
-            'filePermission' => null,
-        ]);
     }
 
-    public function testMove(): void
+    public function getFileSystems(): array
+    {
+        parent::setUp();
+        return [
+            [
+                new FtpFileSystem([
+                    'ssl' => false,
+                    'username' => 'tinyframework-minio',
+                    'password' => 'tinyframework-minio',
+                    'host' => 'minio',
+                    'passiv' => true,
+                    'basePath' => 'tinyframework-ftp',
+                    'folderPermission' => null,
+                    'filePermission' => null,
+                ]),
+                env('APP_URL'),
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getFileSystems
+     */
+    public function testMove(FileSystemInterface $fileSystem, string $publicUrl): void
     {
         $this->markTestSkipped('Unsupported function on minio-ftp.');
     }
 
-    public function testMimeType(): void
+    /**
+     * @dataProvider getFileSystems
+     */
+    public function testMimeType(FileSystemInterface $fileSystem, string $publicUrl): void
     {
         $this->expectException(\RuntimeException::class);
-        $this->fileSystem->mimeType('file');
+        $fileSystem->mimeType('file');
     }
 
-    public function testUrl(): void
+    /**
+     * @dataProvider getFileSystems
+     */
+    public function testUrl(FileSystemInterface $fileSystem, string $publicUrl): void
     {
         $this->expectException(\RuntimeException::class);
-        $this->fileSystem->url('file');
+        $fileSystem->url('file');
     }
 
-    public function testTemporaryUrl(): void
+    /**
+     * @dataProvider getFileSystems
+     */
+    public function testTemporaryUrl(FileSystemInterface $fileSystem, string $publicUrl): void
     {
         $this->expectException(\RuntimeException::class);
-        $this->fileSystem->temporaryUrl('file', 30);
+        $fileSystem->temporaryUrl('file', 30);
     }
 
 }

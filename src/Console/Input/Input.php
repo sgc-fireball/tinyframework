@@ -89,6 +89,9 @@ class Input implements InputInterface
         if ($interaction === 'noninteractive') {
             $this->interaction = false;
         }
+        if (!stream_isatty(STDIN)) {
+            $this->interaction = false;
+        }
         return $command;
     }
 

@@ -768,3 +768,10 @@ if (!function_exists('userAgent')) {
         return $cache;
     }
 }
+
+if (!function_exists('sigmoid')) {
+    function sigmoid(float $t): float
+    {
+        return 1 / (1 + pow(M_EULER, -$t));
+    }
+}
