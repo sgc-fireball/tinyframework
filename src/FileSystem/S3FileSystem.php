@@ -44,7 +44,7 @@ class S3FileSystem extends FileSystemAwesome implements FileSystemInterface
         'bucket' => null,
         'use_path_style_endpoint' => false,
         'acl' => 'private',
-        'root' => '',
+        'basePath' => '',
     ];
 
     public function __construct(array $config)
@@ -330,8 +330,8 @@ class S3FileSystem extends FileSystemAwesome implements FileSystemInterface
     ): Response {
         $config['list-type'] = 2;
         $config['prefix'] = ltrim(trim($path, '/') . '/', '/');
-        if ($this->config['root']) {
-            $config['prefix'] = trim($this->config['root'], '/') . '/' . $config['prefix'];
+        if ($this->config['basePath']) {
+            $config['prefix'] = trim($this->config['basePath'], '/') . '/' . $config['prefix'];
         }
         ksort($config);
         $url = $this->baseUrl('', false)->query($config);
@@ -359,13 +359,13 @@ class S3FileSystem extends FileSystemAwesome implements FileSystemInterface
         ]);
     }
 
-    private function baseUrl(string $path, bool $withRoot = true): URL
+    private function baseUrl(string $path, bool $withBasePath = true): URL
     {
         $url = sprintf(
             '%s%s%s%s',
             $this->config['domain'],
             $this->config['use_path_style_endpoint'] ? '/' . $this->config['bucket'] : '',
-            $withRoot && $this->config['root'] ? '/' . $this->config['root'] : '',
+            $withBasePath && $this->config['basePath'] ? '/' . $this->config['basePath'] : '',
             '/' . ltrim($path, '/')
         );
         return new URL($url);

@@ -153,6 +153,12 @@ services:
     networks:
       - "tinyframework"
 
+  sftp:
+    image: "atmoz/sftp"
+    command: "tinyframework:tinyframework:${_UID:-1000}:${_GID:-1000}:tinyframework"
+    networks:
+      - "tinyframework"
+
 volumes:
   data-mysql:
     driver: "local"

@@ -14,6 +14,7 @@ use TinyFramework\Database\DatabaseInterface;
 use TinyFramework\Database\QueryInterface;
 use TinyFramework\Event\EventAwesome;
 use TinyFramework\Event\EventDispatcherInterface;
+use TinyFramework\FileSystem\FileSystemInterface;
 use TinyFramework\Hash\HashInterface;
 use TinyFramework\Helpers\Arr;
 use TinyFramework\Helpers\Htmlable;
@@ -135,23 +136,30 @@ if (!function_exists('config')) {
 }
 
 if (!function_exists('cache')) {
-    function cache(): CacheInterface
+    function cache(string $name): CacheInterface
     {
-        return container('cache');
+        return container('cache' . ($name ? '.' . $name : ''));
+    }
+}
+
+if (!function_exists('filesystem')) {
+    function filesystem(string $name): FileSystemInterface
+    {
+        return container('filesystem' . ($name ? '.' . $name : ''));
     }
 }
 
 if (!function_exists('database')) {
-    function database(): DatabaseInterface
+    function database(string $name): DatabaseInterface
     {
-        return container('database');
+        return container('database' . ($name ? '.' . $name : ''));
     }
 }
 
 if (!function_exists('session')) {
-    function session(): SessionInterface
+    function session(string $name): SessionInterface
     {
-        return container('session');
+        return container('session' . ($name ? '.' . $name : ''));
     }
 }
 
@@ -165,37 +173,37 @@ if (!function_exists('event')) {
 }
 
 if (!function_exists('logger')) {
-    function logger(): LoggerInterface
+    function logger(string $name): LoggerInterface
     {
-        return container('logger');
+        return container('logger' . ($name ? '.' . $name : ''));
     }
 }
 
 if (!function_exists('queue')) {
-    function queue(): QueueInterface
+    function queue(string $name): QueueInterface
     {
-        return container('queue');
+        return container('queue' . ($name ? '.' . $name : ''));
     }
 }
 
 if (!function_exists('hasher')) {
-    function hasher(): HashInterface
+    function hasher(string $name): HashInterface
     {
-        return container('hash');
+        return container('hash' . ($name ? '.' . $name : ''));
     }
 }
 
 if (!function_exists('crypto')) {
-    function crypto(): CryptInterface
+    function crypto(string $name): CryptInterface
     {
-        return container('crypt');
+        return container('crypt' . ($name ? '.' . $name : ''));
     }
 }
 
 if (!function_exists('mailer')) {
-    function mailer(): MailerInterface
+    function mailer(string $name): MailerInterface
     {
-        return container('mailer');
+        return container('mailer' . ($name ? '.' . $name : ''));
     }
 }
 
@@ -375,6 +383,13 @@ if (!function_exists('to_bool')) {
     }
 }
 
+if (!function_exists('toBool')) {
+    function toBool(mixed $mixed): bool
+    {
+        return to_bool($mixed);
+    }
+}
+
 if (!function_exists('e')) {
     function e(Htmlable|string $content): string
     {
@@ -399,7 +414,7 @@ if (!function_exists('password')) {
             $chars .= 'abcdefghkmnpqrstwxyz'; // without i,j,l,o,u,v
         }
         if ($upperChars) {
-            $chars .= 'ABCDEFGHKMNPQRSTWXYZ'; // without I,J,L,O,U,V
+            $chars .= 'ABCDEFGHJKLMNPQRSTWXYZ'; // without I,O,U,V
         }
         if ($numbers) {
             $chars .= '2345689'; // without 0,1

@@ -6,22 +6,25 @@ namespace TinyFramework\FileSystem;
 
 use TinyFramework\Exception\FileSystemException;
 
-class FtpFileSystem extends FileSystemAwesome implements FileSystemInterface
+class SftpFileSystem extends FileSystemAwesome implements FileSystemInterface
 {
-    /** @var \FTP\Connection|resource|null */
-    protected $socket = null;
+
+    /** @var resource|null */
+    protected $sshSocket = null;
+
+    /** @var resource|null */
+    protected $sftpSocket = null;
 
     protected array $config = [
         'username' => null,
+        'pubkeyfile' => null,
+        'privkeyfile' => null,
         'password' => null,
         'host' => null,
-        'port' => 21,
-        'ssl' => false,
+        'port' => 22,
         'basePath' => '/',
-        'passiv' => false,
-        'timeout' => 5,
-        'folderPermission' => 0750,
         'filePermission' => 0640,
+        'folderPermission' => 0750,
     ];
 
     private function buildLocation(string $location): string
@@ -30,7 +33,16 @@ class FtpFileSystem extends FileSystemAwesome implements FileSystemInterface
             '%s%s',
             $this->config['basePath'],
             ltrim($location, '/')
-        );;
+        );
+    }
+
+    private function prefixLocation(string $location): string
+    {
+        return sprintf(
+            'ssh2.sftp://%d%s',
+            intval($this->sftpSocket),
+            $location
+        );
     }
 
     public function __construct(array $config)
@@ -38,44 +50,48 @@ class FtpFileSystem extends FileSystemAwesome implements FileSystemInterface
         $basePath = '/' . trim($config['basePath'] ?? '/', '/') . '/';
         $basePath = $basePath === '/' . '/' ? '/' : $basePath;
         $this->config = array_merge($this->config, $config, ['basePath' => $basePath]);
-        if (!extension_loaded('ftp')) {
-            $this->throw('Missing ext-ftp.');
+        if (!extension_loaded('ssh2')) {
+            $this->throw('Missing ext-ssh2.');
         }
     }
 
     public function __destruct()
     {
-        if ($this->socket) {
-            @ftp_close($this->socket);
-            $this->socket = null;
+        if ($this->sshSocket) {
+            @ssh2_disconnect($this->sshSocket);
+            $this->sshSocket = null;
         }
+        $this->sftpSocket = null;
     }
 
     private function connect(): self
     {
-        if (!$this->socket) {
-            $func = $this->config['ssl'] ? 'ftp_ssl_connect' : 'ftp_connect';
-            $this->socket = @$func(
-                $this->config['host'],
-                $this->config['port'],
-                $this->config['timeout']
-            );
-            if (!$this->socket) {
-                $this->socket = null;
+        if (!$this->sshSocket) {
+            $this->sshSocket = @ssh2_connect($this->config['host'], $this->config['port']);
+            if (!$this->sshSocket) {
+                $this->sshSocket = null;
                 $this->throw('Could not connect.');
             }
-            if ($this->config['username']) {
-                if (!@ftp_login($this->socket, $this->config['username'], $this->config['password'])) {
-                    $this->throw('Could not login');
+            if ($this->config['password'] && (!$this->config['privkeyfile'] || !$this->config['pubkeyfile'])) {
+                if (!ssh2_auth_password($this->sshSocket, $this->config['username'], $this->config['password'])) {
+                    $this->throw('Could not login via password.');
+                }
+            } elseif ($this->config['privkeyfile'] && $this->config['pubkeyfile']) {
+                if (!ssh2_auth_pubkey_file(
+                    $this->sshSocket,
+                    $this->config['username'],
+                    $this->config['pubkeyfile'],
+                    $this->config['privkeyfile'],
+                    $this->config['password']
+                )) {
+                    $this->throw('Could not login via private key.');
                 }
             }
-            if ($this->config['passiv']) {
-                if (@ftp_pasv($this->socket, true) !== true) {
-                    $this->throw('Could not switch to passiv mode.');
-                }
-            }
-            if (!ftp_chdir($this->socket, $this->config['basePath'])) {
-                $this->throw('Could not change directory.', $this->config['basePath']);
+            $this->sftpSocket = ssh2_sftp($this->sshSocket);
+            if (!$this->sftpSocket) {
+                $this->sftpSocket = null;
+                $this->sshSocket = null;
+                $this->throw('Could switch to sftp protocol.');
             }
         }
         return $this;
@@ -83,44 +99,29 @@ class FtpFileSystem extends FileSystemAwesome implements FileSystemInterface
 
     public function fileExists(string $location): bool
     {
-        try {
-            $_location = $this->buildLocation($location);
-            $_folder = dirname($_location);
-            $list = @ftp_nlist($this->socket, $_folder);
-            if (!is_array($list) || !in_array(basename($_location), $list)) {
-                return false;
-            }
-
-            $result = @ftp_chdir($this->socket, $_location);
-            if ($result && !@ftp_chdir($this->socket, $this->config['basePath'])) {
-                $this->throw('Could not change directory.', $this->config['basePath']);
-            }
-            return $result === false;
-        } catch (\Throwable) {
-            return false;
-        }
+        $this->connect();
+        $_location = $this->buildLocation($location);
+        $_path = $this->prefixLocation($_location);
+        clearstatcache(true, $_path);
+        return is_file($_path);
     }
 
     public function directoryExists(string $location): bool
     {
         $this->connect();
         $_location = $this->buildLocation($location);
-        $_folder = dirname($_location);
-        $list = @ftp_nlist($this->socket, $_folder);
-        if (!is_array($list) || !in_array(basename($_location), $list)) {
-            return false;
-        }
-
-        $result = @ftp_chdir($this->socket, $_location);
-        if ($result && !@ftp_chdir($this->socket, $this->config['basePath'])) {
-            $this->throw('Could not change directory.', $this->config['basePath']);
-        }
-        return $result === true;
+        $_path = $this->prefixLocation($_location);
+        clearstatcache(true, $_path);
+        return is_dir($_path);
     }
 
     public function exists(string $location): bool
     {
-        return $this->fileExists($location) || $this->directoryExists($location);
+        $this->connect();
+        $_location = $this->buildLocation($location);
+        $_path = $this->prefixLocation($_location);
+        clearstatcache(true, $_path);
+        return file_exists($_path);
     }
 
     public function write(string $location, $contents, array $config = []): self
@@ -138,11 +139,16 @@ class FtpFileSystem extends FileSystemAwesome implements FileSystemInterface
     {
         $this->connect();
         $_location = $this->buildLocation($location);
-        if (!@ftp_fput($this->socket, $_location, $contents)) {
-            $this->throw('Could not write file.', $_location);
+        $_path = $this->prefixLocation($_location);
+        $stream = fopen($_path, 'w+');
+        while (!feof($contents) && $content = fread($contents, 4096)) {
+            if ($content && !@fwrite($stream, $content)) {
+                $this->throw('Could not write file chunk.', $_location);
+            }
         }
+
         if ($this->config['filePermission'] !== null) {
-            if (@ftp_chmod($this->socket, $this->config['filePermission'], $_location) === false) {
+            if (@ssh2_sftp_chmod($this->sftpSocket, $_location, $this->config['filePermission']) === false) {
                 $this->throw('Could not change file mode.', $_location);
             }
         }
@@ -160,15 +166,9 @@ class FtpFileSystem extends FileSystemAwesome implements FileSystemInterface
     public function readStream(string $location): mixed
     {
         $this->connect();
-        $stream = fopen('php://temp', 'w+b');
         $_location = $this->buildLocation($location);
-        $result = @ftp_fget($this->socket, $stream, $_location);
-        if (!$result) {
-            fclose($stream);
-            $this->throw('Could not read file.', $_location);
-        }
-        rewind($stream);
-        return $stream;
+        $_path = $this->prefixLocation($_location);
+        return fopen($_path, 'r');
     }
 
     public function delete(string $location): self
@@ -176,17 +176,19 @@ class FtpFileSystem extends FileSystemAwesome implements FileSystemInterface
         $this->connect();
         if ($this->fileExists($location)) {
             $_location = $this->buildLocation($location);
-            if (@ftp_delete($this->socket, $_location) === false) {
+            if (!@ssh2_sftp_unlink($this->sftpSocket, $_location)) {
                 $this->throw('Could not remove file.', $_location);
+            }
+            if ($this->fileExists($location)) {
+                throw new \RuntimeException('Could not delete the file!!!!');
             }
         } elseif ($this->directoryExists($location)) {
             $fileList = $this->list($location);
             foreach ($fileList as $subLocation) {
-                $this->delete($subLocation);
+                $this->delete($location.'/'.$subLocation);
             }
             $_location = $this->buildLocation($location);
-            $result = @ftp_rmdir($this->socket, $_location);
-            if ($result === false) {
+            if (!@ssh2_sftp_rmdir($this->sftpSocket, $_location)) {
                 $this->throw('Could not remove directory.', $_location);
             }
         }
@@ -197,13 +199,11 @@ class FtpFileSystem extends FileSystemAwesome implements FileSystemInterface
     {
         $this->connect();
         $_location = $this->buildLocation($location);
-        if (@ftp_mkdir($this->socket, $_location) === false) {
-            $this->throw('Could not create folder.', $_location);
+        if ($this->directoryExists($location)) {
+            return $this;
         }
-        if ($this->config['folderPermission'] !== null) {
-            if (@ftp_chmod($this->socket, $this->config['folderPermission'], $_location) === false) {
-                $this->throw('Could not change dir mode.', $_location);
-            }
+        if (@ssh2_sftp_mkdir($this->sftpSocket, $_location, $this->config['folderPermission'], true) === false) {
+            $this->throw('Could not create folder.', $_location);
         }
         return $this;
     }
@@ -212,11 +212,16 @@ class FtpFileSystem extends FileSystemAwesome implements FileSystemInterface
     {
         $this->connect();
         $_location = $this->buildLocation($location);
-        $result = @ftp_nlist($this->socket, $_location);
-        if ($result !== false) {
-            return array_filter($result, fn(string $path) => !in_array($path, ['.', '..']));
+        $_path = $this->prefixLocation($_location);
+        clearstatcache(true, $_path);
+        if (!($handle = opendir($_path))) {
+            $this->throw('Could not receive file list.', $location);
         }
-        $this->throw('Could not receive file list.', $location);
+        $result = [];
+        while (false !== ($entry = readdir($handle))) {
+            $result[] = $entry;
+        }
+        return array_filter($result, fn(string $path) => !in_array($path, ['.', '..']));
     }
 
     public function move(string $source, string $destination, array $config = []): self
@@ -224,7 +229,8 @@ class FtpFileSystem extends FileSystemAwesome implements FileSystemInterface
         $this->connect();
         $_source = $this->buildLocation($source);
         $_destination = $this->buildLocation($destination);
-        if (!@ftp_rename($this->socket, $_source, $_destination)) {
+        $this->delete($destination); // in sftp we could not "overmove" a file, that already exists
+        if (!@ssh2_sftp_rename($this->sftpSocket, $_source, $_destination)) {
             $this->throw('Could not move file.', $_source, $_destination);
         }
         return $this;
@@ -247,7 +253,9 @@ class FtpFileSystem extends FileSystemAwesome implements FileSystemInterface
     {
         $this->connect();
         $_location = $this->buildLocation($location);
-        $size = @ftp_size($this->socket, $_location);
+        $_path = $this->prefixLocation($_location);
+        clearstatcache(true, $_path);
+        $size = @filesize($_path);
         if ($size === -1) {
             $this->throw('Could not read size.', $_location);
         }
@@ -256,23 +264,21 @@ class FtpFileSystem extends FileSystemAwesome implements FileSystemInterface
 
     public function mimeType(string $location): string
     {
-        $this->throw('Unsupported on ftp.');
+        $this->connect();
+        $_location = $this->buildLocation($location);
+        $_path = $this->prefixLocation($_location);
+        clearstatcache(true, $_path);
+        $mimeType = @mime_content_type($_path);
+        if (!$mimeType) {
+            $this->throw('Could not detect mimetype.', $_location);
+        }
+        return $mimeType;
     }
 
     public function url(string $location): string
     {
         $_location = $this->buildLocation($location);
-        if ($this->config['username']) {
-            $this->throw('Filesystem does not support url downloads.', $_location);
-        }
-        return sprintf(
-            'ftp%s://%s%s:%d/%s',
-            $this->config['ssl'] ? 's' : '',
-            $this->config['username'] ? $this->config['username'] . '@' : '',
-            $this->config['host'],
-            $this->config['port'],
-            ltrim($location, '/')
-        );
+        $this->throw('Filesystem does not support url downloads.', $_location);
     }
 
     public function temporaryUrl(string $location, int $ttl, array $config = []): string
@@ -291,8 +297,7 @@ class FtpFileSystem extends FileSystemAwesome implements FileSystemInterface
     {
         if ($location) {
             $message .= sprintf(
-                ' (ftp%s://%s%s:%d/%s)',
-                $this->config['ssl'] ? 's' : '',
+                ' (sftp://%s%s:%d/%s)',
                 $this->config['username'] ? $this->config['username'] . '@' : '',
                 $this->config['host'],
                 $this->config['port'],
@@ -301,8 +306,7 @@ class FtpFileSystem extends FileSystemAwesome implements FileSystemInterface
         }
         if ($destination) {
             $message .= sprintf(
-                ' (ftp%s://%s%s:%d/%s)',
-                $this->config['ssl'] ? 's' : '',
+                ' (sftp://%s%s:%d/%s)',
                 $this->config['username'] ? $this->config['username'] . '@' : '',
                 $this->config['host'],
                 $this->config['port'],
