@@ -15,16 +15,16 @@ class LocalFileSystemTest extends FileSystemTestCase
     public function getFileSystems(): array
     {
         parent::setUp();
-        $rootFs = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'phpunit';
-        if (!is_dir($rootFs)) {
-            mkdir($rootFs, 0755, true);
+        $basePath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'phpunit';
+        if (!is_dir($basePath)) {
+            mkdir($basePath, 0755, true);
         }
         return [
             [
                 new LocalFileSystem([
                     'name' => 'test',
                     'allowUnsafe' => true,
-                    'basePath' => $rootFs,
+                    'basePath' => $basePath,
                 ]),
                 env('APP_URL'),
             ],
