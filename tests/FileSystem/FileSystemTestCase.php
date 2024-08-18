@@ -54,18 +54,26 @@ abstract class FileSystemTestCase extends FeatureTestCase
     /**
      * @dataProvider getFileSystems
      */
-    public function testExists(FileSystemInterface $fileSystem, string $publicUrl): void
+    public function testExistsWithFile(FileSystemInterface $fileSystem, string $publicUrl): void
     {
-        $path = 'testExists';
+        $path = 'testExistsWithFile';
         $rand = mt_rand(0, 1_000_000);
-        $this->assertInstanceOf(FileSystemInterface::class, $fileSystem->delete($path . '1'));
-        $this->assertInstanceOf(FileSystemInterface::class, $fileSystem->delete($path . '2'));
-        $this->assertFalse($fileSystem->exists($path . '1'));
-        $this->assertFalse($fileSystem->exists($path . '2'));
-        $this->assertInstanceOf(FileSystemInterface::class, $fileSystem->write($path . '1', $rand));
-        $this->assertInstanceOf(FileSystemInterface::class, $fileSystem->createDirectory($path . '2'));
-        $this->assertTrue($fileSystem->exists($path . '1'));
-        $this->assertTrue($fileSystem->exists($path . '2'));
+        $this->assertInstanceOf(FileSystemInterface::class, $fileSystem->delete($path));
+        $this->assertFalse($fileSystem->exists($path));
+        $this->assertInstanceOf(FileSystemInterface::class, $fileSystem->write($path, $rand));
+        $this->assertTrue($fileSystem->exists($path));
+    }
+
+    /**
+     * @dataProvider getFileSystems
+     */
+    public function testExistsWithDirectory(FileSystemInterface $fileSystem, string $publicUrl): void
+    {
+        $path = 'testExistsWithDirectory';
+        $this->assertInstanceOf(FileSystemInterface::class, $fileSystem->delete($path));
+        $this->assertFalse($fileSystem->exists($path));
+        $this->assertInstanceOf(FileSystemInterface::class, $fileSystem->createDirectory($path));
+        $this->assertTrue($fileSystem->exists($path));
     }
 
     /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TinyFramework\Tests\FileSystem;
 
+use TinyFramework\Exception\FileSystemException;
 use TinyFramework\FileSystem\FileSystemInterface;
 use TinyFramework\FileSystem\FtpFileSystem;
 
@@ -46,7 +47,8 @@ class FtpFileSystemTest extends FileSystemTestCase
      */
     public function testMove(FileSystemInterface $fileSystem, string $publicUrl): void
     {
-        $this->markTestSkipped('Unsupported function on minio-ftp.');
+        $this->expectException(FileSystemException::class);
+        parent::testMove($fileSystem, $publicUrl);
     }
 
     /**
@@ -54,7 +56,7 @@ class FtpFileSystemTest extends FileSystemTestCase
      */
     public function testMimeType(FileSystemInterface $fileSystem, string $publicUrl): void
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(FileSystemException::class);
         $fileSystem->mimeType('file');
     }
 
@@ -63,7 +65,7 @@ class FtpFileSystemTest extends FileSystemTestCase
      */
     public function testUrl(FileSystemInterface $fileSystem, string $publicUrl): void
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(FileSystemException::class);
         $fileSystem->url('file');
     }
 
@@ -72,7 +74,7 @@ class FtpFileSystemTest extends FileSystemTestCase
      */
     public function testTemporaryUrl(FileSystemInterface $fileSystem, string $publicUrl): void
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(FileSystemException::class);
         $fileSystem->temporaryUrl('file', 30);
     }
 

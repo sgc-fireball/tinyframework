@@ -7,6 +7,7 @@
     - [ftp](#ftp)
     - [S3 Pubic](#s3_pubic)
     - [S3 private](#s3_private)
+    - [SFTP](#sftp)
 
 ## Introduction
 
