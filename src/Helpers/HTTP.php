@@ -10,17 +10,11 @@ use TinyFramework\Http\URL;
 class HTTP
 {
 
-    private URL $url;
-
-    private array $headers;
-
-    public function __construct(URL $url = null, array $headers = [])
+    public function __construct()
     {
         if (!extension_loaded('curl')) {
             throw new \RuntimeException('Missing curl. Please install php-curl first.');
         }
-        $this->url = $url instanceof URL ? $url : URL::factory($url);
-        $this->headers = $headers;
     }
 
     public function get(URL|string $url, array $headers = []): Response
@@ -58,7 +52,7 @@ class HTTP
         return $this->request('DELETE', $url, $body, $headers);
     }
 
-    public function request(string $method = 'POST', URL|string $url, mixed $body = null, array $headers = []): Response
+    public function request(string $method, URL|string $url, mixed $body = null, array $headers = []): Response
     {
         $ch = curl_init(is_string($url) ? $url : $url->__toString());
         curl_setopt($ch, \CURLOPT_CUSTOMREQUEST, $method);
@@ -69,12 +63,11 @@ class HTTP
             curl_setopt($ch, \CURLOPT_NOBODY, true);
         }
 
-        $headers = array_merge($this->headers, $headers);
         $headers = array_map(function (string $value, string $key) {
             return $key . ': ' . $value;
         }, array_values($headers), array_keys($headers));
         curl_setopt($ch, \CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, \CURLOPT_HEADER, 1);
+        curl_setopt($ch, \CURLOPT_HEADER, true);
         curl_setopt($ch, \CURLOPT_RETURNTRANSFER, true);
         $result = curl_exec($ch);
         curl_close($ch);

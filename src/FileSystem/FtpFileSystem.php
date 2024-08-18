@@ -123,7 +123,7 @@ class FtpFileSystem extends FileSystemAwesome implements FileSystemInterface
         return $this->fileExists($location) || $this->directoryExists($location);
     }
 
-    public function write(string $location, $contents, array $config = []): self
+    public function write(string $location, mixed $contents, array $config = []): self
     {
         try {
             $fp = fopen('data://text/plain,' . $contents, 'r');
@@ -134,7 +134,7 @@ class FtpFileSystem extends FileSystemAwesome implements FileSystemInterface
         return $this;
     }
 
-    public function writeStream(string $location, $contents, array $config = []): self
+    public function writeStream(string $location, mixed $contents, array $config = []): self
     {
         $this->connect();
         $_location = $this->buildLocation($location);
@@ -262,17 +262,7 @@ class FtpFileSystem extends FileSystemAwesome implements FileSystemInterface
     public function url(string $location): string
     {
         $_location = $this->buildLocation($location);
-        if ($this->config['username']) {
-            $this->throw('Filesystem does not support url downloads.', $_location);
-        }
-        return sprintf(
-            'ftp%s://%s%s:%d/%s',
-            $this->config['ssl'] ? 's' : '',
-            $this->config['username'] ? $this->config['username'] . '@' : '',
-            $this->config['host'],
-            $this->config['port'],
-            ltrim($location, '/')
-        );
+        $this->throw('Filesystem does not support temporary url downloads.', $_location);
     }
 
     public function temporaryUrl(string $location, int $ttl, array $config = []): string
@@ -287,7 +277,7 @@ class FtpFileSystem extends FileSystemAwesome implements FileSystemInterface
      * @param string|null $destination
      * @throws FileSystemException
      */
-    private function throw(string $message, string|null $location = null, string|null $destination = null): void
+    private function throw(string $message, string|null $location = null, string|null $destination = null): never
     {
         if ($location) {
             $message .= sprintf(

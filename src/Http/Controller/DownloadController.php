@@ -20,7 +20,7 @@ class DownloadController
     public function download(RequestInterface $request, string $fsDisk, string $fsPath): DownloadResponse
     {
         try {
-            $sign = (string)$request->get('sign') ?? '';
+            $sign = (string)($request->get('sign') ?: '');
 
             $jwt = new JWT(JWT::ALG_HS512, secret());
             $data = $jwt->decode($sign);

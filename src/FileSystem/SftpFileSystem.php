@@ -124,7 +124,7 @@ class SftpFileSystem extends FileSystemAwesome implements FileSystemInterface
         return file_exists($_path);
     }
 
-    public function write(string $location, $contents, array $config = []): self
+    public function write(string $location, mixed $contents, array $config = []): self
     {
         try {
             $fp = fopen('data://text/plain,' . $contents, 'r');
@@ -135,14 +135,14 @@ class SftpFileSystem extends FileSystemAwesome implements FileSystemInterface
         return $this;
     }
 
-    public function writeStream(string $location, $contents, array $config = []): self
+    public function writeStream(string $location, mixed $contents, array $config = []): self
     {
         $this->connect();
         $_location = $this->buildLocation($location);
         $_path = $this->prefixLocation($_location);
         $stream = fopen($_path, 'w+');
         while (!feof($contents) && $content = fread($contents, 4096)) {
-            if ($content && !@fwrite($stream, $content)) {
+            if (strlen($content) && !@fwrite($stream, $content)) {
                 $this->throw('Could not write file chunk.', $_location);
             }
         }
@@ -185,7 +185,7 @@ class SftpFileSystem extends FileSystemAwesome implements FileSystemInterface
         } elseif ($this->directoryExists($location)) {
             $fileList = $this->list($location);
             foreach ($fileList as $subLocation) {
-                $this->delete($location.'/'.$subLocation);
+                $this->delete($location . '/' . $subLocation);
             }
             $_location = $this->buildLocation($location);
             if (!@ssh2_sftp_rmdir($this->sftpSocket, $_location)) {
@@ -256,7 +256,7 @@ class SftpFileSystem extends FileSystemAwesome implements FileSystemInterface
         $_path = $this->prefixLocation($_location);
         clearstatcache(true, $_path);
         $size = @filesize($_path);
-        if ($size === -1) {
+        if ($size === false) {
             $this->throw('Could not read size.', $_location);
         }
         return $size;
@@ -275,12 +275,18 @@ class SftpFileSystem extends FileSystemAwesome implements FileSystemInterface
         return $mimeType;
     }
 
+    /**
+     * @throws FileSystemException
+     */
     public function url(string $location): string
     {
         $_location = $this->buildLocation($location);
         $this->throw('Filesystem does not support url downloads.', $_location);
     }
 
+    /**
+     * @throws FileSystemException
+     */
     public function temporaryUrl(string $location, int $ttl, array $config = []): string
     {
         $_location = $this->buildLocation($location);
@@ -293,7 +299,7 @@ class SftpFileSystem extends FileSystemAwesome implements FileSystemInterface
      * @param string|null $destination
      * @throws FileSystemException
      */
-    private function throw(string $message, string|null $location = null, string|null $destination = null): void
+    private function throw(string $message, string|null $location = null, string|null $destination = null): never
     {
         if ($location) {
             $message .= sprintf(

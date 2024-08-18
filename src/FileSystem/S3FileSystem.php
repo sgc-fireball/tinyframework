@@ -88,7 +88,7 @@ class S3FileSystem extends FileSystemAwesome implements FileSystemInterface
         return $this->fileExists($location);
     }
 
-    public function write(string $location, $contents, array $config = []): self
+    public function write(string $location, mixed $contents, array $config = []): self
     {
         $headers = array_merge(
             ['Content-Type' => 'text/plain'],
@@ -146,7 +146,7 @@ class S3FileSystem extends FileSystemAwesome implements FileSystemInterface
         return $this;
     }
 
-    public function writeStream(string $location, $contents, array $config = []): self
+    public function writeStream(string $location, mixed $contents, array $config = []): self
     {
         $content = '';
         while (!feof($contents)) {
@@ -265,8 +265,8 @@ class S3FileSystem extends FileSystemAwesome implements FileSystemInterface
     public function mimeType(string $location): string
     {
         $response = $this->s3HeadObject($location);
-        [$mimeType,] = explode(';', $response->header('content-type'));
-        return $mimeType ?? 'text/plain';
+        $contentType = $response->header('content-type');
+        return explode(';', $contentType, 2)[0] ?: 'text/plain';
     }
 
     public function url(string $location): string
@@ -425,7 +425,7 @@ class S3FileSystem extends FileSystemAwesome implements FileSystemInterface
         return (new HTTP())->request($method, $url, $body, $headers);
     }
 
-    protected function signUrl(string $method, URL $url, $ttl = 604800): URL
+    protected function signUrl(string $method, URL $url, int $ttl = 604800): URL
     {
         $date = date('Ymd\THis\Z');
         $query = [

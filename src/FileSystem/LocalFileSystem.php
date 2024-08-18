@@ -87,7 +87,7 @@ class LocalFileSystem extends FileSystemAwesome implements FileSystemInterface
         return file_exists($this->normalize($location));
     }
 
-    public function write(string $location, $contents, array $config = []): self
+    public function write(string $location, mixed $contents, array $config = []): self
     {
         $path = $this->normalize($location);
         if (file_put_contents($path, $contents) === false) {
@@ -99,7 +99,7 @@ class LocalFileSystem extends FileSystemAwesome implements FileSystemInterface
         return $this;
     }
 
-    public function writeStream(string $location, $contents, array $config = []): self
+    public function writeStream(string $location, mixed $contents, array $config = []): self
     {
         $this->assertIsResource($contents);
         $this->rewindStream($contents);

@@ -336,7 +336,7 @@ class IMAP
         return $this->copyMessageByUID($uid, $folder, $options);
     }
 
-    public function moveMessageByMsgNo(int $messageNumber, string $folder, int $options = null)
+    public function moveMessageByMsgNo(int $messageNumber, string $folder, int $options = null): self
     {
         return $this->moveMessageByUID($this->getUIDByMsgNo($messageNumber), $folder, $options);
     }

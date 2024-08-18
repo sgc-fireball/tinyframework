@@ -39,6 +39,21 @@ abstract class FileSystemTestCase extends FeatureTestCase
     /**
      * @dataProvider getFileSystems
      */
+    public function testDeepDirectoryExists(FileSystemInterface $fileSystem, string $publicUrl): void
+    {
+        $parent = 'testDeepDirectoryExists';
+        $folder = $parent . '/testDirectoryExists';
+        $this->assertInstanceOf(FileSystemInterface::class, $fileSystem->delete($parent));
+        $this->assertFalse($fileSystem->directoryExists($folder));
+        $this->assertFalse($fileSystem->directoryExists($parent));
+        $this->assertInstanceOf(FileSystemInterface::class, $fileSystem->createDirectory($folder));
+        $this->assertTrue($fileSystem->directoryExists($parent));
+        $this->assertTrue($fileSystem->directoryExists($folder));
+    }
+
+    /**
+     * @dataProvider getFileSystems
+     */
     public function testExists(FileSystemInterface $fileSystem, string $publicUrl): void
     {
         $path = 'testExists';

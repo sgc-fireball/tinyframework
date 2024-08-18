@@ -18,7 +18,7 @@ class Video
 
     private static bool $checked = false;
 
-    public static function createFromFile(string $path): static
+    public static function createFromFile(string $path): self
     {
         return new self($path);
     }
@@ -114,7 +114,7 @@ class Video
     /**
      * @link https://support.google.com/youtube/answer/2853702?hl=de
      */
-    public function resolution(int $resolutions, $target): self
+    public function resolution(int $resolutions, string $target): self
     {
         [$videoBitrate, $audioChannels, $audioSample, $audioBitrate] = match ($resolutions) {
             self::RESOLUTION_240P => ['500k', 1, 48, '128k'], // mono 48khz
@@ -123,6 +123,7 @@ class Video
             self::RESOLUTION_720P => ['5000k', 2, 96, '384k'], // stereo 96khz
             self::RESOLUTION_1080P => ['8000k', 2, 96, '384k'], // stereo 96khz
             self::RESOLUTION_1440P => ['16000k', 2, 96, '384k'], // stereo 96khz
+            default => throw new \InvalidArgumentException('Invalid RESOLUTION value.')
         };
 
         $width = ceil($this->width() / $this->height() * $resolutions);

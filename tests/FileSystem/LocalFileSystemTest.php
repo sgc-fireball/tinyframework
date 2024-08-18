@@ -87,7 +87,7 @@ class LocalFileSystemTest extends FileSystemTestCase
 
     /**
      * @dataProvider getFileSystems
-     */
+         */
     public function testPrivateTemporaryUrl(FileSystemInterface $fileSystem, string $publicUrl): void
     {
         $file = 'testValidTemporaryUrl';

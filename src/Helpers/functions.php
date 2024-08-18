@@ -136,28 +136,28 @@ if (!function_exists('config')) {
 }
 
 if (!function_exists('cache')) {
-    function cache(string $name): CacheInterface
+    function cache(?string $name = null): CacheInterface
     {
         return container('cache' . ($name ? '.' . $name : ''));
     }
 }
 
 if (!function_exists('filesystem')) {
-    function filesystem(string $name): FileSystemInterface
+    function filesystem(?string $name = null): FileSystemInterface
     {
         return container('filesystem' . ($name ? '.' . $name : ''));
     }
 }
 
 if (!function_exists('database')) {
-    function database(string $name): DatabaseInterface
+    function database(?string $name = null): DatabaseInterface
     {
         return container('database' . ($name ? '.' . $name : ''));
     }
 }
 
 if (!function_exists('session')) {
-    function session(string $name): SessionInterface
+    function session(?string $name = null): SessionInterface
     {
         return container('session' . ($name ? '.' . $name : ''));
     }
@@ -173,35 +173,35 @@ if (!function_exists('event')) {
 }
 
 if (!function_exists('logger')) {
-    function logger(string $name): LoggerInterface
+    function logger(?string $name = null): LoggerInterface
     {
         return container('logger' . ($name ? '.' . $name : ''));
     }
 }
 
 if (!function_exists('queue')) {
-    function queue(string $name): QueueInterface
+    function queue(?string $name = null): QueueInterface
     {
         return container('queue' . ($name ? '.' . $name : ''));
     }
 }
 
 if (!function_exists('hasher')) {
-    function hasher(string $name): HashInterface
+    function hasher(?string $name = null): HashInterface
     {
         return container('hash' . ($name ? '.' . $name : ''));
     }
 }
 
 if (!function_exists('crypto')) {
-    function crypto(string $name): CryptInterface
+    function crypto(?string $name = null): CryptInterface
     {
         return container('crypt' . ($name ? '.' . $name : ''));
     }
 }
 
 if (!function_exists('mailer')) {
-    function mailer(string $name): MailerInterface
+    function mailer(?string $name = null): MailerInterface
     {
         return container('mailer' . ($name ? '.' . $name : ''));
     }

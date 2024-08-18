@@ -108,7 +108,6 @@ class Shell
                 restore_error_handler();
             }
         };
-        $closure->bindTo($this, \get_class($this));
         $closure();
     }
 

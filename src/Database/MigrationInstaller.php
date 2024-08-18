@@ -39,7 +39,7 @@ class MigrationInstaller
         sort($files);
         foreach ($files as $file) {
             require_once $file;
-            $class = str_replace('.php', '', basename($file));
+            $class = '\\' . str_replace('.php', '', basename($file));
             if (!($class instanceof MigrationInterface)) {
                 continue;
             }

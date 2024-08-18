@@ -15,7 +15,7 @@ interface FileSystemInterface
 
     public function exists(string $location): bool;
 
-    public function write(string $location, $contents, array $config = []): FileSystemInterface;
+    public function write(string $location, mixed $contents, array $config = []): FileSystemInterface;
 
     /**
      * @param string $location
@@ -23,7 +23,7 @@ interface FileSystemInterface
      * @param array $config
      * @return FileSystemInterface
      */
-    public function writeStream(string $location, $contents, array $config = []): FileSystemInterface;
+    public function writeStream(string $location, mixed $contents, array $config = []): FileSystemInterface;
 
     public function read(string $location): string;
 

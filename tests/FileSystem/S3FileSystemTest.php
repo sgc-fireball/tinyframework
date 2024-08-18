@@ -64,6 +64,14 @@ class S3FileSystemTest extends FileSystemTestCase
     /**
      * @dataProvider getFileSystems
      */
+    public function testDeepDirectoryExists(FileSystemInterface $fileSystem, string $publicUrl): void
+    {
+        $this->markTestSkipped('Unsupported on S3, because directory are not supported.');
+    }
+
+    /**
+     * @dataProvider getFileSystems
+     */
     public function testExists(FileSystemInterface $fileSystem, string $publicUrl): void
     {
         $this->markTestSkipped('Unsupported on S3, because no directory exists.');
