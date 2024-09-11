@@ -5,20 +5,17 @@ declare(strict_types=1);
 namespace TinyFramework\Tests\Feature\Database;
 
 use TinyFramework\Database\BaseModel;
-use TinyFramework\Database\MySQL\Database;
 use TinyFramework\Database\Relations\BelongsToOne;
 use TinyFramework\Tests\Feature\FeatureTestCase;
 
 class BelongsToOneModelA extends BaseModel
 {
-    protected string $connection = 'mysql';
     protected string $table = 'test_model_a';
     protected array $fillable = ['id', 'name'];
 }
 
 class BelongsToOneModelB extends BaseModel
 {
-    protected string $connection = 'mysql';
     protected string $table = 'test_model_b';
     protected array $fillable = ['id', 'name', 'belongs_to_one_model_a_id'];
 
@@ -33,8 +30,8 @@ class BelongsToOneTest extends FeatureTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $database = $this->container->get('database');
-        assert($database instanceof Database);
+        $database = $this->container->get('database.' . config('database.default'));
+        assert($database instanceof DatabaseInterface);
         $database->execute('DROP TABLE IF EXISTS `test_model_a`');
         $database->execute('DROP TABLE IF EXISTS `test_model_b`');
         $database->execute('CREATE TABLE IF NOT EXISTS `test_model_a` (`id` char(36) NOT NULL,`name` char(36) NOT NULL,PRIMARY KEY (`id`))');

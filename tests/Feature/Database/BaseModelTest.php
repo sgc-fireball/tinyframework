@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace TinyFramework\Tests\Feature\Database;
 
 use TinyFramework\Database\BaseModel;
-use TinyFramework\Database\MySQL\Database;
+use TinyFramework\Database\DatabaseInterface;
 use TinyFramework\Tests\Feature\FeatureTestCase;
 
 class TestModel extends BaseModel
 {
-    protected string $connection = 'mysql';
     protected string $table = 'test_model';
     protected array $fillable = ['id', 'name'];
 }
@@ -20,8 +19,8 @@ class BaseModelTest extends FeatureTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $database = $this->container->get('database');
-        assert($database instanceof Database);
+        $database = $this->container->get('database.' . config('database.default'));
+        assert($database instanceof DatabaseInterface);
         $database->execute('DROP TABLE IF EXISTS `test_model`');
         $database->execute(
             'CREATE TABLE IF NOT EXISTS `test_model` (`id` char(36) NOT NULL,`name` varchar(255) NOT NULL,PRIMARY KEY (`id`))'
@@ -30,8 +29,8 @@ class BaseModelTest extends FeatureTestCase
 
     public function tearDown(): void
     {
-        $database = $this->container->get('database');
-        assert($database instanceof Database);
+        $database = $this->container->get('database.' . config('database.default'));
+        assert($database instanceof DatabaseInterface);
         $database->execute('DROP TABLE IF EXISTS `test_model`');
         parent::tearDown();
     }

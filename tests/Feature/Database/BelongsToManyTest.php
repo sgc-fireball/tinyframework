@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace TinyFramework\Tests\Feature\Database;
 
 use TinyFramework\Database\BaseModel;
-use TinyFramework\Database\MySQL\Database;
+use TinyFramework\Database\DatabaseInterface;
 use TinyFramework\Database\Relations\BelongsToMany;
 use TinyFramework\Tests\Feature\FeatureTestCase;
 
 class BelongsToManyModelA extends BaseModel
 {
-    protected string $connection = 'mysql';
     protected string $table = 'test_model_a';
     protected array $fillable = ['id', 'name'];
 
@@ -23,7 +22,6 @@ class BelongsToManyModelA extends BaseModel
 
 class BelongsToManyModelB extends BaseModel
 {
-    protected string $connection = 'mysql';
     protected string $table = 'test_model_b';
     protected array $fillable = ['id', 'name'];
 
@@ -38,8 +36,8 @@ class BelongsToManyTest extends FeatureTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $database = $this->container->get('database');
-        assert($database instanceof Database);
+        $database = $this->container->get('database.' . config('database.default'));
+        assert($database instanceof DatabaseInterface);
         $database->execute('DROP TABLE IF EXISTS `test_model_a`');
         $database->execute('DROP TABLE IF EXISTS `test_model_b`');
         $database->execute('DROP TABLE IF EXISTS `test_model_a_2_test_model_b`');
@@ -62,8 +60,8 @@ class BelongsToManyTest extends FeatureTestCase
 
     public function testFoundModels(): void
     {
-        $modelA = (new BelongsToManyModelA(['name' => 'modela']))->save();
-        $modelB = (new BelongsToManyModelB(['name' => 'modelb']))->save();
+        (new BelongsToManyModelA(['name' => 'modela']))->save();
+        (new BelongsToManyModelB(['name' => 'modelb']))->save();
         $this->assertEquals(
             1,
             BelongsToManyModelA::query()->count(),
@@ -92,7 +90,7 @@ class BelongsToManyTest extends FeatureTestCase
             BelongsToManyModelB::query()->count(),
             'Found an invalid count for BelongsToManyModelB entries.'
         );
-        /** @var Database $database */
+        /** @var DatabaseInterface $database */
         $database = container('database');
         $database->execute(
             sprintf(
@@ -132,7 +130,7 @@ class BelongsToManyTest extends FeatureTestCase
         $modelB3 = (new BelongsToManyModelB(['name' => 'modelb3']))->save();
         $modelB4 = (new BelongsToManyModelB(['name' => 'modelb4']))->save();
 
-        /** @var Database $database */
+        /** @var DatabaseInterface $database */
         $database = container('database');
         $database->execute(
             sprintf(

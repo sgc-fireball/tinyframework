@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TinyFramework\Tests\Feature\Database;
 
 use TinyFramework\Database\BaseModel;
-use TinyFramework\Database\MySQL\Database;
 use TinyFramework\Database\Relations\HasOne;
 use TinyFramework\Tests\Feature\FeatureTestCase;
 
@@ -76,8 +75,8 @@ class EagerLoadingTest extends FeatureTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $database = $this->container->get('database');
-        assert($database instanceof Database);
+        $database = $this->container->get('database.' . config('database.default'));
+        assert($database instanceof DatabaseInterface);
     }
 
     public function testGetterSetterWith(): void

@@ -15,4 +15,11 @@ return [
         'collation' => env('MYSQL_COLLATION', 'utf8mb4_general_ci'),
         'timezone' => env('MYSQL_TIMEZONE', env('APP_TIMEZONE', 'UTC')),
     ],
+    'sqlite3' => [
+        'driver' => \TinyFramework\Database\SQLite\Database::class,
+        'file' => env('SQLITE3_FILE', storage_dir('database.sqlite3')),
+        'flags' => env('SQLITE3_FLAGS', 2 /* SQLITE3_OPEN_READWRITE */ | 4 /* SQLITE3_OPEN_CREATE*/),
+        'encryption' => env('SQLITE3_ENCRYPTION'),
+        'timezone' => env('SQLITE3_TIMEZONE', env('APP_TIMEZONE', 'UTC')),
+    ],
 ];

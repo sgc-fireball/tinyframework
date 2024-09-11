@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace TinyFramework\Tests\Feature\Database;
 
 use TinyFramework\Database\BaseModel;
-use TinyFramework\Database\MySQL\Database;
+use TinyFramework\Database\DatabaseInterface;
 use TinyFramework\Database\Relations\BelongsToMany;
 use TinyFramework\Database\Relations\HasOne;
 use TinyFramework\Tests\Feature\FeatureTestCase;
 
 class HasOneModelA extends BaseModel
 {
-    protected string $connection = 'mysql';
     protected string $table = 'test_model_a';
     protected array $fillable = ['id', 'name'];
 
@@ -24,7 +23,6 @@ class HasOneModelA extends BaseModel
 
 class HasOneModelB extends BaseModel
 {
-    protected string $connection = 'mysql';
     protected string $table = 'test_model_b';
     protected array $fillable = ['id', 'name', 'has_one_model_a_id'];
 }
@@ -34,8 +32,8 @@ class HasOneTest extends FeatureTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $database = $this->container->get('database');
-        assert($database instanceof Database);
+        $database = $this->container->get('database.' . config('database.default'));
+        assert($database instanceof DatabaseInterface);
         $database->execute('DROP TABLE IF EXISTS `test_model_a`');
         $database->execute('DROP TABLE IF EXISTS `test_model_b`');
         $database->execute(

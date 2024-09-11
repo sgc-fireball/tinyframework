@@ -30,7 +30,6 @@
   "require": {
     "php": "^8.2||^8.3",
     "ext-json": "*",
-    "ext-mysqli": "*",
     "ext-simplexml": "*",
     "ext-readline": "*",
     "ext-mbstring": "*",
@@ -69,7 +68,9 @@
     "ext-redis": "To use Redis for Caching, Queues instanceof database or file systems.",
     "ext-sodium": "To use curve encryption, for example jwt(EdDSA).",
     "ext-ssh2": "To use sftp filesystem.",
-    "ext-swoole": "To use swoole http server to speed up your application."
+    "ext-swoole": "To use swoole http server to speed up your application.",
+    "ext-mysqli": "To use mysqli database engine.",
+    "ext-sqlite3": "To use sqlite3 database engine."
   },
   "support": {
     "issues": "https://github.com/sgc-fireball/tinyframework/issues"
