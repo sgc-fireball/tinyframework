@@ -285,7 +285,7 @@ class Query extends QueryAwesome
     {
         $sql = rtrim(
             vnsprintf(
-                'SELECT {field} FROM {table} {join} {where} {group} {having} {order} {limit} {offset}',
+                'SELECT {field} FROM `{table}` {join} {where} {group} {having} {order} {limit} {offset}',
                 [
                     'field' => $this->compileSelect($this->select),
                     'table' => $this->table,
@@ -314,7 +314,7 @@ class Query extends QueryAwesome
     {
         if (array_key_exists('id', $fields) && $fields['id']) {
             $query = vnsprintf(
-                'INSERT INTO `{table}` ({fieldList}) VALUES ({fieldValues}) ON CONFLICT(id) DO UPDATE SET {fields2} WHERE `id` = {id}',
+                'INSERT INTO `{table}` ({fieldList}) VALUES ({fieldValues}) ON CONFLICT (`id`) DO UPDATE SET {fields2}',
                 [
                     'table' => $this->table,
                     'fieldList' => $this->compileFieldList($fields),
@@ -324,7 +324,6 @@ class Query extends QueryAwesome
                             return $key !== 'id';
                         }, ARRAY_FILTER_USE_BOTH)
                     ),
-                    'id' => $this->driver->escape($fields['id'])
                 ]
             );
             $this->driver->execute($query);
@@ -347,7 +346,7 @@ class Query extends QueryAwesome
     {
         $query = rtrim(
             vnsprintf(
-                'DELETE FROM {table} {where} {order} {limit} {offset}',
+                'DELETE FROM `{table}` {where} {order} {limit} {offset}',
                 [
                     'table' => $this->table,
                     'where' => $this->compileWhere($this->wheres, 'WHERE'),

@@ -101,24 +101,7 @@ class Database implements DatabaseInterface
             }
         }
 
-        /**
-         * @link https://github.com/abreksa4/sqlite-escape-string-polyfill/blob/master/src/functions.php
-         * @link https://dev.sqlite.com/doc/refman/8.0/en/string-literals.html#character-escape-sequences
-         */
-        $value = strtr($value, [
-            "\0" => "\\0",
-            "\n" => "\\n",
-            "\r" => "\\r",
-            "\t" => "\\t",
-            chr(26) => "\\Z",
-            chr(8) => "\\b",
-            '"' => '\"',
-            "'" => "\'",
-            '_' => '\_',
-            '%' => '\%',
-            '\\' => '\\\\',
-        ]);
-        return '"' . $value . '"';
+        return '"' . SQLite3::escapeString($value) . '"';
     }
 
     public function query(): Query

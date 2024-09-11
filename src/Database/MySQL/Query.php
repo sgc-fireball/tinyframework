@@ -252,7 +252,7 @@ class Query extends QueryAwesome
     {
         $sql = rtrim(
             vnsprintf(
-                'SELECT {field} FROM {table} {join} {where} {group} {having} {order} {limit} {offset}',
+                'SELECT {field} FROM `{table}` {join} {where} {group} {having} {order} {limit} {offset}',
                 [
                     'field' => $this->compileSelect($this->select),
                     'table' => $this->table,
@@ -311,7 +311,7 @@ class Query extends QueryAwesome
     {
         $query = rtrim(
             vnsprintf(
-                'DELETE FROM {table} {where} {order} {limit} {offset}',
+                'DELETE FROM `{table}` {where} {order} {limit} {offset}',
                 [
                     'table' => $this->table,
                     'where' => $this->compileWhere($this->wheres, 'WHERE'),
