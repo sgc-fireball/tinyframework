@@ -248,6 +248,39 @@ class Query extends QueryAwesome
         );
     }
 
+    private function compileFieldList(array $fields = []): string
+    {
+        return trim(
+            implode(
+                ', ',
+                array_map(function ($value, $key) {
+                    return sprintf(
+                        '`%s`',
+                        str_replace('`', '', $key)
+                    );
+                }, array_values($fields), array_keys($fields))
+            ),
+            ' ,'
+        );
+    }
+
+    private function compileFieldValues(array $fields = []): string
+    {
+        $self = $this;
+        return trim(
+            implode(
+                ', ',
+                array_map(function ($value) use ($self) {
+                    return sprintf(
+                        '%s',
+                        $self->driver->escape($value)
+                    );
+                }, array_values($fields), array_keys($fields))
+            ),
+            ' ,'
+        );
+    }
+
     public function toSql(): string
     {
         $sql = rtrim(
@@ -281,10 +314,11 @@ class Query extends QueryAwesome
     {
         if (array_key_exists('id', $fields) && $fields['id']) {
             $query = vnsprintf(
-                'INSERT INTO `{table}` SET {fields1} ON DUPLICATE KEY UPDATE {fields2}',
+                'INSERT INTO `{table}` ({fieldList}) VALUES ({fieldValues}) ON DUPLICATE KEY UPDATE {fields2}',
                 [
                     'table' => $this->table,
-                    'fields1' => $this->compileFieldSet($fields),
+                    'fieldList' => $this->compileFieldList($fields),
+                    'fieldValues' => $this->compileFieldValues($fields),
                     'fields2' => $this->compileFieldSet(
                         array_filter($fields, function ($value, $key) {
                             return $key !== 'id';
@@ -295,10 +329,11 @@ class Query extends QueryAwesome
             $this->driver->execute($query);
         } else {
             $query = vnsprintf(
-                'INSERT INTO `{table}` SET {fields}',
+                'INSERT INTO `{table}` ({fieldList}) VALUES {fieldValues}',
                 [
                     'table' => $this->table,
-                    'fields' => $this->compileFieldSet($fields),
+                    'fieldList' => $this->compileFieldList($fields),
+                    'fieldValues' => $this->compileFieldValues($fields),
                 ]
             );
             $this->driver->execute($query);
