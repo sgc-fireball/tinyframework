@@ -94,14 +94,14 @@ class BelongsToManyTest extends FeatureTestCase
         $database = container('database');
         $database->execute(
             sprintf(
-                'INSERT INTO `test_model_a_2_test_model_b` SET test_model_a_id=%s, test_model_b_id=%s',
+                'INSERT INTO `test_model_a_2_test_model_b` (test_model_a_id, test_model_b_id) VALUES (%s, %s)',
                 $database->escape($modelA->id),
                 $database->escape($modelB->id),
             )
         );
         $database->execute(
             sprintf(
-                'INSERT INTO `test_model_a_2_test_model_b` SET test_model_a_id=%s, test_model_b_id=%s',
+                'INSERT INTO `test_model_a_2_test_model_b` (test_model_a_id, test_model_b_id) VALUES (%s, %s)',
                 $database->escape($modelAA->id),
                 $database->escape($modelBB->id),
             )
@@ -134,28 +134,28 @@ class BelongsToManyTest extends FeatureTestCase
         $database = container('database');
         $database->execute(
             sprintf(
-                'INSERT INTO `test_model_a_2_test_model_b` SET test_model_a_id=%s, test_model_b_id=%s',
+                'INSERT INTO `test_model_a_2_test_model_b` (test_model_a_id, test_model_b_id) VALUES (%s, %s)',
                 $database->escape($modelA1->id),
                 $database->escape($modelB1->id),
             )
         );
         $database->execute(
             sprintf(
-                'INSERT INTO `test_model_a_2_test_model_b` SET test_model_a_id=%s, test_model_b_id=%s',
+                'INSERT INTO `test_model_a_2_test_model_b` (test_model_a_id, test_model_b_id) VALUES (%s, %s)',
                 $database->escape($modelA1->id),
                 $database->escape($modelB2->id),
             )
         );
         $database->execute(
             sprintf(
-                'INSERT INTO `test_model_a_2_test_model_b` SET test_model_a_id=%s, test_model_b_id=%s',
+                'INSERT INTO `test_model_a_2_test_model_b` (test_model_a_id, test_model_b_id) VALUES (%s, %s)',
                 $database->escape($modelA2->id),
                 $database->escape($modelB3->id),
             )
         );
         $database->execute(
             sprintf(
-                'INSERT INTO `test_model_a_2_test_model_b` SET test_model_a_id=%s, test_model_b_id=%s',
+                'INSERT INTO `test_model_a_2_test_model_b` (test_model_a_id, test_model_b_id) VALUES (%s, %s)',
                 $database->escape($modelA2->id),
                 $database->escape($modelB4->id),
             )
