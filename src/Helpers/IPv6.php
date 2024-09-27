@@ -9,6 +9,9 @@ use RuntimeException;
 
 class IPv6
 {
+
+    use Macroable;
+
     private string $ipAddr = '::1';
 
     private int $cidr = 64;

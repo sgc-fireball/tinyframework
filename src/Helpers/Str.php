@@ -11,6 +11,9 @@ use TinyFramework\Http\URL;
  */
 class Str implements \Stringable
 {
+
+    use Macroable;
+
     protected string $value = '';
 
     public static function factory(string $value = ''): Str

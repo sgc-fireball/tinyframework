@@ -6,6 +6,9 @@ namespace TinyFramework\Helpers;
 
 class IPv4
 {
+
+    use Macroable;
+
     private string $ipAddr = '0.0.0.0';
 
     private int $cidr = 0;

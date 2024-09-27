@@ -9,6 +9,9 @@ namespace TinyFramework\Helpers;
  */
 class GPS
 {
+
+    use Macroable;
+
     protected string $latitudeDirections = 'N';
 
     protected int $latitudeHours = 0;

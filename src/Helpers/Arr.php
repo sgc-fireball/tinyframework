@@ -12,6 +12,9 @@ namespace TinyFramework\Helpers;
 #[\AllowDynamicProperties]
 class Arr implements \ArrayAccess, \Iterator, \Countable
 {
+
+    use Macroable;
+
     protected array $items = [];
 
     /**

@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace TinyFramework\Helpers;
 
-use RuntimeException;
-
 class ImageOptimizer
 {
+
+    use Macroable;
+
     public static function optimize(string $path): bool
     {
         return match (mimetype_from_file($path)) {

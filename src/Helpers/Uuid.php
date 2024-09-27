@@ -12,6 +12,9 @@ namespace TinyFramework\Helpers;
  */
 class Uuid
 {
+
+    use Macroable;
+
     /**
      * midnight 15 October 1582 UTC
      */

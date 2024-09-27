@@ -10,6 +10,8 @@ use TinyFramework\Http\URL;
 class HTTP
 {
 
+    use Macroable;
+
     public function __construct()
     {
         if (!extension_loaded('curl')) {
