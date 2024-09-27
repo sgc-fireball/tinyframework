@@ -790,3 +790,10 @@ if (!function_exists('sigmoid')) {
         return 1 / (1 + pow(M_EULER, -$t));
     }
 }
+
+if (!function_exists('datetime')) {
+    function datetime(string $datetime = 'now', DateTimeZone|null $timezone = null): DateTime
+    {
+        return new DateTime($datetime, $timezone);
+    }
+}
