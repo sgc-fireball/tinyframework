@@ -9,6 +9,8 @@ use RuntimeException;
 class Video
 {
 
+    use Macroable;
+
     public const RESOLUTION_240P = 240;
     public const RESOLUTION_360P = 360;
     public const RESOLUTION_480P = 480;
@@ -56,6 +58,56 @@ class Video
             throw new RuntimeException('Could not create thumbnail from ' . $this->path);
         }
         return Image::createFromImage($outputPath);
+    }
+
+    /**
+     * @see https://developer.bitmovin.com/playback/docs/webvtt-based-thumbnails
+     * @see https://bitmovin.com/demos/thumbnail-seeking
+     * @param int $second default is zero, that means we are creating automatically 100 positions, but maximal one per second.
+     * @return array<Image, string>
+     */
+    public function webvtt(string $target, int $second = 0, int $width = 120): array
+    {
+        $content = "WEBVTT";
+        $duration = $this->duration();
+        if ($second < 1) {
+            $second = max(1, (int)($duration / 100));
+        }
+        $images = min(100, (int)($duration / $second));
+        $ratio = $width / $this->width();
+        $height = (int)($this->height() * $ratio);
+        $webVttImage = new Image($width, $height * $images);
+        for ($position = 0; $position < $images; $position += 1) {
+            $time = $position * $second;
+            $offsetY = $position * $height;
+            $content .= sprintf(
+                "\n\n%s.000 --> %s.000\n%s#xywh=0,%d,%d,%d",
+                $this->secondsToHis($time),
+                $this->secondsToHis($time + $second),
+                $target,
+                $offsetY,
+                $width,
+                $height
+            );
+            $frame = $this->frame($time);
+            $webVttImage->drawImage(
+                $frame,
+                0,
+                $offsetY,
+                0,
+                0,
+                $width,
+                $height,
+                $frame->getWidth(),
+                $frame->getHeight()
+            );
+        }
+        return [$webVttImage, $content];
+    }
+
+    private function secondsToHis(int $seconds): string
+    {
+        return sprintf('%02d:%02d:%02d', ($seconds / 3600), ($seconds / 60 % 60), $seconds % 60);
     }
 
     public function duration(): int

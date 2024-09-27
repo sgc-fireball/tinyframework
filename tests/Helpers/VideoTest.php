@@ -77,7 +77,7 @@ class VideoTest extends TestCase
     /**
      * @dataProvider resolutionProvider
      */
-    public function testResolution(int $resolution)
+    public function testResolution(int $resolution): void
     {
         if (!command_exists('ffmpeg')) {
             $this->markTestSkipped('Missing ffmpeg.');
@@ -99,5 +99,36 @@ class VideoTest extends TestCase
         $this->assertInstanceOf(Video::class, Video::createFromFile($path)->resolution($resolution, $target));
         $this->assertTrue(is_file($target));
         $this->assertTrue(is_readable($target));
+    }
+
+    public function testWebVttThumbnails(): void
+    {
+        if (!command_exists('ffmpeg')) {
+            $this->markTestSkipped('Missing ffmpeg.');
+        }
+        if (!command_exists('ffprobe')) {
+            $this->markTestSkipped('Missing ffprobe.');
+        }
+        $path = 'tests/assets/video.mp4';
+        $this->assertTrue(is_file($path));
+        $this->assertTrue(is_readable($path));
+
+        $video = Video::createFromFile($path);
+        [$thumbnail, $webvtt] = $video->webvtt('video.jpg');
+        $this->assertInstanceOf(Image::class, $thumbnail);
+        $this->assertIsString($webvtt);
+        $this->assertStringStartsWith('WEBVTT', $webvtt);
+
+        $vttThumbnail = str_replace('mp4', 'jpg', $path);
+        $thumbnail->saveJpeg($vttThumbnail);
+
+        $webVttPath = str_replace('mp4', 'vtt', $path);
+        file_put_contents($webVttPath, $webvtt);
+
+        $this->assertTrue(is_file($webVttPath));
+        $this->assertTrue(is_readable($webVttPath));
+
+        $this->assertTrue(is_file($vttThumbnail));
+        $this->assertTrue(is_readable($vttThumbnail));
     }
 }

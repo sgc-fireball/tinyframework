@@ -10,6 +10,9 @@ use RuntimeException;
 
 class Image
 {
+
+    use Macroable;
+
     public const MAX_SIZE = 1920 * 2;
 
     private string|null $path = null;
@@ -494,6 +497,23 @@ class Image
             $this->height // dst height
         );
         return $image;
+    }
+
+    public function drawImage(Image|GdImage $image, int $dstX, int $dstY, int $srcX, int $srcY, int $dstWidth, int $dstHeight, int $srcWidth, int $srcHeight): self
+    {
+        imagecopyresampled(
+            $this->image, // dst
+            $image instanceOf Image ? $image->image : $image, // src
+            $dstX, // dst x
+            $dstY, // dst y
+            $srcX, // src x
+            $srcY, // src y
+            $dstWidth, // dst width
+            $dstHeight, // dst height
+            $srcWidth, // src width
+            $srcHeight, // src height
+        );
+        return $this;
     }
 
     /**
