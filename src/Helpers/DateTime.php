@@ -579,6 +579,15 @@ class DateTime extends \DateTime implements JsonSerializable, Stringable, DateTi
         return clone $this;
     }
 
+    public function diff(DateTimeInterface $targetObject, bool $absolute = false): DateInterval|false
+    {
+        $di = parent::diff($targetObject, $absolute);
+        if ($di === false) {
+            return false;
+        }
+        return DateInterval::wrap($di);
+    }
+
     public function diffInSeconds(DateTime $dateTime, bool $absolute = false): int
     {
         $diff = $this->diff($dateTime, $absolute);
@@ -588,7 +597,7 @@ class DateTime extends \DateTime implements JsonSerializable, Stringable, DateTi
             + $diff->h * 60 * 60
             + $diff->m * 60
             + $diff->s;
-        return !$absolute && $this->lessThan($dateTime) ? -1*$result : $result;
+        return !$absolute && $this->lessThan($dateTime) ? -1 * $result : $result;
     }
 
     public function diffInMinutes(DateTime $dateTime, bool $absolute = false): int
@@ -599,7 +608,7 @@ class DateTime extends \DateTime implements JsonSerializable, Stringable, DateTi
             + $diff->d * 24 * 60
             + $diff->h * 60
             + $diff->i;
-        return !$absolute && $this->lessThan($dateTime) ? -1*$result : $result;
+        return !$absolute && $this->lessThan($dateTime) ? -1 * $result : $result;
     }
 
     public function diffInHours(DateTime $dateTime, bool $absolute = false): int
@@ -609,13 +618,14 @@ class DateTime extends \DateTime implements JsonSerializable, Stringable, DateTi
             + $diff->m * 30 * 24
             + $diff->d * 24
             + $diff->h;
-        return !$absolute && $this->lessThan($dateTime) ? -1*$result : $result;
+        return !$absolute && $this->lessThan($dateTime) ? -1 * $result : $result;
     }
 
     public function diffInDays(DateTime $dateTime, bool $absolute = false): int
     {
-        $result = (int)$this->diff($dateTime, $absolute)->format('%a');
-        return !$absolute && $this->lessThan($dateTime) ? -1*$result : $result;
+        $diff = $this->toTimestamp() - $dateTime->toTimestamp();
+        $result = abs(round($diff / 86400));
+        return !$absolute && $this->lessThan($dateTime) ? -1 * $result : $result;
     }
 
     public function diffInWeeks(DateTime $dateTime, bool $absolute = false): int
@@ -628,13 +638,13 @@ class DateTime extends \DateTime implements JsonSerializable, Stringable, DateTi
         $diff = $this->diff($dateTime, $absolute);
         $result = $diff->y * 12
             + $diff->m;
-        return !$absolute && $this->lessThan($dateTime) ? -1*$result : $result;
+        return !$absolute && $this->lessThan($dateTime) ? -1 * $result : $result;
     }
 
     public function diffInYears(DateTime $dateTime, bool $absolute = false): int
     {
         $result = $this->diff($dateTime, $absolute)->y;
-        return !$absolute && $this->lessThan($dateTime) ? -1*$result : $result;
+        return !$absolute && $this->lessThan($dateTime) ? -1 * $result : $result;
     }
 
     public function diffForHumans(DateTime $dateTime, bool $absolute = false): string
