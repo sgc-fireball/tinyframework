@@ -78,7 +78,8 @@ class Request implements RequestInterface
         URL $url,
         array $get = [],
         array|string $post = [],
-        array $headers = []
+        array $headers = [],
+        array $cookies = []
     ): Request {
         $request = new self();
         $request->realIp = $request->ip = $headers['REMOTE_ADDR'] ?? '127.0.0.1';
@@ -88,10 +89,21 @@ class Request implements RequestInterface
         parse_str((string)$url->query(), $request->get);
         $request->get = array_merge($request->get, $get);
         $request->post = is_array($post) ? $post : [];
-        $request->cookie = [];
-        $request->header = array_map(function (array|string $value): array {
-            return is_array($value) ? array_values($value) : [$value];
-        }, array_values($headers));
+        $request->cookie = $cookies;
+        $request->header = array_combine(
+            array_map(
+                function (string $key): string {
+                    return mb_strtolower(str_replace('-', '_', $key));
+                },
+                array_keys($headers)
+            ),
+            array_map(
+                function (array|string $value): array {
+                    return is_array($value) ? array_values($value) : [$value];
+                },
+                array_values($headers)
+            )
+        );
         $request->body = is_string($post) ? $post : null;
         return self::compileTrustedProxies($request);
     }
