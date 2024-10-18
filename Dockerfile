@@ -19,6 +19,7 @@ RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg -
 RUN add-apt-repository ppa:ondrej/php && \
     apt-get -qy update && \
     apt-get -qy install --fix-missing --no-install-recommends \
+    imagemagick \
     php-sodium \
     php8.2-cli php8.2-readline php8.2-mysql php8.2-mbstring php8.2-redis php8.2-amqp php8.2-xml php8.2-intl php8.2-imap \
     php8.2-zip php8.2-xdebug php8.2-opcache php8.2-curl php8.2-gd php8.2-imagick php8.2-swoole php8.2-mcrypt php8.2-ftp \
