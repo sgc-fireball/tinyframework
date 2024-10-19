@@ -27,9 +27,15 @@ class TinyframeworkCheckCommand extends CommandAwesome
     {
         parent::run($input, $output);
         $this->checkSetting('date.timezone', ['UTC']);
-        $this->checkSetting('error_reporting', [0]);
+        $this->checkSetting('error_reporting', [E_ALL, 'E_ALL']);
+        $this->checkSetting('report_memleaks', ['On', '1', 1, 'true']);
         $this->checkSetting('ignore_user_abort', [0]);
+        $this->checkSetting('ignore_repeated_errors', ['Off', '', 0, '0', 'false', false, null]);
+        $this->checkSetting('allow_url_open', ['Off', '', 0, '0', 'false', false, null]);
+        $this->checkSetting('allow_url_include', ['Off', '', 0, '0', 'false', false, null]);
+        $this->checkSetting('expose_php', ['Off', '', 0, '0', 'false', false, null]);
         $this->checkSetting('display_errors', ['Off', '', 0, '0', 'false', false, null]);
+        $this->checkSetting('display_startup_errors', ['Off', '', 0, '0', 'false', false, null]);
         $this->checkSetting('variables_order', ['EGPCS', 'ES']);
         $this->checkSetting('request_order', ['GP']);
         return 0;

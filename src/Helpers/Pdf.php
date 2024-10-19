@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TinyFramework\Helpers;
 
 use Imagick;
+use ImagickPixel;
 use RuntimeException;
 
 class Pdf
@@ -68,7 +69,7 @@ class Pdf
         return $this->pages;
     }
 
-    public function thumbnail(int $page = 1): ?Image
+    public function thumbnail(int $page = 1, int $width = 1920): ?Image
     {
         if ($page > $this->getPages()) {
             return null;
@@ -76,19 +77,18 @@ class Pdf
         if ($page < 1) {
             throw new \InvalidArgumentException('Invalid page. Range: 1-' . $this->getPages());
         }
-        $imagick = new Imagick($this->path . '[' . ($page - 1) . ']');
+
+        $imagick = new Imagick();
+        $imagick->setResolution(300, 300);
+        $imagick->readImage($this->path . '[' . ($page - 1) . ']');
+        $imagick->scaleImage($width, (int)($width / $this->getWidth() * $this->getHeight()));
+        $imagick->setImageColorspace(255);
         $imagick->setImageFormat('png');
-
-        $white = new Imagick();
-
-        $white->newImage($imagick->getImageWidth(), $imagick->getImageHeight(), "white");
-        $white->compositeimage($imagick, Imagick::COMPOSITE_OVER, 0, 0);
-        $white->setImageFormat('png');
-        #$white->writeImage('opaque.jpg');
-
-        $blob = $white->getImageBlob();
+        $imagick->setCompressionQuality(100);
+        $imagick->setImageBackgroundColor(new ImagickPixel('white'));
+        $imagick->setImageAlphaChannel(Imagick::ALPHACHANNEL_REMOVE);
+        $blob = $imagick->getImageBlob();
         $imagick->destroy();
-        $white->destroy();
         return Image::createFromString($blob);
     }
 
