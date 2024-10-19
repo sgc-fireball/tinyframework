@@ -88,7 +88,6 @@ class StringType extends AbstractType
                     throw new OpenAPIException('Invalid ' . $this->format . '.', 400);
                 }
             } elseif ($this->format === 'hex') {
-                // @TODO why o0 ?
                 if (!preg_match('/^[0-9a-f]+$/i', $value)) {
                     throw new OpenAPIException('Invalid ' . $this->format . '.', 400);
                 }
