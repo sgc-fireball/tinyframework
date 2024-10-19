@@ -82,10 +82,8 @@ phpx console
 
 - Implement DateTime wrapper
 - Implement Input::choise, Input::question, Input::confirm
-- Implement Model Relations
 - Implement Casts into Models
 - Implement Auth Service / Interface
-- create tinyframework-echo as a nodejs repo with a node server
 - URL Signer
 - https://github.com/opis/closure/
 - Implement ServiceProviders::provides to implement lazy loading services
