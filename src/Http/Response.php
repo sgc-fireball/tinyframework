@@ -87,6 +87,7 @@ class Response
 
     private array $headers = [
         'content-type' => 'text/html; charset=utf-8',
+        'cache-control' => 'no-store',
         #'content-security-policy' => "default-src 'none'; script-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self';",
         #'permissions-policy' => 'accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()',
         #'referrer-policy' => 'strict-origin-when-cross-origin',
@@ -100,6 +101,12 @@ class Response
     private string $id;
 
     private ?SessionInterface $session = null;
+
+    private array $flashInputs = [];
+
+    private array $flashErrors = [];
+
+    private array $flashMessages = [];
 
     public static function new(?string $content = '', int $code = 200, array $headers = []): Response
     {
@@ -181,23 +188,41 @@ class Response
 
     public function withInput(array $input = null): static
     {
-        if ($this->session) {
-            if ($input === null) {
-                $request = container('request');
-                assert($request instanceof RequestInterface);
-                $input = array_merge($request->get(), $request->post());
-            }
-            $this->session->set('flash_inputs', $input);
+        if ($input === null) {
+            $request = container('request');
+            assert($request instanceof RequestInterface);
+            $input = array_merge($request->get(), $request->post());
         }
+        $this->flashInputs = $input;
         return $this;
+    }
+
+    public function getFlashInputs(): array
+    {
+        return $this->flashInputs;
     }
 
     public function withErrors(array $errors = []): static
     {
-        if ($this->session) {
-            $this->session->set('flash_errors', $errors);
-        }
+        $this->flashErrors = $errors;
         return $this;
+    }
+
+    public function getFlashErrors(): array
+    {
+        return $this->flashErrors;
+    }
+
+    public function withFlashMessage(string $type, string $message): static
+    {
+        $this->flashMessages[$type] ??= [];
+        $this->flashMessages[$type][] = $message;
+        return $this;
+    }
+
+    public function getFlashMessages(): array
+    {
+        return $this->flashMessages;
     }
 
     public function id(): string
@@ -237,7 +262,7 @@ class Response
         bool $secure = false,
         bool $httponly = false,
         bool $partitioned = false,
-        string $sameSite = ''
+        string $sameSite = 'strict'
     ): static {
         $line = sprintf('%s=%s', urlencode($name), urlencode($value));
         if ($httponly) {

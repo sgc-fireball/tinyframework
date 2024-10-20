@@ -89,7 +89,7 @@ class PasswordRule extends RuleAwesome
             );
         }
 
-        if (self::$requirements['notCompromised']) {
+        if (count($errors) === 0 && self::$requirements['notCompromised']) {
             $prefix = substr($hash = strtoupper(sha1($value)), 0, 5);
             $postfix = substr($hash, 5);
             if (!extension_loaded('curl')) {

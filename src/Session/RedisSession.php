@@ -48,7 +48,9 @@ class RedisSession extends SessionAwesome implements SessionInterface
 
     public function close(): static
     {
-        $this->redis->setex($this->getId(), $this->config['ttl'], serialize($this->data));
+        if (!$this->redis->setex($this->getId(), $this->config['ttl'], serialize($this->data))) {
+            throw new \RuntimeException('Could not write session information.');
+        }
         $this->data = [];
         return $this;
     }

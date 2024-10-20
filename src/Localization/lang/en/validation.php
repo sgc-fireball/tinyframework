@@ -75,7 +75,7 @@ return [
         'lowercase' => '{attribute} is missing lower case chars.',
         'numerics' => '{attribute}s is missing numerics.',
         'symbols' => '{attribute}s is missing symbols.',
-        'pwned' => '{attribute} is insecure. For more information, please see https://haveibeenpwned.com/Passwords',
+        'pwned' => '{attribute} is insecure. For more information, please visit https://haveibeenpwned.com/Passwords',
     ],
     'present' => 'The {attribute} field must be present.',
 #    'regex' => 'The {attribute} format is invalid.',

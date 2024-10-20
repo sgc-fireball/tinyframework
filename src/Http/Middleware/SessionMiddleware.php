@@ -13,6 +13,11 @@ use TinyFramework\Session\SessionInterface;
 
 class SessionMiddleware implements MiddlewareInterface
 {
+
+    public const FLASH_MESSAGES = 'flash_messages';
+    public const FLASH_ERRORS = 'flash_errors';
+    public const FLASH_INPUTS = 'flash_inputs';
+
     private ContainerInterface $container;
 
     public function __construct(ContainerInterface $container)
@@ -27,8 +32,15 @@ class SessionMiddleware implements MiddlewareInterface
         $name = $this->container->get('config')->get('session.cookie');
         if ($name) {
             $id = (string)$request->cookie($name) ?: Uuid::v4();
-            $response = $next($request->session($session->open($id)));
+            $session->open($id);
+            $request->attribute(self::FLASH_MESSAGES, $session->get(self::FLASH_MESSAGES) ?? []);
+            $request->attribute(self::FLASH_ERRORS, $session->get(self::FLASH_ERRORS) ?? []);
+            $request->attribute(self::FLASH_INPUTS, $session->get(self::FLASH_INPUTS) ?? []);
+            $response = $next($request->session($session));
             assert($response instanceof Response);
+            $session->set(self::FLASH_MESSAGES, $response->getFlashMessages());
+            $session->set(self::FLASH_ERRORS, $response->getFlashErrors());
+            $session->set(self::FLASH_INPUTS, $response->getFlashInputs());
             $session->close();
             $response->cookie(
                 $name,
@@ -37,7 +49,9 @@ class SessionMiddleware implements MiddlewareInterface
                 '',
                 $request->url()->host(),
                 to_bool($request->server('https')[0] ?? false),
-                true
+                true,
+                false,
+                'None'
             );
         } else {
             $response = $next($request);

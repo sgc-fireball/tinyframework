@@ -20,6 +20,8 @@ use TinyFramework\Helpers\Arr;
 use TinyFramework\Helpers\Htmlable;
 use TinyFramework\Helpers\Str;
 use TinyFramework\Helpers\Uuid;
+use TinyFramework\Http\Middleware\SessionMiddleware;
+use TinyFramework\Http\RequestInterface;
 use TinyFramework\Http\Response;
 use TinyFramework\Http\Router;
 use TinyFramework\Helpers\DateTime;
@@ -795,5 +797,47 @@ if (!function_exists('datetime')) {
     function datetime(string $datetime = 'now', DateTimeZone|null $timezone = null): DateTime
     {
         return new DateTime($datetime, $timezone);
+    }
+}
+
+if (!function_exists('old')) {
+    function old(string $field, $default = null): mixed
+    {
+        $request = container('request');
+        assert($request instanceof RequestInterface);
+        $flashInputs = $request->attribute(SessionMiddleware::FLASH_INPUTS);
+        if (!is_array($flashInputs)) {
+            return $default;
+        }
+        $result = $flashInputs[$field] ?? $default;
+        $result = $request->post($field) ?? $result;
+        return match (true) {
+            is_string($result) => $result,
+            is_numeric($result) => $result,
+            default => (string)$result
+        };
+    }
+}
+
+if (!function_exists('error')) {
+    function error(string $field): ?array
+    {
+        $request = container('request');
+        assert($request instanceof RequestInterface);
+        $flashErrors = $request->attribute(SessionMiddleware::FLASH_ERRORS);
+        if (!is_array($flashErrors)) {
+            return null;
+        }
+        return $flashErrors[$field] ?? null;
+    }
+}
+
+if (!function_exists('getFlashMessages')) {
+    function getFlashMessages(): array
+    {
+        $request = container('request');
+        assert($request instanceof RequestInterface);
+        $flashMessages = $request->attribute(SessionMiddleware::FLASH_MESSAGES);
+        return is_array($flashMessages) ? $flashMessages : [];
     }
 }

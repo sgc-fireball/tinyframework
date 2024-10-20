@@ -40,6 +40,10 @@ class SmtpMailer extends MailerAwesome implements MailerInterface
         $from = $mail->from();
         if (!array_key_exists('email', $from) || !$from['email']) {
             $mail->from($this->config['from_address'], $this->config['from_name']);
+            $from = $mail->from();
+        }
+        if (!array_key_exists('email', $from) || !$from['email']) {
+            throw new \RuntimeException('Missing env MAIL_FROM_ADDRESS.');
         }
 
         $crypto = STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT | STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT;
