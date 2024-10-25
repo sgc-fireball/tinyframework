@@ -25,6 +25,11 @@ class IntegerTypeTest extends TestCase
         $this->assertEquals(null, $scheme->exclusiveMaximum);
         $this->assertEquals(null, $scheme->maximum);
         $this->assertEquals(null, $scheme->xml);
+        $scheme->validate('-2');
+        $scheme->validate('-1');
+        $scheme->validate('0');
+        $scheme->validate('1');
+        $scheme->validate('2');
         $scheme->validate(-2);
         $scheme->validate(-1);
         $scheme->validate(0);
@@ -39,6 +44,11 @@ class IntegerTypeTest extends TestCase
         $scheme = IntegerType::parse(['nullable' => true]);
         $this->assertInstanceOf(IntegerType::class, $scheme);
         $this->assertEquals(true, $scheme->nullable);
+        $scheme->validate('-2');
+        $scheme->validate('-1');
+        $scheme->validate('0');
+        $scheme->validate('1');
+        $scheme->validate('2');
         $scheme->validate(-2);
         $scheme->validate(-1);
         $scheme->validate(0);
@@ -55,8 +65,11 @@ class IntegerTypeTest extends TestCase
         $this->assertInstanceOf(IntegerType::class, $scheme);
         $this->assertEquals(0, $scheme->minimum);
         $scheme->validate(2);
+        $scheme->validate('2');
         $scheme->validate(1);
+        $scheme->validate('1');
         $scheme->validate(0);
+        $scheme->validate('0');
         $this->expectException(OpenAPIException::class);
         $scheme->validate(-1);
     }
@@ -67,7 +80,9 @@ class IntegerTypeTest extends TestCase
         $this->assertInstanceOf(IntegerType::class, $scheme);
         $this->assertEquals(0, $scheme->exclusiveMinimum);
         $scheme->validate(2);
+        $scheme->validate('2');
         $scheme->validate(1);
+        $scheme->validate('1');
         $this->expectException(OpenAPIException::class);
         $scheme->validate(0);
     }
@@ -78,7 +93,9 @@ class IntegerTypeTest extends TestCase
         $this->assertInstanceOf(IntegerType::class, $scheme);
         $this->assertEquals(2, $scheme->exclusiveMaximum);
         $scheme->validate(0);
+        $scheme->validate('0');
         $scheme->validate(1);
+        $scheme->validate('1');
         $this->expectException(OpenAPIException::class);
         $scheme->validate(2);
     }
@@ -89,8 +106,11 @@ class IntegerTypeTest extends TestCase
         $this->assertInstanceOf(IntegerType::class, $scheme);
         $this->assertEquals(2, $scheme->maximum);
         $scheme->validate(0);
+        $scheme->validate('0');
         $scheme->validate(1);
+        $scheme->validate('1');
         $scheme->validate(2);
+        $scheme->validate('2');
         $this->expectException(OpenAPIException::class);
         $scheme->validate(3);
     }

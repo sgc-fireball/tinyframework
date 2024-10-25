@@ -124,10 +124,13 @@ components:
           \$ref: '#/components/schemas/Age'
 EOF
         );
+
+        $jwt = new JWT(JWT::ALG_HS256, random_bytes(32));
+
         $request = Request::factory(
             'POST',
             URL::factory('http://localhost:8000/api/v1/register'),
-            ['token' => 'secret'],
+            ['token' => $jwt->encode()],
             [
                 'name' => 'name',
                 'email' => '123user@example.com',
@@ -141,7 +144,6 @@ EOF
         $httpValidator = new HttpValidator($openAPI);
         $httpValidator->validateHttpRequest($request);
 
-        $jwt = new JWT(JWT::ALG_HS256, random_bytes(32));
         $response = Response::json(['token' => $jwt->encode()]);
         $httpValidator->validateHttpResponse($request, $response);
 

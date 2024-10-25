@@ -50,7 +50,7 @@ class HttpValidator
                     return '(?P<' . $group[1] . '>[^\/]+)';
                 }, $path);
                 $regex = '(^' . $regex . '$)';
-                if (!preg_match($regex, $realPath)) {
+                if (!preg_match($regex, $realPath, $matches)) {
                     continue;
                 }
                 if (!isset($pathItem->{$method})) {
@@ -59,6 +59,13 @@ class HttpValidator
                 if (is_null($pathItem->{$method})) {
                     throw new OpenAPIException('Method not allowed (2)', 405);
                 }
+                $parameters = $request->attribute('__openapi_parameters') ?? [];
+                foreach ($matches as $key => $value) {
+                    if (!is_int(($key))) {
+                        $parameters[$key] = $value;
+                    }
+                }
+                $request->attribute('__openapi_parameters', $parameters);
                 /** @var Operation $operation */
                 $operation = $pathItem->{$method};
                 $request->attribute('__openapi_operation', $operation);
@@ -142,7 +149,17 @@ class HttpValidator
 
     private function validateParameterRequest(Reference|Parameter $parameter, HttpRequestInterface $httpRequest): void
     {
-        // @TODO
+        $value = match ($parameter->in) {
+            'query' => $httpRequest->get($parameter->name) ?? null,
+            'header' => $httpRequest->header($parameter->name)[0] ?? null,
+            'path' => ($httpRequest->attribute('__openapi_parameters') ?? [])[$parameter->name] ?? null,
+            'cookie' => $httpRequest->cookie($parameter->name) ?? null,
+            default => throw new OpenAPIException('Unsupported Parameter::in type.', 500)
+        };
+        if ($parameter->required && $value === null) {
+            throw new OpenAPIException('Missing value of ' . $parameter->name . ' in ' . $parameter->in, 400);
+        }
+        $parameter->schema->validate($value);
     }
 
     public function validateRequestBody(Reference|RequestBody $requestBody, HttpRequestInterface $httpRequest): void
@@ -197,11 +214,11 @@ class HttpValidator
         HttpRequestInterface $httpRequest
     ): void {
         $token = match ($securityScheme->in) {
-            'query' => $httpRequest->get($securityScheme->name) ?? '',
-            'header' => $httpRequest->header($securityScheme->name)[0] ?? '',
-            'cookie' => $httpRequest->cookie($securityScheme->name) ?? ''
+            'query' => $httpRequest->get($securityScheme->name) ?? null,
+            'header' => $httpRequest->header($securityScheme->name)[0] ?? null,
+            'cookie' => $httpRequest->cookie($securityScheme->name) ?? null
         };
-        if (!strlen($token)) {
+        if ($token === null) {
             throw new OpenAPIException('Missing apiKey in ' . $securityScheme->in . '[' . $securityScheme->name . ']');
         }
     }
@@ -295,6 +312,9 @@ class HttpValidator
                 }
                 try {
                     $this->validateServerVariable($server->variables->{$key}, $value);
+                    $parameters = $httpRequest->attribute('__openapi_parameters') ?? [];
+                    $parameters[$key] = $value;
+                    $httpRequest->attribute('__openapi_parameters', $parameters);
                 } catch (OpenAPIException $e) {
                     return false;
                 }

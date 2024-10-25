@@ -29,15 +29,21 @@ class AnyOfTypeTest extends TestCase
                     'required' => ['id'],
                     'properties' => [
                         'id' => [
-                            'type' => 'string',
+                            'type' => 'boolean',
                         ],
                     ],
                 ],
             ],
         ]);
         $this->assertInstanceOf(AnyOfType::class, $scheme);
+        $scheme->validate(['id' => '-1']);
+        $scheme->validate(['id' => -1]);
+        $scheme->validate(['id' => 0]);
+        $scheme->validate(['id' => '0']);
         $scheme->validate(['id' => 1]);
-        $scheme->validate(['id' => 'a']);
+        $scheme->validate(['id' => '1']);
+        $scheme->validate(['id' => false]);
+        $scheme->validate(['id' => true]);
         $this->expectException(OpenAPIException::class);
         $scheme->validate(['id' => 1.5]);
     }

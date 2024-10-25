@@ -67,9 +67,13 @@ class IntegerType extends AbstractType
         if ($this->nullable && $value === null) {
             return;
         }
-        if (!is_int($value)) {
+        if ($value === null) {
             throw new OpenAPIException('Invalid integer value.', 400);
         }
+        if ($value != (int)$value) {
+            throw new OpenAPIException('Invalid integer value.', 400);
+        }
+        $value = (int)$value;
         if (!is_null($this->minimum) && $value < $this->minimum) {
             throw new OpenAPIException(
                 'Invalid integer, value is to low (inclusive minimum: .' . $this->minimum . ').',

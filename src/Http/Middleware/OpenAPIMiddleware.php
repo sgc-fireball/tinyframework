@@ -41,10 +41,11 @@ class OpenAPIMiddleware implements MiddlewareInterface
         try {
             $httpValidator->validateHttpRequest($request);
         } catch (OpenAPIException $e) {
+            $code = max(max(400, $e->getCode()), 499);
             return Response::json([
-                'error' => max(max(400, $e->getCode()), 499),
+                'error' => max(1, $e->getCode()),
                 'message' => $e->getMessage(),
-            ]);
+            ], $code);
         }
 
         /**
@@ -58,10 +59,11 @@ class OpenAPIMiddleware implements MiddlewareInterface
         try {
             $httpValidator->validateHttpResponse($request, $response);
         } catch (OpenAPIException $e) {
+            $code = min(max(500, $e->getCode()), 599);
             return Response::json([
-                'error' => max(max(500, $e->getCode()), 599),
+                'error' => max(1, $e->getCode()),
                 'message' => $e->getMessage(),
-            ]);
+            ], $code);
         }
         return $response;
     }
