@@ -3,8 +3,6 @@
 namespace TinyFramework\OpenAPI\Types;
 
 use TinyFramework\OpenAPI\Objects\Reference;
-use TinyFramework\OpenAPI\Objects\Schema;
-use TinyFramework\OpenAPI\OpenAPIException;
 use TinyFramework\OpenAPI\Settings\XMLSettings;
 
 /**
@@ -37,40 +35,11 @@ class ArrayType extends AbstractType
             $object->maxItems = (int)$arr['maxItems'];
         }
         if (array_key_exists('items', $arr)) {
-            $object->items = Schema::parse($arr['items']);
+            $object->items = AbstractType::parse($arr['items']);
         }
         if (array_key_exists('xml', $arr)) {
             $object->xml = XMLSettings::parse($arr['xml']);
         }
         return $object->parseExtension($arr);
     }
-
-    public function validate(mixed $value): void
-    {
-        if ($this->nullable && $value === null) {
-            return;
-        }
-        if (!is_array($value)) {
-            throw new OpenAPIException('Invalid array value.', 400);
-        }
-        if ($this->minItems !== null || $this->maxItems !== null || $this->uniqueItems) {
-            $count = count($value);
-            if ($this->minItems !== null && $count < $this->minItems) {
-                throw new OpenAPIException('Invalid array min count. Required ' . $this->minItems . ' items.', 400);
-            }
-            if ($this->maxItems !== null && $count > $this->maxItems) {
-                throw new OpenAPIException('Invalid array max count. Required ' . $this->maxItems . ' items.', 400);
-            }
-            if ($this->uniqueItems && $count !== count(array_unique($value))) {
-                throw new OpenAPIException('Invalid array. Array items are not unique.', 400);
-            }
-        }
-        if (!$this->items) {
-            return;
-        }
-        foreach ($value as $subValue) {
-            $this->items->validate($subValue);
-        }
-    }
-
 }

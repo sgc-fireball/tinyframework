@@ -3,7 +3,6 @@
 namespace TinyFramework\OpenAPI\Types;
 
 use TinyFramework\OpenAPI\Objects\Reference;
-use TinyFramework\OpenAPI\Objects\Schema;
 use TinyFramework\OpenAPI\OpenAPIException;
 use TinyFramework\OpenAPI\Settings\DiscriminatorSettings;
 use TinyFramework\OpenAPI\Settings\XMLSettings;
@@ -11,6 +10,7 @@ use TinyFramework\OpenAPI\Settings\XMLSettings;
 class AnyOfType extends AbstractType
 {
 
+    public string $type = 'anyOf';
     /** @var AbstractType[]|Reference[] */
     public array $types = [];
     public ?XMLSettings $xml = null;
@@ -23,7 +23,7 @@ class AnyOfType extends AbstractType
             throw new OpenAPIException('Missing anyOf field.');
         }
         foreach ($arr['anyOf'] as $schema) {
-            $object->types[] = Schema::parse($schema);
+            $object->types[] = AbstractType::parse($schema);
         }
         if (array_key_exists('xml', $arr)) {
             $object->xml = XMLSettings::parse($arr['xml']);
@@ -33,19 +33,4 @@ class AnyOfType extends AbstractType
         }
         return $object->parseExtension($arr);
     }
-
-    public function validate(mixed $value): void
-    {
-        // @TODO discriminator
-        foreach ($this->types as $type) {
-            try {
-                $type->validate($value);
-                return;
-            } catch (OpenAPIException $e) {
-                // ignore
-            }
-        }
-        throw new OpenAPIException('Invalid anyOf value.', 400);
-    }
-
 }

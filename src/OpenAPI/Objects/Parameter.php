@@ -3,6 +3,8 @@
 namespace TinyFramework\OpenAPI\Objects;
 
 use stdClass;
+use TinyFramework\OpenAPI\ParameterIn;
+use TinyFramework\OpenAPI\Types\AbstractType;
 
 /**
  * @see https://swagger.io/specification/#parameter-object
@@ -11,7 +13,7 @@ class Parameter extends AbstractObject
 {
 
     public ?string $name;
-    public string $in; // @TODO enum[query, header, path, cookie]
+    public ParameterIn $in;
 
     public ?string $style = null;
     public ?string $description = null;
@@ -21,7 +23,7 @@ class Parameter extends AbstractObject
     public bool $explode = false;
     public mixed $example = null;
 
-    public Schema|Reference|null $schema = null;
+    public AbstractType|Reference|null $schema = null;
 
     /** @var ?object<string, Example|Reference> */
     public ?object $examples = null;
@@ -31,11 +33,11 @@ class Parameter extends AbstractObject
 
     public static function parse(array $arr): Parameter
     {
-        if (!in_array($arr['in'], ['query', 'header', 'path', 'cookie'])) {
-            throw new \InvalidArgumentException('Parameter::in must be one of query, header, path, cookie');
+        if (!array_key_exists('in', $arr) || !ParameterIn::tryFrom($arr['in'])) {
+            throw new \InvalidArgumentException('Parameter::in must be defined and one of: query, header, path, cookie');
         }
         $object = new Parameter();
-        $object->in = $arr['in'];
+        $object->in = ParameterIn::from($arr['in']);
         if (!array_key_exists('name', $arr) || !$arr['name']) {
             throw new \InvalidArgumentException('Parameter::name is missing.');
         }
@@ -59,7 +61,7 @@ class Parameter extends AbstractObject
             $object->explode = (bool)$arr['explode'];
         }
         if (array_key_exists('schema', $arr)) {
-            $object->schema = Schema::parse($arr['schema']);
+            $object->schema = AbstractType::parse($arr['schema']);
         }
         if (array_key_exists('example', $arr)) {
             $object->example = $arr['example'];

@@ -2,16 +2,16 @@
 
 namespace TinyFramework\OpenAPI\Objects;
 
-use TinyFramework\Http\RequestInterface;
-use TinyFramework\OpenAPI\OpenAPIException;
+use TinyFramework\OpenAPI\SecuritySchemeIn;
+use TinyFramework\OpenAPI\SecuritySchemeType;
 
 class SecurityScheme extends AbstractObject
 {
 
-    public string $type; // enum: apiKey, http, mutualTLS, oauth2, openIdConnect
+    public SecuritySchemeType $type;
     public ?string $description = null;
     public ?string $name = null;
-    public ?string $in = null; // enum: query, header, cookie
+    public ?SecuritySchemeIn $in = null;
     public string $scheme = 'bearer';
     public string $bearerFormat = 'jwt';
     public OAuthFlows|null $flows = null;
@@ -24,57 +24,51 @@ class SecurityScheme extends AbstractObject
     public static function parse(array $arr): SecurityScheme
     {
         $object = new SecurityScheme();
-        if (!array_key_exists('type', $arr) || !$arr['type']) {
-            throw new \InvalidArgumentException('SecurityScheme::type is missing.');
-        }
-        if (!in_array($arr['type'], ['apiKey', 'http', 'mutualTLS', 'oauth2', 'openIdConnect'])) {
+        if (!array_key_exists('type', $arr) || !SecuritySchemeType::from($arr['type'])) {
             throw new \InvalidArgumentException(
-                'SecurityScheme::type is invalid. Valid values are: apiKey, http, mutualTLS, oauth2, openIdConnect'
+                'SecurityScheme::type must be defined and one of:: apiKey, http, mutualTLS, oauth2, openIdConnect'
             );
         }
-        $object->type = $arr['type'];
+        $object->type = SecuritySchemeType::from($arr['type']);
         if (array_key_exists('description', $arr)) {
             $object->description = $arr['description'];
         }
 
-        if ($object->type === 'apiKey') {
+        if ($object->type === SecuritySchemeType::API_KEY) {
             if (!array_key_exists('name', $arr) || !$arr['name']) {
                 throw new \InvalidArgumentException('SecurityScheme::name is missing.');
             }
-            if (!array_key_exists('in', $arr) || !$arr['in']) {
-                throw new \InvalidArgumentException('SecurityScheme::in is missing.');
-            }
-            if (!in_array($arr['in'], ['query', 'header', 'cookie'])) {
+            if (!array_key_exists('in', $arr) || !SecuritySchemeIn::tryFrom($arr['in'])) {
                 throw new \InvalidArgumentException(
-                    'SecurityScheme::in is invalid. Valid values are: query, header, cookie'
+                    'SecurityScheme::in must be defined and one of: query, header, cookie'
                 );
             }
             $object->name = $arr['name'];
-            $object->in = $arr['in'];
+            $object->in = SecuritySchemeIn::from($arr['in']);
         }
 
-        if ($object->type === 'http' && !array_key_exists('scheme', $arr)) {
+        if ($object->type === SecuritySchemeType::HTTP && !array_key_exists('scheme', $arr)) {
             throw new \InvalidArgumentException('SecurityScheme::scheme is missing.');
         }
-        if ($object->type === 'oauth2' && !array_key_exists('flows', $arr)) {
+        if ($object->type === SecuritySchemeType::OAUTH2 && !array_key_exists('flows', $arr)) {
             throw new \InvalidArgumentException('SecurityScheme::flows is missing.');
         }
-        if ($object->type === 'openIdConnect' && !array_key_exists('openIdConnectUrl', $arr)) {
+        if ($object->type === SecuritySchemeType::OPEN_ID_CONNECT && !array_key_exists('openIdConnectUrl', $arr)) {
             throw new \InvalidArgumentException('SecurityScheme::openIdConnectUrl  is missing.');
         }
 
-        if ($object->type === 'http') {
+        if ($object->type === SecuritySchemeType::HTTP) {
             $object->scheme = $arr['scheme'];
             if ($object->scheme === 'bearer' && array_key_exists('bearerFormat', $arr)) {
                 $object->bearerFormat = $arr['bearerFormat'];
             }
         }
 
-        if ($object->type === 'oauth2') {
+        if ($object->type === SecuritySchemeType::OAUTH2) {
             $object->flows = OAuthFlows::parse($arr['flows']);
         }
 
-        if ($object->type === 'openIdConnect') {
+        if ($object->type === SecuritySchemeType::OPEN_ID_CONNECT) {
             $object->openIdConnectUrl = $arr['openIdConnectUrl'];
         }
         return $object->parseExtension($arr);

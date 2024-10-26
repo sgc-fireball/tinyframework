@@ -3,13 +3,14 @@
 namespace TinyFramework\OpenAPI\Types;
 
 use TinyFramework\OpenAPI\Objects\Reference;
-use TinyFramework\OpenAPI\Objects\Schema;
 use TinyFramework\OpenAPI\OpenAPIException;
 use TinyFramework\OpenAPI\Settings\DiscriminatorSettings;
 use TinyFramework\OpenAPI\Settings\XMLSettings;
 
 class AllOfType extends AbstractType
 {
+
+    public string $type = 'allOf';
 
     /** @var AbstractType[]|Reference[] */
     public array $types = [];
@@ -24,7 +25,7 @@ class AllOfType extends AbstractType
             throw new OpenAPIException('Missing allOf field.');
         }
         foreach ($arr['allOf'] as $schema) {
-            $object->types[] = Schema::parse($schema);
+            $object->types[] = AbstractType::parse($schema);
         }
         if (array_key_exists('xml', $arr)) {
             $object->xml = XMLSettings::parse($arr['xml']);
@@ -34,13 +35,4 @@ class AllOfType extends AbstractType
         }
         return $object->parseExtension($arr);
     }
-
-    public function validate(mixed $value): void
-    {
-        // @TODO discriminator
-        foreach ($this->types as $type) {
-            $type->validate($value);
-        }
-    }
-
 }

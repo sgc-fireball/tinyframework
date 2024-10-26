@@ -2,8 +2,6 @@
 
 namespace TinyFramework\OpenAPI\Types;
 
-use TinyFramework\OpenAPI\Objects\AbstractObject;
-use TinyFramework\OpenAPI\Objects\Schema;
 use TinyFramework\OpenAPI\OpenAPIException;
 use TinyFramework\OpenAPI\Settings\XMLSettings;
 
@@ -60,36 +58,4 @@ class NumberType extends AbstractType
         }
         return $object->parseExtension($arr);
     }
-
-    public function validate(mixed $value): void
-    {
-        if ($this->nullable && $value === null) {
-            return;
-        }
-        if (!is_numeric($value)) {
-            throw new OpenAPIException('Invalid number value.', 400);
-        }
-        if (!is_null($this->minimum) && $value < $this->minimum) {
-            throw new OpenAPIException(
-                'Invalid number, value is to low (inclusive minimum: .' . $this->minimum . ').',
-                400
-            );
-        }
-        if (!is_null($this->exclusiveMinimum) && $value <= $this->exclusiveMinimum) {
-            throw new OpenAPIException(
-                'Invalid number, value is to low (exclusive minimum: .' . $this->exclusiveMinimum . ').', 400
-            );
-        }
-        if (!is_null($this->exclusiveMaximum) && $value >= $this->exclusiveMaximum) {
-            throw new OpenAPIException(
-                'Invalid number, value is to high (exclusive maximum: .' . $this->exclusiveMaximum . ').', 400
-            );
-        }
-        if (!is_null($this->maximum) && $value > $this->maximum) {
-            throw new OpenAPIException(
-                'Invalid number, value is to high (inclusive maximum: .' . $this->maximum . ').', 400
-            );
-        }
-    }
-
 }

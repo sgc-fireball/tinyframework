@@ -2,6 +2,8 @@
 
 namespace TinyFramework\OpenAPI\Objects;
 
+use TinyFramework\OpenAPI\Types\AbstractType;
+
 /**
  * @see https://swagger.io/specification/#header-object
  */
@@ -9,12 +11,11 @@ class Header extends Parameter
 {
 
     public ?string $name = null;
-    public string $in = 'header';
+    public ParameterIn $in = ParameterIn::HEADER;
 
     public static function parse(array $arr): Header
     {
         $object = new Header();
-        $object->in = 'header';
         if (array_key_exists('name', $arr)) {
             $object->name = $arr['name'];
         }
@@ -37,7 +38,7 @@ class Header extends Parameter
             $object->explode = (bool)$arr['explode'];
         }
         if (array_key_exists('schema', $arr)) {
-            $object->schema = Schema::parse($arr['schema']);
+            $object->schema = AbstractType::parse($arr['schema']);
         }
         if (array_key_exists('example', $arr)) {
             $object->example = $arr['example'];

@@ -2,13 +2,15 @@
 
 namespace TinyFramework\OpenAPI\Objects;
 
+use TinyFramework\OpenAPI\Types\AbstractType;
+
 /**
  * @see https://swagger.io/specification/#media-type-object
  */
 class MediaType extends AbstractObject
 {
 
-    public Schema|Reference|null $schema = null;
+    public AbstractType|Reference|null $schema = null;
     public mixed $example = null;
     /** @var ?object<string, Example|Reference> */
     public ?object $examples = null;
@@ -22,7 +24,7 @@ class MediaType extends AbstractObject
             if (array_key_exists('$ref', $arr['schema'])) {
                 $object->schema = Reference::parse($arr['schema']);
             } else {
-                $object->schema = Schema::parse($arr['schema']);
+                $object->schema = AbstractType::parse($arr['schema']);
             }
         }
         if (array_key_exists('example', $arr)) {

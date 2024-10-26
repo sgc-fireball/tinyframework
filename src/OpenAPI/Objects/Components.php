@@ -3,6 +3,7 @@
 namespace TinyFramework\OpenAPI\Objects;
 
 use stdClass;
+use TinyFramework\OpenAPI\Types\AbstractType;
 
 /**
  * @see https://swagger.io/specification/#components-object
@@ -49,7 +50,7 @@ class Components extends AbstractObject
                 if (array_key_exists('$ref', $schema)) {
                     $object->schemas->{$key} = Reference::parse($schema);
                 } else {
-                    $object->schemas->{$key} = Schema::parse($schema);
+                    $object->schemas->{$key} = AbstractType::parse($schema);
                 }
             }
         }

@@ -8,14 +8,14 @@ use PHPUnit\Framework\TestCase;
 use TinyFramework\Http\Request;
 use TinyFramework\Http\Response;
 use TinyFramework\Http\URL;
-use TinyFramework\OpenAPI\HttpValidator;
+use TinyFramework\OpenAPI\OpenAPIValidator;
 use TinyFramework\OpenAPI\Objects\OpenAPI;
 use TinyFramework\OpenAPI\Objects\Operation;
 use TinyFramework\OpenAPI\Objects\Server;
 use TinyFramework\OpenAPI\OpenAPIException;
 use TinyFramework\WebToken\JWT;
 
-class HttpValidatorTest extends TestCase
+class OpenAPIValidatorTest extends TestCase
 {
 
     public function testRequest(): void
@@ -27,8 +27,8 @@ class HttpValidatorTest extends TestCase
             URL::factory('http://localhost:8000/api/pets'),
             ['tags' => ['zoo'], 'limit' => 12]
         );
-        $httpValidator = new HttpValidator($openAPI);
-        $httpValidator->validateHttpRequest($request);
+        $openAPIValidator = new OpenAPIValidator($openAPI);
+        $openAPIValidator->validateHttpRequest($request);
 
         $server = $request->attribute('__openapi_server');
         $this->assertInstanceOf(Server::class, $server);
@@ -43,7 +43,7 @@ class HttpValidatorTest extends TestCase
             ['id' => 3, 'name' => 'Animal 3', 'tag' => 'zoo'],
         ]);
 
-        $httpValidator->validateHttpResponse($request, $response);
+        $openAPIValidator->validateHttpResponse($request, $response);
         $this->assertEquals(200, $response->code());
         $content = $response->content();
         $this->assertIsString($content);
@@ -74,8 +74,8 @@ EOF
             'GET',
             URL::factory('http://localhost:8000/api/v1/login')
         );
-        $httpValidator = new HttpValidator($openAPI);
-        $httpValidator->validateHttpRequest($request);
+        $openAPIValidator = new OpenAPIValidator($openAPI);
+        $openAPIValidator->validateHttpRequest($request);
         $this->assertTrue(true);
     }
 
@@ -103,8 +103,8 @@ EOF
             URL::factory('http://localhost:8000/api/v2/login')
         );
         $this->expectException(OpenAPIException::class);
-        $httpValidator = new HttpValidator($openAPI);
-        $httpValidator->validateHttpRequest($request);
+        $openAPIValidator = new OpenAPIValidator($openAPI);
+        $openAPIValidator->validateHttpRequest($request);
     }
 
     public function testRequestValidServerProtocol(): void
@@ -132,8 +132,8 @@ EOF
             'GET',
             URL::factory('http://localhost:8000/api/v1')
         );
-        $httpValidator = new HttpValidator($openAPI);
-        $httpValidator->validateHttpRequest($request);
+        $openAPIValidator = new OpenAPIValidator($openAPI);
+        $openAPIValidator->validateHttpRequest($request);
         $this->assertTrue(true);
     }
 
@@ -163,8 +163,8 @@ EOF
             URL::factory('http://localhost:8000/api/v1')
         );
         $this->expectException(OpenAPIException::class);
-        $httpValidator = new HttpValidator($openAPI);
-        $httpValidator->validateHttpRequest($request);
+        $openAPIValidator = new OpenAPIValidator($openAPI);
+        $openAPIValidator->validateHttpRequest($request);
     }
 
     public function testRequestInvalidPath(): void
@@ -188,8 +188,8 @@ EOF
             URL::factory('http://localhost/login')
         );
         $this->expectException(OpenAPIException::class);
-        $httpValidator = new HttpValidator($openAPI);
-        $httpValidator->validateHttpRequest($request);
+        $openAPIValidator = new OpenAPIValidator($openAPI);
+        $openAPIValidator->validateHttpRequest($request);
     }
 
     public function testRequestInvalidMethod(): void
@@ -213,8 +213,8 @@ EOF
             URL::factory('http://localhost/logout')
         );
         $this->expectException(OpenAPIException::class);
-        $httpValidator = new HttpValidator($openAPI);
-        $httpValidator->validateHttpRequest($request);
+        $openAPIValidator = new OpenAPIValidator($openAPI);
+        $openAPIValidator->validateHttpRequest($request);
     }
 
     public function testRequestBody(): void
@@ -253,8 +253,8 @@ EOF
             ['email' => 'user@example.de', 'password' => $password = random_bytes(16)],
             ['Content-Type' => ['application/json']]
         );
-        $httpValidator = new HttpValidator($openAPI);
-        $httpValidator->validateHttpRequest($request);
+        $openAPIValidator = new OpenAPIValidator($openAPI);
+        $openAPIValidator->validateHttpRequest($request);
         $this->assertEquals('user@example.de', $request->post('email'));
         $this->assertEquals($password, $request->post('password'));
     }
@@ -302,8 +302,8 @@ EOF
             ['Content-Length' => 1, 'Content-Type' => ['application/json']]
         );
         $this->expectException(OpenAPIException::class);
-        $httpValidator = new HttpValidator($openAPI);
-        $httpValidator->validateHttpRequest($request);
+        $openAPIValidator = new OpenAPIValidator($openAPI);
+        $openAPIValidator->validateHttpRequest($request);
     }
 
     public function testResponseBody(): void
@@ -341,12 +341,12 @@ EOF
             'POST',
             URL::factory('http://localhost:8000/login')
         );
-        $httpValidator = new HttpValidator($openAPI);
-        $httpValidator->validateHttpRequest($request);
+        $openAPIValidator = new OpenAPIValidator($openAPI);
+        $openAPIValidator->validateHttpRequest($request);
 
         $jwt = new JWT(JWT::ALG_HS256, random_bytes(32));
         $response = Response::json(['token' => $jwt->encode()]);
-        $httpValidator->validateHttpResponse($request, $response);
+        $openAPIValidator->validateHttpResponse($request, $response);
         $this->assertStringStartsWith('ey', json_decode($response->content(), true)['token']);
     }
 
@@ -385,12 +385,12 @@ EOF
             'POST',
             URL::factory('http://localhost:8000/login')
         );
-        $httpValidator = new HttpValidator($openAPI);
-        $httpValidator->validateHttpRequest($request);
+        $openAPIValidator = new OpenAPIValidator($openAPI);
+        $openAPIValidator->validateHttpRequest($request);
 
         $this->expectException(OpenAPIException::class);
         $response = Response::json(['token' => null]);
-        $httpValidator->validateHttpResponse($request, $response);
+        $openAPIValidator->validateHttpResponse($request, $response);
     }
 
     public function testSecuritySchemeApiKeyQuery(): void
@@ -422,8 +422,8 @@ EOF
             URL::factory('http://localhost/login'),
             ['token' => 'token']
         );
-        $httpValidator = new HttpValidator($openAPI);
-        $httpValidator->validateHttpRequest($request);
+        $openAPIValidator = new OpenAPIValidator($openAPI);
+        $openAPIValidator->validateHttpRequest($request);
         $this->assertEquals('token', $request->get('token'));
     }
 
@@ -456,8 +456,8 @@ EOF
             URL::factory('http://localhost/login'),
         );
         $this->expectException(OpenAPIException::class);
-        $httpValidator = new HttpValidator($openAPI);
-        $httpValidator->validateHttpRequest($request);
+        $openAPIValidator = new OpenAPIValidator($openAPI);
+        $openAPIValidator->validateHttpRequest($request);
     }
 
     public function testSecuritySchemeApiKeyHeader(): void
@@ -489,8 +489,8 @@ EOF
             URL::factory('http://localhost/login'),
             headers: ['x_token' => ['token']]
         );
-        $httpValidator = new HttpValidator($openAPI);
-        $httpValidator->validateHttpRequest($request);
+        $openAPIValidator = new OpenAPIValidator($openAPI);
+        $openAPIValidator->validateHttpRequest($request);
         $this->assertEquals('token', $request->header('x-token')[0]);
     }
 
@@ -523,8 +523,8 @@ EOF
             URL::factory('http://localhost/login')
         );
         $this->expectException(OpenAPIException::class);
-        $httpValidator = new HttpValidator($openAPI);
-        $httpValidator->validateHttpRequest($request);
+        $openAPIValidator = new OpenAPIValidator($openAPI);
+        $openAPIValidator->validateHttpRequest($request);
     }
 
     public function testSecuritySchemeApiKeyCookie(): void
@@ -556,8 +556,8 @@ EOF
             URL::factory('http://localhost/login'),
             cookies: ['ctoken' => 'token']
         );
-        $httpValidator = new HttpValidator($openAPI);
-        $httpValidator->validateHttpRequest($request);
+        $openAPIValidator = new OpenAPIValidator($openAPI);
+        $openAPIValidator->validateHttpRequest($request);
         $this->assertEquals('token', $request->cookie('ctoken'));
     }
 
@@ -590,8 +590,8 @@ EOF
             URL::factory('http://localhost/login')
         );
         $this->expectException(OpenAPIException::class);
-        $httpValidator = new HttpValidator($openAPI);
-        $httpValidator->validateHttpRequest($request);
+        $openAPIValidator = new OpenAPIValidator($openAPI);
+        $openAPIValidator->validateHttpRequest($request);
     }
 
     public function testSecuritySchemeHttpBasic(): void
@@ -622,8 +622,8 @@ EOF
             URL::factory('http://localhost/login'),
             headers: ['authorization' => ['Basic ' . base64_encode('user:pass')]]
         );
-        $httpValidator = new HttpValidator($openAPI);
-        $httpValidator->validateHttpRequest($request);
+        $openAPIValidator = new OpenAPIValidator($openAPI);
+        $openAPIValidator->validateHttpRequest($request);
         $this->assertTrue(true);
     }
 
@@ -656,8 +656,8 @@ EOF
             headers: ['authorization' => ['Basic invalid']]
         );
         $this->expectException(OpenAPIException::class);
-        $httpValidator = new HttpValidator($openAPI);
-        $httpValidator->validateHttpRequest($request);
+        $openAPIValidator = new OpenAPIValidator($openAPI);
+        $openAPIValidator->validateHttpRequest($request);
     }
 
     public function testSecuritySchemeHttpBearer(): void
@@ -694,8 +694,8 @@ EOF
             URL::factory('http://localhost/login'),
             headers: ['authorization' => ['Bearer ' . $jwt]]
         );
-        $httpValidator = new HttpValidator($openAPI);
-        $httpValidator->validateHttpRequest($request);
+        $openAPIValidator = new OpenAPIValidator($openAPI);
+        $openAPIValidator->validateHttpRequest($request);
         $this->assertTrue(true);
     }
 
@@ -732,8 +732,8 @@ EOF
             headers: ['authorization' => ['Bearer ' . $jwt]]
         );
         $this->expectException(OpenAPIException::class);
-        $httpValidator = new HttpValidator($openAPI);
-        $httpValidator->validateHttpRequest($request);
+        $openAPIValidator = new OpenAPIValidator($openAPI);
+        $openAPIValidator->validateHttpRequest($request);
     }
 
     // @TODO oauth implicit

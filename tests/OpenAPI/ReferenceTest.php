@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 use TinyFramework\Http\Request;
 use TinyFramework\Http\Response;
 use TinyFramework\Http\URL;
-use TinyFramework\OpenAPI\HttpValidator;
+use TinyFramework\OpenAPI\OpenAPIValidator;
 use TinyFramework\OpenAPI\Objects\OpenAPI;
 use TinyFramework\WebToken\JWT;
 
@@ -141,11 +141,11 @@ EOF
         );
         $this->assertEquals('POST', $request->method());
         $this->assertEquals('/api/v1/register', $request->url()->path());
-        $httpValidator = new HttpValidator($openAPI);
-        $httpValidator->validateHttpRequest($request);
+        $openAPIValidator = new OpenAPIValidator($openAPI);
+        $openAPIValidator->validateHttpRequest($request);
 
         $response = Response::json(['token' => $jwt->encode()]);
-        $httpValidator->validateHttpResponse($request, $response);
+        $openAPIValidator->validateHttpResponse($request, $response);
 
         $this->assertTrue(true);
     }

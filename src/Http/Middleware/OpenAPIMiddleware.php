@@ -5,7 +5,7 @@ namespace TinyFramework\Http\Middleware;
 use Closure;
 use TinyFramework\Http\RequestInterface;
 use TinyFramework\Http\Response;
-use TinyFramework\OpenAPI\HttpValidator;
+use TinyFramework\OpenAPI\OpenAPIValidator;
 use TinyFramework\OpenAPI\Objects\OpenAPI;
 use TinyFramework\OpenAPI\OpenAPIException;
 
@@ -37,9 +37,9 @@ class OpenAPIMiddleware implements MiddlewareInterface
          * openapi was loaded successful
          * validate the request
          */
-        $httpValidator = new HttpValidator($openAPI);
+        $openAPIValidator = new OpenAPIValidator($openAPI);
         try {
-            $httpValidator->validateHttpRequest($request);
+            $openAPIValidator->validateHttpRequest($request);
         } catch (OpenAPIException $e) {
             $code = max(max(400, $e->getCode()), 499);
             return Response::json([
@@ -57,7 +57,7 @@ class OpenAPIMiddleware implements MiddlewareInterface
          * validate the response
          */
         try {
-            $httpValidator->validateHttpResponse($request, $response);
+            $openAPIValidator->validateHttpResponse($request, $response);
         } catch (OpenAPIException $e) {
             $code = min(max(500, $e->getCode()), 599);
             return Response::json([

@@ -5,11 +5,26 @@ declare(strict_types=1);
 namespace TinyFramework\Tests\OpenAPI;
 
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use ReflectionMethod;
+use TinyFramework\OpenAPI\Objects\OpenAPI;
 use TinyFramework\OpenAPI\OpenAPIException;
+use TinyFramework\OpenAPI\OpenAPIValidator;
 use TinyFramework\OpenAPI\Types\IntegerType;
 
 class IntegerTypeTest extends TestCase
 {
+
+    private OpenAPIValidator $openAPIValidator;
+    private ReflectionMethod $reflectionMethod;
+
+    public function setUp(): void
+    {
+        $this->openAPIValidator = new OpenAPIValidator(new OpenAPI());
+        $reflectionClass = new ReflectionClass($this->openAPIValidator);
+        $this->reflectionMethod = $reflectionClass->getMethod('validateIntegerType');
+        $this->reflectionMethod->setAccessible(true);
+    }
 
     public function testNormal(): void
     {
@@ -25,18 +40,18 @@ class IntegerTypeTest extends TestCase
         $this->assertEquals(null, $scheme->exclusiveMaximum);
         $this->assertEquals(null, $scheme->maximum);
         $this->assertEquals(null, $scheme->xml);
-        $scheme->validate('-2');
-        $scheme->validate('-1');
-        $scheme->validate('0');
-        $scheme->validate('1');
-        $scheme->validate('2');
-        $scheme->validate(-2);
-        $scheme->validate(-1);
-        $scheme->validate(0);
-        $scheme->validate(1);
-        $scheme->validate(2);
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, '-2');
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, '-1');
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, '0');
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, '1');
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, '2');
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, -2);
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, -1);
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, 0);
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, 1);
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, 2);
         $this->expectException(OpenAPIException::class);
-        $scheme->validate(null);
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, null);
     }
 
     public function testNullable(): void
@@ -44,19 +59,19 @@ class IntegerTypeTest extends TestCase
         $scheme = IntegerType::parse(['nullable' => true]);
         $this->assertInstanceOf(IntegerType::class, $scheme);
         $this->assertEquals(true, $scheme->nullable);
-        $scheme->validate('-2');
-        $scheme->validate('-1');
-        $scheme->validate('0');
-        $scheme->validate('1');
-        $scheme->validate('2');
-        $scheme->validate(-2);
-        $scheme->validate(-1);
-        $scheme->validate(0);
-        $scheme->validate(1);
-        $scheme->validate(2);
-        $scheme->validate(null);
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, '-2');
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, '-1');
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, '0');
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, '1');
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, '2');
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, -2);
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, -1);
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, 0);
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, 1);
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, 2);
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, null);
         $this->expectException(OpenAPIException::class);
-        $scheme->validate('a');
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, 'a');
     }
 
     public function testMinimum(): void
@@ -64,14 +79,14 @@ class IntegerTypeTest extends TestCase
         $scheme = IntegerType::parse(['minimum' => 0]);
         $this->assertInstanceOf(IntegerType::class, $scheme);
         $this->assertEquals(0, $scheme->minimum);
-        $scheme->validate(2);
-        $scheme->validate('2');
-        $scheme->validate(1);
-        $scheme->validate('1');
-        $scheme->validate(0);
-        $scheme->validate('0');
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, 2);
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, '2');
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, 1);
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, '1');
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, 0);
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, '0');
         $this->expectException(OpenAPIException::class);
-        $scheme->validate(-1);
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, -1);
     }
 
     public function testExclusiveMinimum(): void
@@ -79,12 +94,12 @@ class IntegerTypeTest extends TestCase
         $scheme = IntegerType::parse(['exclusiveMinimum' => 0]);
         $this->assertInstanceOf(IntegerType::class, $scheme);
         $this->assertEquals(0, $scheme->exclusiveMinimum);
-        $scheme->validate(2);
-        $scheme->validate('2');
-        $scheme->validate(1);
-        $scheme->validate('1');
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, 2);
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, '2');
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, 1);
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, '1');
         $this->expectException(OpenAPIException::class);
-        $scheme->validate(0);
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, 0);
     }
 
     public function testExclusiveMaximum(): void
@@ -92,12 +107,12 @@ class IntegerTypeTest extends TestCase
         $scheme = IntegerType::parse(['exclusiveMaximum' => 2]);
         $this->assertInstanceOf(IntegerType::class, $scheme);
         $this->assertEquals(2, $scheme->exclusiveMaximum);
-        $scheme->validate(0);
-        $scheme->validate('0');
-        $scheme->validate(1);
-        $scheme->validate('1');
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, 0);
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, '0');
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, 1);
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, '1');
         $this->expectException(OpenAPIException::class);
-        $scheme->validate(2);
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, 2);
     }
 
     public function testMaximum(): void
@@ -105,14 +120,14 @@ class IntegerTypeTest extends TestCase
         $scheme = IntegerType::parse(['maximum' => 2]);
         $this->assertInstanceOf(IntegerType::class, $scheme);
         $this->assertEquals(2, $scheme->maximum);
-        $scheme->validate(0);
-        $scheme->validate('0');
-        $scheme->validate(1);
-        $scheme->validate('1');
-        $scheme->validate(2);
-        $scheme->validate('2');
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, 0);
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, '0');
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, 1);
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, '1');
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, 2);
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, '2');
         $this->expectException(OpenAPIException::class);
-        $scheme->validate(3);
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, 3);
     }
 
 }
