@@ -14,7 +14,12 @@ class OpenAPIMiddleware implements MiddlewareInterface
 
     public function handle(RequestInterface $request, Closure $next, mixed ...$parameters): Response
     {
-        $file = $parameters[0];
+        $config = config('openapi') ?? [];
+        $file = $parameters[0] ?? $config['file'] ?? null;
+        if (!file_exists($file)) {
+            throw new OpenAPIException('Could not found openapi.yaml file');
+        }
+
         $version = filemtime($file) ?? 0;
         $cacheKey = sprintf('openapi:%s:%d', $file, $version);
 
@@ -30,7 +35,7 @@ class OpenAPIMiddleware implements MiddlewareInterface
         }, now()->addDay());
 
         if (!$openAPI) {
-            return $next($request);
+            throw new OpenAPIException('Could not parse openapi.yaml file.');
         }
 
         /**
@@ -38,8 +43,11 @@ class OpenAPIMiddleware implements MiddlewareInterface
          * validate the request
          */
         $openAPIValidator = new OpenAPIValidator($openAPI);
+
         try {
-            $openAPIValidator->validateHttpRequest($request);
+            if ($config['validate_request']) {
+                $openAPIValidator->validateHttpRequest($request);
+            }
         } catch (OpenAPIException $e) {
             $code = max(max(400, $e->getCode()), 499);
             return Response::json([
@@ -57,7 +65,9 @@ class OpenAPIMiddleware implements MiddlewareInterface
          * validate the response
          */
         try {
-            $openAPIValidator->validateHttpResponse($request, $response);
+            if ($config['validate_response']) {
+                $openAPIValidator->validateHttpResponse($request, $response);
+            }
         } catch (OpenAPIException $e) {
             $code = min(max(500, $e->getCode()), 599);
             return Response::json([

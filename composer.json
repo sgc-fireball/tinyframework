@@ -73,7 +73,8 @@
     "ext-ssh2": "To use sftp filesystem.",
     "ext-swoole": "To use swoole http server to speed up your application.",
     "ext-mysqli": "To use mysqli database engine.",
-    "ext-yaml": "To use openapi validation."
+    "ext-yaml": "To use openapi validation.",
+    "swagger-api/swagger-ui": "To generate a dynamically and beautiful documentation from a openapi.yaml."
   },
   "support": {
     "issues": "https://github.com/sgc-fireball/tinyframework/issues"

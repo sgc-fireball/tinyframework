@@ -134,9 +134,6 @@ class OpenAPIValidator
                 $this->validateParameterRequest($parameter, $httpRequest);
             }
         }
-        if ($operation->requestBody) {
-            $this->validateRequestBody($operation->requestBody, $httpRequest);
-        }
         if ($operation->security) {
             foreach ($operation->security as $securityRequirement) {
                 foreach ($securityRequirement->handler as $handler => $scopes) {
@@ -146,6 +143,9 @@ class OpenAPIValidator
                     );
                 }
             }
+        }
+        if ($operation->requestBody) {
+            $this->validateRequestBody($operation->requestBody, $httpRequest);
         }
     }
 
