@@ -46,6 +46,12 @@ class ViewServiceProvider extends ServiceProviderAwesome
             }
             return '';
         });
+        $engine->addDirective('csrfmeta', function (string $expression): string {
+            if ($token = $this->container->get('request')?->session()?->get('csrf-token')) {
+                return sprintf('<meta name="csrf-token" content="%s">', $token);
+            }
+            return '';
+        });
         $engine->addDirective('inject', function (string $expression): string {
             [$variable, $service] = explode(',', (string)preg_replace("/[\(\)\\\"\']/", '', $expression));
             return sprintf('<?php $%s = container("%s"); ?>', trim($variable), trim($service));
