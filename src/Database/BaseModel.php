@@ -189,14 +189,14 @@ class BaseModel implements JsonSerializable, ArrayAccess
                 if (!is_array($value)) {
                     throw new \InvalidArgumentException(
                         sprintf(
-                            'Value %for s->%s must be an array.',
+                            'Value for %f->%s must be an array.',
                             get_class($this),
                             $name
                         )
                     );
                 }
             } elseif ($type === 'json') {
-                $value = json_encode($type);
+                $value = json_encode($value);
             } elseif ($type === 'object') {
                 if (is_string($value) && (str_starts_with($value, '{') && str_ends_with($value, '}'))) {
                     $value = json_decode($value);
