@@ -46,10 +46,8 @@ class Validator implements ValidatorInterface
         foreach ($rules as $field => $fieldRules) {
             if ($errors = $this->validateField($attributes, $field, $fieldRules)) {
                 $errorBag[$field] = $errors;
-            } else {
-                if (\array_key_exists($field, $attributes)) {
-                    $values[$field] = $attributes[$field];
-                }
+            } elseif (\array_key_exists($field, $attributes)) {
+                $values[$field] = $attributes[$field];
             }
         }
         if (\count($errorBag)) {

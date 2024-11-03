@@ -34,6 +34,7 @@ abstract class RequestValidator implements RequestInterface
             return true;
         } catch (ValidationException $e) {
             $this->errorBag = $e->getErrorBag();
+            $this->errorBag['__global'] = [$e->getMessage()];
             return false;
         }
     }

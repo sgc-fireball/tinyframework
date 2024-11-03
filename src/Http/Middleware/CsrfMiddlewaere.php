@@ -23,7 +23,9 @@ class CsrfMiddlewaere implements MiddlewareInterface
             $session->set('csrf-token', $tokens = bin2hex(random_bytes(32)));
         }
         if (!in_array($request->method(), ['GET', 'HEAD', 'OPTIONS'])) {
-            $given = $request->get('csrf-token') ?? $request->post('csrf-token') ?? $request->header('x-csrf-token');
+            $given = $request->post('csrf-token')
+                ?? $request->header('x-csrf-token')[0]
+                ?? null;
             if ($tokens !== $given) {
                 return Response::error(419);
             }
