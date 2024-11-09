@@ -18,7 +18,7 @@ abstract class RequestValidator implements RequestInterface
 
     public function __construct(
         private ValidatorInterface $validator,
-        private Request $request
+        private RequestInterface $request
     ) {
     }
 

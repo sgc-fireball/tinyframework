@@ -46,12 +46,12 @@ class SessionMiddleware implements MiddlewareInterface
                 $name,
                 $session->getId(),
                 -1,
-                '',
+                '/',
                 $request->url()->host(),
                 to_bool($request->server('https')[0] ?? false),
                 true,
                 false,
-                'None'
+                'Lax'
             );
         } else {
             $response = $next($request);

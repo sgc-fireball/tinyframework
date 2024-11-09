@@ -269,13 +269,13 @@ class Response
             $line .= '; HttpOnly';
         }
         if ($expires > -1) {
-            $line .= '; Expires=' . urlencode(date('r', time() + $expires));
+            $line .= '; Expires=' . date('r', time() + $expires);
         }
         if ($path) {
-            $line .= '; Path=' . urlencode($path);
+            $line .= '; Path=' . $path;
         }
         if ($domain) {
-            $line .= '; Domain=' . urlencode($domain);
+            $line .= '; Domain=' . $domain;
         }
         if ($secure) {
             $line .= '; Secure';

@@ -57,12 +57,12 @@ abstract class SessionAwesome implements SessionInterface, ArrayAccess
 
     public function regenerate(bool $cleanup = false): static
     {
-        $data = $this->data;
+        $data = $cleanup ? [] : $this->data;
         if ($this->id) {
             $this->destroy();
         }
         $this->id = $this->newId();
-        $this->data = $cleanup ? [] : $data;
+        $this->data = $data;
         return $this;
     }
 

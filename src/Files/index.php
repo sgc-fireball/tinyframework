@@ -5,6 +5,7 @@ declare(strict_types=1);
 use TinyFramework\Core\Container;
 use TinyFramework\Http\HttpKernel;
 use TinyFramework\Http\Request;
+use TinyFramework\Http\Response;
 
 define('PHARBIN', false);
 $path = preg_replace('/\/src\/.*/', '', __DIR__);
@@ -27,6 +28,7 @@ $container = Container::instance();
 $kernel = $container->call(HttpKernel::class);
 assert($kernel instanceof HttpKernel);
 $response = $container->call([$kernel, 'handle'], ['request' => $request = Request::fromGlobal()]);
+assert($response instanceof Response);
 $response->send();
 $kernel->terminateRequest($request, $response);
 $kernel->terminate();
