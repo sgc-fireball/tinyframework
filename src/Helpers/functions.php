@@ -94,9 +94,9 @@ if (!function_exists('base64url_encode')) {
 }
 
 if (!function_exists('base64url_decode')) {
-    function base64url_decode(string $data): string
+    function base64url_decode(string $data, bool $strict = false): string
     {
-        return base64_decode(base64url_to_base64($data), true);
+        return base64_decode(base64url_to_base64($data), $strict);
     }
 }
 
@@ -742,9 +742,11 @@ if (!function_exists('mimetype_from_file')) {
 }
 
 if (!function_exists('now')) {
-    function now(): DateTime
+    function now(DateTimeZone|string|null $timezone = null): DateTime
     {
-        return new DateTime('now', new DateTimeZone(config('app.timezone') ?: 'UTC'));
+        $timezone = is_null($timezone) ? config('app.timezone') ?: 'UTC' : $timezone;
+        $timezone = is_string($timezone) ? new DateTimeZone($timezone) : $timezone;
+        return new DateTime('now', $timezone);
     }
 }
 

@@ -8,7 +8,7 @@ class EventDispatcher implements EventDispatcherInterface
 {
     private array $listeners = [];
 
-    public function addListener(string $eventName, callable $listener, int $priority = 0): static
+    public function addListener(string $eventName, array|string|\Closure|callable $listener, int $priority = 0): static
     {
         $this->checkEventName('eventName', $eventName);
         if (!array_key_exists($eventName, $this->listeners)) {
@@ -21,13 +21,13 @@ class EventDispatcher implements EventDispatcherInterface
         return $this;
     }
 
-    public function removeListener(string $eventName, callable $listener): static
+    public function removeListener(string $eventName, array|string|\Closure|callable $listener): static
     {
         $this->checkEventName('eventName', $eventName);
         if (\array_key_exists($eventName, $this->listeners)) {
             foreach ($this->listeners[$eventName] as $priority => &$listeners) {
-                foreach ($listeners as $index => &$l) {
-                    if ($listener === $l) {
+                foreach ($listeners as $index => &$storedListener) {
+                    if ($listener === $storedListener) {
                         unset($this->listeners[$eventName][$priority][$index]);
                     }
                 }
@@ -40,7 +40,7 @@ class EventDispatcher implements EventDispatcherInterface
     {
         $listeners = $this->getListenersForEvent($event);
         foreach ($listeners as $listener) {
-            $listener($event);
+            container()->call($listener, ['event' => $event]);
             if ($event->isPropagationStopped()) {
                 break;
             }
@@ -66,10 +66,14 @@ class EventDispatcher implements EventDispatcherInterface
     private function checkEventName(string $field, string $eventName): void
     {
         if (!class_exists($eventName)) {
-            throw new \InvalidArgumentException('Invalid argument $' . $field . ' must be an existing class name and must be implement the EventInterface.');
+            throw new \InvalidArgumentException(
+                'Invalid argument $' . $field . ' must be an existing class name and must be implement the EventInterface.'
+            );
         }
         if (!in_array(EventInterface::class, class_implements($eventName))) {
-            throw new \InvalidArgumentException('Invalid argument $' . $field . ' must be an existing class name and must be implement the EventInterface.');
+            throw new \InvalidArgumentException(
+                'Invalid argument $' . $field . ' must be an existing class name and must be implement the EventInterface.'
+            );
         }
     }
 }

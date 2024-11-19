@@ -6,9 +6,9 @@ namespace TinyFramework\Event;
 
 interface EventDispatcherInterface
 {
-    public function addListener(string $eventName, callable $listener, int $priority = 0): EventDispatcherInterface;
+    public function addListener(string $eventName, array|string|\Closure|callable $listener, int $priority = 0): EventDispatcherInterface;
 
-    public function removeListener(string $eventName, callable $listener): EventDispatcherInterface;
+    public function removeListener(string $eventName, array|string|\Closure|callable $listener): EventDispatcherInterface;
 
     public function dispatch(EventInterface $event): EventDispatcherInterface;
 

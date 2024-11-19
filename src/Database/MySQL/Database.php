@@ -135,7 +135,6 @@ class Database implements DatabaseInterface
         }
 
         /**
-         * @link https://github.com/abreksa4/mysql-escape-string-polyfill/blob/master/src/functions.php
          * @link https://dev.mysql.com/doc/refman/8.0/en/string-literals.html#character-escape-sequences
          */
         $value = strtr($value, [
@@ -147,9 +146,16 @@ class Database implements DatabaseInterface
             chr(8) => "\\b",
             '"' => '\"',
             "'" => "\'",
-            '_' => '\_',
-            '%' => '\%',
             '\\' => '\\\\',
+            /**
+             * The \% and \_ sequences are used to search for literal instances of % and _ in pattern-matching contexts
+             * where they would otherwise be interpreted as wildcard characters. See the description of the
+             * LIKE operator in Section 14.8.1, “String Comparison Functions and Operators”.
+             * If you use \% or \_ outside of pattern-matching contexts,
+             * they evaluate to the strings \% and \_, not to % and _.
+             */
+            //'_' => '\_',
+            //'%' => '\%',
         ]);
         return '"' . $value . '"';
     }

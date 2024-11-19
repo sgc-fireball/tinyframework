@@ -311,6 +311,39 @@ class DateTime extends \DateTime implements JsonSerializable, Stringable, DateTi
         return self::easter($year, $timezone)->addDays(60);
     }
 
+    public function addSecond(int $second = 1): self
+    {
+        return $this->addSeconds($second);
+    }
+
+    public function addSeconds(int $seconds): self
+    {
+        $this->modify('+' . $seconds . ' seconds');
+        return $this;
+    }
+
+    public function addMinute(int $minute = 1): self
+    {
+        return $this->addMinutes($minute);
+    }
+
+    public function addMinutes(int $minutes): self
+    {
+        $this->modify('+' . $minutes . ' minutes');
+        return $this;
+    }
+
+    public function addHour(int $hour = 1): self
+    {
+        return $this->addHours($hour);
+    }
+
+    public function addHours(int $hours): self
+    {
+        $this->modify('+' . $hours . ' hour');
+        return $this;
+    }
+
     public function addDay(int $day = 1): self
     {
         return $this->addDays($day);
@@ -341,6 +374,39 @@ class DateTime extends \DateTime implements JsonSerializable, Stringable, DateTi
     public function addYears(int $years): self
     {
         $this->modify('+' . $years . ' year');
+        return $this;
+    }
+    
+    public function subSecond(int $second = 1): self
+    {
+        return $this->subSeconds($second);
+    }
+
+    public function subSeconds(int $seconds): self
+    {
+        $this->modify('-' . $seconds . ' seconds');
+        return $this;
+    }
+
+    public function subMinute(int $minute = 1): self
+    {
+        return $this->subMinutes($minute);
+    }
+
+    public function subMinutes(int $minutes): self
+    {
+        $this->modify('-' . $minutes . ' minutes');
+        return $this;
+    }
+
+    public function subHour(int $hour = 1): self
+    {
+        return $this->subHours($hour);
+    }
+
+    public function subHours(int $hours): self
+    {
+        $this->modify('-' . $hours . ' hour');
         return $this;
     }
 

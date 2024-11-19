@@ -13,17 +13,23 @@ class JWT
     private const ASN1_SEQUENCE = 0x10;
     private const ASN1_BIT_STRING = 0x03;
 
-    public const ALG_HS256 = 'HS256';
-    public const ALG_HS384 = 'HS384';
-    public const ALG_HS512 = 'HS512';
-    public const ALG_RS256 = 'RS256';
-    public const ALG_RS384 = 'RS384';
-    public const ALG_RS512 = 'RS512';
-    public const ALG_ES256 = 'ES256';
-    public const ALG_ES256K = 'ES256K';
-    public const ALG_ES384 = 'ES384';
-    public const ALG_ES512 = 'ES512';
-    public const ALG_EDDSA = 'EdDSA';
+    /**
+     * from okay to safer
+     */
+    public const ALG_HS256 = 'HS256'; // shared secret
+    public const ALG_HS384 = 'HS384'; // shared secret
+    public const ALG_HS512 = 'HS512'; // shared secret
+    public const ALG_RS256 = 'RS256'; // RSASSA PKCS1 v1.5 signature with SHA-256
+    public const ALG_RS384 = 'RS384'; // RSASSA PKCS1 v1.5 signature with SHA-384
+    public const ALG_RS512 = 'RS512'; // RSASSA PKCS1 v1.5 signature with SHA-512
+    #public const ALG_PS256 = 'PS256'; // RSASSA-PSS signature with SHA-256
+    #public const ALG_PS384 = 'PS384'; // RSASSA-PSS signature with SHA-384
+    #public const ALG_PS512 = 'PS512'; // RSASSA-PSS signature with SHA-512
+    public const ALG_ES256 = 'ES256'; // ECDSA using secp256r1 signature with SHA-256
+    public const ALG_ES256K = 'ES256K'; // ECDSA using secp256k1 signature with SHA-256
+    public const ALG_ES384 = 'ES384'; // ECDSA using secp384r1 signature with SHA-384
+    public const ALG_ES512 = 'ES512'; // ECDSA using secp521r1 signature with SHA-512
+    public const ALG_EDDSA = 'EdDSA'; // EdDSA using Ed25519
 
     private int $time;
     private ?int $expirationTime = null;
