@@ -61,6 +61,7 @@
   "suggest": {
     "ext-amqp": "To use AMQP (RabbitMQ) Queues instanceof Sync or Redis Queues.",
     "ext-apcu": "To store UUID Node id, otherwise we are using filesystem fallback.",
+    "ext-dio": "To use dio logging for stdout.",
     "ext-ftp": "To use FTP protocol helper.",
     "ext-gd": "To use image helper wrapper.",
     "ext-http": "To use HTTP protocol helper.",
