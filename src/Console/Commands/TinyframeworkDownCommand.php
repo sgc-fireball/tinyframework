@@ -18,10 +18,11 @@ class TinyframeworkDownCommand extends CommandAwesome
         return parent::configure()
             ->description('Put the application into maintenance mode.')
             ->sections([
+                'AUTHOR' => 'Written by Richard Hülsberg.',
                 'EXIT STATUS' => 'The program utility exits 0 on success, and >0 if an error occurs.',
                 'SEE ALSO' => 'tinyframework:up',
                 'BUGS' => 'https://github.com/sgc-fireball/tinyframework/issues',
-                'WWW' => 'https://github.com/sgc-fireball/tinyframework'
+                'SEE ALSO' => 'Full documentation <https://github.com/sgc-fireball/tinyframework/blob/master/docs/index.md>'
             ])
             ->option(
                 Option::create('ip', null, Option::VALUE_IS_ARRAY, 'Whitelist: one address per option.', ['127.0.0.1'])

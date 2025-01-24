@@ -18,7 +18,7 @@ COMMIT_FILEPATH="${1:-}"
 [ -f "${COMMIT_FILEPATH}" ] || die 2 "File not found: ${COMMIT_FILEPATH}"
 COMMIT_MESSAGE=$(cat ${COMMIT_FILEPATH})
 
-REGEX_TYPE="(chore|build|perf|feat|fix|refactor|style|test|ci)"
+REGEX_TYPE="(chore|build|perf|feat|fix|refactor|docs|style|test|ci)"
 REGEX_SCOPE="(\(([^\)]+)\)){0,1}"
 REGEX_TICKET="(NO-TICKET|[A-Z]+-[\d]+){1}"
 REGEX_MESSAGE="(\n\n(.+)){0,1}"

@@ -30,10 +30,11 @@ class TinyframeworkQueueWorkerCommand extends CommandAwesome
         return parent::configure()
             ->description('Start processing jobs on the queue as a daemon.')
             ->sections([
+                'AUTHOR' => 'Written by Richard Hülsberg.',
                 'EXIT STATUS' => 'The program utility exits 0 on success, and >0 if an error occurs.',
                 'SEE ALSO' => 'tinyframework:queue:stop',
                 'BUGS' => 'https://github.com/sgc-fireball/tinyframework/issues',
-                'WWW' => 'https://github.com/sgc-fireball/tinyframework'
+                'SEE ALSO' => 'Full documentation <https://github.com/sgc-fireball/tinyframework/blob/master/docs/index.md>'
             ])
             ->option(new Option('queue', null, Option::VALUE_IS_ARRAY, 'Queue name', []));
     }

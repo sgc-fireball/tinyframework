@@ -17,9 +17,10 @@ class TinyframeworkViewClearCommand extends CommandAwesome
         return parent::configure()
             ->description('Clear all compiled view files')
             ->sections([
+                'AUTHOR' => 'Written by Richard Hülsberg.',
                 'EXIT STATUS' => 'The program utility exits 0 on success, and >0 if an error occurs.',
                 'BUGS' => 'https://github.com/sgc-fireball/tinyframework/issues',
-                'WWW' => 'https://github.com/sgc-fireball/tinyframework'
+                'SEE ALSO' => 'Full documentation <https://github.com/sgc-fireball/tinyframework/blob/master/docs/index.md>',
             ]);
     }
 

@@ -18,9 +18,10 @@ class TinyframeworkSystemdInstallCommand extends CommandAwesome
         return parent::configure()
             ->description('Installing swoole server into systemd services.')
             ->sections([
+                'AUTHOR' => 'Written by Richard Hülsberg.',
                 'EXIT STATUS' => 'The program utility exits 0 on success, and >0 if an error occurs.',
                 'BUGS' => 'https://github.com/sgc-fireball/tinyframework/issues',
-                'WWW' => 'https://github.com/sgc-fireball/tinyframework',
+                'SEE ALSO' => 'Full documentation <https://github.com/sgc-fireball/tinyframework/blob/master/docs/index.md>',
             ])
             ->option(Option::create('name', 'n', Option::VALUE_REQUIRED, 'The systemd service name.', 'tinyframework'))
             ->option(Option::create('user', 'u', Option::VALUE_REQUIRED, 'The systemd service username.', 'www-data'))
