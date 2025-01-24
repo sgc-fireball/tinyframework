@@ -167,22 +167,22 @@ class StrTest extends TestCase
 
     public function testLtrim(): void
     {
-        $this->assertEquals(' test ', Str::factory(' test ')->trim('#'));
-        $this->assertEquals('test', Str::factory(' test')->trim());
-        $this->assertEquals('test ', Str::factory('test ')->trim());
-        $this->assertEquals('test ', Str::factory(' test ')->trim());
-        $this->assertEquals('test  ', Str::factory('  test  ')->trim());
-        $this->assertEquals('test  test  ', Str::factory('  test  test  ')->trim());
+        $this->assertEquals(' test ', Str::factory(' test ')->ltrim('#'));
+        $this->assertEquals('test', Str::factory(' test')->ltrim());
+        $this->assertEquals('test ', Str::factory('test ')->ltrim());
+        $this->assertEquals('test ', Str::factory(' test ')->ltrim());
+        $this->assertEquals('test  ', Str::factory('  test  ')->ltrim());
+        $this->assertEquals('test  test  ', Str::factory('  test  test  ')->ltrim());
     }
 
     public function testRtrim(): void
     {
-        $this->assertEquals(' test ', Str::factory(' test ')->trim('#'));
-        $this->assertEquals(' test', Str::factory(' test')->trim());
-        $this->assertEquals('test', Str::factory('test ')->trim());
-        $this->assertEquals(' test', Str::factory(' test ')->trim());
-        $this->assertEquals('  test', Str::factory('  test  ')->trim());
-        $this->assertEquals('  test  test', Str::factory('  test  test  ')->trim());
+        $this->assertEquals(' test ', Str::factory(' test ')->rtrim('#'));
+        $this->assertEquals(' test', Str::factory(' test')->rtrim());
+        $this->assertEquals('test', Str::factory('test ')->rtrim());
+        $this->assertEquals(' test', Str::factory(' test ')->rtrim());
+        $this->assertEquals('  test', Str::factory('  test  ')->rtrim());
+        $this->assertEquals('  test  test', Str::factory('  test  test  ')->rtrim());
     }
 
     public function testPadLeft(): void
