@@ -7,7 +7,7 @@ namespace TinyFramework\Helpers;
 /**
  * @template TKey of int|string
  * @template TValue of mixed
- * @see https://www.php.net/manual/de/ref.array.php
+ * @link https://www.php.net/manual/de/ref.array.php
  */
 #[\AllowDynamicProperties]
 class Arr implements \ArrayAccess, \Iterator, \Countable

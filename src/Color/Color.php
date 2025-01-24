@@ -495,7 +495,7 @@ class Color
 
 
     /**
-     * @see https://developers.meethue.com/documentation/color-conversions-rgb-xy
+     * @link https://developers.meethue.com/documentation/color-conversions-rgb-xy
      * @param int $red
      * @param int $green
      * @param int $blue

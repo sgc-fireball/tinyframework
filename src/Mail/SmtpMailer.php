@@ -35,7 +35,7 @@ class SmtpMailer extends MailerAwesome implements MailerInterface
 
     public function send(Mail $mail): bool
     {
-        /** @see https://tools.ietf.org/html/rfc2821 */
+        /** @link https://tools.ietf.org/html/rfc2821 */
 
         $from = $mail->from();
         if (!array_key_exists('email', $from) || !$from['email']) {
@@ -130,7 +130,7 @@ class SmtpMailer extends MailerAwesome implements MailerInterface
         }
 
         /**
-         * @see https://stackoverflow.com/questions/3902455/mail-multipart-alternative-vs-multipart-mixed
+         * @link https://stackoverflow.com/questions/3902455/mail-multipart-alternative-vs-multipart-mixed
          */
         $this->write($fp, "MIME-Version: 1.0\r\n", false);
 

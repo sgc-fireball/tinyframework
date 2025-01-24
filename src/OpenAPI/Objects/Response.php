@@ -5,7 +5,7 @@ namespace TinyFramework\OpenAPI\Objects;
 use stdClass;
 
 /**
- * @see https://swagger.io/specification/#responses-object
+ * @link https://swagger.io/specification/#responses-object
  */
 class Response extends AbstractObject
 {

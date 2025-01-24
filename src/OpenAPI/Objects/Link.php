@@ -5,7 +5,7 @@ namespace TinyFramework\OpenAPI\Objects;
 use stdClass;
 
 /**
- * @see https://swagger.io/specification/#license-object
+ * @link https://swagger.io/specification/#license-object
  */
 class Link extends AbstractObject
 {

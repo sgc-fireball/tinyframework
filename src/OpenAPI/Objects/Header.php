@@ -5,7 +5,7 @@ namespace TinyFramework\OpenAPI\Objects;
 use TinyFramework\OpenAPI\Types\AbstractType;
 
 /**
- * @see https://swagger.io/specification/#header-object
+ * @link https://swagger.io/specification/#header-object
  */
 class Header extends Parameter
 {

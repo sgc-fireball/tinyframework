@@ -12,11 +12,26 @@ class HTTP
 
     use Macroable;
 
+    private array $fakes = [];
+
     public function __construct()
     {
         if (!extension_loaded('curl')) {
             throw new \RuntimeException('Missing curl. Please install php-curl first.');
         }
+    }
+
+    public function fake(array|null $fakes = []): self
+    {
+        if (is_array($fakes)) {
+            foreach ($fakes as $url => $response) {
+                assert($response instanceof Response);
+                $this->fakes[$url] = $response;
+            }
+        } else {
+            $this->fakes = [];
+        }
+        return $this;
     }
 
     public function get(URL|string $url, array $headers = []): Response
@@ -56,7 +71,11 @@ class HTTP
 
     public function request(string $method, URL|string $url, mixed $body = null, array $headers = []): Response
     {
-        $ch = curl_init(is_string($url) ? $url : $url->__toString());
+        $_url = is_string($url) ? $url : $url->__toString();
+        if (isset($this->fakes[$_url])) {
+            return $this->fakes[$_url];
+        }
+        $ch = curl_init($_url);
         curl_setopt($ch, \CURLOPT_CUSTOMREQUEST, $method);
         if (!in_array($method, ['GET', 'OPTION', 'HEAD'])) {
             curl_setopt($ch, \CURLOPT_POSTFIELDS, $body);
@@ -82,7 +101,6 @@ class HTTP
             substr($result, $headerSize),
             curl_getinfo($ch, \CURLINFO_HTTP_CODE)
         );
-
 
         $header = trim(substr($result, 0, $headerSize));
         $header = explode("\n", $header);

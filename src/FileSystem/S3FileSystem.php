@@ -10,7 +10,7 @@ use TinyFramework\Http\Response;
 use TinyFramework\Http\URL;
 
 /**
- * @see https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-auth-using-authorization-header.html
+ * @link https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-auth-using-authorization-header.html
  */
 class S3FileSystem extends FileSystemAwesome implements FileSystemInterface
 {
@@ -302,7 +302,7 @@ class S3FileSystem extends FileSystemAwesome implements FileSystemInterface
     }
 
     /**
-     * @see https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObject.html
+     * @link https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObject.html
      */
     private function s3GetObject(
         string $path,
@@ -311,7 +311,7 @@ class S3FileSystem extends FileSystemAwesome implements FileSystemInterface
     }
 
     /**
-     * @see https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObject.html
+     * @link https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObject.html
      */
     private function s3PutObject(
         string $path,
@@ -322,7 +322,7 @@ class S3FileSystem extends FileSystemAwesome implements FileSystemInterface
     }
 
     /**
-     * @see https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListObjectsV2.html
+     * @link https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListObjectsV2.html
      */
     private function s3ListObjectV2(
         string $path,
@@ -339,7 +339,7 @@ class S3FileSystem extends FileSystemAwesome implements FileSystemInterface
     }
 
     /**
-     * @see https://docs.aws.amazon.com/AmazonS3/latest/API/API_DeleteObject.html
+     * @link https://docs.aws.amazon.com/AmazonS3/latest/API/API_DeleteObject.html
      */
     private function s3DeleteObject(
         string $path
@@ -448,7 +448,7 @@ class S3FileSystem extends FileSystemAwesome implements FileSystemInterface
     }
 
     /**
-     * @see https://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-header-based-auth.html
+     * @link https://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-header-based-auth.html
      */
     private function createCanonicalRequestHash(string $method, URL $url, array &$headers): string
     {
@@ -470,7 +470,7 @@ class S3FileSystem extends FileSystemAwesome implements FileSystemInterface
     }
 
     /**
-     * @see https://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-header-based-auth.html
+     * @link https://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-header-based-auth.html
      */
     private function createSign(string $method, URL $url, string $date, array $headers): string
     {
@@ -490,7 +490,7 @@ class S3FileSystem extends FileSystemAwesome implements FileSystemInterface
     }
 
     /**
-     * @see https://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-header-based-auth.html
+     * @link https://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-header-based-auth.html
      */
     private function calculateSignatureKey(
         string $date

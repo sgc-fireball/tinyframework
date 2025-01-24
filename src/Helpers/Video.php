@@ -61,8 +61,8 @@ class Video
     }
 
     /**
-     * @see https://developer.bitmovin.com/playback/docs/webvtt-based-thumbnails
-     * @see https://bitmovin.com/demos/thumbnail-seeking
+     * @link https://developer.bitmovin.com/playback/docs/webvtt-based-thumbnails
+     * @link https://bitmovin.com/demos/thumbnail-seeking
      * @param int $second default is zero, that means we are creating automatically 100 positions, but maximal one per second.
      * @return array<Image, string>
      */

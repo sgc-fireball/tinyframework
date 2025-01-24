@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TinyFramework\Helpers;
 
 /**
- * @see https://www.koordinaten-umrechner.de/decimal/51.388923,6.642949
+ * @link https://www.koordinaten-umrechner.de/decimal/51.388923,6.642949
  */
 class GPS
 {

@@ -8,7 +8,7 @@ use InvalidArgumentException;
 use TinyFramework\Console\Output\OutputInterface;
 
 /**
- * @see https://symfony.com/doc/current/components/console/helpers/table.html
+ * @link https://symfony.com/doc/current/components/console/helpers/table.html
  */
 class Table
 {

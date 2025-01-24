@@ -422,7 +422,7 @@ class Router
                 $url .= str_contains($url, '?') ? '&' : '?';
                 $url .= http_build_query($parameters);
             }
-            return rtrim($url, '?&');
+            return rtrim($url, '?&=');
         }
         throw new RuntimeException('Could not found route: ' . $name);
     }

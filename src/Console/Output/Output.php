@@ -23,9 +23,9 @@ class Output implements OutputInterface
 
     /**
      * foreground;background;attributes
-     * @see https://misc.flogisoft.com/bash/tip_colors_and_formatting
-     * @see https://github.com/symfony/console/blob/b61edc965ce547319f0b9dad02ba22c96da27c5a/Color.php#L143
-     * @see https://github.com/symfony/console/blob/5.x/Formatter/OutputFormatter.php
+     * @link https://misc.flogisoft.com/bash/tip_colors_and_formatting
+     * @link https://github.com/symfony/console/blob/b61edc965ce547319f0b9dad02ba22c96da27c5a/Color.php#L143
+     * @link https://github.com/symfony/console/blob/5.x/Formatter/OutputFormatter.php
      * reset attributes: \e[0m
      * background-RGB: \e[48;2;R;G;Bm
      * foreground-RGB: \e[38;2;R;G;Bm

@@ -5,7 +5,7 @@ namespace TinyFramework\OpenAPI\Objects;
 use TinyFramework\OpenAPI\OpenAPIException;
 
 /**
- * @see https://swagger.io/specification/#info-object
+ * @link https://swagger.io/specification/#info-object
  */
 class Info extends AbstractObject
 {

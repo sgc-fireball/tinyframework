@@ -3,7 +3,7 @@
 namespace TinyFramework\OpenAPI\Objects;
 
 /**
- * @see https://swagger.io/specification/#oauth-flows-object
+ * @link https://swagger.io/specification/#oauth-flows-object
  */
 class OAuthFlows extends AbstractObject
 {

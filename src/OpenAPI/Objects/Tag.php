@@ -3,7 +3,7 @@
 namespace TinyFramework\OpenAPI\Objects;
 
 /**
- * @see https://swagger.io/specification/#header-object
+ * @link https://swagger.io/specification/#header-object
  */
 class Tag extends AbstractObject
 {

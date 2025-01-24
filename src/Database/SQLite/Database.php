@@ -22,6 +22,8 @@ class Database implements DatabaseInterface
 
     protected ?SQLite3 $connection = null;
 
+    protected array $listenCallbacks = [];
+
     public function __construct(#[\SensitiveParameter] array $config = [])
     {
         foreach ($this->config as $key => $default) {
@@ -111,7 +113,18 @@ class Database implements DatabaseInterface
 
     public function execute(string $query): array|bool
     {
+        $start = microtime(true);
         $result = $this->connect()->connection->query($query);
+        $end = microtime(true);
+        $parameter = [
+            'query' => $query,
+            'start' => $start,
+            'duration' => $end - $start,
+            'end' => $end,
+        ];
+        foreach ($this->listenCallbacks as $callback) {
+            rescue(fn() => container()->call($callback, $parameter));
+        }
         if ($result === false) {
             throw new RuntimeException(
                 sprintf(
@@ -150,4 +163,11 @@ class Database implements DatabaseInterface
         );
         return $this;
     }
+
+    public function listen(callable|string|array|\Closure $listen): static
+    {
+        $this->listenCallbacks[] = $listen;
+        return $this;
+    }
+
 }

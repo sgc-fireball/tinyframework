@@ -843,3 +843,15 @@ if (!function_exists('getFlashMessages')) {
         return is_array($flashMessages) ? $flashMessages : [];
     }
 }
+
+if (!function_exists('rescue')) {
+    function rescue(callable|string|array|Closure $callback, mixed $default = null): mixed
+    {
+        try {
+            $default = container()->call($callback);
+        } catch (\Throwable $e) {
+            // ignore
+        }
+        return $default;
+    }
+}

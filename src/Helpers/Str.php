@@ -7,7 +7,7 @@ namespace TinyFramework\Helpers;
 use TinyFramework\Http\URL;
 
 /**
- * @see https://www.php.net/manual/de/ref.strings.php
+ * @link https://www.php.net/manual/de/ref.strings.php
  */
 class Str implements \Stringable
 {
@@ -307,6 +307,13 @@ class Str implements \Stringable
     public function wrap(Str|string $prefix, Str|string $postfix): static
     {
         $this->value = $prefix . $this->value . $postfix;
+        return $this;
+    }
+
+    public function squish(): static
+    {
+        $this->value = preg_replace('/(\s\s+)/', ' ', $this->value);
+        $this->value = \trim($this->value, ' ');
         return $this;
     }
 

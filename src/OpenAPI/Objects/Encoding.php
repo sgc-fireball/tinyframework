@@ -5,7 +5,7 @@ namespace TinyFramework\OpenAPI\Objects;
 use stdClass;
 
 /**
- * @see https://swagger.io/specification/#encoding-object
+ * @link https://swagger.io/specification/#encoding-object
  */
 class Encoding extends AbstractObject
 {

@@ -5,7 +5,7 @@ namespace TinyFramework\OpenAPI\Objects;
 use TinyFramework\OpenAPI\OpenAPIException;
 
 /**
- * @see https://swagger.io/specification/#server-variable-object
+ * @link https://swagger.io/specification/#server-variable-object
  */
 class ServerVariable extends AbstractObject
 {

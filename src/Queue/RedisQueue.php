@@ -52,7 +52,7 @@ class RedisQueue implements QueueInterface
     }
 
     /**
-     * @see https://redis.io/commands/rpush
+     * @link https://redis.io/commands/rpush
      */
     public function push(JobInterface $job): static
     {
@@ -97,7 +97,7 @@ class RedisQueue implements QueueInterface
     }
 
     /**
-     * @see https://redis.io/commands/llen
+     * @link https://redis.io/commands/llen
      * @return int
      */
     public function count(): int

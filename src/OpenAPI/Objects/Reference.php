@@ -6,7 +6,7 @@ use TinyFramework\OpenAPI\OpenAPIException;
 use TinyFramework\OpenAPI\Types\AbstractType;
 
 /**
- * @see https://swagger.io/specification/#reference-object
+ * @link https://swagger.io/specification/#reference-object
  */
 class Reference extends AbstractObject
 {

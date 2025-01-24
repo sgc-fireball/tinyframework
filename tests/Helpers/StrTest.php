@@ -146,19 +146,43 @@ class StrTest extends TestCase
         $this->markTestSkipped('TODO');
     }
 
+    public function testSquish(): void
+    {
+        $this->assertEquals('test test', Str::factory(' test test')->squish());
+        $this->assertEquals('test test', Str::factory('test test ')->squish());
+        $this->assertEquals('test test', Str::factory(' test test ')->squish());
+        $this->assertEquals('test test', Str::factory(' test  test ')->squish());
+        $this->assertEquals('test test', Str::factory('  test  test  ')->squish());
+    }
+
     public function testTrim(): void
     {
-        $this->markTestSkipped('TODO');
+        $this->assertEquals(' test ', Str::factory(' test ')->trim('#'));
+        $this->assertEquals('test', Str::factory(' test')->trim());
+        $this->assertEquals('test', Str::factory('test ')->trim());
+        $this->assertEquals('test', Str::factory(' test ')->trim());
+        $this->assertEquals('test', Str::factory('  test  ')->trim());
+        $this->assertEquals('test  test', Str::factory('  test  test  ')->trim());
     }
 
     public function testLtrim(): void
     {
-        $this->markTestSkipped('TODO');
+        $this->assertEquals(' test ', Str::factory(' test ')->trim('#'));
+        $this->assertEquals('test', Str::factory(' test')->trim());
+        $this->assertEquals('test ', Str::factory('test ')->trim());
+        $this->assertEquals('test ', Str::factory(' test ')->trim());
+        $this->assertEquals('test  ', Str::factory('  test  ')->trim());
+        $this->assertEquals('test  test  ', Str::factory('  test  test  ')->trim());
     }
 
     public function testRtrim(): void
     {
-        $this->markTestSkipped('TODO');
+        $this->assertEquals(' test ', Str::factory(' test ')->trim('#'));
+        $this->assertEquals(' test', Str::factory(' test')->trim());
+        $this->assertEquals('test', Str::factory('test ')->trim());
+        $this->assertEquals(' test', Str::factory(' test ')->trim());
+        $this->assertEquals('  test', Str::factory('  test  ')->trim());
+        $this->assertEquals('  test  test', Str::factory('  test  test  ')->trim());
     }
 
     public function testPadLeft(): void

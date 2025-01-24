@@ -21,4 +21,6 @@ interface DatabaseInterface
     public function execute(string $query): array|bool;
 
     public function createMigrationTable(): DatabaseInterface;
+
+    public function listen(callable|string|array|\Closure $listen): static;
 }

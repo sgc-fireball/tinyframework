@@ -3,7 +3,7 @@
 namespace TinyFramework\OpenAPI\Objects;
 
 /**
- * @see https://swagger.io/specification/#path-item-object
+ * @link https://swagger.io/specification/#path-item-object
  */
 class PathItem extends AbstractObject
 {

@@ -7,7 +7,7 @@ use TinyFramework\OpenAPI\ParameterIn;
 use TinyFramework\OpenAPI\Types\AbstractType;
 
 /**
- * @see https://swagger.io/specification/#parameter-object
+ * @link https://swagger.io/specification/#parameter-object
  */
 class Parameter extends AbstractObject
 {

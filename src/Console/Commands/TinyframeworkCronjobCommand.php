@@ -13,6 +13,7 @@ use TinyFramework\Console\Input\InputInterface;
 use TinyFramework\Console\Input\Option;
 use TinyFramework\Console\Output\OutputInterface;
 use TinyFramework\Cron\CronExpression;
+use TinyFramework\Cron\CronjobAwesome;
 use TinyFramework\Cron\CronjobInterface;
 use TinyFramework\Logger\LoggerInterface;
 
@@ -48,10 +49,13 @@ class TinyframeworkCronjobCommand extends CommandAwesome
         /** @var CronjobInterface[] $jobs */
         $jobs = array_filter(
             $this->container->tagged('cronjob'),
-            function (CronjobInterface $job) use ($now) {
+            function (CronjobInterface|CronjobAwesome $job) use ($now) {
                 $cron = new CronExpression($job->expression());
                 $mustRun = $cron->isDue($now);
                 /** @var int $verbosity */
+                if ($mustRun && $job instanceof CronjobAwesome) {
+                    $mustRun = !$job->skip();
+                }
                 $verbosity = $this->output->verbosity();
                 if (!$mustRun && $verbosity >= OutputInterface::VERBOSITY_VERBOSE) {
                     $this->output->writeln(
@@ -67,9 +71,13 @@ class TinyframeworkCronjobCommand extends CommandAwesome
         );
 
         foreach ($jobs as $job) {
-            $start = microtime(true);
             try {
-                $this->output->write(sprintf("\r[....] <yellow>%s</yellow>", get_class($job)));
+                $start = microtime(true);
+                if ($job instanceof CronjobAwesome) {
+                    $this->output->write(sprintf("\r[INIT ] <yellow>%s</yellow>", get_class($job)));
+                    $job->onStart();
+                }
+                $this->output->write(sprintf("\r[RUN ] <yellow>%s</yellow>", get_class($job)));
                 $job->handle();
                 $this->output->write(
                     sprintf(
@@ -78,7 +86,13 @@ class TinyframeworkCronjobCommand extends CommandAwesome
                         microtime(true) - $start
                     )
                 );
+                if ($job instanceof CronjobAwesome) {
+                    $job->onSuccess();
+                }
             } catch (\Throwable $e) {
+                if ($job instanceof CronjobAwesome) {
+                    $job->onFailed();
+                }
                 $this->output->write(
                     sprintf(
                         "\r[<red>FAIL</red>] <yellow>%s</yellow> in %.2f secs.\n",
@@ -87,6 +101,10 @@ class TinyframeworkCronjobCommand extends CommandAwesome
                     )
                 );
                 $logger->error(exception2text($e, true));
+            } finally {
+                if ($job instanceof CronjobAwesome) {
+                    $job->onEnd();
+                }
             }
         }
         return 0;

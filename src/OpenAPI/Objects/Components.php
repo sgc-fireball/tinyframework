@@ -6,7 +6,7 @@ use stdClass;
 use TinyFramework\OpenAPI\Types\AbstractType;
 
 /**
- * @see https://swagger.io/specification/#components-object
+ * @link https://swagger.io/specification/#components-object
  */
 class Components extends AbstractObject
 {

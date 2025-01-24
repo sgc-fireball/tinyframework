@@ -7,7 +7,7 @@ use RuntimeException;
 use stdClass;
 
 /**
- * @see https://swagger.io/specification/#openapi-object
+ * @link https://swagger.io/specification/#openapi-object
  */
 class OpenAPI extends AbstractObject
 {

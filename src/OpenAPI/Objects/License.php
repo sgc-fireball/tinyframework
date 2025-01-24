@@ -5,7 +5,7 @@ namespace TinyFramework\OpenAPI\Objects;
 use TinyFramework\OpenAPI\OpenAPIException;
 
 /**
- * @see https://swagger.io/specification/#license-object
+ * @link https://swagger.io/specification/#license-object
  */
 class License extends AbstractObject
 {

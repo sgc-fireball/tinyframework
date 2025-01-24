@@ -7,7 +7,7 @@ use TinyFramework\Http\RequestInterface;
 use TinyFramework\OpenAPI\OpenAPIException;
 
 /**
- * @see https://swagger.io/specification/#request-body-object
+ * @link https://swagger.io/specification/#request-body-object
  */
 class RequestBody extends AbstractObject
 {

@@ -6,7 +6,7 @@ use TinyFramework\Http\RequestInterface;
 use TinyFramework\OpenAPI\OpenAPIException;
 
 /**
- * @see https://swagger.io/specification/#server-object
+ * @link https://swagger.io/specification/#server-object
  */
 class Server extends AbstractObject
 {
