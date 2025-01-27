@@ -27,6 +27,10 @@ class JWTTest extends TestCase
             [JWT::ALG_RS256, $rsKey, $rsPub],
             [JWT::ALG_RS384, $rsKey, $rsPub],
             [JWT::ALG_RS512, $rsKey, $rsPub],
+            // PS
+            [JWT::ALG_PS256, $rsKey, $rsPub],
+            [JWT::ALG_PS384, $rsKey, $rsPub],
+            [JWT::ALG_PS512, $rsKey, $rsPub],
             // ES
             [JWT::ALG_ES256, $esKey, $esPub],
             [JWT::ALG_ES256K, $esKey, $esPub],

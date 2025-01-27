@@ -22,9 +22,11 @@ class JWT
     public const ALG_RS256 = 'RS256'; // RSASSA PKCS1 v1.5 signature with SHA-256
     public const ALG_RS384 = 'RS384'; // RSASSA PKCS1 v1.5 signature with SHA-384
     public const ALG_RS512 = 'RS512'; // RSASSA PKCS1 v1.5 signature with SHA-512
-    #public const ALG_PS256 = 'PS256'; // RSASSA-PSS signature with SHA-256
-    #public const ALG_PS384 = 'PS384'; // RSASSA-PSS signature with SHA-384
-    #public const ALG_PS512 = 'PS512'; // RSASSA-PSS signature with SHA-512
+
+    public const ALG_PS256 = 'PS256'; // RSASSA-PSS signature with SHA-256
+    public const ALG_PS384 = 'PS384'; // RSASSA-PSS signature with SHA-384
+    public const ALG_PS512 = 'PS512'; // RSASSA-PSS signature with SHA-512
+
     public const ALG_ES256 = 'ES256'; // ECDSA using secp256r1 signature with SHA-256
     public const ALG_ES256K = 'ES256K'; // ECDSA using secp256k1 signature with SHA-256
     public const ALG_ES384 = 'ES384'; // ECDSA using secp384r1 signature with SHA-384
@@ -47,7 +49,8 @@ class JWT
         if (str_starts_with($this->alg, 'HS')) {
             $this->public = $this->private;
         }
-        if (str_starts_with($this->alg, 'RS') || str_starts_with($this->alg, 'ES')) {
+
+        if (in_array(substr($this->alg, 0, 2), ['RS', 'ES', 'PS'])) {
             if (is_string($this->private)) {
                 if (file_exists($this->private)) {
                     $this->private = 'file://' . $this->private;
@@ -139,7 +142,9 @@ class JWT
         $body = $header . '.' . $payload;
 
         $sign = '';
-        if (str_starts_with($this->alg, 'RS') || str_starts_with($this->alg, 'ES')) {
+        if (str_starts_with($this->alg, 'PS')) {
+            $sign = $this->signatureRSASSAPSS($body);
+        } elseif (str_starts_with($this->alg, 'RS') || str_starts_with($this->alg, 'ES')) {
             $success = openssl_sign($body, $sign, $this->private, $this->typToSha($this->alg));
             if ($success !== true) {
                 throw new RuntimeException('OpenSSL unable to sign data: ' . openssl_error_string());
@@ -157,6 +162,9 @@ class JWT
             $sign = sodium_crypto_sign_detached($body, (string)$this->private);
         }
 
+        if (empty($sign)) {
+            throw new RuntimeException('Unable to sign data.');
+        }
         return $body . '.' . $this->base64UrlEncode($sign);
     }
 
@@ -241,15 +249,19 @@ class JWT
         }
 
         $success = false;
-        if (str_starts_with($this->alg, 'RS') || str_starts_with($this->alg, 'ES')) {
-            if (str_starts_with($this->alg, 'ES')) {
-                $sign = $this->signatureToDER($sign);
+        if (str_starts_with($this->alg, 'PS')) {
+            $success = $this->verifyRSASSAPSS($body, $sign);
+        } else {
+            if (str_starts_with($this->alg, 'RS') || str_starts_with($this->alg, 'ES')) {
+                if (str_starts_with($this->alg, 'ES')) {
+                    $sign = $this->signatureToDER($sign);
+                }
+                $success = openssl_verify($body, $sign, $this->public, $this->typToSha($this->alg)) === 1;
+            } elseif (str_starts_with($this->alg, 'HS')) {
+                $success = hash_equals($sign, hash_hmac($this->typToSha($this->alg), $body, $this->public, true));
+            } elseif ($this->alg === 'EdDSA') {
+                $success = sodium_crypto_sign_verify_detached($sign, $body, (string)$this->public);
             }
-            $success = openssl_verify($body, $sign, $this->public, $this->typToSha($this->alg)) === 1;
-        } elseif (str_starts_with($this->alg, 'HS')) {
-            $success = hash_equals($sign, hash_hmac($this->typToSha($this->alg), $body, $this->public, true));
-        } elseif ($this->alg === 'EdDSA') {
-            $success = sodium_crypto_sign_verify_detached($sign, $body, (string)$this->public);
         }
         if (!$success && $throw) {
             throw new RuntimeException('Invalid JWT. Invalid sign.');
@@ -259,7 +271,7 @@ class JWT
 
     private function base64UrlEncode(#[\SensitiveParameter] string $input): string
     {
-        return str_replace('=', '', strtr(\base64_encode($input), '+/', '-_'));
+        return rtrim(strtr(\base64_encode($input), '+/', '-_'), '=');
     }
 
     private function base64UrlDecode(#[\SensitiveParameter] string $input): string
@@ -355,4 +367,96 @@ class JWT
 
         return [$pos, $data];
     }
+
+    private function signatureRSASSAPSS(string $data): string
+    {
+        if (!str_starts_with($this->alg, 'PS')) {
+            throw new \RuntimeException('The RSASSA-PSS verify process was called with an unsupported algorithm.');
+        }
+        if (!function_exists('exec')) {
+            throw new \RuntimeException('Please allow the function exec to execute openssl command!');
+        }
+        if (!command_exists('openssl')) {
+            throw new \RuntimeException(
+                'Please install openssl cli first. OpenSSL is needed, because PHP could not set rsa padding mode to pss.'
+            );
+        }
+
+        $hashFile = tempnam(sys_get_temp_dir(), 'hash');
+        $signFile = tempnam(sys_get_temp_dir(), 'sig');
+        $keyFile = tempnam(sys_get_temp_dir(), 'key');
+        chmod($hashFile, 0600);
+        chmod($signFile, 0600);
+        chmod($keyFile, 0600);
+
+        $hash = hash($this->typToSha($this->alg), $data, true);
+        file_put_contents($hashFile, $hash);
+        openssl_pkey_export_to_file($this->private, $keyFile);
+
+        $command = sprintf(
+            'openssl pkeyutl -sign -in %s -out %s -inkey %s -pkeyopt digest:%s -pkeyopt rsa_padding_mode:pss --pkeyopt rsa_pss_saltlen:-1',
+            escapeshellarg($hashFile),
+            escapeshellarg($signFile),
+            escapeshellarg($keyFile),
+            escapeshellarg(strtolower($this->typToSha($this->alg)))
+        );
+        exec($command, $output, $result_code);
+        // overwrite key file! to erase the storage
+        file_put_contents($keyFile, random_bytes(4096));
+        unlink($keyFile);
+
+        $sign = file_get_contents($signFile);
+        unlink($signFile);
+        unlink($hashFile);
+
+        if ($result_code === 0) {
+            return $sign;
+        }
+        return '';
+    }
+
+    private function verifyRSASSAPSS(string $data, string $sign): bool
+    {
+        if (!str_starts_with($this->alg, 'PS')) {
+            throw new \RuntimeException('The RSASSA-PSS verify process was called with an unsupported algorithm.');
+        }
+        if (!function_exists('exec')) {
+            throw new \RuntimeException('Please allow the function exec to execute openssl command!');
+        }
+        if (!command_exists('openssl')) {
+            throw new \RuntimeException(
+                'Please install openssl cli first. OpenSSL is needed, because PHP could not set rsa padding mode to pss.'
+            );
+        }
+
+        $hashFile = tempnam(sys_get_temp_dir(), 'hash');
+        $signFile = tempnam(sys_get_temp_dir(), 'sig');
+        $certFile = tempnam(sys_get_temp_dir(), 'sig');
+        chmod($hashFile, 0600);
+        chmod($signFile, 0600);
+        chmod($certFile, 0600);
+
+        $hash = hash($this->typToSha($this->alg), $data, true);
+        file_put_contents($hashFile, $hash);
+        file_put_contents($signFile, $sign);
+
+        $key = openssl_pkey_get_details($this->public);
+        file_put_contents($certFile, $key['key']);
+
+        $command = sprintf(
+            'openssl pkeyutl -verify -in %s -sigfile %s -pubin -inkey %s -pkeyopt digest:%s -pkeyopt rsa_padding_mode:pss --pkeyopt rsa_pss_saltlen:-1',
+            escapeshellarg($hashFile),
+            escapeshellarg($signFile),
+            escapeshellarg($certFile),
+            escapeshellarg(strtolower($this->typToSha($this->alg)))
+        );
+        exec($command, $output, $result_code);
+
+        file_put_contents($certFile, random_bytes(4096));
+        unlink($certFile);
+        unlink($signFile);
+        unlink($hashFile);
+        return $result_code === 0;
+    }
+
 }
