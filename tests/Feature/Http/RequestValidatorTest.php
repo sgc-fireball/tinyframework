@@ -31,6 +31,7 @@ class RequestValidatorTest extends FeatureTestCase
     public function testEmpty()
     {
         /** @var IDValidator|Request $request */
+        container()->singleton('request', new Request());
         $request = container(NoRulesValidator::class);
         $this->assertTrue($request->validate());
         $this->assertEmpty($request->getErrorBag());
@@ -40,9 +41,10 @@ class RequestValidatorTest extends FeatureTestCase
     public function testInvalid()
     {
         /** @var IDValidator|Request $request */
+        container()->singleton('request', new Request());
         $request = container(IDValidator::class);
         $this->assertFalse($request->validate());
-        $this->assertCount(1, $request->getErrorBag());
+        $this->assertCount(2, $request->getErrorBag());
         $this->assertArrayHasKey('id', $request->getErrorBag());
         $this->assertIsArray($request->getErrorBag()['id']);
         $this->assertCount(3, $request->getErrorBag()['id']);
@@ -53,6 +55,7 @@ class RequestValidatorTest extends FeatureTestCase
 
     public function testGet()
     {
+        container()->singleton('request', new Request());
         /** @var IDValidator|Request $request */
         $request = container(IDValidator::class);
         $request->get(['id' => 5]);
@@ -66,6 +69,7 @@ class RequestValidatorTest extends FeatureTestCase
 
     public function testPost()
     {
+        container()->singleton('request', new Request());
         /** @var IDValidator|Request $request */
         $request = container(IDValidator::class);
         $request->post(['id' => 5]);
