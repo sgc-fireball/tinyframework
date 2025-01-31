@@ -323,13 +323,20 @@ class DateTimeTest extends TestCase
 
     public function testAddMonth(): void
     {
-        $this->assertEquals(date('Y-m', time() + 30 * 24 * 60 * 60), DateTime::now()->addMonth()->format('Y-m'));
+        $date = date("Y-m-d");
+        $date = strtotime(date("Y-m-d", strtotime($date)) . "+1 months");
+        $date = date("Y-m", $date);
+        $this->assertEquals($date, DateTime::now()->addMonth()->format('Y-m'));
     }
 
     public function testAddMonths(): void
     {
-        $this->assertEquals(date('Y-m', time() + 2 * 30 * 24 * 60 * 60), DateTime::now()->addMonths(2)->format('Y-m'));
-        $this->assertEquals(date('Y-m', time() + 3 * 30 * 24 * 60 * 60), DateTime::now()->addMonths(3)->format('Y-m'));
+        for ($i = 1; $i < 48; $i++) {
+            $date = date("Y-m-d");
+            $date = strtotime(date("Y-m-d", strtotime($date)) . "+{$i} months");
+            $date = date("Y-m", $date);
+            $this->assertEquals($date, DateTime::now()->addMonths($i)->format('Y-m'));
+        }
     }
 
     public function testAddYear(): void
@@ -356,13 +363,20 @@ class DateTimeTest extends TestCase
 
     public function testSubMonth(): void
     {
-        $this->assertEquals(date('Y-m', time() - 30 * 24 * 60 * 60), DateTime::now()->subMonth()->format('Y-m'));
+        $date = date("Y-m-d");
+        $date = strtotime(date("Y-m-d", strtotime($date)) . "-1 months");
+        $date = date("Y-m", $date);
+        $this->assertEquals($date, DateTime::now()->subMonth()->format('Y-m'));
     }
 
     public function testSubMonths(): void
     {
-        $this->assertEquals(date('Y-m', time() - 2 * 30 * 24 * 60 * 60), DateTime::now()->subMonths(2)->format('Y-m'));
-        $this->assertEquals(date('Y-m', time() - 3 * 30 * 24 * 60 * 60), DateTime::now()->subMonths(3)->format('Y-m'));
+        for ($i = 1; $i < 48; $i++) {
+            $date = date("Y-m-d");
+            $date = strtotime(date("Y-m-d", strtotime($date)) . "-{$i} months");
+            $date = date("Y-m", $date);
+            $this->assertEquals($date, DateTime::now()->subMonths($i)->format('Y-m'));
+        }
     }
 
     public function testSubYear(): void
