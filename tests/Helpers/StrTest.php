@@ -6,422 +6,566 @@ namespace TinyFramework\Tests\Helpers;
 
 use PHPUnit\Framework\TestCase;
 use TinyFramework\Helpers\Str;
+use TinyFramework\Http\URL;
 
 class StrTest extends TestCase
 {
-    public function testToString(): void
+    public function testFactory()
     {
-        $this->markTestSkipped('TODO');
-    }
-
-    public function testClone(): void
-    {
-        $this->markTestSkipped('TODO');
-    }
-
-    public function testSlug(): void
-    {
-        $str = Str::factory('Hello, world!')->slug();
+        $str = Str::factory('test');
         $this->assertInstanceOf(Str::class, $str);
-        $this->assertEquals('hello-world', $str->string());
+        $this->assertEquals('test', $str->toString());
+    }
+
+    public function testChr()
+    {
+        $str = Str::chr(65);
+        $this->assertEquals('A', $str->toString());
+    }
+
+    public function testHttpBuildQuery()
+    {
+        $data = ['foo' => 'bar', 'baz' => 'qux'];
+        $str = Str::httpBuildQuery($data);
+        $this->assertEquals('foo=bar&baz=qux', $str->toString());
+    }
+
+    public function testUuidMethods()
+    {
+        $uuid1 = Str::uuid1();
+        $this->assertNotEmpty($uuid1->toString());
+
+        $uuid4 = Str::uuid4();
+        $this->assertNotEmpty($uuid4->toString());
+    }
+
+    public function testUild()
+    {
+        $uild = Str::uild();
+        $this->assertNotEmpty($uild->toString());
+    }
+
+    public function testConstructor()
+    {
+        $str = new Str('test');
+        $this->assertEquals('test', $str->toString());
+    }
+
+    public function testStringMethods()
+    {
+        $str = new Str('test');
+        $this->assertEquals('test', $str->string());
+        $this->assertEquals('test', $str->toString());
+        $this->assertEquals('test', (string)$str);
+    }
+
+    public function testClone()
+    {
+        $str = new Str('test');
+        $clone = $str->clone();
+        $this->assertEquals($str->toString(), $clone->toString());
+        $this->assertNotSame($str, $clone);
+    }
+
+    public function testSlug()
+    {
+        $str = new Str('Hello World!');
+        $slug = $str->slug();
+        $this->assertEquals('hello-world', $slug->toString());
 
-        $this->markTestSkipped('TODO');
-        /*$str = Str::factory('äöüß')->slug();
-        $this->assertInstanceOf(Str::class, $str);
-        $this->assertEquals('aeoeuess', $str->string());*/
+        /*$str = new Str('äöüß');
+        $slug = $str->slug();
+        $this->assertEquals('aeoeuess', $slug->toString());*/
     }
 
-    public function testKebabCase(): void
+    public function testKebabCase()
     {
-        $str = Str::factory('Hello, World!')->kebabCase();
-        $this->assertInstanceOf(Str::class, $str);
-        $this->assertEquals('hello-world', $str->string());
+        $str = new Str('Hello World');
+        $kebab = $str->kebabCase();
+        $this->assertEquals('hello-world', $kebab->toString());
     }
 
-    public function testSnakeCase(): void
+    public function testSnakeCase()
     {
-        $str = Str::factory('Hello, World!')->snakeCase();
-        $this->assertInstanceOf(Str::class, $str);
-        $this->assertEquals('hello_world', $str->string());
+        $str = new Str('Hello World');
+        $snake = $str->snakeCase();
+        $this->assertEquals('hello_world', $snake->toString());
     }
 
-    public function testCamelCase(): void
+    public function testCamelCase()
     {
-        $str = Str::factory('Hello, World!')->camelCase();
-        $this->assertInstanceOf(Str::class, $str);
-        $this->assertEquals('helloWorld', $str->string());
+        $str = new Str('hello world');
+        $camel = $str->camelCase();
+        $this->assertEquals('helloWorld', $camel->toString());
     }
 
-    public function testLowerCase(): void
+    public function testLowerCase()
     {
-        $str = Str::factory('Hello, World!')->lowerCase();
-        $this->assertInstanceOf(Str::class, $str);
-        $this->assertEquals('hello, world!', $str->string());
+        $str = new Str('Hello World');
+        $lower = $str->lowerCase();
+        $this->assertEquals('hello world', $lower->toString());
     }
 
-    public function testUpperCase(): void
+    public function testUpperCase()
     {
-        $str = Str::factory('Hello, World!')->upperCase();
-        $this->assertInstanceOf(Str::class, $str);
-        $this->assertEquals('HELLO, WORLD!', $str->string());
+        $str = new Str('Hello World');
+        $upper = $str->upperCase();
+        $this->assertEquals('HELLO WORLD', $upper->toString());
     }
 
-    public function testAddCSlashes(): void
+    public function testAddCSlashes()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello World');
+        $str = $str->addCSlashes('A..z');
+        $this->assertEquals('\H\e\l\l\o \W\o\r\l\d', $str->toString());
     }
 
-    public function testAddSlashes(): void
+    public function testAddSlashes()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str("Hello 'World'");
+        $str = $str->addSlashes();
+        $this->assertEquals("Hello \\'World\\'", $str->toString());
     }
 
-    public function testChunkSplit(): void
+    public function testChunkSplit()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello World');
+        $str = $str->chunkSplit(5, '-');
+        $this->assertEquals('Hello- Worl-d-', $str->toString());
     }
 
-    public function testSubstr(): void
+    public function testSubstr()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello World');
+        $str = $str->substr(6);
+        $this->assertEquals('World', $str->toString());
     }
 
-    public function testCountChars(): void
+    public function testCountChars()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello');
+        $result = $str->countChars(1);
+        $this->assertIsArray($result->toArray());
     }
 
-    public function testSubstrReplace(): void
+    public function testSubstrReplace()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello World');
+        $str = $str->substrReplace('Earth', 6);
+        $this->assertEquals('Hello Earth', $str->toString());
     }
 
-    public function testWordCount(): void
+    public function testWordCount()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello World');
+        $count = $str->wordCount();
+        $this->assertEquals(2, $count);
     }
 
-    public function testHtmlEntityDecode(): void
+    public function testHtmlEntityDecode()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('&lt;Hello&gt;');
+        $str = $str->htmlEntityDecode();
+        $this->assertEquals('<Hello>', $str->toString());
     }
 
-    public function testHtmlEntityEncode(): void
+    public function testHtmlEntityEncode()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('<Hello>');
+        $str = $str->htmlEntityEncode();
+        $this->assertEquals('&lt;Hello&gt;', $str->toString());
     }
 
-    public function testHtmlSpecialCharsDecode(): void
+    public function testHtmlSpecialCharsDecode()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('&lt;Hello&gt;');
+        $str = $str->htmlSpecialCharsDecode();
+        $this->assertEquals('<Hello>', $str->toString());
     }
 
-    public function testHtmlSpecialCharsEncode(): void
+    public function testHtmlSpecialCharsEncode()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('<Hello>');
+        $str = $str->htmlSpecialCharsEncode();
+        $this->assertEquals('&lt;Hello&gt;', $str->toString());
     }
 
-    public function testLcfirst(): void
+    public function testLcfirst()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello World');
+        $str = $str->lcfirst();
+        $this->assertEquals('hello World', $str->toString());
     }
 
-    public function testUcfirst(): void
+    public function testUcfirst()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('hello world');
+        $str = $str->ucfirst();
+        $this->assertEquals('Hello world', $str->toString());
     }
 
-    public function testPrefix(): void
+    public function testPrefix()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('World');
+        $str = $str->prefix('Hello ');
+        $this->assertEquals('Hello World', $str->toString());
     }
 
-    public function testPostfix(): void
+    public function testPostfix()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello');
+        $str = $str->postfix(' World');
+        $this->assertEquals('Hello World', $str->toString());
     }
 
-    public function testWrap(): void
+    public function testWrap()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello');
+        $str = $str->wrap('<', '>');
+        $this->assertEquals('<Hello>', $str->toString());
     }
 
-    public function testSquish(): void
+    public function testSquish()
     {
-        $this->assertEquals('test test', Str::factory(' test test')->squish());
-        $this->assertEquals('test test', Str::factory('test test ')->squish());
-        $this->assertEquals('test test', Str::factory(' test test ')->squish());
-        $this->assertEquals('test test', Str::factory(' test  test ')->squish());
-        $this->assertEquals('test test', Str::factory('  test  test  ')->squish());
+        $str = new Str('  Hello   World  ');
+        $str = $str->squish();
+        $this->assertEquals('Hello World', $str->toString());
     }
 
-    public function testTrim(): void
+    public function testTrim()
     {
-        $this->assertEquals(' test ', Str::factory(' test ')->trim('#'));
-        $this->assertEquals('test', Str::factory(' test')->trim());
-        $this->assertEquals('test', Str::factory('test ')->trim());
-        $this->assertEquals('test', Str::factory(' test ')->trim());
-        $this->assertEquals('test', Str::factory('  test  ')->trim());
-        $this->assertEquals('test  test', Str::factory('  test  test  ')->trim());
+        $str = new Str('  Hello World  ');
+        $str = $str->trim();
+        $this->assertEquals('Hello World', $str->toString());
     }
 
-    public function testLtrim(): void
+    public function testLtrim()
     {
-        $this->assertEquals(' test ', Str::factory(' test ')->ltrim('#'));
-        $this->assertEquals('test', Str::factory(' test')->ltrim());
-        $this->assertEquals('test ', Str::factory('test ')->ltrim());
-        $this->assertEquals('test ', Str::factory(' test ')->ltrim());
-        $this->assertEquals('test  ', Str::factory('  test  ')->ltrim());
-        $this->assertEquals('test  test  ', Str::factory('  test  test  ')->ltrim());
+        $str = new Str('  Hello World  ');
+        $str = $str->ltrim();
+        $this->assertEquals('Hello World  ', $str->toString());
     }
 
-    public function testRtrim(): void
+    public function testRtrim()
     {
-        $this->assertEquals(' test ', Str::factory(' test ')->rtrim('#'));
-        $this->assertEquals(' test', Str::factory(' test')->rtrim());
-        $this->assertEquals('test', Str::factory('test ')->rtrim());
-        $this->assertEquals(' test', Str::factory(' test ')->rtrim());
-        $this->assertEquals('  test', Str::factory('  test  ')->rtrim());
-        $this->assertEquals('  test  test', Str::factory('  test  test  ')->rtrim());
+        $str = new Str('  Hello World  ');
+        $str = $str->rtrim();
+        $this->assertEquals('  Hello World', $str->toString());
     }
 
-    public function testPadLeft(): void
+    public function testPadLeft()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello');
+        $str = $str->padLeft(10, '-');
+        $this->assertEquals('-----Hello', $str->toString());
     }
 
-    public function testPadBoth(): void
+    public function testPadBoth()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello');
+        $str = $str->padBoth(10, '-');
+        $this->assertEquals('--Hello---', $str->toString());
     }
 
-    public function testPadRight(): void
+    public function testPadRight()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello');
+        $str = $str->padRight(10, '-');
+        $this->assertEquals('Hello-----', $str->toString());
     }
 
-    public function testReplace(): void
+    public function testReplace()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello World');
+        $str = $str->replace('World', 'Earth');
+        $this->assertEquals('Hello Earth', $str->toString());
     }
 
-    public function testIreplace(): void
+    public function testIreplace()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello World');
+        $str = $str->ireplace('world', 'Earth');
+        $this->assertEquals('Hello Earth', $str->toString());
     }
 
-    public function testStrstr(): void
+    public function testStrstr()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello World');
+        $str = $str->strstr('World');
+        $this->assertEquals('World', $str->toString());
     }
 
-    public function testStristr(): void
+    public function testStristr()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello World');
+        $str = $str->stristr('world');
+        $this->assertEquals('World', $str->toString());
     }
 
-    public function testStrtok(): void
+    public function testStrtok()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello World');
+        $str = $str->strtok(' ');
+        $this->assertEquals('Hello', $str->toString());
     }
 
-    public function testStrtr(): void
+    public function testStrtr()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello World');
+        $str = $str->strtr('eo', '12');
+        $this->assertEquals('H1ll2 W2rld', $str->toString());
     }
 
-    public function testShuffle(): void
+    public function testShuffle()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello World');
+        $str = $str->shuffle();
+        $this->assertNotEquals('Hello World', $str->toString());
     }
 
-    public function testRepeat(): void
+    public function testRepeat()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello');
+        $str = $str->repeat(3);
+        $this->assertEquals('HelloHelloHello', $str->toString());
     }
 
-    public function testReverse(): void
+    public function testReverse()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello');
+        $str = $str->reverse();
+        $this->assertEquals('olleH', $str->toString());
     }
 
-    public function testNl2br(): void
+    public function testNl2br()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str("Hello\nWorld");
+        $str = $str->nl2br();
+        $this->assertEquals("Hello<br />\nWorld", $str->toString());
     }
 
-    public function testQuotedPrintableDecode(): void
+    public function testQuotedPrintableDecode()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello=20World');
+        $str = $str->quotedPrintableDecode();
+        $this->assertEquals('Hello World', $str->toString());
     }
 
-    public function testQuotedPrintableEncode(): void
+    public function testQuotedPrintableEncode()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello World==');
+        $str = $str->quotedPrintableEncode();
+        $this->assertEquals('Hello World=3D=3D', $str->toString());
     }
 
-    public function testQuotemeta(): void
+    public function testQuotemeta()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello.World');
+        $str = $str->quotemeta();
+        $this->assertEquals('Hello\.World', $str->toString());
     }
 
-    public function testStripTags(): void
+    public function testStripTags()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('<p>Hello World</p>');
+        $str = $str->stripTags();
+        $this->assertEquals('Hello World', $str->toString());
     }
 
-    public function testStripCSlashes(): void
+    public function testStripCSlashes()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('\Hello\World');
+        $str = $str->stripCSlashes();
+        $this->assertEquals('HelloWorld', $str->toString());
     }
 
-    public function testStripSlashes(): void
+    public function testStripSlashes()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello\\World');
+        $str = $str->stripSlashes();
+        $this->assertEquals('HelloWorld', $str->toString());
     }
 
-    public function testWordwrap(): void
+    public function testWordwrap()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello World');
+        $str = $str->wordwrap(5);
+        $this->assertEquals("Hello\nWorld", $str->toString());
     }
 
-    public function testStrpbrk(): void
+    public function testStrpbrk()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello World');
+        $str = $str->strpbrk('o');
+        $this->assertEquals('o World', $str->toString());
     }
 
-    public function testStrrchr(): void
+    public function testStrrchr()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello World');
+        $str = $str->strrchr('o');
+        $this->assertEquals('orld', $str->toString());
     }
 
-    public function testContains(): void
+    public function testContains()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello World');
+        $this->assertTrue($str->contains('World'));
     }
 
-    public function testStartsWith(): void
+    public function testStartsWith()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello World');
+        $this->assertTrue($str->startsWith('Hello'));
     }
 
-    public function testEndsWith(): void
+    public function testEndsWith()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello World');
+        $this->assertTrue($str->endsWith('World'));
     }
 
-    public function testStrnatcasecmp(): void
+    public function testStrnatcasecmp()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello');
+        $this->assertEquals(0, $str->strnatcasecmp('hello'));
     }
 
-    public function testStrnatcmp(): void
+    public function testStrnatcmp()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello');
+        $this->assertEquals(0, $str->strnatcmp('Hello'));
     }
 
-    public function testStrncasecmp(): void
+    public function testStrncasecmp()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello');
+        $this->assertEquals(0, $str->strncasecmp('hello', 5));
     }
 
-    public function testStrncmp(): void
+    public function testStrncmp()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello');
+        $this->assertEquals(0, $str->strncmp('Hello', 5));
     }
 
-    public function testPosition(): void
+    public function testPosition()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello World');
+        $this->assertEquals(6, $str->position('World'));
     }
 
-    public function testCompareCaseInsensitive(): void
+    public function testCompareCaseInsensitive()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello');
+        $this->assertEquals(0, $str->compareCaseInsensitive('hello'));
     }
 
-    public function testCompare(): void
+    public function testCompare()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello');
+        $this->assertEquals(0, $str->compare('Hello'));
     }
 
-    public function testStrcoll(): void
+    public function testStrcoll()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello');
+        $this->assertEquals(0, $str->strcoll('Hello'));
     }
 
-    public function testStrcspn(): void
+    public function testStrcspn()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello');
+        $this->assertEquals(2, $str->strcspn('l'));
     }
 
-    public function testOrd(): void
+    public function testOrd()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('A');
+        $this->assertEquals(65, $str->ord());
     }
 
-    public function testReversePosition(): void
+    public function testReversePosition()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello World');
+        $this->assertEquals(7, $str->reversePosition('o'));
     }
 
-    public function testStrspn(): void
+    public function testStrspn()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello');
+        $this->assertEquals(5, $str->strspn('Helo'));
     }
 
-    public function testCaseInsensitivePosition(): void
+    public function testCaseInsensitivePosition()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello World');
+        $this->assertEquals(4, $str->caseInsensitivePosition('O'));
     }
 
-    public function testCaseInsensitiveReversePosition(): void
+    public function testCaseInsensitiveReversePosition()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello World');
+        $this->assertEquals(7, $str->caseInsensitiveReversePosition('O'));
     }
 
-    public function testLength(): void
+    public function testLength()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello');
+        $this->assertEquals(5, $str->length());
     }
 
-    public function testSubstrCompare(): void
+    public function testSubstrCompare()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello World');
+        $this->assertEquals(0, $str->substrCompare('World', 6));
     }
 
-    public function testSubstrCount(): void
+    public function testSubstrCount()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello World');
+        $this->assertEquals(1, $str->substrCount('World'));
     }
 
-    public function testCsv2arr(): void
+    public function testCsv2arr()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello,World');
+        $arr = $str->csv2arr();
+        $this->assertEquals(['Hello', 'World'], $arr->toArray());
     }
 
-    public function testSplit(): void
+    public function testSplit()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello');
+        $arr = $str->split(2);
+        $this->assertEquals(['He', 'll', 'o'], $arr->toArray());
     }
 
-    public function testExplode(): void
+    public function testExplode()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello World');
+        $arr = $str->explode(' ');
+        $this->assertEquals(['Hello', 'World'], $arr->toArray());
     }
 
-    public function testParseStr(): void
+    public function testParseStr()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('foo=bar&baz=qux');
+        $arr = $str->parseStr();
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $arr->toArray());
     }
 
-    public function testParseUrl(): void
+    public function testParseUrl()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('https://example.com');
+        $url = $str->parseUrl();
+        $this->assertInstanceOf(URL::class, $url);
     }
 
-    public function testMask(): void
+    public function testMask()
     {
-        $this->markTestSkipped('TODO');
+        $str = new Str('Hello World');
+        $str = $str->mask('*', 6, 5);
+        $this->assertEquals('Hello *****', $str->toString());
     }
 }

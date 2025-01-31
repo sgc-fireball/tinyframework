@@ -631,7 +631,7 @@ class Str implements \Stringable
 
     public function mask(string $character = '*', int $index = null, int $length = null): static
     {
-        assert(empty($character), 'Paramter #1 $character must not be empty!');
+        assert(empty($character), 'Parameter #1 $character must not be empty!');
         $length = $length ?: mb_strlen($this->value);
         if ($index === null) {
             $this->value = str_repeat($character, $length);
