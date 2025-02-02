@@ -8,6 +8,7 @@ use TinyFramework\Cache\CacheInterface;
 use TinyFramework\Console\CommandAwesome;
 use TinyFramework\Console\Input\InputDefinitionInterface;
 use TinyFramework\Console\Input\InputInterface;
+use TinyFramework\Console\Input\Option;
 use TinyFramework\Console\Output\OutputInterface;
 
 class TinyframeworkCacheClearCommand extends CommandAwesome
@@ -16,10 +17,18 @@ class TinyframeworkCacheClearCommand extends CommandAwesome
     {
         return parent::configure()
             ->description('Flush the application cache.')
+            ->option(
+                new Option(
+                    'queue-worker-restart',
+                    'r',
+                    Option::VALUE_NONE,
+                    'Automatically restart the queue worker.',
+                    false
+                )
+            )
             ->sections([
                 'AUTHOR' => 'Written by Richard Hülsberg.',
                 'EXIT STATUS' => 'The program utility exits 0 on success, and >0 if an error occurs.',
-                'SEE ALSO' => 'tinyframework:session:clear',
                 'BUGS' => 'https://github.com/sgc-fireball/tinyframework/issues',
                 'SEE ALSO' => 'Full documentation <https://github.com/sgc-fireball/tinyframework/blob/master/docs/index.md>',
             ]);
@@ -28,11 +37,54 @@ class TinyframeworkCacheClearCommand extends CommandAwesome
     public function run(InputInterface $input, OutputInterface $output): int
     {
         parent::run($input, $output);
-        $this->output->write('[<green>....</green>] Cache clear');
+
+        /**
+         * Clear normal cache
+         */
+        $this->output->write('[<green>....</green>] Clear cache');
         /** @var CacheInterface $cache */
         $cache = $this->container->get('cache');
         $cache->clear();
         $this->output->write("\r[<green>DONE</green>]\n");
-        return 0;
+
+        $this->clearFile('Clear services-http cache', storage_dir('cache') . '/services-http.php');
+        $this->clearFile('Clear services-console cache', storage_dir('cache') . '/services-console.php');
+        $this->clearFile('Clear config cache', storage_dir('cache') . '/config.php');
+        $this->clearFile('Clear commands cache', storage_dir('cache') . '/commands.php');
+
+        /**
+         * Restart Queue Worker
+         */
+        $this->output->write("\n");
+        $exitCode = 0;
+        if ($input->option('queue-worker-restart')->value()) {
+            $command = [
+                PHP_BINARY,
+                $_SERVER['argv'][0],
+                'tinyframework:queue:worker:stop',
+            ];
+            system(implode(' ', $command), $exitCode);
+        } else {
+            $this->output->info(
+                "We want to recommend, a queue worker restart, with: tinyframework:queue:worker:stop"
+            );
+        }
+
+        return $exitCode;
     }
+
+    private function clearFile(string $title, string $path): void
+    {
+        $this->output->write('[<green>....</green>] ' . $title);
+        if (file_exists($path)) {
+            if (unlink($path)) {
+                $this->output->write("\r[<green>DONE</green>]\n");
+            } else {
+                $this->output->write("\r[<red>FAIL</red>]\n");
+            }
+        } else {
+            $this->output->write("\r[<yellow>DONE</yellow>]\n");
+        }
+    }
+
 }

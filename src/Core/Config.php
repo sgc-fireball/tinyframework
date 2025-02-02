@@ -14,17 +14,28 @@ class Config implements ConfigInterface
     public function __construct(#[\SensitiveParameter] array $config = [])
     {
         $this->config = array_merge($this->config, $config);
-        // @TODO implement config cache
-        $this->loadFolder(__DIR__ . '/config');
-        $this->loadFolder(root_dir() . '/config');
+        $cachePath = storage_dir('cache') . '/config.php';
+        if (env('APP_CACHE', true) && file_exists($cachePath)) {
+            $this->config = require_once($cachePath);
+        } else {
+            $this->loadFolder(__DIR__ . '/config');
+            $this->loadFolder(root_dir() . '/config');
+            if (env('APP_CACHE', true)) {
+                file_put_contents(
+                    $cachePath,
+                    '<?php declare(strict_types=1); return ' . var_export($this->config, true) . ';'
+                );
+            }
+        }
+        date_default_timezone_set($this->config['app']['timezone'] ?? 'UTC');
     }
 
     private function loadFolder(string $path): static
     {
         if (is_dir($path)) {
             $list = scandir($path); // allow real folders and .phar folders
-            $list = array_filter($list, fn ($f) => str_ends_with($f, '.php'));
-            $list = array_map(fn ($f) => $path . '/' . $f, $list);
+            $list = array_filter($list, fn($f) => str_ends_with($f, '.php'));
+            $list = array_map(fn($f) => $path . '/' . $f, $list);
             foreach ($list as $file) {
                 $this->load(str_replace('.php', '', basename($file)), $file);
             }

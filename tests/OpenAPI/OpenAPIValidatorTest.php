@@ -345,7 +345,7 @@ EOF
         $openAPIValidator->validateHttpRequest($request);
 
         $jwt = new JWT(JWT::ALG_HS256, random_bytes(32));
-        $response = Response::json(['token' => $jwt->encode()]);
+        $response = Response::json(['token' => $jwt->encode(['test' => mt_rand(0,5)])]);
         $openAPIValidator->validateHttpResponse($request, $response);
         $this->assertStringStartsWith('ey', json_decode($response->content(), true)['token']);
     }

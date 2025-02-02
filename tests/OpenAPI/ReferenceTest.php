@@ -130,7 +130,7 @@ EOF
         $request = Request::factory(
             'POST',
             URL::factory('http://localhost:8000/api/v1/register'),
-            ['token' => $jwt->encode()],
+            ['token' => $jwt->encode(['test' => mt_rand(0,5)])],
             [
                 'name' => 'name',
                 'email' => '123user@example.com',
@@ -144,7 +144,7 @@ EOF
         $openAPIValidator = new OpenAPIValidator($openAPI);
         $openAPIValidator->validateHttpRequest($request);
 
-        $response = Response::json(['token' => $jwt->encode()]);
+        $response = Response::json(['token' => $jwt->encode(['test' => mt_rand(0,5)])]);
         $openAPIValidator->validateHttpResponse($request, $response);
 
         $this->assertTrue(true);

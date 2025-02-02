@@ -102,6 +102,15 @@ abstract class Kernel implements KernelInterface
 
     protected function findServiceProviders(): void
     {
+        $cachePath = storage_dir('cache') . '/services-';
+        $cachePath .= $this->runningInConsole() ? 'console' : 'http';
+        $cachePath .= '.php';
+
+        if (env('APP_CACHE', true) && file_exists($cachePath)) {
+            $this->serviceProviderNames = require_once($cachePath);
+            return;
+        }
+
         $this->serviceProviderNames = [
             EventServiceProvider::class,
             ConfigServiceProvider::class,
@@ -126,7 +135,6 @@ abstract class Kernel implements KernelInterface
             $this->serviceProviderNames[] = ConsoleServiceProvider::class;
         }
 
-        // @TODO implement a cache or composer hook!
         if (file_exists('composer.lock')) {
             if ($content = file_get_contents('composer.lock')) {
                 $composer = json_decode($content, true);
@@ -152,13 +160,12 @@ abstract class Kernel implements KernelInterface
             }
         }
 
-        // @TODO implement load Providers by Namespace
         $root = root_dir();
         if (is_dir($root . '/app/Providers')) {
             $path = $root . '/app/Providers';
             $list = scandir($path); // allow real folders and .phar folders
-            $list = array_filter($list, fn ($f) => str_ends_with($f, '.php'));
-            $list = array_map(fn ($f) => $path . '/' . $f, $list);
+            $list = array_filter($list, fn($f) => str_ends_with($f, '.php'));
+            $list = array_map(fn($f) => $path . '/' . $f, $list);
             foreach ($list as $file) {
                 $provider = 'App\\Providers\\' . str_replace('.php', '', basename($file));
                 if (class_exists($provider)) {
@@ -167,6 +174,13 @@ abstract class Kernel implements KernelInterface
                     throw new RuntimeException('Could not found service provider: ' . $provider);
                 }
             }
+        }
+
+        if (env('APP_CACHE', true)) {
+            file_put_contents(
+                $cachePath,
+                '<?php declare(strict_types=1); return ' . var_export($this->serviceProviderNames, true) . ';'
+            );
         }
     }
 

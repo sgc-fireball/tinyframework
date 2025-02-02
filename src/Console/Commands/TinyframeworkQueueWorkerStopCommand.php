@@ -15,7 +15,7 @@ class TinyframeworkQueueWorkerStopCommand extends CommandAwesome
     protected function configure(): InputDefinitionInterface
     {
         return parent::configure()
-            ->description('Stop queue worker after the current jon.')
+            ->description('Stop queue worker after the current job.')
             ->sections([
                 'AUTHOR' => 'Written by Richard Hülsberg.',
                 'EXIT STATUS' => 'The program utility exits 0 on success, and >0 if an error occurs.',

@@ -2,9 +2,6 @@
 
 declare(strict_types=1);
 
-$timezone = env('APP_TIMEZONE', 'UTC');
-date_default_timezone_set($timezone);
-
 return [
     'env' => env('APP_ENV', 'production'),
 
@@ -18,5 +15,5 @@ return [
 
     'locale' => env('APP_LANG', 'en'),
 
-    'timezone' => $timezone,
+    'timezone' => env('APP_TIMEZONE', 'UTC'),
 ];

@@ -35,6 +35,7 @@
     </logging>
     <php>
         <server name="APP_ENV" value="testing"/>
+        <server name="APP_CACHE" value="false"/>
         <server name="APP_SECRET" value="qFfdrk+liPVRkxRflSJhLQgrKh/PX89inE1Z1P5iFp8="/>
         <server name="APP_URL" value="http://localhost:8000"/>
         <server name="CACHE_DRIVER" value="array"/>

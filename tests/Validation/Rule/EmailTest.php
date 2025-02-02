@@ -22,8 +22,30 @@ class EmailTest extends ValidationTestCase
             ['test@testasdadadasasdasdasdadadsd.de', 'email:rfc', true],
             ['test@testasdadadasasdasdasdadadsd.de', 'email:dns', false],
 
-            ['test@github.com', 'email', true],
-            ['test@github.com', 'email:dns,rfc', true],
+            // ipv4
+            ['test@168.119.154.157', 'email', false],
+            ['test@168.119.154.157', 'email:dns', true],
+            ['test@168.119.154.157', 'email:rfc', false],
+            ['test@168.119.154.157', 'email:dns,tcp', true],
+
+            // ipv6
+            ['test@2a01:4f8:1c17:5020::1', 'email', false],
+            ['test@2a01:4f8:1c17:5020::1', 'email:dns', true],
+            ['test@2a01:4f8:1c17:5020::1', 'email:rfc', false],
+            ['test@2a01:4f8:1c17:5020::1', 'email:dns,tcp', true],
+
+            // root domain
+            ['test@hrdns.de', 'email', true],
+            ['test@hrdns.de', 'email:dns', true],
+            ['test@hrdns.de', 'email:rfc', true],
+            ['test@hrdns.de', 'email:dns,tcp,rfc', true],
+
+            // domain without mx
+            ['test@mail2.hrdns.de', 'email', true],
+            ['test@mail2.hrdns.de', 'email:dns', true],
+            ['test@mail2.hrdns.de', 'email:rfc', true],
+            ['test@mail2.hrdns.de', 'email:dns,tcp,rfc', true],
+
             ['@@-///@@@@github.com', 'email:dns', true],
             ['@@-///@@@@github.com', 'email', false],
         ];

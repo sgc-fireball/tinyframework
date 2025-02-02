@@ -134,7 +134,7 @@ class StringTypeTest extends TestCase
         $this->assertInstanceOf(StringType::class, $scheme);
         $this->assertEquals('jwt', $scheme->format);
         $jwt = new JWT(JWT::ALG_HS256, random_bytes(32));
-        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, $jwt->encode());
+        $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, $jwt->encode(['test' => mt_rand(0,5)]));
         $this->expectException(OpenAPIException::class);
         $this->reflectionMethod->invoke($this->openAPIValidator, $scheme, '123123.132123.123123');
     }

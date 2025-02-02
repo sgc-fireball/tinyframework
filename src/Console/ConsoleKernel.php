@@ -34,7 +34,13 @@ class ConsoleKernel extends Kernel implements ConsoleKernelInterface
     protected function boot(): void
     {
         parent::boot();
-        // @TODO implement loadCommandsByNamespace
+
+        $cachePath = storage_dir('cache') . '/commands.php';
+        if (env('APP_CACHE', true) && file_exists($cachePath)) {
+            $this->commands = require_once($cachePath);
+            return;
+        }
+
         $this->loadCommandsByPath(__DIR__ . '/Commands', '\\TinyFramework\\Console\\Commands\\');
         /** @var CommandAwesome $command */
         foreach ($this->container->tagged('commands') as $command) {
@@ -42,6 +48,13 @@ class ConsoleKernel extends Kernel implements ConsoleKernelInterface
             $this->commands[$inputDefinition->name()] = $command;
         }
         $this->loadCommandsByPath(root_dir() . '/app/Commands', '\\App\\Commands\\');
+
+        if (env('APP_CACHE', true)) {
+            file_put_contents(
+                $cachePath,
+                '<?php declare(strict_types=1); return unserialize(\'' . serialize($this->commands) . '\');'
+            );
+        }
     }
 
     /**
@@ -58,8 +71,8 @@ class ConsoleKernel extends Kernel implements ConsoleKernelInterface
             return;
         }
         $list = scandir($path); // allow real folders and .phar folders
-        $list = array_filter($list, fn ($f) => str_ends_with($f, '.php'));
-        $list = array_map(fn ($f) => $path . '/' . $f, $list);
+        $list = array_filter($list, fn($f) => str_ends_with($f, '.php'));
+        $list = array_map(fn($f) => $path . '/' . $f, $list);
         $classes = array_map(function ($path) use ($namespace) {
             return trim($namespace, '\\') . '\\' . str_replace('.php', '', basename($path));
         }, $list);
