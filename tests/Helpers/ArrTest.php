@@ -346,29 +346,43 @@ class ArrTest extends TestCase
         $this->assertEquals([1 => 'a', 2 => 'b', 3 => 'c'], $arr->toArray());
     }
 
-    public function testIntersectAssoc(): void
+    public function testIntersectAssoc()
     {
-        $this->markTestSkipped('TODO');
+        $arr = Arr::factory(['a' => 1, 'b' => 2, 'c' => 3]);
+        $arr->intersectAssoc(['a' => 1, 'b' => 4, 'c' => 3]);
+        $this->assertEquals(['a' => 1, 'c' => 3], $arr->toArray());
     }
 
-    public function testIntersectUAssoc(): void
+    public function testIntersectUAssoc()
     {
-        $this->markTestSkipped('TODO');
+        $arr = Arr::factory(['a' => 1, 'b' => 2, 'c' => 3]);
+        $arr->intersectUAssoc(['a' => 1, 'b' => 4, 'c' => 3], function ($a, $b) {
+            return $a <=> $b;
+        });
+        $this->assertEquals(['a' => 1, 'c' => 3], $arr->toArray());
     }
 
-    public function testIntersectByKeys(): void
+    public function testIntersectByKeys()
     {
-        $this->markTestSkipped('TODO');
+        $arr = Arr::factory(['a' => 1, 'b' => 2, 'c' => 3]);
+        $arr->intersectByKeys(['a' => 4, 'b' => 5]);
+        $this->assertEquals(['a' => 1, 'b' => 2], $arr->toArray());
     }
 
-    public function testIntersectUKey(): void
+    public function testIntersectUKey()
     {
-        $this->markTestSkipped('TODO');
+        $arr = Arr::factory(['a' => 1, 'b' => 2, 'c' => 3]);
+        $arr->intersectUKey(['a' => 4, 'b' => 5], function ($a, $b) {
+            return $a <=> $b;
+        });
+        $this->assertEquals(['a' => 1, 'b' => 2], $arr->toArray());
     }
 
-    public function testIntersect(): void
+    public function testIntersect()
     {
-        $this->markTestSkipped('TODO');
+        $arr = Arr::factory(['a' => 1, 'b' => 2, 'c' => 3]);
+        $arr->intersect(['a' => 1, 'b' => 4, 'c' => 3]);
+        $this->assertEquals(['a' => 1, 'c' => 3], $arr->toArray());
     }
 
     public function testKeyExists(): void
@@ -711,19 +725,71 @@ class ArrTest extends TestCase
         $this->assertEquals(39, $arr3[2][1]);
     }
 
-    public function testUIntersectAssoc(): void
+    public function testUIntersectAssoc()
     {
-        $this->markTestSkipped('TODO');
+        $arr = Arr::factory(['a' => 1, 'b' => 2, 'c' => 3]);
+        $arr->uIntersectAssoc(['a' => 1, 'b' => 4, 'c' => 3], function ($a, $b) {
+            return $a <=> $b;
+        });
+        $this->assertEquals(['a' => 1, 'c' => 3], $arr->toArray());
     }
 
-    public function testUIntersectUAssoc(): void
+    public function testUIntersectAssocThrowsExceptionWhenCallableMissing()
     {
-        $this->markTestSkipped('TODO');
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The last value must be a callable');
+
+        $arr = Arr::factory(['a' => 1, 'b' => 2, 'c' => 3]);
+        $arr->uIntersectAssoc(['a' => 1, 'b' => 4, 'c' => 3]);
     }
 
-    public function testUIntersect(): void
+    public function testUIntersectUAssoc()
     {
-        $this->markTestSkipped('TODO');
+        $arr = Arr::factory(['a' => 1, 'b' => 2, 'c' => 3]);
+        $arr->uIntersectUAssoc(['a' => 1, 'b' => 4, 'c' => 3], function ($a, $b) {
+            return $a <=> $b;
+        }, function ($a, $b) {
+            return $a <=> $b;
+        });
+        $this->assertEquals(['a' => 1, 'c' => 3], $arr->toArray());
+    }
+
+    public function testUIntersectUAssocThrowsExceptionWhenCallableMissing()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The last value must be a callable');
+
+        $arr = Arr::factory(['a' => 1, 'b' => 2, 'c' => 3]);
+        $arr->uIntersectUAssoc(['a' => 1, 'b' => 4, 'c' => 3]);
+    }
+
+    public function testUIntersectUAssocThrowsExceptionWhenSecondCallableMissing()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The last value must be a callable');
+
+        $arr = Arr::factory(['a' => 1, 'b' => 2, 'c' => 3]);
+        $arr->uIntersectUAssoc(['a' => 1, 'b' => 4, 'c' => 3], function ($a, $b) {
+            return $a <=> $b;
+        }, 'not_a_callable');
+    }
+
+    public function testUIntersect()
+    {
+        $arr = Arr::factory(['a' => 1, 'b' => 2, 'c' => 3]);
+        $arr->uIntersect(['a' => 1, 'b' => 4, 'c' => 3], function ($a, $b) {
+            return $a <=> $b;
+        });
+        $this->assertEquals(['a' => 1, 'c' => 3], $arr->toArray());
+    }
+
+    public function testUIntersectThrowsExceptionWhenCallableMissing()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The last value must be a callable');
+
+        $arr = Arr::factory(['a' => 1, 'b' => 2, 'c' => 3]);
+        $arr->uIntersect(['a' => 1, 'b' => 4, 'c' => 3]);
     }
 
     public function testUnique(): void

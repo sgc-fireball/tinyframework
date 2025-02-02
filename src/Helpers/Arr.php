@@ -347,7 +347,7 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         return $this;
     }
 
-    public function intersectUAssoc(array $array2, array ...$arrays): static
+    public function intersectUAssoc(array $array2, ...$arrays): static
     {
         \array_unshift($arrays, $array2);
         \array_unshift($arrays, $this->items);
@@ -366,7 +366,7 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         return $this;
     }
 
-    public function intersectUKey(array $array2, array ...$arrays): static
+    public function intersectUKey(array $array2, ...$arrays): static
     {
         \array_unshift($arrays, $array2);
         \array_unshift($arrays, $this->items);
@@ -679,7 +679,7 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         return $this;
     }
 
-    public function uIntersectAssoc(array $array2, array ...$arrays): static
+    public function uIntersectAssoc(array $array2, ...$arrays): static
     {
         \array_unshift($arrays, $array2);
         \array_unshift($arrays, $this->items);
@@ -690,7 +690,7 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         return $this;
     }
 
-    public function uIntersectUAssoc(array $array2, array ...$arrays): static
+    public function uIntersectUAssoc(array $array2, ...$arrays): static
     {
         \array_unshift($arrays, $array2);
         \array_unshift($arrays, $this->items);
@@ -704,7 +704,7 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         return $this;
     }
 
-    public function uIntersect(array $array2, array ...$arrays): static
+    public function uIntersect(array $array2, ...$arrays): static
     {
         \array_unshift($arrays, $array2);
         \array_unshift($arrays, $this->items);
