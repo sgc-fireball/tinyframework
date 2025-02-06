@@ -41,19 +41,13 @@ class ViewServiceProvider extends ServiceProviderAwesome
             return sprintf('<?php if ($__environment === %s): ?>', substr($expression, 1, -1));
         });
         $engine->addDirective('csrf', function (string $expression): string {
-            if ($token = $this->container->get('request')?->session()?->get('csrf-token')) {
-                return sprintf('<input type="hidden" name="csrf-token" value="%s">', $token);
-            }
-            return '';
+            return "<input type=\"hidden\" name=\"csrf-token\" value=\"<?php echo container()->get('request')?->session()?->get('csrf-token') ?: ''; ?>\">";
         });
         $engine->addDirective('csrfmeta', function (string $expression): string {
-            if ($token = $this->container->get('request')?->session()?->get('csrf-token')) {
-                return sprintf('<meta name="csrf-token" content="%s">', $token);
-            }
-            return '';
+            return "<meta name=\"csrf-token\" content=\"<?php echo container()->get('request')?->session()?->get('csrf-token') ?: ''; ?>\">";
         });
         $engine->addDirective('inject', function (string $expression): string {
-            [$variable, $service] = explode(',', (string)preg_replace("/[\(\)\\\"\']/", '', $expression));
+            [$variable, $service] = explode(',', (string)preg_replace(" / [\(\)\\\"\']/", '', $expression));
             return sprintf('<?php $%s = container("%s"); ?>', trim($variable), trim($service));
         });
         $engine->addDirective('dump', function (string $expression): string {
