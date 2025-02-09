@@ -47,11 +47,6 @@ class TinyframeworkCacheClearCommand extends CommandAwesome
         $cache->clear();
         $this->output->write("\r[<green>DONE</green>]\n");
 
-        $this->clearFile('Clear services-http cache', storage_dir('cache') . '/services-http.php');
-        $this->clearFile('Clear services-console cache', storage_dir('cache') . '/services-console.php');
-        $this->clearFile('Clear config cache', storage_dir('cache') . '/config.php');
-        $this->clearFile('Clear commands cache', storage_dir('cache') . '/commands.php');
-
         /**
          * Restart Queue Worker
          */

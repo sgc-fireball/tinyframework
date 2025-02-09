@@ -10,7 +10,7 @@ class WebsocketTable extends Table
 {
     public function __construct()
     {
-        parent::__construct(1024, 0);
+        parent::__construct(10240, 0);
         $this->column('id', Table::TYPE_INT);
         $this->column('request', Table::TYPE_STRING, 65535);
         $this->create();

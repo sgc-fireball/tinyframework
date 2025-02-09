@@ -14,19 +14,8 @@ class Config implements ConfigInterface
     public function __construct(#[\SensitiveParameter] array $config = [])
     {
         $this->config = array_merge($this->config, $config);
-        $cachePath = storage_dir('cache') . '/config.php';
-        if (env('APP_CACHE', true) && file_exists($cachePath)) {
-            $this->config = require_once($cachePath);
-        } else {
-            $this->loadFolder(__DIR__ . '/config');
-            $this->loadFolder(root_dir() . '/config');
-            if (env('APP_CACHE', true)) {
-                file_put_contents(
-                    $cachePath,
-                    '<?php declare(strict_types=1); return ' . var_export($this->config, true) . ';'
-                );
-            }
-        }
+        $this->loadFolder(__DIR__ . '/config');
+        $this->loadFolder(root_dir() . '/config');
         date_default_timezone_set($this->config['app']['timezone'] ?? 'UTC');
     }
 

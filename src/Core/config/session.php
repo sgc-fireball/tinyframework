@@ -21,7 +21,7 @@ return [
         'prefix' => env('REDIS_SESSION_PREFIX', 'tinyframework:session:'),
     ],
     'swoole' => [
-        'driver' => \TinyFramework\Session\SwooleTableSession::class,
+        'driver' => \TinyFramework\Session\SwooleSession::class,
     ],
     'array' => [
         'driver' => \TinyFramework\Session\ArraySession::class,

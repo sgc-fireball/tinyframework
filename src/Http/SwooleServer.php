@@ -19,6 +19,7 @@ use TinyFramework\Cron\CronjobInterface;
 use TinyFramework\Event\EventDispatcherInterface;
 use TinyFramework\Queue\JobInterface;
 use TinyFramework\Queue\SwooleQueue;
+use TinyFramework\Session\SwooleTableSession;
 use TinyFramework\System\SignalEvent;
 use TinyFramework\System\SignalHandler;
 
@@ -35,6 +36,7 @@ class SwooleServer
     private Atomic $crontick;
     private array $config;
 
+    private SwooleTableSession $sessionTable;
     private SwooleTableCache $cacheTable;
     private WebsocketTable $websocketTable;
     private BroadcastChannelTable $broadcastChannelTable;
@@ -56,9 +58,11 @@ class SwooleServer
         $this->output = new Output();
         $this->crontick = new Atomic((int)date('Hi'));
 
+        $this->sessionTable = new SwooleTableSession();
         $this->cacheTable = new SwooleTableCache();
         $this->websocketTable = new WebsocketTable();
         $this->broadcastChannelTable = new BroadcastChannelTable();
+        $this->container->singleton(SwooleTableSession::class, $this->sessionTable);
         $this->container->singleton(SwooleTableCache::class, $this->cacheTable);
         $this->container->singleton(WebsocketTable::class, $this->websocketTable);
         $this->container->singleton(BroadcastChannelTable::class, $this->broadcastChannelTable);
@@ -376,6 +380,7 @@ class SwooleServer
     private function onSignal(SignalEvent $event): void
     {
         match ($event->signal()) {
+            SignalHandler::SIGHUP => $this->onReload(),
             SignalHandler::SIGQUIT => $this->onStop(),
             SignalHandler::SIGUSR1 => $this->onReload(),
             SignalHandler::SIGUSR2 => $this->onReload(),

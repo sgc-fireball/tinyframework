@@ -76,7 +76,7 @@ abstract class Kernel implements KernelInterface
             ->singleton(DotEnvInterface::class, DotEnv::class)
             ->get(DotEnvInterface::class);
         $dotEnv->load('.env')->load('.env.local');
-        if (defined('SWOOLE') && SWOOLE) {
+        if (defined('SWOOLE') && SWOOLE && getenv('SWOOLE_DAEMONIZE')) {
             $dotEnv->load('.env.swoole');
         }
 
@@ -102,15 +102,6 @@ abstract class Kernel implements KernelInterface
 
     protected function findServiceProviders(): void
     {
-        $cachePath = storage_dir('cache') . '/services-';
-        $cachePath .= $this->runningInConsole() ? 'console' : 'http';
-        $cachePath .= '.php';
-
-        if (env('APP_CACHE', true) && file_exists($cachePath)) {
-            $this->serviceProviderNames = require_once($cachePath);
-            return;
-        }
-
         $this->serviceProviderNames = [
             EventServiceProvider::class,
             ConfigServiceProvider::class,
@@ -174,13 +165,6 @@ abstract class Kernel implements KernelInterface
                     throw new RuntimeException('Could not found service provider: ' . $provider);
                 }
             }
-        }
-
-        if (env('APP_CACHE', true)) {
-            file_put_contents(
-                $cachePath,
-                '<?php declare(strict_types=1); return ' . var_export($this->serviceProviderNames, true) . ';'
-            );
         }
     }
 

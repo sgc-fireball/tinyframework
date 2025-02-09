@@ -35,12 +35,6 @@ class ConsoleKernel extends Kernel implements ConsoleKernelInterface
     {
         parent::boot();
 
-        $cachePath = storage_dir('cache') . '/commands.php';
-        if (env('APP_CACHE', true) && file_exists($cachePath)) {
-            $this->commands = require_once($cachePath);
-            return;
-        }
-
         $this->loadCommandsByPath(__DIR__ . '/Commands', '\\TinyFramework\\Console\\Commands\\');
         /** @var CommandAwesome $command */
         foreach ($this->container->tagged('commands') as $command) {
@@ -48,13 +42,6 @@ class ConsoleKernel extends Kernel implements ConsoleKernelInterface
             $this->commands[$inputDefinition->name()] = $command;
         }
         $this->loadCommandsByPath(root_dir() . '/app/Commands', '\\App\\Commands\\');
-
-        if (env('APP_CACHE', true)) {
-            file_put_contents(
-                $cachePath,
-                '<?php declare(strict_types=1); return unserialize(\'' . serialize($this->commands) . '\');'
-            );
-        }
     }
 
     /**

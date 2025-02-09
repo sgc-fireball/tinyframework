@@ -12,6 +12,8 @@ class RedisCache extends CacheAwesome
     /** @var Redis */
     private Redis $redis;
 
+    private string $prefix = '';
+
     public function __construct(#[\SensitiveParameter] array $config = [])
     {
         parent::__construct($config);
@@ -20,7 +22,7 @@ class RedisCache extends CacheAwesome
         $this->config['password'] = $config['password'] ?? null;
         $this->config['database'] = (int)($config['database'] ?? 0);
         $this->config['read_write_timeout'] = (int)($config['read_write_timeout'] ?? -1);
-        $this->config['prefix'] = $config['prefix'] ?? 'cache:';
+        $this->config['prefix'] = trim($config['prefix'] ?? 'cache', ':') . ':';
 
         $this->redis = new Redis();
         if (!$this->redis->pconnect($this->config['host'], $this->config['port'])) {
@@ -28,26 +30,36 @@ class RedisCache extends CacheAwesome
         }
         $this->redis->auth($this->config['password']);
         $this->redis->select($this->config['database']);
-        $this->redis->setOption(Redis::OPT_PREFIX, $this->config['prefix']);
+        $this->prefix = trim($this->config['prefix'] ?: '', ':');
         $this->redis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_NONE);
         $this->redis->setOption(Redis::OPT_READ_TIMEOUT, $this->config['read_write_timeout']);
     }
 
-    public function clear(): static
+    private function prepareKey(string $key): string
     {
-        $deleteKeys = [];
-        if (\count($this->tags)) {
-            foreach ($this->tags as $tag) {
-                if ($this->redis->exists($tag)) {
-                    $deleteKeys = array_merge($deleteKeys, $this->redis->lrange($tag, 0, -1));
-                }
-                $deleteKeys[] = $tag;
-            }
-        } else {
-            $deleteKeys = $this->redis->keys('*');
+        if ($this->prefix) {
+            return $this->prefix . ':' . trim($key, ':');
         }
-        if (\count($deleteKeys)) {
-            $this->redis->del(array_unique($deleteKeys));
+        return trim($key, ':');
+    }
+
+    protected function calculateExpiration(null|int|\DateTimeInterface|\DateInterval $ttl): int|null
+    {
+        $ttl = parent::calculateExpiration($ttl);
+        return $ttl === null ? null : max(0, $ttl - time());
+    }
+
+    private function addKeyToTags(string $key): static
+    {
+        foreach ($this->tags as $tag) {
+            $insert = true;
+            if ($this->redis->exists($this->prepareKey($tag))) {
+                $list = $this->redis->lrange($this->prepareKey($tag), 0, -1);
+                $insert = !array_key_exists($this->prepareKey($key), $list);
+            }
+            if ($insert) {
+                $this->redis->rpush($this->prepareKey($tag), $this->prepareKey($key));
+            }
         }
         return $this;
     }
@@ -55,14 +67,14 @@ class RedisCache extends CacheAwesome
     public function get(string $key): mixed
     {
         if ($this->has($key)) {
-            return unserialize($this->redis->get($key)) ?? null;
+            return unserialize($this->redis->get($this->prepareKey($key))) ?? null;
         }
         return null;
     }
 
     public function has(string $key): bool
     {
-        $result = $this->redis->exists($key);
+        $result = $this->redis->exists($this->prepareKey($key));
         if (is_bool($result) && $result) {
             return true;
         }
@@ -76,9 +88,9 @@ class RedisCache extends CacheAwesome
     {
         $ttl = $this->calculateExpiration($ttl);
         if ($ttl === null) {
-            $this->redis->set($key, serialize($value));
+            $this->redis->set($this->prepareKey($key), serialize($value));
         } else {
-            $this->redis->setex($key, $ttl, serialize($value));
+            $this->redis->setex($this->prepareKey($key), $ttl, serialize($value));
         }
         $this->addKeyToTags($key);
         return $this;
@@ -86,28 +98,27 @@ class RedisCache extends CacheAwesome
 
     public function forget(string $key): static
     {
-        $this->redis->del($key);
+        $this->redis->del($this->prepareKey($key));
         return $this;
     }
 
-    protected function calculateExpiration(null|int|\DateTimeInterface|\DateInterval $ttl): int|null
+    public function clear(): static
     {
-        $ttl = parent::calculateExpiration($ttl);
-        return $ttl === null ? null : max(0, $ttl - time());
-    }
-
-    private function addKeyToTags(string $key): static
-    {
-        foreach ($this->tags as $tag) {
-            $insert = true;
-            if ($this->redis->exists($tag)) {
-                $list = $this->redis->lrange($tag, 0, -1);
-                $insert = !array_key_exists($tag, $list);
+        $deleteKeys = [];
+        if (\count($this->tags)) {
+            foreach ($this->tags as $tag) {
+                if ($this->redis->exists($this->prepareKey($tag))) {
+                    $deleteKeys = array_merge($deleteKeys, $this->redis->lrange($this->prepareKey($tag), 0, -1));
+                }
+                $deleteKeys[] = $this->prepareKey($tag);
             }
-            if ($insert) {
-                $this->redis->rpush($tag, $key);
-            }
+        } else {
+            $deleteKeys = $this->redis->keys($this->prepareKey('*'));
+        }
+        if (\count($deleteKeys)) {
+            $this->redis->del($deleteKeys);
         }
         return $this;
     }
+
 }
