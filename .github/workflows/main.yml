@@ -39,19 +39,19 @@ jobs:
         run: "docker compose up --wait --no-build -d"
 
       - name: "composer install"
-        run: "docker exec -T tinyframework-php-1 composer install"
+        run: "docker exec tinyframework-php-1 composer install"
 
       - name: "Run parallel-lint"
-        run: "docker exec -T tinyframework-php-1 vendor/bin/parallel-lint --no-colors --no-progress --show-deprecated src/ tests/"
+        run: "docker exec tinyframework-php-1 vendor/bin/parallel-lint --no-colors --no-progress --show-deprecated src/ tests/"
 
       - name: "Run phpstan"
-        run: "docker exec -T tinyframework-php-1 vendor/bin/phpstan analyse"
+        run: "docker exec tinyframework-php-1 vendor/bin/phpstan analyse"
 
       - name: "Run phpunit"
-        run: "docker exec -T tinyframework-php-1 vendor/bin/phpunit"
+        run: "docker exec tinyframework-php-1 vendor/bin/phpunit"
 
       - name: "Run SBOM"
-        run: "docker exec -T tinyframework-php-1 composer CycloneDX:make-sbom --output-format=xml --output-file=.reports/sbom.xml --omit=dev"
+        run: "docker exec tinyframework-php-1 composer CycloneDX:make-sbom --output-format=xml --output-file=.reports/sbom.xml --omit=dev"
 
       - name: "stop docker container"
         run: "docker compose stop"
