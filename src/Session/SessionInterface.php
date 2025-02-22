@@ -25,4 +25,7 @@ interface SessionInterface
     public function regenerate(): SessionInterface;
 
     public function clear(): SessionInterface;
+
+    public function count(): int;
+
 }

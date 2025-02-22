@@ -28,6 +28,11 @@ class ArraySession extends SessionAwesome implements SessionInterface
         return $this;
     }
 
+    public function count(): int
+    {
+        return count(self::$sessions);
+    }
+
     public function close(): static
     {
         self::$sessions[$this->id] = serialize($this->data);

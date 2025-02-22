@@ -9,7 +9,7 @@ class SwooleSession extends SessionAwesome implements SessionInterface
     private SwooleTableSession $table;
 
     private array $config = [];
-    
+
     public function __construct(SwooleTableSession $table, #[\SensitiveParameter] array $config = [])
     {
         $this->table = $table;
@@ -50,6 +50,11 @@ class SwooleSession extends SessionAwesome implements SessionInterface
         }
         $this->data = [];
         return $this;
+    }
+
+    public function count(): int
+    {
+        return $this->table->count();
     }
 
     public function clear(): static

@@ -39,6 +39,11 @@ class FileSession extends SessionAwesome implements SessionInterface
         return $this;
     }
 
+    public function count(): int
+    {
+        return count((array)glob(sprintf('%s/*.session.tmp', $this->path)));
+    }
+
     public function clear(): static
     {
         foreach ((array)glob(sprintf('%s/*.session.tmp', $this->path)) as $file) {
