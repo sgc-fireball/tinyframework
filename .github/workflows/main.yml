@@ -1,33 +1,57 @@
-name: "TinyFramework CI"
+name: "CI"
 
 on:
-  # to allow a manual start
-  workflow_dispatch:
+  pull_request: ~
+  workflow_dispatch: ~
   push:
     branches:
       - "master"
 
+concurrency:
+  group: "${{ github.workflow }}-${{ github.head_ref || github.run_id }}"
+  cancel-in-progress: true
+
 jobs:
   tests:
-    runs-on: "ubuntu:latest"
+    name: "Tests"
+    runs-on: "ubuntu-latest"
     steps:
+
+      - name: "Checkout"
+        uses: "actions/checkout@v4"
+
+      - name: "Set up Docker Buildx"
+        uses: "docker/setup-buildx-action@v3"
+
+      - name: "Build Docker images"
+        uses: "docker/bake-action@v6"
+        with:
+          pull: true
+          load: true
+          files: |
+            docker-compose.yaml
+          set: |
+            *.cache-from=type=gha,scope=${{github.ref}}
+            *.cache-from=type=gha,scope=refs/heads/main
+            *.cache-to=type=gha,scope=${{github.ref}},mode=max
+
       - name: "start docker container"
-        run: "docker compose up -d"
+        run: "docker compose up --wait --no-build -d"
 
       - name: "composer install"
-        run: "docker exec tinyframework-php-1 composer install"
+        run: "docker exec -T tinyframework-php-1 composer install"
 
       - name: "Run parallel-lint"
-        run: "docker exec tinyframework-php-1 vendor/bin/parallel-lint --no-colors --no-progress --show-deprecated src/ tests/"
+        run: "docker exec -T tinyframework-php-1 vendor/bin/parallel-lint --no-colors --no-progress --show-deprecated src/ tests/"
 
       - name: "Run phpstan"
-        run: "docker exec tinyframework-php-1 vendor/bin/phpstan analyse"
+        run: "docker exec -T tinyframework-php-1 vendor/bin/phpstan analyse"
 
       - name: "Run phpunit"
-        run: "docker exec tinyframework-php-1 vendor/bin/phpunit"
+        run: "docker exec -T tinyframework-php-1 vendor/bin/phpunit"
 
       - name: "Run SBOM"
-        run: "docker exec tinyframework-php-1 composer CycloneDX:make-sbom --output-format=xml --output-file=.reports/sbom.xml --omit=dev"
+        run: "docker exec -T tinyframework-php-1 composer CycloneDX:make-sbom --output-format=xml --output-file=.reports/sbom.xml --omit=dev"
 
       - name: "stop docker container"
         run: "docker compose stop"
