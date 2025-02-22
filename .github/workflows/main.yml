@@ -17,6 +17,18 @@ jobs:
     runs-on: "ubuntu-latest"
     steps:
 
+      - name: "User ID"
+        run: id -u
+
+      - name: "Group ID"
+        run: id -g
+
+      - name: "Export User ID"
+        run: "export _UID=$(id -u)"
+
+      - name: "EXPORT Group ID"
+        run: "export _GID=$(id -g)"
+
       - name: "Checkout"
         uses: "actions/checkout@v4"
 
@@ -25,9 +37,9 @@ jobs:
 
       - name: "Build Docker images"
         uses: "docker/bake-action@v6"
-        env:
-          _UID: $(id -u)
-          _GID: $(id -g)
+        #env:
+        #  _UID: $(id -u)
+        #  _GID: $(id -g)
         with:
           pull: true
           load: true
