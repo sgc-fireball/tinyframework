@@ -6,6 +6,7 @@ services:
     build:
       context: "./"
       dockerfile: "Dockerfile"
+      target: "tinyframework"
       args:
         - "_UID=${_UID:-1000}"
         - "_GID=${_GID:-1000}"
