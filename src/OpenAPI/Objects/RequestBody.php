@@ -14,7 +14,7 @@ class RequestBody extends AbstractObject
 
     public ?string $description = null;
     public bool $required = false;
-    /** @var ?object<string, MediaType> */
+    /** @var null|stdClass<MediaType> */
     public ?object $content = null;
 
     public static function parse(array $arr): RequestBody

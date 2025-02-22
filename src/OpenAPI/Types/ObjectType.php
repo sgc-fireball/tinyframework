@@ -17,8 +17,8 @@ class ObjectType extends AbstractType
     public array $required = [];
     public ?int $minProperties = null;
     public ?int $maxProperties = null;
-    /** @var null|object<string, AbstractType> */
-    public ?object $properties = null;
+    /** @var null|stdClass<AbstractType> */
+    public ?stdClass $properties = null;
     public bool|AbstractType $additionalProperties = true;
     public ?XMLSettings $xml = null;
     public ?DiscriminatorSettings $discriminator = null;

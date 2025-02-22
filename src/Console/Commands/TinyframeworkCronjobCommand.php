@@ -53,10 +53,10 @@ class TinyframeworkCronjobCommand extends CommandAwesome
             function (CronjobInterface|CronjobAwesome $job) use ($now) {
                 $cron = new CronExpression($job->expression());
                 $mustRun = $cron->isDue($now);
-                /** @var int $verbosity */
                 if ($mustRun && $job instanceof CronjobAwesome) {
                     $mustRun = !$job->skip();
                 }
+                /** @var int $verbosity */
                 $verbosity = $this->output->verbosity();
                 if (!$mustRun && $verbosity >= OutputInterface::VERBOSITY_VERBOSE) {
                     $this->output->writeln(
@@ -72,8 +72,8 @@ class TinyframeworkCronjobCommand extends CommandAwesome
         );
 
         foreach ($jobs as $job) {
+            $start = microtime(true);
             try {
-                $start = microtime(true);
                 if ($job instanceof CronjobAwesome) {
                     $this->output->write(sprintf("\r[INIT ] <yellow>%s</yellow>", get_class($job)));
                     $job->onStart();

@@ -9,6 +9,7 @@ use RuntimeException;
 class DioLogger extends LoggerAwesome implements LoggerInterface
 {
     private string $path;
+    /** @var resource|null */
     private $fp;
 
     public function __construct(#[\SensitiveParameter] array $config)
@@ -26,6 +27,9 @@ class DioLogger extends LoggerAwesome implements LoggerInterface
 
     public function log(string $level, string $message, array $context = []): static
     {
+        if (!$message) {
+            return $this;
+        }
         $message = json_encode([
             'type' => 'log',
             'host' => gethostname(),
@@ -43,7 +47,7 @@ class DioLogger extends LoggerAwesome implements LoggerInterface
             return $this;
         }
         $bytes = dio_write($this->fp, $message);
-        if ($bytes === false) {
+        if ($bytes === 0) {
             trigger_error('Could not write log message.', E_USER_WARNING);
         }
         return $this;

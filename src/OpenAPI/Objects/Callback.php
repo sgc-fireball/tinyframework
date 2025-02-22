@@ -5,7 +5,7 @@ namespace TinyFramework\OpenAPI\Objects;
 class Callback extends AbstractObject
 {
 
-    /** @var ?object<string, PathItem|Reference> */
+    /** @var null|stdClass<PathItem|Reference> */
     public ?object $paths = null;
 
     public static function parse(array $arr): Callback

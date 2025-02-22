@@ -10,7 +10,7 @@ use stdClass;
 class Encoding extends AbstractObject
 {
 
-    /** @var ?object<string, Header|Reference> */
+    /** @var null|stdClass<Header|Reference> */
     public ?object $headers = null;
     public string $contentType = 'application/octet-stream';
     public ?string $style = null;

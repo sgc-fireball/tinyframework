@@ -15,7 +15,7 @@ class Server extends AbstractObject
     public string $description;
 
     /**
-     * @var ?object<string, ServerVariable>
+     * @var null|stdClass<ServerVariable>
      */
     public ?object $variables = null;
 

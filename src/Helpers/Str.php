@@ -353,13 +353,13 @@ class Str implements \Stringable
         return $this;
     }
 
-    public function replace(array|string $search, array|string $replace, int &$count = null): static
+    public function replace(array|string $search, array|string $replace, int &$count = 0): static
     {
         $this->value = \str_replace($search, $replace, $this->value, $count);
         return $this;
     }
 
-    public function ireplace(array|string $search, array|string $replace, int &$count = null): static
+    public function ireplace(array|string $search, array|string $replace, int &$count = 0): static
     {
         $this->value = \str_ireplace($search, $replace, $this->value, $count);
         return $this;

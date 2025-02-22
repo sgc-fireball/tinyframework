@@ -11,34 +11,34 @@ use TinyFramework\OpenAPI\Types\AbstractType;
 class Components extends AbstractObject
 {
 
-    /** @var ?object<string, Schema> */
+    /** @var null|stdClass<Schema> */
     public ?object $schemas = null;
 
-    /** @var ?object<string, Response|Reference> */
+    /** @var null|stdClass<Response|Reference> */
     public ?object $responses = null;
 
-    /** @var ?object<string, Parameter|Reference> */
+    /** @var null|stdClass<Parameter|Reference> */
     public ?object $parameters = null;
 
-    /** @var ?object<string, Example|Reference> */
+    /** @var null|stdClass<Example|Reference> */
     public ?object $examples = null;
 
-    /** @var ?object<string, RequestBody|Reference> */
+    /** @var null|stdClass<RequestBody|Reference> */
     public ?object $requestBodies = null;
 
-    /** @var ?object<string, Header|Reference> */
-    public null|object $headers = null;
+    /** @var null|stdClass<Header|Reference> */
+    public null|stdClass $headers = null;
 
-    /** @var ?object<string, SecurityScheme|Reference> */
+    /** @var null|stdClass<SecurityScheme|Reference> */
     public ?object $securitySchemes = null;
 
-    /** @var ?object<string, Link|Reference> */
+    /** @var null|stdClass<Link|Reference> */
     public ?object $links = null;
 
-    /** @var ?object<string, Callback|Reference> */
+    /** @var null|stdClass<Callback|Reference> */
     public ?object $callbacks = null;
 
-    /** @var ?object<string, PathItem|Reference> */
+    /** @var null|stdClass<PathItem|Reference> */
     public ?object $pathItems = null;
 
     public static function parse(array $arr): Components

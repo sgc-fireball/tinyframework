@@ -9,7 +9,7 @@ class DiscriminatorSettings extends AbstractObject
 {
 
     public ?string $propertyName = null;
-    /** @var ?object<string, string> */
+    /** @var null|stdClass<string> */
     public ?object $mapping = null;
 
     public static function parse(array $arr): DiscriminatorSettings

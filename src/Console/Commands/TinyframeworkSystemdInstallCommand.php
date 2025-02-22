@@ -57,9 +57,11 @@ class TinyframeworkSystemdInstallCommand extends CommandAwesome
         }
         $this->output->write("\r[<green>DONE</green>]\n");
 
-        $this->execute('systemctl daemon-reload');
-        $this->execute('systemctl enable ' . escapeshellarg($name));
-        $this->execute('systemctl restart ' . escapeshellarg($name));
+        $output = [];
+        $exitCode = 0;
+        $this->execute('systemctl daemon-reload', $output, $exitCode);
+        $this->execute('systemctl enable ' . escapeshellarg($name), $output, $exitCode);
+        $this->execute('systemctl restart ' . escapeshellarg($name), $output, $exitCode);
 
         return 0;
     }
@@ -95,11 +97,11 @@ class TinyframeworkSystemdInstallCommand extends CommandAwesome
         return implode("\n", $content);
     }
 
-    private function execute(string $command, array &$output = null, int &$result_code = null): string|false
+    private function execute(string $command, array &$output = [], int &$result_code = 0): string|false
     {
         $this->output->write('[<green>....</green>] Run: ' . $command);
-        $result = exec($command, $output, $exitCode);
-        if ($exitCode) {
+        $result = exec($command, $output, $result_code);
+        if ($result_code) {
             $this->output->write("\r[<red>FAIL</red>]\n");
             return $result;
         }

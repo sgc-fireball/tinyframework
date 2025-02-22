@@ -32,7 +32,7 @@ trait Macroable
                 );
             }
         }
-        static::$staticMacros[$name] = $callback;
+        self::$staticMacros[$name] = $callback;
     }
 
     public static function addMacro(string $name, Closure|callable $callback): void
@@ -50,25 +50,25 @@ trait Macroable
                 );
             }
         }
-        static::$macros[$name] = $callback;
+        self::$macros[$name] = $callback;
     }
 
     public static function hasStaticMacro(string $name): bool
     {
-        return array_key_exists($name, static::$staticMacros);
+        return array_key_exists($name, self::$staticMacros);
     }
 
     public static function hasMacro(string $name): bool
     {
-        return array_key_exists($name, static::$macros);
+        return array_key_exists($name, self::$macros);
     }
 
     public static function __callStatic(string $name, array $arguments): mixed
     {
         if (static::hasStaticMacro($name)) {
-            $callback = static::$staticMacros[$name];
+            $callback = self::$staticMacros[$name];
             if ($callback instanceof Closure) {
-                $callback->bindTo(null, static::class);
+                return $callback->bindTo(null, static::class)();
             }
             return $callback(...$arguments);
         }
@@ -84,9 +84,9 @@ trait Macroable
     public function __call(string $name, array $arguments): mixed
     {
         if (static::hasMacro($name)) {
-            $callback = static::$macros[$name];
+            $callback = self::$macros[$name];
             if ($callback instanceof Closure) {
-                return $callback->bindTo($this, static::class);
+                return $callback->bindTo($this, static::class)();
             }
             return $callback(...$arguments);
         }

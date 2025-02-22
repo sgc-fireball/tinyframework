@@ -22,7 +22,7 @@ class Promise
 
     /**
      * @param mixed $value
-     * @return Promise<mixed>
+     * @return Promise
      */
     public static function resolve(mixed $value = null): Promise
     {
@@ -31,7 +31,7 @@ class Promise
 
     /**
      * @param Throwable $value
-     * @return Promise<Throwable>
+     * @return Promise
      */
     public static function reject(Throwable $value = null): Promise
     {

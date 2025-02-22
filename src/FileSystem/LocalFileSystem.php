@@ -33,7 +33,10 @@ class LocalFileSystem extends FileSystemAwesome implements FileSystemInterface
     private function getAbsolutePath(string $path): string
     {
         $path = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $path);
-        $parts = array_filter(explode(DIRECTORY_SEPARATOR, $path), 'strlen');
+        $parts = array_filter(
+            explode(DIRECTORY_SEPARATOR, $path),
+            fn(string $value): bool => (bool)strlen($value)
+        );
         $absolutes = [];
         foreach ($parts as $part) {
             if ('.' == $part) {

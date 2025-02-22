@@ -12,9 +12,9 @@ class MediaType extends AbstractObject
 
     public AbstractType|Reference|null $schema = null;
     public mixed $example = null;
-    /** @var ?object<string, Example|Reference> */
+    /** @var null|stdClass<Example|Reference> */
     public ?object $examples = null;
-    /** @var ?object<string, Encoding> */
+    /** @var null|stdClass<Encoding> */
     public ?object $encoding = null;
 
     public static function parse(array $arr): MediaType

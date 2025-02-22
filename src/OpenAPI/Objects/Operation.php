@@ -19,10 +19,10 @@ class Operation extends AbstractObject
 
     public RequestBody|Reference|null $requestBody = null;
 
-    /** @var ?object<string, Response|Reference> */
+    /** @var null|stdClass<Response|Reference> */
     public ?object $responses = null;
 
-    /** @var ?object<string, Callback|Reference> */
+    /** @var null|stdClass<Callback|Reference> */
     public ?object $callbacks = null;
 
     public bool $deprecated = false;

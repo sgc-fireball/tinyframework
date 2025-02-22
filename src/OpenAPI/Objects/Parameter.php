@@ -25,10 +25,10 @@ class Parameter extends AbstractObject
 
     public AbstractType|Reference|null $schema = null;
 
-    /** @var ?object<string, Example|Reference> */
+    /** @var null|stdClass<Example|Reference> */
     public ?object $examples = null;
 
-    /** @var ?object<string, MediaType> */
+    /** @var null|stdClass<MediaType> */
     public ?object $content = null;
 
     public static function parse(array $arr): Parameter

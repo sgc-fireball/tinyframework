@@ -19,10 +19,10 @@ class OpenAPI extends AbstractObject
     /** @var Server[] */
     public array $servers = [];
 
-    /** @var ?object<string, PathItem|Reference> */
+    /** @var null|stdClass<PathItem|Reference> */
     public ?object $paths = null;
 
-    /** @var ?object<string, PathItem|Reference> */
+    /** @var null|stdClass<PathItem|Reference> */
     public ?object $webhooks = null;
 
     /** @var ?Components */

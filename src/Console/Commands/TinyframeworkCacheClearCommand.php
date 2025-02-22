@@ -68,18 +68,4 @@ class TinyframeworkCacheClearCommand extends CommandAwesome
         return $exitCode;
     }
 
-    private function clearFile(string $title, string $path): void
-    {
-        $this->output->write('[<green>....</green>] ' . $title);
-        if (file_exists($path)) {
-            if (unlink($path)) {
-                $this->output->write("\r[<green>DONE</green>]\n");
-            } else {
-                $this->output->write("\r[<red>FAIL</red>]\n");
-            }
-        } else {
-            $this->output->write("\r[<yellow>DONE</yellow>]\n");
-        }
-    }
-
 }

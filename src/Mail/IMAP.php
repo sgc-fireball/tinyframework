@@ -94,7 +94,7 @@ class IMAP
         return $this;
     }
 
-    public function setOption(string $option, $value = null): self
+    public function setOption(string $option, mixed $value = null): self
     {
         $option = trim(strtolower($option));
         switch ($option) {
@@ -185,7 +185,7 @@ class IMAP
     public function getFolderInformation(): array
     {
         $result = @imap_mailboxmsginfo($this->connection);
-        if ($result === false) {
+        if (!is_object($result)) {
             throw new RuntimeException(@imap_last_error());
         }
         return [
@@ -211,11 +211,7 @@ class IMAP
 
     public function getMsgNoByUID(int $uid): int
     {
-        $result = @imap_msgno($this->connection, $uid);
-        if ($result === false) {
-            throw new RuntimeException(@imap_last_error());
-        }
-        return $result;
+        return @imap_msgno($this->connection, $uid);
     }
 
     public function getMessageOverviewByUID(int $uid): array
@@ -388,7 +384,7 @@ class IMAP
             throw new RuntimeException('Unknown folder.');
         }
         $result = @imap_getacl($this->connection, @imap_utf7_encode($folder));
-        if ($result === false || !is_array($result)) {
+        if (!is_array($result)) {
             throw new RuntimeException(@imap_last_error());
         }
         return $result;

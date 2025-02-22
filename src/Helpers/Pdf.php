@@ -29,7 +29,7 @@ class Pdf
             throw new RuntimeException('Please install the image ext-imagick first.');
         }
         if (!command_exists('convert')) {
-            $this->markTestSkipped('Missing imagick cli programms.');
+            throw new RuntimeException('Please install the imagick cli programms first.');
         }
         if (!is_readable($path)) {
             throw new RuntimeException('Argument #1 $path must be a valid and readable filepath.');
@@ -82,7 +82,7 @@ class Pdf
         $imagick->setResolution(300, 300);
         $imagick->readImage($this->path . '[' . ($page - 1) . ']');
         $imagick->scaleImage($width, (int)($width / $this->getWidth() * $this->getHeight()));
-        $imagick->setImageColorspace(255);
+        $imagick->setImageColorspace(Imagick::COLORSPACE_SRGB);
         $imagick->setImageFormat('png');
         $imagick->setCompressionQuality(100);
         $imagick->setImageBackgroundColor(new ImagickPixel('white'));

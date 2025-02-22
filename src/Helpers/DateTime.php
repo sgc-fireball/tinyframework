@@ -19,17 +19,17 @@ class DateTime extends \DateTime implements JsonSerializable, Stringable, DateTi
 
     public static function setDefaultTimeZone(string $timezone = 'UTC'): void
     {
-        static::$defaultTimeZone = $timezone;
+        self::$defaultTimeZone = $timezone;
     }
 
     public static function setFakeNow(DateTime $fakeNow): void
     {
-        static::$fakeNow = $fakeNow;
+        self::$fakeNow = $fakeNow;
     }
 
     public static function clearFakeNow(): void
     {
-        static::$fakeNow = null;
+        self::$fakeNow = null;
     }
 
     /**
@@ -37,8 +37,8 @@ class DateTime extends \DateTime implements JsonSerializable, Stringable, DateTi
      */
     public static function now(DateTimeZone|null $timezone = null): DateTime
     {
-        if (static::$fakeNow) {
-            return static::$fakeNow->clone()->setTimezone($timezone ?? new DateTimeZone(static::$defaultTimeZone));
+        if (self::$fakeNow) {
+            return self::$fakeNow->clone()->setTimezone($timezone ?? new DateTimeZone(self::$defaultTimeZone));
         }
         return new DateTime('now', $timezone);
     }
@@ -47,10 +47,10 @@ class DateTime extends \DateTime implements JsonSerializable, Stringable, DateTi
         string $datetime = 'now',
         DateTimeZone|null $timezone = null
     ) {
-        if ($datetime === 'now' && static::$fakeNow instanceof DateTime) {
-            $datetime = static::$fakeNow->__toString();
+        if ($datetime === 'now' && self::$fakeNow instanceof DateTime) {
+            $datetime = self::$fakeNow->__toString();
         }
-        parent::__construct($datetime, $timezone ?? new DateTimeZone(static::$defaultTimeZone));
+        parent::__construct($datetime, $timezone ?? new DateTimeZone(self::$defaultTimeZone));
     }
 
     public function getYear(): int
@@ -376,7 +376,7 @@ class DateTime extends \DateTime implements JsonSerializable, Stringable, DateTi
         $this->modify('+' . $years . ' year');
         return $this;
     }
-    
+
     public function subSecond(int $second = 1): self
     {
         return $this->subSeconds($second);

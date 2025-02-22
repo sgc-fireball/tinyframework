@@ -23,16 +23,22 @@ class EmailTest extends ValidationTestCase
             ['test@testasdadadasasdasdasdadadsd.de', 'email:dns', false],
 
             // ipv4
-            ['test@168.119.154.157', 'email', false],
-            ['test@168.119.154.157', 'email:dns', true],
-            ['test@168.119.154.157', 'email:rfc', false],
-            ['test@168.119.154.157', 'email:dns,tcp', true],
+            ['test@[256.256.256.256]', 'email', false],
+            ['test@[2a01:4f8:1c17:5020::1]', 'email', false],
+            ['test@[256.256.256.256]', 'email', false],
+            ['test@[168.119.154.157]', 'email', true],
+            ['test@[168.119.154.157]', 'email:dns', true],
+            ['test@[168.119.154.157]', 'email:rfc', true],
+            ['test@[168.119.154.157]', 'email:dns,tcp', true],
 
             // ipv6
-            ['test@2a01:4f8:1c17:5020::1', 'email', false],
-            ['test@2a01:4f8:1c17:5020::1', 'email:dns', true],
-            ['test@2a01:4f8:1c17:5020::1', 'email:rfc', false],
-            ['test@2a01:4f8:1c17:5020::1', 'email:dns,tcp', true],
+            ['test@[IPv4:2a01:4f8:1c17:5020::1]', 'email', false],
+            ['test@[IPv5:2a01:4f8:1c17:5020::1]', 'email', false],
+            ['test@[IPv6:gggg:4f8:1c17:5020::g]', 'email', false],
+            ['test@[IPv6:2a01:4f8:1c17:5020::1]', 'email', true],
+            ['test@[IPv6:2a01:4f8:1c17:5020::1]', 'email:dns', true],
+            ['test@[IPv6:2a01:4f8:1c17:5020::1]', 'email:rfc', true],
+            ['test@[IPv6:2a01:4f8:1c17:5020::1]', 'email:dns,tcp', true],
 
             // root domain
             ['test@hrdns.de', 'email', true],
@@ -69,9 +75,9 @@ class EmailTest extends ValidationTestCase
                 ['field' => $value],
                 ['field' => $rule]
             );
-            $this->assertTrue($valid);
+            $this->assertTrue($valid, 'The value ' . $value . ' must be invalid!');
         } catch (ValidationException $e) {
-            $this->assertFalse($valid);
+            $this->assertFalse($valid, 'The value ' . $value . ' must be valid!');
         }
     }
 }

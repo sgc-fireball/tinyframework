@@ -22,9 +22,27 @@ class EmailRule extends RuleAwesome
 
         [$domain, $user] = explode('@', strrev($value), 2);
         $domain = strrev($domain);
-        $idnDomain = idn_to_ascii($domain);
-        if (!filter_var($idnDomain, FILTER_VALIDATE_IP) && !filter_var($idnDomain, FILTER_VALIDATE_DOMAIN)) {
-            return [$this->translator->trans('validation.email', ['attribute' => $this->getTransName($name)])];
+
+        // @TODO https://www.rfc-editor.org/rfc/rfc5321#section-4.1.3
+        // user@[1.2.3.4]
+        // user@IPv6:2002::1
+        // user@domain.org
+
+        if (str_starts_with($domain, '[') && str_ends_with($domain, ']')) {
+            $idnDomain = substr($domain, 1, -1);
+            if (str_starts_with($idnDomain, 'IPv6:')) {
+                $idnDomain = substr($idnDomain, 5);
+                if (!filter_var($idnDomain, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+                    return [$this->translator->trans('validation.email', ['attribute' => $this->getTransName($name)])];
+                }
+            } else if (!filter_var($idnDomain, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                return [$this->translator->trans('validation.email', ['attribute' => $this->getTransName($name)])];
+            }
+        } else {
+            $idnDomain = idn_to_ascii($domain);
+            if (!filter_var($idnDomain, FILTER_VALIDATE_DOMAIN)) {
+                return [$this->translator->trans('validation.email', ['attribute' => $this->getTransName($name)])];
+            }
         }
 
         if (in_array('rfc', $parameters)) {

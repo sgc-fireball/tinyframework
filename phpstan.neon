@@ -11,10 +11,12 @@ parameters:
     dynamicConstantNames:
         - SWOOLE
     ignoreErrors:
+        - '#is never assigned null so it can be removed from the property type.#'
+        - '#of anonymous function has typehint with deprecated#'
         - '#has invalid type Composer\\Script\\Event\.#'
         - '#Result of && is always false#'
         - '#Right side of && is always false#'
-        - '#Left side of && is always false#'
+        - '#Ternary operator condition is always true#'
         - '#If condition is always true#'
         - '#Used function Swoole\\.*#'
         -
@@ -27,6 +29,9 @@ parameters:
         -
             message: '#Constructor of class TinyFramework\\Broadcast\\SwooleBroadcast has an unused parameter \$config\.#'
             path: src/Broadcast/SwooleBroadcast.php
+        -
+            message: '#Call to function is_object\(\) with stdClass will always evaluate to true.#'
+            path: src/Mail/IMAP.php
 
     level: 6
     paths:

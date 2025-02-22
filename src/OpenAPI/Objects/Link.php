@@ -12,7 +12,7 @@ class Link extends AbstractObject
 
     public ?string $operationRef;
     public ?string $operationId = null;
-    /** @var ?object<string, mixed> */
+    /** @var null|stdClass<mixed> */
     public ?object $parameters = null;
     public ?string $requestBody = null;
     public ?string $description = null;

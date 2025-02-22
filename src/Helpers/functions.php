@@ -803,7 +803,7 @@ if (!function_exists('datetime')) {
 }
 
 if (!function_exists('old')) {
-    function old(string $field, $default = null): mixed
+    function old(string $field, mixed $default = null): mixed
     {
         $request = container('request');
         assert($request instanceof RequestInterface);

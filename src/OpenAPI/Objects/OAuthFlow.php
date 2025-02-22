@@ -11,7 +11,7 @@ class OAuthFlow extends AbstractObject
     public string $tokenUrl; // @todo only for: password, clientCredentials, authorizationCode
     public ?string $refreshUrl = null;
 
-    /** @var ?object<string, string> */
+    /** @var null|stdClass<string> */
     public ?object $scopes = null;
 
     public static function parse(array $arr): OAuthFlow

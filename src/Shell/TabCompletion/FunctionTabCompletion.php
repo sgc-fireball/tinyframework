@@ -33,7 +33,7 @@ class FunctionTabCompletion implements TabCompletionInterface
         if (!isset($functions) || !is_array($functions) || empty($functions)) {
             $functions = [];
             foreach (get_defined_functions() as $land => $list) {
-                $functions = array_merge($functions, array_values($list));
+                $functions = array_merge($functions, $list);
             }
         }
         return $functions;

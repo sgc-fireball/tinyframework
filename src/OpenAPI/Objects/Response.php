@@ -11,11 +11,11 @@ class Response extends AbstractObject
 {
 
     public string $description = '';
-    /** @var ?object<string, Header|Reference> */
+    /** @var null|stdClass<Header|Reference> */
     public ?object $headers = null;
-    /** @var ?object<string, Mediatype> */
+    /** @var null|stdClass<Mediatype> */
     public ?object $content = null;
-    /** @var ?object<string, Link|Reference> */
+    /** @var null|stdClass<Link|Reference> */
     public ?object $links = null;
 
     public static function parse(array $arr): Response
