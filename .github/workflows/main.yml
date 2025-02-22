@@ -17,18 +17,6 @@ jobs:
     runs-on: "ubuntu-latest"
     steps:
 
-      - name: "User ID"
-        run: id -u
-
-      - name: "Group ID"
-        run: id -g
-
-      - name: "Export User ID"
-        run: "export _UID=$(id -u)"
-
-      - name: "EXPORT Group ID"
-        run: "export _GID=$(id -g)"
-
       - name: "Checkout"
         uses: "actions/checkout@v4"
 
@@ -37,9 +25,9 @@ jobs:
 
       - name: "Build Docker images"
         uses: "docker/bake-action@v6"
-        #env:
-        #  _UID: $(id -u)
-        #  _GID: $(id -g)
+        env:
+          _UID: 1001
+          _GID: 118
         with:
           pull: true
           load: true
@@ -51,6 +39,9 @@ jobs:
             *.cache-to=type=gha,scope=${{github.ref}},mode=max
 
       - name: "start docker container"
+        env:
+          _UID: 1001
+          _GID: 118
         run: "docker compose up --wait --no-build -d"
 
       - name: "composer install"
