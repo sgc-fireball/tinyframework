@@ -7,12 +7,12 @@ includes:
 parameters:
     tmpDir: /tmp/phpstan
     #editorUrl: 'phpstorm://open?file=%%file%%&line=%%line%%'
-    checkMissingIterableValueType: false
     treatPhpDocTypesAsCertain: false
-    checkGenericClassInNonGenericObjectType: false
     dynamicConstantNames:
         - SWOOLE
     ignoreErrors:
+        - identifier: missingType.iterableValue
+        - identifier: missingType.generics
         - '#has invalid type Composer\\Script\\Event\.#'
         - '#Call to an undefined method AMQPConnection::setConnectionName#'
         - '#Used function Swoole\\.*#'

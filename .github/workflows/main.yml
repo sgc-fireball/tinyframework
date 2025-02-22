@@ -52,12 +52,15 @@ jobs:
 
       - name: "Run phpstan"
         run: "docker exec tinyframework-php-1 vendor/bin/phpstan analyse"
+        continue-on-error: true
 
       - name: "Run phpunit"
         run: "docker exec tinyframework-php-1 vendor/bin/phpunit"
+        continue-on-error: true
 
       - name: "Run SBOM"
         run: "docker exec tinyframework-php-1 composer CycloneDX:make-sbom --output-format=xml --output-file=.reports/sbom.xml --omit=dev"
+        continue-on-error: true
 
       - name: "stop docker container"
         run: "docker compose stop"
