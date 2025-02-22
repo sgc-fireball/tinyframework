@@ -1,0 +1,33 @@
+name: "TinyFramework CI"
+
+on:
+  # to allow a manual start
+  workflow_dispatch:
+  push:
+    branches:
+      - "master"
+
+jobs:
+  tests:
+    runs-on: "ubuntu:latest"
+    steps:
+      - name: "start docker container"
+        run: "docker compose up -d"
+
+      - name: "composer install"
+        run: "docker exec tinyframework-php-1 composer install"
+
+      - name: "Run parallel-lint"
+        run: "docker exec tinyframework-php-1 vendor/bin/parallel-lint --no-colors --no-progress --show-deprecated src/ tests/"
+
+      - name: "Run phpstan"
+        run: "docker exec tinyframework-php-1 vendor/bin/phpstan analyse"
+
+      - name: "Run phpunit"
+        run: "docker exec tinyframework-php-1 vendor/bin/phpunit"
+
+      - name: "Run SBOM"
+        run: "docker exec tinyframework-php-1 composer CycloneDX:make-sbom --output-format=xml --output-file=.reports/sbom.xml --omit=dev"
+
+      - name: "stop docker container"
+        run: "docker compose stop"
