@@ -47,7 +47,9 @@ class Info extends AbstractObject
         if (array_key_exists('license', $arr)) {
             $object->license = License::parse($arr['license']);
         }
-        return $object->parseExtension($arr);
+        $object = $object->parseExtension($arr);
+        assert($object instanceof self);
+        return $object;
     }
 
 }

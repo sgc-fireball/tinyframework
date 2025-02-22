@@ -20,7 +20,7 @@ class OpenAPIMiddleware implements MiddlewareInterface
             throw new OpenAPIException('Could not found openapi.yaml file');
         }
 
-        $version = filemtime($file) ?? 0;
+        $version = filemtime($file) ?: 0;
         $cacheKey = sprintf('openapi:%s:%d', $file, $version);
 
         $openAPI = cache()->tag(['openapi'])->remember($cacheKey, function () use ($file): ?OpenAPI {

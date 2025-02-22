@@ -368,33 +368,43 @@ class OpenAPIValidator
         }
         switch ($type->type) {
             case 'allOf':
+                assert( $type instanceof AllOfType);
                 $this->validateAllOfType($type, $value);
                 break;
             case 'anyOf':
+                assert( $type instanceof AnyOfType);
                 $this->validateAnyOfType($type, $value);
                 break;
             case 'oneOf':
+                assert( $type instanceof OneOfType);
                 $this->validateOneOfType($type, $value);
                 break;
             case 'boolean':
+                assert( $type instanceof BoolType);
                 $this->validateBooleanType($type, $value);
                 break;
             case 'array':
+                assert( $type instanceof ArrayType);
                 $this->validateArrayType($type, $value);
                 break;
             case 'integer':
+                assert( $type instanceof IntegerType);
                 $this->validateIntegerType($type, $value);
                 break;
             case 'number':
+                assert( $type instanceof NumberType);
                 $this->validateNumberType($type, $value);
                 break;
             case 'string':
+                assert( $type instanceof StringType);
                 $this->validateStringType($type, $value);
                 break;
             case 'null':
+                assert( $type instanceof NullType);
                 $this->validateNullType($type, $value);
                 break;
             case 'object':
+                assert( $type instanceof ObjectType);
                 $this->validateObjectType($type, $value);
                 break;
         };

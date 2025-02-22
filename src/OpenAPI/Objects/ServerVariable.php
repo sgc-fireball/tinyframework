@@ -25,7 +25,9 @@ class ServerVariable extends AbstractObject
         if (array_key_exists('enum', $arr)) {
             $object->enum = array_map(fn(string $enum) => (string)$enum, $arr['enum']);
         }
-        return $object->parseExtension($arr);
+        $object = $object->parseExtension($arr);
+        assert($object instanceof self);
+        return $object;
     }
 
 }

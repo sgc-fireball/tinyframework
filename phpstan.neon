@@ -11,6 +11,7 @@ parameters:
     dynamicConstantNames:
         - SWOOLE
     ignoreErrors:
+        - '#contains generic type stdClass#'
         - '#is never assigned null so it can be removed from the property type.#'
         - '#of anonymous function has typehint with deprecated#'
         - '#has invalid type Composer\\Script\\Event\.#'
@@ -32,6 +33,15 @@ parameters:
         -
             message: '#Call to function is_object\(\) with stdClass will always evaluate to true.#'
             path: src/Mail/IMAP.php
+        -
+            message: '#Call to function is_array\(\) with array will always evaluate to true.#'
+            path: src/Helpers/Arr.php
+        -
+            message: '#Call to an undefined method ReflectionType::getName#'
+            path: src/Database/QueryAwesome.php
+        -
+            message: '#Call to an undefined method ReflectionType::getName#'
+            path: src/Database/BaseModel.php
 
     level: 6
     paths:

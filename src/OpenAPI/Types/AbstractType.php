@@ -22,7 +22,7 @@ abstract class AbstractType extends AbstractObject
             return AnyOfType::parse($arr);
         }
 
-        $type = array_key_exists('type', $arr) ? $arr['type'] : 'object';
+        $type = array_key_exists('type', $arr) ? (string)$arr['type'] : 'object';
         return match ($type) {
             'boolean' => BoolType::parse($arr),
             'array' => ArrayType::parse($arr),
@@ -31,6 +31,7 @@ abstract class AbstractType extends AbstractObject
             'string' => StringType::parse($arr),
             'null' => NullType::parse($arr),
             'object' => ObjectType::parse($arr),
+            default => ObjectType::parse($arr),
         };
     }
 }

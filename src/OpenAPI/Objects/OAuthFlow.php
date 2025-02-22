@@ -33,6 +33,8 @@ class OAuthFlow extends AbstractObject
         foreach ($arr['scopes'] as $scope => $description) {
             $object->scopes[$scope] = $description;
         }
-        return $object->parseExtension($arr);
+        $object = $object->parseExtension($arr);
+        assert($object instanceof self);
+        return $object;
     }
 }

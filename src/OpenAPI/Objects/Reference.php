@@ -35,7 +35,9 @@ class Reference extends AbstractObject
         if (array_key_exists('description', $arr)) {
             $object->description = $arr['description'];
         }
-        return $object->parseExtension($arr);
+        $object = $object->parseExtension($arr);
+        assert($object instanceof self);
+        return $object;
     }
 
     public function setReference(AbstractObject $object): self
@@ -65,9 +67,9 @@ class Reference extends AbstractObject
         return $this->_referenceTarget->{$name};
     }
 
-    public function __set(string $name, mixed $value)
+    public function __set(string $name, mixed $value): void
     {
-        return $this->_referenceTarget->{$name} = $value;
+        $this->_referenceTarget->{$name} = $value;
     }
 
     public function __isset(string $name): bool

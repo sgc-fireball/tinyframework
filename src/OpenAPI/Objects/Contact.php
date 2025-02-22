@@ -32,7 +32,9 @@ class Contact extends AbstractObject
             }
             $object->email = $arr['email'];
         }
-        return $object->parseExtension($arr);
+        $object = $object->parseExtension($arr);
+        assert($object instanceof self);
+        return $object;
     }
 
 }

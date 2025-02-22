@@ -2,6 +2,7 @@
 
 namespace TinyFramework\OpenAPI\Objects;
 
+use stdClass;
 use TinyFramework\Http\RequestInterface;
 use TinyFramework\OpenAPI\OpenAPIException;
 
@@ -29,12 +30,14 @@ class Server extends AbstractObject
             $object->url = $arr['description'];
         }
         if (array_key_exists('variables', $arr)) {
-            $object->variables = new \stdClass();
+            $object->variables = new stdClass();
             foreach ($arr['variables'] as $key => $variable) {
                 $object->variables->{$key} = ServerVariable::parse($variable);
             }
         }
-        return $object->parseExtension($arr);
+        $object = $object->parseExtension($arr);
+        assert($object instanceof self);
+        return $object;
     }
 
 }

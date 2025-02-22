@@ -33,7 +33,9 @@ class RequestBody extends AbstractObject
         foreach ($arr['content'] as $key => $content) {
             $object->content->{$key} = MediaType::parse($content);
         }
-        return $object->parseExtension($arr);
+        $object = $object->parseExtension($arr);
+        assert($object instanceof self);
+        return $object;
     }
 
 }

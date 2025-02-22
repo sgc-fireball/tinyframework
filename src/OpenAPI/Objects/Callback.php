@@ -2,6 +2,8 @@
 
 namespace TinyFramework\OpenAPI\Objects;
 
+use stdClass;
+
 class Callback extends AbstractObject
 {
 
@@ -12,12 +14,15 @@ class Callback extends AbstractObject
     {
         $object = new Callback();
         foreach ($arr as $key => $pathItem) {
+            $object->paths ??= new stdClass();
             if (array_key_exists('$ref', $pathItem)) {
                 $object->paths->{$key} = Reference::parse($pathItem);
             } else {
                 $object->paths->{$key} = PathItem::parse($pathItem);
             }
         }
-        return $object->parseExtension($arr);
+        $object = $object->parseExtension($arr);
+        assert($object instanceof self);
+        return $object;
     }
 }

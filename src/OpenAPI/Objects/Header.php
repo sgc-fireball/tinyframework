@@ -2,6 +2,8 @@
 
 namespace TinyFramework\OpenAPI\Objects;
 
+use stdClass;
+use TinyFramework\OpenAPI\ParameterIn;
 use TinyFramework\OpenAPI\Types\AbstractType;
 
 /**
@@ -60,7 +62,9 @@ class Header extends Parameter
             }
         }
 
-        return $object->parseExtension($arr);
+        $object = $object->parseExtension($arr);
+        assert($object instanceof self);
+        return $object;
     }
 
 }

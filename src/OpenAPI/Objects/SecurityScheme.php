@@ -71,7 +71,9 @@ class SecurityScheme extends AbstractObject
         if ($object->type === SecuritySchemeType::OPEN_ID_CONNECT) {
             $object->openIdConnectUrl = $arr['openIdConnectUrl'];
         }
-        return $object->parseExtension($arr);
+        $object = $object->parseExtension($arr);
+        assert($object instanceof self);
+        return $object;
     }
 
 }

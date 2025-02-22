@@ -211,9 +211,7 @@ class BaseModel implements JsonSerializable, ArrayAccess
                     );
                 }
             } elseif (in_array($type, ['date', 'datetime', 'timestamp'])) {
-                if (is_null($value)) {
-                    // do nothing - null is fine!
-                } elseif (is_numeric($value)) {
+                if (is_numeric($value)) {
                     $value = DateTime::createFromFormat('u', $value);
                 } elseif (is_string($value) && $value) {
                     if ($time = strtotime($value)) {
@@ -351,7 +349,8 @@ class BaseModel implements JsonSerializable, ArrayAccess
         if (\array_key_exists('id', $this->attributes) && !empty($this->attributes['id'])) {
             $data = $this::query()
                 ->where('id', '=', $this->attributes['id'])
-                ?->first()?->attributes ?? [];
+                ->first()
+                ->attributes ?? [];
             $this->relations = $this->pivot = [];
             $this->attributes = $this->originals = $data;
         }

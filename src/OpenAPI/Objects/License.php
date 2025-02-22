@@ -30,7 +30,9 @@ class License extends AbstractObject
             }
             $object->url = $arr['url'];
         }
-        return $object->parseExtension($arr);
+        $object = $object->parseExtension($arr);
+        assert($object instanceof self);
+        return $object;
     }
 
 }

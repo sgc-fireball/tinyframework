@@ -184,7 +184,7 @@ class DateTime extends \DateTime implements JsonSerializable, Stringable, DateTi
     public function endOfMonth(): self
     {
         $this->setTime(23, 59, 59, 999999);
-        $this->setDate($this->getYear(), $this->getMonth(), $this->format('t'));
+        $this->setDate($this->getYear(), $this->getMonth(), (int)$this->format('t'));
         return $this;
     }
 
@@ -520,7 +520,7 @@ class DateTime extends \DateTime implements JsonSerializable, Stringable, DateTi
 
     public function toTimestamp(): int
     {
-        return $this->format('U');
+        return (int)$this->format('U');
     }
 
     public function toFloatTimestamp(): float
@@ -573,7 +573,7 @@ class DateTime extends \DateTime implements JsonSerializable, Stringable, DateTi
         return $dateTimeA->toTimestamp() <= $this->toTimestamp() && $this->toTimestamp() <= $dateTimeB->toTimestamp();
     }
 
-    public function min(DateTime $dateTime): static
+    public function min(DateTime $dateTime): self
     {
         return $this->toTimestamp() < $dateTime->toTimestamp() ? $this->clone() : $dateTime->clone();
     }
@@ -645,10 +645,10 @@ class DateTime extends \DateTime implements JsonSerializable, Stringable, DateTi
         return clone $this;
     }
 
-    public function diff(DateTimeInterface $targetObject, bool $absolute = false): DateInterval|false
+    #[\ReturnTypeWillChange] public function diff(DateTimeInterface $targetObject, bool $absolute = false): DateInterval|false
     {
         $di = parent::diff($targetObject, $absolute);
-        if ($di === false) {
+        if (!$di) {
             return false;
         }
         return DateInterval::wrap($di);
@@ -687,7 +687,7 @@ class DateTime extends \DateTime implements JsonSerializable, Stringable, DateTi
         return !$absolute && $this->lessThan($dateTime) ? -1 * $result : $result;
     }
 
-    public function diffInDays(DateTime $dateTime, bool $absolute = false): int
+    public function diffInDays(DateTime $dateTime, bool $absolute = false): float|int
     {
         $diff = $this->toTimestamp() - $dateTime->toTimestamp();
         $result = abs(round($diff / 86400));
@@ -722,11 +722,11 @@ class DateTime extends \DateTime implements JsonSerializable, Stringable, DateTi
             $count++;
             $result = trim(sprintf('%s %dy', $result, $diff->y));
         }
-        if ($diff->m > 1 && $count < 3) {
+        if ($diff->m > 1) {
             $count++;
             $result = trim(sprintf('%s %dm', $result, $diff->m));
         }
-        if ($diff->d > 1 && $count < 3) {
+        if ($diff->d > 1) {
             $count++;
             $result = trim(sprintf('%s %dd', $result, $diff->d));
         }

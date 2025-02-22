@@ -11,7 +11,7 @@ use TinyFramework\OpenAPI\Types\AbstractType;
 class Components extends AbstractObject
 {
 
-    /** @var null|stdClass<Schema> */
+    /** @var null|stdClass<AbstractType> */
     public ?object $schemas = null;
 
     /** @var null|stdClass<Response|Reference> */
@@ -144,7 +144,9 @@ class Components extends AbstractObject
                 }
             }
         }
-        return $object->parseExtension($arr);
+        $object = $object->parseExtension($arr);
+        assert($object instanceof self);
+        return $object;
     }
 
 }

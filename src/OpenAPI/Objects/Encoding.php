@@ -46,6 +46,8 @@ class Encoding extends AbstractObject
         if (array_key_exists('allowReserved', $arr)) {
             $object->allowReserved = (bool)$arr['allowReserved'];
         }
-        return $object->parseExtension($arr);
+        $object = $object->parseExtension($arr);
+        assert($object instanceof self);
+        return $object;
     }
 }

@@ -51,7 +51,9 @@ class Response extends AbstractObject
                 }
             }
         }
-        return $object->parseExtension($arr);
+        $object = $object->parseExtension($arr);
+        assert($object instanceof self);
+        return $object;
     }
 
 }

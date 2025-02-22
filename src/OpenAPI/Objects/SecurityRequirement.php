@@ -23,7 +23,9 @@ class SecurityRequirement extends AbstractObject
             $object->handler->{$handler} = array_map(fn(string $scope) => (string)$scope, $scopes);
             $object->_securitySchema->{$handler} = null;
         }
-        return $object->parseExtension($arr);
+        $object = $object->parseExtension($arr);
+        assert($object instanceof self);
+        return $object;
     }
 
     public function setSecuritySchemaForHandler(string $handler, SecurityScheme $securitySchema): self

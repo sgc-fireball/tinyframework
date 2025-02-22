@@ -56,6 +56,8 @@ class IntegerType extends AbstractType
         if (array_key_exists('xml', $arr)) {
             $object->xml = XMLSettings::parse($arr['xml']);
         }
-        return $object->parseExtension($arr);
+        $object = $object->parseExtension($arr);
+        assert($object instanceof self);
+        return $object;
     }
 }

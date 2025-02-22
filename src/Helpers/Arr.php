@@ -347,6 +347,11 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         return $this;
     }
 
+    /**
+     * @param array $array2
+     * @param array ...$arrays
+     * @return $this
+     */
     public function intersectUAssoc(array $array2, ...$arrays): static
     {
         \array_unshift($arrays, $array2);
@@ -358,6 +363,11 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         return $this;
     }
 
+    /**
+     * @param array $array2
+     * @param array ...$arrays
+     * @return $this
+     */
     public function intersectByKeys(array $array2, array ...$arrays): static
     {
         \array_unshift($arrays, $array2);
@@ -366,6 +376,11 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         return $this;
     }
 
+    /**
+     * @param array $array2
+     * @param array ...$arrays
+     * @return $this
+     */
     public function intersectUKey(array $array2, ...$arrays): static
     {
         \array_unshift($arrays, $array2);
@@ -377,6 +392,11 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         return $this;
     }
 
+    /**
+     * @param array $array2
+     * @param array ...$arrays
+     * @return $this
+     */
     public function intersect(array $array2, array ...$arrays): static
     {
         \array_unshift($arrays, $array2);
@@ -637,10 +657,10 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         $array = $this->items;
         \sort($array);
         $length = \count($array);
-        $middle = $length / 2.0;
+        $middle = intval($length / 2.0);
         return $length % 2 === 0
-            ? ($array[\floor($middle) - 1] + $array[\ceil($middle)]) / 2
-            : $array[\intval($middle)];
+            ? ($array[$middle + 1] + $array[$middle]) / 2
+            : $array[$middle];
     }
 
     public function uDiffAssoc(array $array2, array|callable ...$arrays): static
@@ -679,6 +699,11 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         return $this;
     }
 
+    /**
+     * @param array $array2
+     * @param array ...$arrays
+     * @return $this
+     */
     public function uIntersectAssoc(array $array2, ...$arrays): static
     {
         \array_unshift($arrays, $array2);
@@ -690,6 +715,11 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         return $this;
     }
 
+    /**
+     * @param array $array2
+     * @param array ...$arrays
+     * @return $this
+     */
     public function uIntersectUAssoc(array $array2, ...$arrays): static
     {
         \array_unshift($arrays, $array2);
@@ -704,6 +734,11 @@ class Arr implements \ArrayAccess, \Iterator, \Countable
         return $this;
     }
 
+    /**
+     * @param array $array2
+     * @param array ...$arrays
+     * @return $this
+     */
     public function uIntersect(array $array2, ...$arrays): static
     {
         \array_unshift($arrays, $array2);

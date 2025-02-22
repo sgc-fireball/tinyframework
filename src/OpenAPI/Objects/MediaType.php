@@ -2,6 +2,7 @@
 
 namespace TinyFramework\OpenAPI\Objects;
 
+use stdClass;
 use TinyFramework\OpenAPI\Types\AbstractType;
 
 /**
@@ -31,7 +32,7 @@ class MediaType extends AbstractObject
             $object->example = $arr['example'];
         }
         if (array_key_exists('examples', $arr)) {
-            $object->examples = new \stdClass();
+            $object->examples = new stdClass();
             foreach ($arr['examples'] as $key => $example) {
                 if (array_key_exists('$ref', $example)) {
                     $object->examples->{$key} = Reference::parse($example);
@@ -41,12 +42,14 @@ class MediaType extends AbstractObject
             }
         }
         if (array_key_exists('encoding', $arr)) {
-            $object->encoding = new \stdClass();
+            $object->encoding = new stdClass();
             foreach ($arr['encoding'] as $key => $example) {
                 $object->encoding->{$key} = Encoding::parse($example);
             }
         }
-        return $object->parseExtension($arr);
+        $object = $object->parseExtension($arr);
+        assert($object instanceof self);
+        return $object;
     }
 
 }

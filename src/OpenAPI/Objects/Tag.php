@@ -25,6 +25,8 @@ class Tag extends AbstractObject
         if (array_key_exists('externalDocs', $arr)) {
             $object->externalDocs = ExternalDocumentation::parse($arr['externalDocs']);
         }
-        return $object->parseExtension($arr);
+        $object = $object->parseExtension($arr);
+        assert($object instanceof self);
+        return $object;
     }
 }

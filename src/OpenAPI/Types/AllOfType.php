@@ -33,6 +33,8 @@ class AllOfType extends AbstractType
         if (array_key_exists('discriminator', $arr)) {
             $object->discriminator = DiscriminatorSettings::parse($arr['discriminator']);
         }
-        return $object->parseExtension($arr);
+        $object = $object->parseExtension($arr);
+        assert($object instanceof self);
+        return $object;
     }
 }

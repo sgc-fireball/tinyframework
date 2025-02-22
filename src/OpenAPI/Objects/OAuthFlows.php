@@ -28,6 +28,8 @@ class OAuthFlows extends AbstractObject
         if (array_key_exists('authorizationCode', $arr)) {
             $object->authorizationCode = OAuthFlow::parse($arr['authorizationCode']);
         }
-        return $object->parseExtension($arr);
+        $object = $object->parseExtension($arr);
+        assert($object instanceof self);
+        return $object;
     }
 }
