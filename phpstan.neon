@@ -11,16 +11,16 @@ parameters:
     dynamicConstantNames:
         - SWOOLE
     ignoreErrors:
-        - identifier: missingType.iterableValue
-        - identifier: missingType.generics
         - '#has invalid type Composer\\Script\\Event\.#'
-        - '#Call to an undefined method AMQPConnection::setConnectionName#'
+        - '#Result of && is always false#'
+        - '#Right side of && is always false#'
+        - '#Left side of && is always false#'
+        - '#If condition is always true#'
         - '#Used function Swoole\\.*#'
-        - '#with no value type specified in iterable type array#'
-        - '#return type has no value type specified in iterable type array#'
-        - '#return type has no value type specified in iterable type iterable#'
-        - '#type has no value type specified in iterable type array#'
-        - '#has no value type specified in iterable type array#'
+        -
+            identifier: missingType.iterableValue
+        -
+            identifier: missingType.generics
         -
             message: '#Unreachable statement - code above always terminates#'
             path: src/Http/SwooleServer.php

@@ -50,16 +50,17 @@ class TinyframeworkSystemdInstallCommand extends CommandAwesome
         $name = Str::factory((string)$input->option('name')->value())->slug()->toString();
         $path = '/etc/systemd/system/' . $name . '.service';
 
-        $this->output->write('[<green>....</green>] Try to install as: ' . $name);
+        $this->output->write('[<green>....</green>] Write: ' . $path);
         if (!file_put_contents($path, $this->getSystemdServiceFile($input))) {
             $this->output->write("\r[<red>FAIL</red>]\n");
             return 1;
         }
         $this->output->write("\r[<green>DONE</green>]\n");
 
-        shell_exec('systemctl daemon-reload');
-        shell_exec('systemctl enable ' . escapeshellarg($name));
-        shell_exec('systemctl restart ' . escapeshellarg($name));
+        $this->execute('systemctl daemon-reload');
+        $this->execute('systemctl enable ' . escapeshellarg($name));
+        $this->execute('systemctl restart ' . escapeshellarg($name));
+
         return 0;
     }
 
@@ -77,19 +78,33 @@ class TinyframeworkSystemdInstallCommand extends CommandAwesome
         $content[] = 'After=network.target';
         $content[] = '';
         $content[] = '[Service]';
-        $content[] = 'Type=forking';
+        $content[] = 'Type=simple';
         $content[] = 'User=' . $user;
         $content[] = 'Group=' . $group;
         $content[] = 'Environment="SWOOLE_DAEMONIZE=1"';
         $content[] = 'WorkingDirectory=' . $root;
         $content[] = 'ExecStart=/usr/bin/php ' . $binary;
-        $content[] = 'ExecStop=/bin/kill -TERM \$MAINPID';
-        $content[] = 'ExecReload=/bin/kill -USR1 \$MAINPID';
+        $content[] = 'ExecStop=/bin/kill -s KILL $MAINPID';
+        $content[] = 'ExecReload=/bin/kill -s HUP $MAINPID';
+        $content[] = 'KillMode=control-group';
         $content[] = 'PIDFile=' . $root . '/storage/shell/swoole.pid';
         $content[] = '';
         $content[] = '[Install]';
-        $content[] = 'WantedBy = multi-user.target';
+        $content[] = 'WantedBy=multi-user.target';
         $content[] = '';
         return implode("\n", $content);
     }
+
+    private function execute(string $command, array &$output = null, int &$result_code = null): string|false
+    {
+        $this->output->write('[<green>....</green>] Run: ' . $command);
+        $result = exec($command, $output, $exitCode);
+        if ($exitCode) {
+            $this->output->write("\r[<red>FAIL</red>]\n");
+            return $result;
+        }
+        $this->output->write("\r[<green>DONE</green>]\n");
+        return $result;
+    }
+
 }

@@ -51,11 +51,13 @@ jobs:
         run: "docker exec tinyframework-php-1 vendor/bin/parallel-lint --no-colors --no-progress --show-deprecated src/ tests/"
 
       - name: "Run phpstan"
-        run: "docker exec tinyframework-php-1 vendor/bin/phpstan analyse"
+        run: "docker exec tinyframework-php-1 vendor/bin/phpstan analyse --error-format=md --no-progress > .reports/phpstan.md"
         continue-on-error: true
 
       - name: "Run phpunit"
-        run: "docker exec tinyframework-php-1 vendor/bin/phpunit"
+        env:
+          XDEBUG_MODE: coverage
+        run: "docker exec tinyframework-php-1 vendor/bin/phpunit --coverage-clover .reports/clover.xml"
         continue-on-error: true
 
       - name: "Run SBOM"
@@ -64,3 +66,16 @@ jobs:
 
       - name: "stop docker container"
         run: "docker compose stop"
+
+      - name: "Coverage Check"
+        uses: "ericsizemore/phpunit-coverage-check-action@1.0.0"
+        with:
+          clover_file: '.reports/clover.xml'
+          threshold: 100
+
+      - name: "Archive reports artifacts"
+        uses: "actions/upload-artifact@v4"
+        with:
+          name: "Reports"
+          path: |
+            .reports
