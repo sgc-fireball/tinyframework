@@ -25,6 +25,9 @@ jobs:
 
       - name: "Build Docker images"
         uses: "docker/bake-action@v6"
+        env:
+          _UID: $(id -u)
+          _GID: $(id -g)
         with:
           pull: true
           load: true
