@@ -87,7 +87,7 @@ class Response
 
     private array $headers = [
         'content-type' => 'text/html; charset=utf-8',
-        'cache-control' => 'no-store',
+        'cache-control' => 'private',
         #'content-security-policy' => "default-src 'none'; script-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self';",
         #'permissions-policy' => 'accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()',
         #'referrer-policy' => 'strict-origin-when-cross-origin',
