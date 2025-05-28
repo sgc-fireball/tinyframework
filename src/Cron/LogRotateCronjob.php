@@ -6,7 +6,7 @@ namespace TinyFramework\Cron;
 
 use TinyFramework\Logger\LogRotateInterface;
 
-class LogRotateCronjob extends CronjobAwesome implements CronjobInterface
+class LogRotateCronjob extends CronjobAwesome
 {
     public function expression(): string
     {

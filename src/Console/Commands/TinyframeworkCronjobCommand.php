@@ -14,7 +14,6 @@ use TinyFramework\Console\Input\Option;
 use TinyFramework\Console\Output\OutputInterface;
 use TinyFramework\Cron\CronExpression;
 use TinyFramework\Cron\CronjobAwesome;
-use TinyFramework\Cron\CronjobInterface;
 use TinyFramework\Logger\LoggerInterface;
 
 class TinyframeworkCronjobCommand extends CommandAwesome
@@ -47,13 +46,13 @@ class TinyframeworkCronjobCommand extends CommandAwesome
         $now = new DateTimeImmutable('now', $timezone);
         /** @var LoggerInterface $logger */
         $logger = $this->container->get('logger');
-        /** @var CronjobInterface[] $jobs */
+        /** @var CronjobAwesome[] $jobs */
         $jobs = array_filter(
             $this->container->tagged('cronjob'),
-            function (CronjobInterface|CronjobAwesome $job) use ($now) {
+            function (CronjobAwesome $job) use ($now) {
                 $cron = new CronExpression($job->expression());
                 $mustRun = $cron->isDue($now);
-                if ($mustRun && $job instanceof CronjobAwesome) {
+                if ($mustRun) {
                     $mustRun = !$job->skip();
                 }
                 /** @var int $verbosity */
@@ -118,7 +117,7 @@ class TinyframeworkCronjobCommand extends CommandAwesome
         $output->writeln('# m h  dom mon dow   command');
         $output->writeln('');
         foreach ($this->container->tagged('cronjob') as $job) {
-            assert($job instanceof CronjobInterface);
+            assert($job instanceof CronjobAwesome);
             $expression = new CronExpression($job->expression());
             $output->writeln($job->expression() . ' \\' . get_class($job));
             $output->writeln('# next run: ' . $expression->getNextRunDate()->format('Y-m-d H:i:s'));

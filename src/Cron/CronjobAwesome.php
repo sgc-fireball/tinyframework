@@ -2,7 +2,7 @@
 
 namespace TinyFramework\Cron;
 
-abstract class CronjobAwesome implements CronjobInterface
+abstract class CronjobAwesome
 {
 
     private array $start = [];
