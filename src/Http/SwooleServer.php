@@ -15,7 +15,7 @@ use TinyFramework\Console\Output\Output;
 use TinyFramework\Core\ConfigInterface;
 use TinyFramework\Core\ContainerInterface;
 use TinyFramework\Cron\CronExpression;
-use TinyFramework\Cron\CronjobInterface;
+use TinyFramework\Cron\CronjobAwesome;
 use TinyFramework\Event\EventDispatcherInterface;
 use TinyFramework\Queue\JobInterface;
 use TinyFramework\Queue\SwooleQueue;
@@ -401,10 +401,10 @@ class SwooleServer
         $timezone = new \DateTimeZone($this->container->get('config')->get('app.timezone', 'UTC'));
         $now = new \DateTimeImmutable('now', $timezone);
 
-        /** @var CronjobInterface[] $jobs */
+        /** @var CronjobAwesome[] $jobs */
         $jobs = array_filter(
             $this->container->tagged('cronjob'),
-            function (CronjobInterface $job) use ($now) {
+            function (CronjobAwesome $job) use ($now) {
                 $cron = new CronExpression($job->expression());
                 return $cron->isDue($now);
             }
