@@ -57,7 +57,7 @@ class AMQPQueue implements QueueInterface
 
     public function push(JobInterface $job): QueueInterface
     {
-        $exchange = $job->delay() ? $this->getExchangeDelyed() : $this->getExchange();
+        $exchange = $job->delay() ? $this->getExchangeDelayed() : $this->getExchange();
         $queue = $this->getQueue($job->queue(), $job->delay());
         $queue->declareQueue();
         $queue->bind($exchange->getName(), $queue->getName(), []);
@@ -145,7 +145,7 @@ class AMQPQueue implements QueueInterface
         return $this->exchange;
     }
 
-    private function getExchangeDelyed(): AMQPExchange
+    private function getExchangeDelayed(): AMQPExchange
     {
         if (!$this->exchangeDelayed) {
             $this->exchangeDelayed = new AMQPExchange($this->connect()->channel);
