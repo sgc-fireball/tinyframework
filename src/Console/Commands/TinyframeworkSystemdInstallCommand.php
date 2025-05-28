@@ -23,9 +23,9 @@ class TinyframeworkSystemdInstallCommand extends CommandAwesome
                 'BUGS' => 'https://github.com/sgc-fireball/tinyframework/issues',
                 'SEE ALSO' => 'Full documentation <https://github.com/sgc-fireball/tinyframework/blob/master/docs/index.md>',
             ])
-            ->option(Option::create('name', 'n', Option::VALUE_REQUIRED, 'The systemd service name.', 'tinyframework'))
-            ->option(Option::create('user', 'u', Option::VALUE_REQUIRED, 'The systemd service username.', 'www-data'))
-            ->option(Option::create('group', 'g', Option::VALUE_REQUIRED, 'The systemd service group.', 'www-data'));
+            ->option(Option::create('name', 'n', Option::VALUE_REQUIRED, 'The service name.', 'tinyframework'))
+            ->option(Option::create('user', 'u', Option::VALUE_REQUIRED, 'The service username.', 'www-data'))
+            ->option(Option::create('group', 'g', Option::VALUE_REQUIRED, 'The service group.', 'www-data'));
     }
 
     public function run(InputInterface $input, OutputInterface $output): int
