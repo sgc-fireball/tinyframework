@@ -51,9 +51,7 @@ class PathItem extends AbstractObject
                 return Parameter::parse($parameter);
             }, $arr['parameters']);
         }
-        $object = $object->parseExtension($arr);
-        assert($object instanceof self);
-        return $object;
+        return $object->parseExtension($arr);
     }
 
 }

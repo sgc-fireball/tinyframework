@@ -97,9 +97,7 @@ class Operation extends AbstractObject
         if (array_key_exists('servers', $arr)) {
             $object->servers = array_map(fn(array $server) => Server::parse($server), $arr['servers']);
         }
-        $object = $object->parseExtension($arr);
-        assert($object instanceof self);
-        return $object;
+        return $object->parseExtension($arr);
     }
 
 }

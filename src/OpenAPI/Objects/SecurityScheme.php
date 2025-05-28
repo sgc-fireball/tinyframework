@@ -24,9 +24,14 @@ class SecurityScheme extends AbstractObject
     public static function parse(array $arr): SecurityScheme
     {
         $object = new SecurityScheme();
-        if (!array_key_exists('type', $arr) || !SecuritySchemeType::from($arr['type'])) {
+        if (!array_key_exists('type', $arr) ) {
             throw new \InvalidArgumentException(
-                'SecurityScheme::type must be defined and one of:: apiKey, http, mutualTLS, oauth2, openIdConnect'
+                'SecurityScheme::type must be defined!'
+            );
+        }
+        if (!SecuritySchemeType::from($arr['type'])) {
+            throw new \InvalidArgumentException(
+                'SecurityScheme::type must one of:: apiKey, http, mutualTLS, oauth2, openIdConnect'
             );
         }
         $object->type = SecuritySchemeType::from($arr['type']);
@@ -71,9 +76,7 @@ class SecurityScheme extends AbstractObject
         if ($object->type === SecuritySchemeType::OPEN_ID_CONNECT) {
             $object->openIdConnectUrl = $arr['openIdConnectUrl'];
         }
-        $object = $object->parseExtension($arr);
-        assert($object instanceof self);
-        return $object;
+        return $object->parseExtension($arr);
     }
 
 }

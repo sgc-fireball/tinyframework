@@ -35,9 +35,7 @@ class Server extends AbstractObject
                 $object->variables->{$key} = ServerVariable::parse($variable);
             }
         }
-        $object = $object->parseExtension($arr);
-        assert($object instanceof self);
-        return $object;
+        return $object->parseExtension($arr);
     }
 
 }

@@ -47,9 +47,7 @@ class MediaType extends AbstractObject
                 $object->encoding->{$key} = Encoding::parse($example);
             }
         }
-        $object = $object->parseExtension($arr);
-        assert($object instanceof self);
-        return $object;
+        return $object->parseExtension($arr);
     }
 
 }

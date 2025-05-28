@@ -56,8 +56,6 @@ class NumberType extends AbstractType
         if (array_key_exists('xml', $arr)) {
             $object->xml = XMLSettings::parse($arr['xml']);
         }
-        $object = $object->parseExtension($arr);
-        assert($object instanceof self);
-        return $object;
+        return $object->parseExtension($arr);
     }
 }

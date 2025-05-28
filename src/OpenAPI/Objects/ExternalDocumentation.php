@@ -18,9 +18,7 @@ class ExternalDocumentation extends AbstractObject
         if (array_key_exists('description', $arr)) {
             $object->description = $arr['description'];
         }
-        $object = $object->parseExtension($arr);
-        assert($object instanceof self);
-        return $object;
+        return $object->parseExtension($arr);
     }
 
 }

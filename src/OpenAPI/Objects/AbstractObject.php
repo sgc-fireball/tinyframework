@@ -9,7 +9,7 @@ abstract class AbstractObject
 
     abstract public static function parse(array $arr): AbstractObject;
 
-    protected function parseExtension(array $arr): self
+    protected function parseExtension(array $arr): static
     {
         foreach ($arr as $key => $value) {
             if (!str_starts_with($key, 'x-') || str_starts_with($key, 'x-oai') || str_starts_with($key, 'x-oas')) {

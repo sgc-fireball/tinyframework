@@ -47,8 +47,6 @@ class Link extends AbstractObject
         if (array_key_exists('server', $arr)) {
             $object->server = Server::parse($arr['server']);
         }
-        $object = $object->parseExtension($arr);
-        assert($object instanceof self);
-        return $object;
+        return $object->parseExtension($arr);
     }
 }

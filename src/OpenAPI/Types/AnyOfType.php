@@ -31,8 +31,6 @@ class AnyOfType extends AbstractType
         if (array_key_exists('discriminator', $arr)) {
             $object->discriminator = DiscriminatorSettings::parse($arr['discriminator']);
         }
-        $object = $object->parseExtension($arr);
-        assert($object instanceof self);
-        return $object;
+        return $object->parseExtension($arr);
     }
 }

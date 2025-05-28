@@ -50,13 +50,13 @@ class OpenAPIValidator
             }
         }
 
-        /**
-         * @var string $path
-         * @var PathItem $pathItem
-         */
         $realPath = $request->attribute('__openapi_realpath') ?? $realPath;
         if ($this->openAPI->paths) {
             $method = strtolower($request->method());
+            /**
+             * @var string $path
+             * @var PathItem $pathItem
+             */
             foreach ($this->openAPI->paths as $path => $pathItem) {
                 $regex = preg_replace_callback('(\{([^}]+)})', function (array $group) {
                     return '(?P<' . $group[1] . '>[^\/]+)';
@@ -172,7 +172,6 @@ class OpenAPIValidator
             ParameterIn::HEADER => $httpRequest->header($parameter->name)[0] ?? null,
             ParameterIn::PATH => ($httpRequest->attribute('__openapi_parameters') ?? [])[$parameter->name] ?? null,
             ParameterIn::COOKIE => $httpRequest->cookie($parameter->name) ?? null,
-            default => throw new OpenAPIException('Unsupported Parameter::in type.', 500)
         };
         if ($parameter->required && $value === null) {
             throw new OpenAPIException('Missing value of ' . $parameter->name . ' in ' . $parameter->in->value, 400);
@@ -295,6 +294,9 @@ class OpenAPIValidator
         }
     }
 
+    /**
+     * @TODO
+     */
     private function validateSecuritySchemeOAuth2Request(
         SecurityScheme $securityScheme,
         HttpRequestInterface $httpRequest

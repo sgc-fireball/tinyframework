@@ -31,8 +31,6 @@ class XMLSettings extends AbstractObject
         if (array_key_exists('wrapped', $arr)) {
             $object->wrapped = (bool)$arr['wrapped'];
         }
-        $object = $object->parseExtension($arr);
-        assert($object instanceof self);
-        return $object;
+        return $object->parseExtension($arr);
     }
 }

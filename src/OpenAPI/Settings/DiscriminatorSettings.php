@@ -25,8 +25,6 @@ class DiscriminatorSettings extends AbstractObject
                 $object->mapping->{$key} = (string)$mapping;
             }
         }
-        $object = $object->parseExtension($arr);
-        assert($object instanceof self);
-        return $object;
+        return $object->parseExtension($arr);
     }
 }

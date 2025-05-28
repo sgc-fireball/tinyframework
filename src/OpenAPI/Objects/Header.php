@@ -62,9 +62,7 @@ class Header extends Parameter
             }
         }
 
-        $object = $object->parseExtension($arr);
-        assert($object instanceof self);
-        return $object;
+        return $object->parseExtension($arr);
     }
 
 }

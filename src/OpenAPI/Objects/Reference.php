@@ -35,9 +35,7 @@ class Reference extends AbstractObject
         if (array_key_exists('description', $arr)) {
             $object->description = $arr['description'];
         }
-        $object = $object->parseExtension($arr);
-        assert($object instanceof self);
-        return $object;
+        return $object->parseExtension($arr);
     }
 
     public function setReference(AbstractObject $object): self
@@ -59,6 +57,7 @@ class Reference extends AbstractObject
         if (!($this->_referenceTarget instanceof AbstractType)) {
             throw new OpenAPIException('Reference is not an instance of AbstractType.', 503);
         }
+        // @TODO was it really correct?
         $this->_referenceTarget->validate($value);
     }
 

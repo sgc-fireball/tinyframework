@@ -128,7 +128,7 @@ class OpenAPI extends AbstractObject
 
     protected function resolveReferences(): self
     {
-        $resolveReferences = function (OpenAPI $openAPI, string $paths): ?AbstractObject {
+        $resolveReferences = function (OpenAPI $openAPI, string $paths): AbstractObject {
             $steps = substr($paths, 2);
             $steps = explode('/', $steps);
             $result = $openAPI;
@@ -165,8 +165,9 @@ class OpenAPI extends AbstractObject
     protected function resolveSecuritySchema(): self
     {
         $resolveSecuritySchema = function (OpenAPI $openAPI, string $name): ?SecurityScheme {
-            $result = $openAPI->components?->securitySchemes?->{$name} ?? null;
+            $result = $openAPI->components->securitySchemes->{$name} ?? null;
             if ($result instanceof Reference) {
+                // @TODO was it really correct?
                 return $result->ref;
             }
             return $result;
